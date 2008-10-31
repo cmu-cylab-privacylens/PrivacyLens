@@ -6,7 +6,6 @@
   <packaging>jar</packaging>
   <version>2.2</version>
   <name>uApprove</name>
-  <url>http://www.switch.ch/aai/uApprove</url>
   
   <repositories>
   	<repository>
@@ -21,9 +20,58 @@
   </repositories>
   
   <dependencies>  
-    <!-- Compile dependencies -->
+    <!-- Compile dependencies (logback, sl4j)-->
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>0.9.9</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.4.3</version>
+    </dependency>
+    <dependency>
+      <groupId>bouncycastle</groupId>
+      <artifactId>bcprov-jdk14</artifactId>
+      <version>138</version>
+    </dependency>
+
+    <dependency>
+      <groupId>edu.vt.middleware</groupId>
+      <artifactId>crypt</artifactId>
+      <version>1.5</version>
+    </dependency>
+
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>5.1.6</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.json</groupId>
+        <artifactId>json-simple</artifactId>
+      <version>1.0</version>
+    </dependency> 
+ 
     <!-- Provided dependencies -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>2.4</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>edu.internet2.middleware</groupId>
+      <artifactId>shibboleth-identityprovider</artifactId>
+      <version>2.1.0</version>
+       <scope>provided</scope>
+    </dependency>
+    
     <!-- Runtime dependencies -->
+    
     <!-- Test dependencies -->
     <dependency>
       <groupId>junit</groupId>
@@ -33,11 +81,90 @@
     </dependency>
   
    </dependencies>
-  
 
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+					<debug>true</debug>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<descriptors>
+						<descriptor>src/main/assembly/bin.xml</descriptor>
+						<descriptor>src/main/assembly/src.xml</descriptor>
+					</descriptors>
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-assembly</id>
+						<phase>package</phase>
+						<goals>
+							<goal>attached</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<configuration>
+					<links>
+						<link>http://java.sun.com/j2se/1.5.0/docs/api/</link>
+					</links>
+					<quiet>true</quiet>
+					<author>false</author>
+					<version>true</version>
+					<doctitle>${project.name} ${project.version} Java
+						API.</doctitle>
+					<windowtitle>${project.name} ${project.version} Java
+						API.</windowtitle>
+					<overview>src/main/java/overview.html</overview>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
 
-  <build>
-    <finalName>uApprove</finalName>
-  </build>
+	<!-- Project Metadata -->
+	<url>http://www.switch.ch/aai/uApprove</url>
+	<inceptionYear>2008</inceptionYear>
+	<licenses>
+		<license>
+			<name>BSD</name>
+			<url>http://www.opensource.org/licenses/bsd-license.php</url>
+			<distribution>package</distribution>
+		</license>
+	</licenses>
+
+	<organization>
+		<name>SWITCH</name>
+		<url>http://www.switch.ch/</url>
+	</organization>
+
+	<developers>
+		<developer>
+			<id>reusser</id>
+			<name>Halm Reusser</name>
+			<organization>SWITCH</organization>
+			<organizationUrl>http://www.switch.ch/</organizationUrl>
+			<roles>
+				<role>developer</role>
+				<role>documentation</role>
+			</roles>
+			<timezone>+1</timezone>
+		</developer>
+	</developers>
+    
 </project>

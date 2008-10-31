@@ -1,0 +1,58 @@
+  #terms
+  {
+  border-style:solid;
+  border-color:#969696;
+  border-width: 1px;
+  padding: 6px;
+  width:650px;
+  height:500px;
+  }
+
+
+  #idcardTitle
+  {
+    color: white;
+    background-color: #203781;
+    font-size: 22px;
+    padding: 4;
+  }
+
+  #card 
+  {
+    border-color: black;
+    border-width: 1px;
+    border-style: solid;
+  }
+
+  #noshadow-tr
+  {
+    width: 4px;
+    height: 4px;
+    background-color: white;
+  }
+  
+  #noshadow-bl
+  {
+    width: 4px;
+    height: 4px;
+    background-color: white;
+  }
+
+  .card-shadow
+  {
+    background-color: #aaaaaa;
+  }
+
+  .attr-name
+  {
+    font-size: 13;
+    padding: 0 0 0 10px;
+    line-height: 20px;
+  }
+
+  .attr-value 
+  {
+    font-size: 13;
+    font-weight: bold;
+    line-height: 20px;
+  }
