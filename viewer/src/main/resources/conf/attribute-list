@@ -1,0 +1,46 @@
+#
+#---------------------------------------------------------
+#
+# File: attribute-list
+#
+# Purpose: File to define the attribute ordering in uApprove
+#
+# All released attributes will be shown in the given order.
+# If attributes are released, which are not in the list, these will
+# be shown at the end of uApprove.
+#
+# You can also hide attributes from uApprove.
+# Example: !transientId
+# -----------------------------------------------------------
+
+surname
+givenName
+mail
+uniqueID
+matriculationNumber
+telephoneNumber
+postalAddress
+uid
+employeeNumber
+dateOfBirth
+gender
+preferredLanguage
+homePhone
+homePostalAddress
+mobile
+homeOrganization
+homeOrganizationType
+affiliation
+studyBranch1
+studyBranch2
+studyBranch3
+studyLevel
+staffCategory
+orgDN
+orgUnitDN
+entitlement
+
+# transientId and persistenId are not shown, cause it makes no sense
+# for the end user
+!persistentId
+!transientId

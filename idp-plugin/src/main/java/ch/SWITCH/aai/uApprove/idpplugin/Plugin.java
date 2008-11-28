@@ -35,7 +35,7 @@ import edu.vt.middleware.crypt.CryptException;
 import edu.vt.middleware.crypt.symmetric.AES;
 
 /**
- * Class AprFilter:
+ * Class Plugin:
  * 
  * Copyright (c) 2005-2006 SWITCH - The Swiss Education & Research Network
  */
@@ -45,15 +45,15 @@ public class Plugin implements Filter {
   
   private static final String CONTIDP_REASON_MONITORING_ONLY = "Monitoring only mode";
   private static final String CONTIDP_REASON_BLACKLIST = "Provider is in blacklist";
-  private static final String CONTIDP_REASON_GLOBAL_APPROVAL = "User has given global attribute release approval";
-  private static final String CONTIDP_REASON_PROVIDER_APPROVAL = "User has given attribute release approval to this provider";
+  private static final String CONTIDP_REASON_GLOBAL_APPROVAL = "User has given global attribute release consent";
+  private static final String CONTIDP_REASON_PROVIDER_APPROVAL = "User has given attribute release consent to this provider";
   private static final String CONTIDP_REASON_NOATTRIBUTES = "No attributes will be released to this provider";
 
-  private static final String CONTAV_REASON_FIRSTVISIT = "User is unknown, seems to be the first visit";
-  private static final String CONTAV_REASON_EDITAPPROVAL = "User want to edit the attribute release approval";
-  private static final String CONTAV_REASON_TERMSCHANGED = "The terms of use has changed";
-  private static final String CONTAV_REASON_NEWPROVIDER = "First access from the user to the provider";
-  private static final String CONTAV_REASON_ATTRCHANGED = "The set set of the attribute, which will be released to this provider has changed";
+  private static final String CONTV_REASON_FIRSTVISIT = "User is unknown, seems to be the first visit";
+  private static final String CONTV_REASON_RESETAPPROVAL = "User wants to reset the attribute release consent";
+  private static final String CONTV_REASON_TERMSCHANGED = "The terms of use has changed";
+  private static final String CONTV_REASON_NEWPROVIDER = "First access from the user to the provider";
+  private static final String CONTV_REASON_ATTRCHANGED = "The set set of the attribute, which will be released to this provider has changed";
 
   private static Logger LOG = LoggerFactory.getLogger(Plugin.class);
 
