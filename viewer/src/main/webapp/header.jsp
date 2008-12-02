@@ -5,7 +5,7 @@
 <head>
 <title>Attribute Policy Viewer</title>
 <link rel="stylesheet" type="text/css" href="css/aai.css">
-<link rel="stylesheet" type="text/css" href="css/arpviewer.css">
+<link rel="stylesheet" type="text/css" href="css/uApprove.css">
 </head>
 
 

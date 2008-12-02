@@ -13,7 +13,7 @@
 #    the regular expression syntax. There should only
 #    be one item per line.
 # 3. You must uncomment the corresponding item in 
-#    the ArpViewer properties file in order to activate it.
+#    the Viewer properties file in order to activate it.
 # 4. Comment lines start with a # or //
 #
 # Examples:

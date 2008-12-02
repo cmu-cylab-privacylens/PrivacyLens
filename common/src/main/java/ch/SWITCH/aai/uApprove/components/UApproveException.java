@@ -9,9 +9,9 @@ import javax.servlet.ServletException;
  * 
  * 
  * This class encapsulate every application exception caused by the processing
- * of ARP files.
+ * of uApprove files.
  * 
- * Adpated to new ArpViewer without modification. C.Witzig, 8.12.2005
+ * Adpated to uApprove without modification. C.Witzig, 8.12.2005
  * 
  */
 public class UApproveException extends ServletException {

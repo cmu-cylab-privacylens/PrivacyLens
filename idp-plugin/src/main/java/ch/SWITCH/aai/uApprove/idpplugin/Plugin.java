@@ -45,12 +45,12 @@ public class Plugin implements Filter {
   
   private static final String CONTIDP_REASON_MONITORING_ONLY = "Monitoring only mode";
   private static final String CONTIDP_REASON_BLACKLIST = "Provider is in blacklist";
-  private static final String CONTIDP_REASON_GLOBAL_APPROVAL = "User has given global attribute release consent";
+  private static final String CONTIDP_REASON_GLOBAL_CONSENT = "User has given global attribute release consent";
   private static final String CONTIDP_REASON_PROVIDER_APPROVAL = "User has given attribute release consent to this provider";
   private static final String CONTIDP_REASON_NOATTRIBUTES = "No attributes will be released to this provider";
 
   private static final String CONTV_REASON_FIRSTVISIT = "User is unknown, seems to be the first visit";
-  private static final String CONTV_REASON_RESETAPPROVAL = "User wants to reset the attribute release consent";
+  private static final String CONTV_REASON_RESETCONSENT = "User wants to reset the attribute release consent";
   private static final String CONTV_REASON_TERMSCHANGED = "The terms of use has changed";
   private static final String CONTV_REASON_NEWPROVIDER = "First access from the user to the provider";
   private static final String CONTV_REASON_ATTRCHANGED = "The set set of the attribute, which will be released to this provider has changed";
@@ -94,13 +94,13 @@ public class Plugin implements Filter {
     }
 
     if (ConfigurationManager.makeBoolean(ConfigurationManager
-        .getParam(ConfigurationManager.ARPFILTER_LOG_PROVIDER_ACCESS))) {
+        .getParam(ConfigurationManager.PLUGIN_LOG_PROVIDER_ACCESS))) {
       if (approvalGiven) {
-        storage.updateArpProviderAccess(username, providerId, globalARA);
+        storage.updateProviderAccess(username, providerId, globalARA);
         LOG
             .info("continue2IdP: provider access logged with attribute release approval");
       } else {
-        storage.updateArpProviderAccessWithNoARA(username, providerId);
+        storage.updateProviderAccessWithNoARA(username, providerId);
         LOG
             .info("continue2IdP: provider access logged without attribute release approval");
       }
@@ -110,30 +110,30 @@ public class Plugin implements Filter {
     return;
   }
 
-  // method to continue to the arpviewer web application (leave IdP)
-  private String post2ArpViewer(String reason, boolean editSettings,
-      String returnURL, String username, String providerId,
+  // method to continue to the uApprove web application (leave IdP)
+  private String post2Viewer(String reason, boolean resetConsent,
+      String returnURL, String principal, String entityId,
       Collection<Attribute> attributesReleased, HttpServletRequest request, LoginContext loginCtx) throws
       UApproveException, PassiveAuthenticationException {
-    LOG.info("continue2ArpViewer, reason: " + reason);
-    LOG.debug("continue2ArpViewer: returnURL=" + returnURL);
+    LOG.info("Continue to uApprove viewer, reason: " + reason);
+    LOG.debug(" returnURL=" + returnURL);
     LOG.debug("Saving LoginContext to HTTP Session for further use");
     request.getSession().setAttribute(LoginContext.LOGIN_CONTEXT_KEY, loginCtx);
     // action URL format:
-    // https://host.domain.com/arpviewer/Controller/?returnUrl=https://idp.domain.com/Authn/RemoteUser&editsettings=true;
+    // https://host.domain.com/uApprove/Controller/?returnUrl=https://idp.domain.com/Authn/RemoteUser&editsettings=true;
     
     boolean isPassive = loginCtx.isPassiveAuthRequired();
-    boolean isPassiveSupported = ConfigurationManager.makeBoolean(ConfigurationManager.getParam(ConfigurationManager.ARPFILTER_ISPASSIVE_SUPPORT));
+    boolean isPassiveSupported = ConfigurationManager.makeBoolean(ConfigurationManager.getParam(ConfigurationManager.PLUGIN_ISPASSIVE_SUPPORT));
     LOG.debug("isPassive={}, isPassiveSupport={}", isPassive, isPassiveSupported);
     
     if (isPassive && isPassiveSupported) {
-      throw new PassiveAuthenticationException("Passive authentication is required, Arpviewer has to support it, but can not, because user interaction is required");
+      throw new PassiveAuthenticationException("Passive authentication is required, uApprove does support it, but can not, because user interaction is required");
     }
     
     // action URL format:
-    // https://host.domain.com/arpviewer/Controller/?returnUrl=https://idp.domain.com/Authn/RemoteUser&editsettings=true;
+    // https://host.domain.com/uApprove/Controller/?returnUrl=https://idp.domain.com/Authn/RemoteUser&editsettings=true;
     String action = ConfigurationManager
-        .getParam(ConfigurationManager.ARPFILTER_ARPVIEWER_DEPLOYPATH);
+        .getParam(ConfigurationManager.PLUGIN_VIEWER_DEPLOYPATH);
     action += "?" + ConfigurationManager.HTTP_PARAM_RETURNURL + "=";
     try {
       action += URLEncoder.encode(returnURL, "utf-8");
@@ -141,9 +141,9 @@ public class Plugin implements Filter {
       LOG.error("Encoding returnURL",e);
       throw new UApproveException(e);
     }
-    action += editSettings ? "&" + ConfigurationManager.HTTP_PARAM_EDIT + "=true"
+    action += resetConsent ? "&" + ConfigurationManager.HTTP_PARAM_RESET + "=true"
         : "";
-    LOG.debug("continue2ArpViewer: action=" + action);
+    LOG.debug("  action=" + action);
 
     String postForm = "<html>"
         + "   <body onload=\"document.forms[0].submit()\">"
@@ -155,14 +155,14 @@ public class Plugin implements Filter {
         + action
         + "\" method=\"post\">"
         + "       <input type=\"hidden\" name=\""
-        + ConfigurationManager.HTTP_PARAM_USERNAME
+        + ConfigurationManager.HTTP_PARAM_PRINCIPAL
         + "\" value=\""
-        + encrypt(username)
+        + encrypt(principal)
         + "\"/>"
         + "       <input type=\"hidden\" name=\""
         + ConfigurationManager.HTTP_PARAM_PROVIDERID
         + "\" value=\""
-        + encrypt(providerId)
+        + encrypt(entityId)
         + "\"/>"
         + "       <input type=\"hidden\" name=\""
         + ConfigurationManager.HTTP_PARAM_ATTRIBUTES
@@ -173,18 +173,18 @@ public class Plugin implements Filter {
         + "       <noscript>"
         + "           <input type=\"submit\" value=\"Continue\"/>"
         + "       </noscript>" + "     </form>" + "   </body>" + " </html>";
-    LOG.trace("continue2ArpViewer: mode=arpViewer postForm={}", postForm);
+    LOG.trace("continue2Viewer: mode=Viewer postForm={}", postForm);
     return postForm;
   }
 
   public void init(FilterConfig filterConfig) {
     try {
-      // initialize arp configuration
+      // initialize configuration
       ConfigurationManager
           .initialize(filterConfig.getInitParameter(INITPAR_CONFIG));
       
-      // initialize arp terms
-      String terms = ConfigurationManager.getParam(ConfigurationManager.COMMON_ARP_TERMS);
+      // initialize terms
+      String terms = ConfigurationManager.getParam(ConfigurationManager.COMMON_TERMS);
       if (terms != null && !terms.equals("")) {
         try {
           TermsOfUseManager.initalize(terms);
@@ -197,9 +197,9 @@ public class Plugin implements Filter {
         LOG.info("No TermsOfUseManager gonna be used");
       }
 
-      // initialize arp blacklist
+      // initialize sp blacklist
       SPBlacklistManager.initialize(ConfigurationManager
-          .getParam(ConfigurationManager.ARPFILTER_ARP_BLACKLIST));
+          .getParam(ConfigurationManager.PLUGIN_SP_BLACKLIST));
 
       // get the attribute authority and RelyingPartyConfigurationManager from the shibboleth idp context
       
@@ -230,11 +230,11 @@ public class Plugin implements Filter {
       String accr = filterConfig.getInitParameter("authnContextClassRef");
       if (accr != null && !accr.equals("")) {
         authnContextClassRef = accr;
-        LOG.info("ArpFilter is only working on this specific authnContextClassRef {}", authnContextClassRef);
+        LOG.info("IdP plugin is only working on this specific authnContextClassRef {}", authnContextClassRef);
       }
       
     } catch (UApproveException e) {
-      LOG.error("Unable to initialize ArpFilter", e);
+      LOG.error("Unable to initialize uApprove IdP plugin", e);
       return;
     }
   }
@@ -247,13 +247,13 @@ public class Plugin implements Filter {
       ServletResponse servletResponse, FilterChain filterChain) throws ServletException, IOException {
     try {
       
-      LOG.debug("ArpFilter entry on path {}",((HttpServletRequest) servletRequest).getServletPath());
+      LOG.trace("IdP plugin entry on path {}",((HttpServletRequest) servletRequest).getServletPath());
       
       // only work on HTTPRequests / responses
       if (!(servletRequest instanceof HttpServletRequest)
           && !(servletResponse instanceof HttpServletResponse)) {
         filterChain.doFilter(servletRequest, servletResponse);
-        LOG.error("ArpFilter only work on HTTPRequests / responses");
+        LOG.error("IdP plugin only work on HTTPRequests / responses");
         return;
       }
       
@@ -262,8 +262,8 @@ public class Plugin implements Filter {
       LoginContext loginCtx = (LoginContext) httpServletRequest
           .getSession().getAttribute(LoginContext.LOGIN_CONTEXT_KEY);
       if (loginCtx != null) {
-        //loginCtx put here by arpfilter, remove it now
-        LOG.debug("Returning from ArpViewer? Transferring LoginContext back to Request Scope");
+        //loginCtx put here by IdP plugin, remove it now
+        LOG.debug("Returning from Viewer? Transferring LoginContext back to Request Scope");
         httpServletRequest.setAttribute(LoginContext.LOGIN_CONTEXT_KEY, loginCtx);
         httpServletRequest.getSession().removeAttribute(LoginContext.LOGIN_CONTEXT_KEY);
       } else {
@@ -288,7 +288,7 @@ public class Plugin implements Filter {
       // check if the filter only should work on a specified authnContextClassRef
       LOG.trace("LoginContext authenticationMethod{}",loginCtx.getAuthenticationMethod());
       if (authnContextClassRef != null && !authnContextClassRef.equals(loginCtx.getAuthenticationMethod())) {
-        LOG.debug("Skip ArpFilter on authN request with authentication method {}", loginCtx.getAuthenticationMethod());
+        LOG.debug("Skip IdP plugin on authN request with authentication method {}", loginCtx.getAuthenticationMethod());
         filterChain.doFilter(servletRequest, servletResponse);
         return;
       }
@@ -303,81 +303,81 @@ public class Plugin implements Filter {
       // set the content type of the response to html, needed by POST
       ((HttpServletResponse) servletResponse).setContentType("text/html");
 
-      // get the username
-      String username = null;
+      // get the principal
+      String principal = null;
       // try from IdP Session
       Session idpSession = (Session) ((HttpServletRequest) servletRequest).getAttribute(Session.HTTP_SESSION_BINDING_ATTRIBUTE);
       LOG.trace("IdP Session is {}", idpSession);
       if (idpSession != null) {
         LOG.trace("IdP Session principal name is {}", idpSession.getPrincipalName());
         LOG.trace("IdP Session subject is {}", idpSession.getSubject());
-        username = idpSession.getPrincipalName();
+        principal = idpSession.getPrincipalName();
       }
 
-      if (username==null || username.equals(""))
-         throw new UApproveException("No username found, assure authentication");
+      if (principal==null || principal.equals(""))
+         throw new UApproveException("No principal found, assure authentication");
       
-      LOG.debug("doFilter: username=" + username);
+      LOG.debug("doFilter: principal=" + principal);
       
-      // get the providerId from shib context
-      String providerId = loginCtx.getRelyingPartyId();
-      LOG.debug("doFilter: providerId={}", providerId);
+      // get the entityId from shib context
+      String entityId = loginCtx.getRelyingPartyId();
+      LOG.debug("doFilter: entityId={}", entityId);
       
-      LOG.info("ArpFilter touched for {} ==> {}", username, providerId);
+      LOG.info("uApprove touched for {} ==> {}", principal, entityId);
 
       // get the attributes released for user and provider id;
       Collection<Attribute> attributesReleased = AttributeDumper.getAttributes(
-          username, providerId);
+          principal, entityId);
 
       // get referer
       String referer = ((HttpServletRequest) servletRequest).getRequestURL()
           .toString();
-      LOG.debug("doFilter: referer=" + referer);
+      LOG.debug("doFilter: referer={}", referer);
 
       // getUserInfo
-      UserLogInfo userInfo = storage.getData(username);
+      UserLogInfo userInfo = storage.getData(principal);
       LOG.debug("userInfo=" + userInfo);
 
       // set global ARA flag
-      boolean globalARA = (userInfo != null && ConfigurationManager
+      boolean globalConsentGiven = (userInfo != null && ConfigurationManager
           .makeBoolean(userInfo.getGlobal()));
-      LOG.debug("globalARA=" + globalARA);
+      LOG.debug("globalConsentGiven=" + globalConsentGiven);
 
       // set edit settings flag
-      boolean editSettings = (((HttpServletRequest) servletRequest)
-          .getParameter(ConfigurationManager.HTTP_PARAM_EDIT) != null);
-      LOG.debug("editSettings=" + editSettings);
+      boolean resetConsent = (((HttpServletRequest) servletRequest)
+          .getParameter(ConfigurationManager.HTTP_PARAM_RESET) != null);
+      LOG.debug("resetConsent=" + resetConsent);
 
       // We have all the information, lets run the business logic
 
       // check monitoring mode only
       if (ConfigurationManager.makeBoolean(ConfigurationManager
-          .getParam(ConfigurationManager.ARPFILTER_MONITORING_ONLY))) {
+          .getParam(ConfigurationManager.PLUGIN_MONITORING_ONLY))) {
         continue2IdP(CONTIDP_REASON_MONITORING_ONLY, storage, userInfo,
-            username, providerId, globalARA, false);
+            principal, entityId, globalConsentGiven, false);
         filterChain.doFilter(servletRequest, servletResponse);
         return;
       }
 
       // providerId in black list
-      if (SPBlacklistManager.containsItem(providerId)) {
-        continue2IdP(CONTIDP_REASON_BLACKLIST, storage, userInfo, username,
-            providerId, globalARA, false);
+      if (SPBlacklistManager.containsItem(entityId)) {
+        continue2IdP(CONTIDP_REASON_BLACKLIST, storage, userInfo, principal,
+            entityId, globalConsentGiven, false);
         filterChain.doFilter(servletRequest, servletResponse);
         return;
       }
 
       if (userInfo == null) {
         ((HttpServletResponse) servletResponse).getWriter().write(
-            post2ArpViewer(CONTAV_REASON_FIRSTVISIT, editSettings, referer,
-                username, providerId, attributesReleased, httpServletRequest, loginCtx));
+            post2Viewer(CONTV_REASON_FIRSTVISIT, resetConsent, referer,
+                principal, entityId, attributesReleased, httpServletRequest, loginCtx));
         return;
       }
       // check if the user wants to reset the settings
-      if (editSettings) {
+      if (resetConsent) {
         ((HttpServletResponse) servletResponse).getWriter().write(
-            post2ArpViewer(CONTAV_REASON_EDITAPPROVAL, editSettings, referer,
-                username, providerId, attributesReleased, httpServletRequest, loginCtx));
+            post2Viewer(CONTV_REASON_RESETCONSENT, resetConsent, referer,
+                principal, entityId, attributesReleased, httpServletRequest, loginCtx));
         return;
       }
 
@@ -391,8 +391,8 @@ public class Plugin implements Filter {
         if (termsVersion != null
             && !userTermsVersion.equalsIgnoreCase(termsVersion)) {
           ((HttpServletResponse) servletResponse).getWriter().write(
-              post2ArpViewer(CONTAV_REASON_TERMSCHANGED, editSettings, referer,
-                  username, providerId, attributesReleased, httpServletRequest, loginCtx));
+              post2Viewer(CONTV_REASON_TERMSCHANGED, resetConsent, referer,
+                  principal, entityId, attributesReleased, httpServletRequest, loginCtx));
           return;
         }
       }
@@ -401,8 +401,8 @@ public class Plugin implements Filter {
       LOG.debug("doFilter: user has given global approval="
           + userInfo.getGlobal());
       if (ConfigurationManager.makeBoolean(userInfo.getGlobal())) {
-        continue2IdP(CONTIDP_REASON_GLOBAL_APPROVAL, storage, userInfo,
-            username, providerId, globalARA, true);
+        continue2IdP(CONTIDP_REASON_GLOBAL_CONSENT, storage, userInfo,
+            principal, entityId, globalConsentGiven, true);
         filterChain.doFilter(servletRequest, servletResponse);
         return;
       }
@@ -414,39 +414,39 @@ public class Plugin implements Filter {
 
       // check if there are any attributes
       if (attributes == null || attributes.equals("")) {
-        continue2IdP(CONTIDP_REASON_NOATTRIBUTES, storage, userInfo, username,
-            providerId, globalARA, false);
+        continue2IdP(CONTIDP_REASON_NOATTRIBUTES, storage, userInfo, principal,
+            entityId, globalConsentGiven, false);
         filterChain.doFilter(servletRequest, servletResponse);
         return;
       }
 
       // check if it is users first visited to this provider
-      LOG.debug("doFilter: providerId=" + providerId);
-      LOG.debug("doFilter: user contains providerId="
-          + userInfo.containsProviderId(providerId));
-      if (providerId != null && !userInfo.containsProviderId(providerId)) {
+      LOG.debug("doFilter: entityId=" + entityId);
+      LOG.debug("doFilter: user contains entityId="
+          + userInfo.containsProviderId(entityId));
+      if (entityId != null && !userInfo.containsProviderId(entityId)) {
         ((HttpServletResponse) servletResponse).getWriter().write(
-            post2ArpViewer(CONTAV_REASON_NEWPROVIDER, editSettings, referer,
-                username, providerId, attributesReleased, httpServletRequest, loginCtx));
+            post2Viewer(CONTV_REASON_NEWPROVIDER, resetConsent, referer,
+                principal, entityId, attributesReleased, httpServletRequest, loginCtx));
         return;
       }
 
       // check if the there are attributes, which not are already approved for
       // release
       LOG.debug("doFilter: attributes already approved="
-          + userInfo.getAttributesForProviderId(providerId));
+          + userInfo.getAttributesForProviderId(entityId));
       LOG.debug("doFilter: attributes to be released  =" + attributes);
-      if (!Attribute.checkCompleteArp(userInfo
-          .getAttributesForProviderId(providerId), attributes)) {
+      if (!Attribute.compareAttributeRelease(userInfo
+          .getAttributesForProviderId(entityId), attributes)) {
         ((HttpServletResponse) servletResponse).getWriter().write(
-            post2ArpViewer(CONTAV_REASON_ATTRCHANGED, editSettings, referer,
-                username, providerId, attributesReleased, httpServletRequest, loginCtx));
+            post2Viewer(CONTV_REASON_ATTRCHANGED, resetConsent, referer,
+                principal, entityId, attributesReleased, httpServletRequest, loginCtx));
         return;
       }
 
       // the user has already given attribute release approval to this provider
       continue2IdP(CONTIDP_REASON_PROVIDER_APPROVAL, storage, userInfo,
-          username, providerId, globalARA, true);
+          principal, entityId, globalConsentGiven, true);
       filterChain.doFilter(servletRequest, servletResponse);
       return;
 
@@ -465,10 +465,10 @@ public class Plugin implements Filter {
   }
   
   private void doError(HttpServletResponse response, UApproveException e) throws IOException {
-    LOG.error("Arpfilter error",e);
+    LOG.error("uApprove error",e);
     
     response.setContentType("text/html");
-    String htmlErrorMessage = "<span style=\"font:bold 16px monospace;color:red;\">ARPFILTER ERROR</span><br><br><br>";
+    String htmlErrorMessage = "<span style=\"font:bold 16px monospace;color:red;\">uApprove error</span><br><br><br>";
     htmlErrorMessage += "<span style=\"font:bold 12px monospace;color:black;\">Message:</span><br><br>";
     htmlErrorMessage += "<tt>" + e.getMessage() +"</tt><br><br><br><br>";
     htmlErrorMessage += "<tt>----------------------------------------------</tt><br>";

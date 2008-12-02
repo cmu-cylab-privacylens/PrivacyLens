@@ -41,7 +41,7 @@ public static String serializeAttributeIDs(Collection<Attribute> attributes) {
 }
 
 
-public static boolean checkCompleteArp(String approved, String current) {
+public static boolean compareAttributeRelease(String approved, String current) {
   StringTokenizer tokenizer = new StringTokenizer( current,ATTR_DELIMITER );
   while (tokenizer.hasMoreElements()) {
     String attr = (String) tokenizer.nextElement();

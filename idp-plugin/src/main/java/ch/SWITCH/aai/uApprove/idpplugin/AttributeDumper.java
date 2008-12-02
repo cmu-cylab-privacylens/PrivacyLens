@@ -32,8 +32,8 @@ public class AttributeDumper {
 
   // create the dumper instance and initialize it
   private AttributeDumper(SAML2AttributeAuthority saml2AA, SAMLMDRelyingPartyConfigurationManager relyingPartyConfigurationManager){
-    this.saml2AA = saml2AA;
-    this.relyingPartyConfigurationManager = relyingPartyConfigurationManager;
+    AttributeDumper.saml2AA = saml2AA;
+    AttributeDumper.relyingPartyConfigurationManager = relyingPartyConfigurationManager;
   }
 
   public synchronized static void initialize(SAML2AttributeAuthority saml2AA, SAMLMDRelyingPartyConfigurationManager relyingPartyConfigurationManager) {

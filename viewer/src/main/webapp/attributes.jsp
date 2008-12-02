@@ -1,7 +1,7 @@
 <%@ page import="
-  ch.SWITCH.aai.arpviewer.Controller,
-  ch.SWITCH.aai.common.Attribute,
-  ch.SWITCH.aai.arpviewer.AttributeList,
+  ch.SWITCH.aai.uApprove.viewer.Controller,
+  ch.SWITCH.aai.uApprove.components.Attribute,
+  ch.SWITCH.aai.uApprove.viewer.AttributeList,
   java.util.Map,
   java.util.List,
   java.util.Set,
@@ -20,7 +20,7 @@
   /*
  *------------------------------------------------------------------------------------
  *
- * arp.jsp:
+ * attributes.jsp:
  * ----------
  *
  * Copyright (c) 2005-2006 SWITCH - The Swiss Education & Research Network
@@ -32,7 +32,7 @@
  * 
  * 
  * Usage: This page is invoked from the servlet Controller of the package
- *        ch.SWITCH.aai.arpviewer. 
+ *        ch.SWITCH.aai.uApprove.viewer. 
  * 
  * Note: 
  * This JSP page uses the classes AttributeDumper and AttributeDescription to display the
@@ -57,8 +57,8 @@
 
 
 <%
-  String providerId = (String) session.getAttribute(Controller.SESKEY_PROVIDERID);
-  boolean globalArpDisabled = (Boolean) session.getAttribute(Controller.SESKEY_GLOBALARP_DISABLED);
+  String entityId = (String) session.getAttribute(Controller.SESKEY_ENTITYID);
+  boolean globalConsentPosibble = (Boolean) session.getAttribute(Controller.SESKEY_GLOBAL_CONSENT_POSSIBLE);
   Collection<Attribute> attributes = (Collection<Attribute>) session.getAttribute(Controller.SESKEY_ATTRIBUTES);
   Locale locale = (Locale) session.getAttribute(Controller.SESKEY_LOCALE);
  
@@ -66,7 +66,7 @@
 
  
   
-	ResourceBundle rb = ResourceBundle.getBundle( Controller.RB_ARP, locale);
+	ResourceBundle rb = ResourceBundle.getBundle( Controller.RB_ATTRIBUTES, locale);
 	    	out.println( "<p><strong>" + (String) rb.getString("title") + "</strong></p>" );
 
 
@@ -74,7 +74,7 @@
 	// --------------------- Attribute Release table  ------------------- 
 
 	String sTxtExpl = (String) rb.getString( "txt_explanation" );
-	sTxtExpl = sTxtExpl.replaceFirst( "\\?", "<tt>" + Controller.getResourceHost(providerId) + "</tt>" ); 
+	sTxtExpl = sTxtExpl.replaceFirst( "\\?", "<tt>" + Controller.getResourceHost(entityId) + "</tt>" ); 
 	out.println("<p>" + sTxtExpl + "</p>" );
 %>
 
@@ -160,15 +160,15 @@ for (Attribute attribute: attributes) {
 
 	<div class="login-field">
     	<form name="question" action="Controller">
-		<% if ( !globalArpDisabled ) { %>
+		<% if ( globalConsentPosibble ) { %>
 	       		<p>  
-        		<input type="checkbox" name="<%=Controller.GETPAR_ARP_AGREEGLOBAL%>" value="on"> <%=rb.getString( "txt_agree_global_arp" ) %>
+        		<input type="checkbox" name="<%=Controller.GETPAR_ATTRIBUTES_GLOBAL_CONSENT%>" value="on"> <%=rb.getString( "txt_agree_global_arp" ) %>
 			</p>
 		<% } %>
 		<div align="right">
 		<p>
-	       	<input type="submit" name="<%= Controller.GETPAR_ARP_DECLINE %>" value="<%=rb.getString( "label_decline") %>">
-        	<input type="submit" name="<%= Controller.GETPAR_ARP_CONFIRM %>" value="<%=rb.getString( "label_confirm") %>">
+	       	<input type="submit" name="<%= Controller.GETPAR_ATTRIBUTES_DECLINE %>" value="<%=rb.getString( "label_decline") %>">
+        	<input type="submit" name="<%= Controller.GETPAR_ATTRIBUTES_CONFIRM %>" value="<%=rb.getString( "label_confirm") %>">
     		</p>
 		</div>
     	</form>

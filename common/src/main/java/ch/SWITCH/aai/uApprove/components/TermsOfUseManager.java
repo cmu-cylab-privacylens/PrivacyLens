@@ -6,10 +6,10 @@
  * 
  * @author Patrik Schnellmann <schnellmann@switch.ch>
  * binding to xml document with the following structure:
- * <TermsOfUseManager>
+ * <TermsOfUse>
  *   <version>...</version>
  *   <termsText>...</termsText>
- * </TermsOfUseManager>
+ * </TermsOfUse>
  * both of these can either contain a PCDATA or a CDATA section
  * 
  */
@@ -39,7 +39,7 @@ import org.slf4j.Logger;
  * 
  */
 public class TermsOfUseManager {
-  private static TermsOfUseManager arpTerms;
+  private static TermsOfUseManager termsManager;
   private static String termsVersion;
   private static String termsText;
 
@@ -58,8 +58,8 @@ public class TermsOfUseManager {
    */
   public static synchronized void initalize(String filename)
       throws UApproveException, FileNotFoundException, ParserConfigurationException, SAXException, IOException {
-    if (arpTerms == null)
-      arpTerms = new TermsOfUseManager(filename);
+    if (termsManager == null)
+      termsManager = new TermsOfUseManager(filename);
   }
 
 
@@ -117,7 +117,7 @@ public class TermsOfUseManager {
 
     nodeList = doc.getChildNodes();
     if (nodeList != null) {
-      if (nodeList.item(0).getNodeName().equals("TermsOfUseManager")) {
+      if (nodeList.item(0).getNodeName().equals("TermsOfUse")) {
         nodeList = nodeList.item(0).getChildNodes();
         if (nodeList != null) {
           for (int i = 0, maxi = nodeList.getLength(); i < maxi; i++) {

@@ -9,7 +9,7 @@
   </appender>
 
   <appender class="ch.qos.logback.core.FileAppender" name="RootFileAppender">
-   <file>/path/to/log/arpviewer.log</file>
+   <file>/path/to/log/uApprove.log</file>
    <append>true</append>
    <layout class="ch.qos.logback.classic.PatternLayout">
      <pattern>%d{yyyy-MM-dd HH:mm:ss},%p,%c,%M %m%n</pattern>
