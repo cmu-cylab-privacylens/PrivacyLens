@@ -1,9 +1,8 @@
 <%@ page
 	import="
-                 ch.SWITCH.aai.arpviewer.Controller,
-		 java.util.*,
-		 javax.servlet.*"%>
-
+   ch.SWITCH.aai.uApprove.viewer.Controller,
+	 java.util.*,
+	 javax.servlet.*"%>
 
 <%@ include file="header.jsp"%>
 
@@ -24,12 +23,12 @@
  *
  * 
  * Usage: This page is invoked from the servlet Controller of the package
- *        ch.SWITCH.aai.arpviewer. 
+ *        ch.SWITCH.aai.uApprove.viewer. 
  * 
  *
  * Author: C.Witzig
  * Date: 26.6.2006
- * 
+ * Addapted by H. Reusser 
  *
  *
  * Modifications:
@@ -44,7 +43,7 @@
 
 
 <%
-String providerId = (String) session.getAttribute(Controller.SESKEY_PROVIDERID);
+String entityId = (String) session.getAttribute(Controller.SESKEY_ENTITYID);
 ResourceBundle rb = ResourceBundle.getBundle( Controller.RB_TERMS_DECLINED, (Locale) session.getAttribute(Controller.SESKEY_LOCALE) );
 
 
@@ -53,7 +52,7 @@ out.println( "<p><strong>" + (String) rb.getString("title") + "</strong></p>" );
 String[] sKeys = { "txt1", "txt2", "txt3" };
 for ( int i = 0; i < sKeys.length; i++ ) {
         String sText = (String) rb.getString( sKeys[i] );
-        sText = sText.replaceFirst( "\\?", Controller.getResourceHost(providerId) );
+        sText = sText.replaceFirst( "\\?", Controller.getResourceHost(entityId) );
         out.println( sText );
 }
 

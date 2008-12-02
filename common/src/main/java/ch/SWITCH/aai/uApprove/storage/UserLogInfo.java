@@ -11,12 +11,12 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * Class that contains the arp info for one user.
+ * Class that contains the info for one user.
  * 
  * Copyright (c) 2005-2006 SWITCH - The Swiss Education & Research Network
  * 
  * 
- * Purpose: store all arp info for a user in a class and keep it in memory, such
+ * Purpose: store all info for a user in a class and keep it in memory, such
  * that it can be retrieved very quickly.
  * 
  * Developped based on the original version from F.Poroli. Addition of global
@@ -28,10 +28,10 @@ import org.slf4j.LoggerFactory;
 
 public class UserLogInfo {
   private String username; // user's name
-  private String version; // version of arp setting accepted
+  private String version; // version of setting accepted
   private String ondate; // date when last setting applied
   private String termsVersion; // terms of use version accepted
-  private String global; // whether the user wants to have a global ARP
+  private String global; // whether the user wants to have a global approval
   private Map<String, String> mapProviderIds;
 
   private static Logger LOG = LoggerFactory.getLogger(UserLogInfo.class);
@@ -149,11 +149,11 @@ public class UserLogInfo {
     return mapProviderIds;
   }
 
-  public void clearArpRelease() {
+  public void clearRelease() {
     mapProviderIds.clear();
   }
   
-  public void clearArpRelease(String providerId) {
+  public void clearRelease(String providerId) {
     mapProviderIds.remove(providerId);
   }
   

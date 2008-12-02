@@ -1,9 +1,8 @@
 <%@ page import="
-  ch.SWITCH.aai.arpviewer.Controller,
-  ch.SWITCH.aai.common.TermsOfUseManager,
+  ch.SWITCH.aai.uApprove.viewer.Controller,
+  ch.SWITCH.aai.uApprove.components.TermsOfUseManager,
   java.util.Locale,
   java.util.ResourceBundle"%>
-
 
 <%@ include file="header.jsp"%>
 
@@ -22,7 +21,7 @@
  * 
  * 
  * Usage: This page is invoked from the servlet Controller of the package
- *        ch.SWITCH.aai.arpviewer. 
+ *        ch.SWITCH.aai.uApprove.viewer
  * 
  *
  * 

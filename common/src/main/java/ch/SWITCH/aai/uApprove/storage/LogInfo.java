@@ -15,7 +15,7 @@ import org.slf4j.Logger;
  * 
  * 
  * 
- * Purpose: interface to communicating the the ArpLog information, which is
+ * Purpose: interface to communicating the the Log information, which is
  * stored "somewhere" in a datastore.
  * 
  * The following subclasses have been implemented: LogInfoFile for file based
@@ -28,7 +28,7 @@ public abstract class LogInfo {
   public static final String STORE_TYPE_FILE = "File";
   public static final String STORE_TYPE_DB = "Database";
   
-  private static LogInfo arpLogInfo = null;
+  private static LogInfo logInfo = null;
 
 
   
@@ -36,23 +36,23 @@ public abstract class LogInfo {
 
   public synchronized static void initialize(String type) throws UApproveException {
     if (type.equalsIgnoreCase(STORE_TYPE_FILE))
-      arpLogInfo = LogInfoFile.getInstance(ConfigurationManager.getParam(ConfigurationManager.COMMON_STORE_FILE_LOG));
+      logInfo = LogInfoFile.getInstance(ConfigurationManager.getParam(ConfigurationManager.COMMON_STORE_FILE_LOG));
     else if (type.equalsIgnoreCase(STORE_TYPE_DB))
-      arpLogInfo = LogInfoJdbc.getInstance(ConfigurationManager.getParam(ConfigurationManager.COMMON_STORE_DB_SQL_CONF));
+      logInfo = LogInfoJdbc.getInstance(ConfigurationManager.getParam(ConfigurationManager.COMMON_STORE_DB_CONF));
     else
       throw new UApproveException("Unable to initilaize storage with type "+ type);
   }
   public static LogInfo getInstance() throws UApproveException {
-    if (arpLogInfo == null) {
+    if (logInfo == null) {
       LOG.error("LogInfo has to be initialized first");
       throw new UApproveException("LogInfo has to be initialized first");
     }
-    return arpLogInfo;
+    return logInfo;
   }
 
 
 
-  public abstract Map getData();
+  public abstract Map<String, UserLogInfo> getData();
   
 
   public abstract UserLogInfo getData(String username);
@@ -67,10 +67,10 @@ public abstract class LogInfo {
     update(theUserData, null);
   }
 
-  abstract public void updateArpProviderAccess(String theUsername,
+  abstract public void updateProviderAccess(String theUsername,
       String theProvider, boolean bGlobal) throws UApproveException;
 
-  abstract public void updateArpProviderAccessWithNoARA(String theUsername,
+  abstract public void updateProviderAccessWithNoARA(String theUsername,
       String theProvider) throws UApproveException;
 
   abstract public UserLogInfo addUserLogInfoData(String username,

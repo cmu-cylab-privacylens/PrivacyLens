@@ -5,30 +5,30 @@
 
 <web-app>
 	<description>
-		Shibboleth ARP - Editor for user specific release policies
+		uApprove - Attribute release user consent
 	</description>
 
 	<context-param>
 		<param-name>Config</param-name>
 		<param-value>
-        /path/to/config/arpviewer/ArpViewer.properties;
-        /path/to/config/common/Common.properties;
+        /path/to/uApprove-config/viewer.properties;
+        /path/to/uApprove-config/common.properties;
 		</param-value>
 	</context-param>
 
 	<!-- Servlet configuration -->
 	<servlet>
-		<servlet-name>ArpViewerController</servlet-name>
-		<display-name>Viewer for Arp Files</display-name>
+		<servlet-name>Controller</servlet-name>
+		<display-name>Viewer</display-name>
 		<servlet-class>
-			ch.SWITCH.aai.arpviewer.Controller
+			ch.SWITCH.aai.uApprove.viewer.Controller
 		</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 
 	<!-- Servlet mapping to paths -->
 	<servlet-mapping>
-		<servlet-name>ArpViewerController</servlet-name>
+		<servlet-name>Controller</servlet-name>
 		<url-pattern>/Controller</url-pattern>
 	</servlet-mapping>
 

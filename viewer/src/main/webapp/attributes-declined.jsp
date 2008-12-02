@@ -1,4 +1,4 @@
-<%@ page import="ch.SWITCH.aai.arpviewer.Controller,
+<%@ page import="ch.SWITCH.aai.uApprove.viewer.Controller,
 		 java.util.*,
 		 javax.servlet.*"%>
 
@@ -11,19 +11,19 @@
 /*
  *------------------------------------------------------------------------------------
  *
- * arp_declined.jsp:
+ * attributes_declined.jsp:
  * ---------------
  * 
  *  Copyright (c) 2005-2006 SWITCH - The Swiss Education & Research Network
  *
  *
  *
- * Purpose: Webpage to remind the user that he decline the arp and therefore
+ * Purpose: Webpage to remind the user that he decline the release and therefore
  * 	    he cannot access the resource.
  *
  * 
  * Usage: This page is invoked from the servlet Controller of the package
- *        ch.SWITCH.aai.arpviewer. 
+ *        ch.SWITCH.aai.uApprobe.viewer. 
  * 
  *
  * Author: C.Witzig
@@ -44,8 +44,8 @@
 
 <%
 
-String providerId = (String) session.getAttribute(Controller.SESKEY_PROVIDERID);
-ResourceBundle rb = ResourceBundle.getBundle( Controller.RB_ARP_DECLINED, (Locale) session.getAttribute(Controller.SESKEY_LOCALE) );
+String entityId = (String) session.getAttribute(Controller.SESKEY_ENTITYID);
+ResourceBundle rb = ResourceBundle.getBundle( Controller.RB_ATTRIBUTES_DECLINED, (Locale) session.getAttribute(Controller.SESKEY_LOCALE) );
 
 
 out.println( "<p><strong>" + (String) rb.getString("title") + "</strong></p>" );
@@ -53,7 +53,7 @@ out.println( "<p><strong>" + (String) rb.getString("title") + "</strong></p>" );
 String[] sKeys = { "txt1", "txt2", "txt3" };
 for ( int i = 0; i < sKeys.length; i++ ) {
         String sText = (String) rb.getString( sKeys[i] );
-        sText = sText.replaceFirst( "\\?", Controller.getResourceHost(providerId) );
+        sText = sText.replaceFirst( "\\?", Controller.getResourceHost(entityId) );
         out.println( sText );
 }
 
@@ -63,9 +63,9 @@ for ( int i = 0; i < sKeys.length; i++ ) {
 	<div class="login-field">
     	<form name="question" action="Controller">
 	<div align="left">
-	<input type="submit" name="<%= Controller.GETPAR_ARP_DECLINE_BACK %>" value="<%=(String) rb.getString( "label_back") %>">
+	<input type="submit" name="<%= Controller.GETPAR_ATTRIBUTES_DECLINE_BACK %>" value="<%=(String) rb.getString( "label_back") %>">
 	</div>
-    	</form>
+    	</form> 
 	</div>
 
 <br>

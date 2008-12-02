@@ -1,11 +1,11 @@
 /*
- * Class ArpBlackLis
+ * Class SPBlacklistManager
  *
  * Copyright (c) 2005-2006 SWITCH - The Swiss Education & Research Network 
  *
  *
- * Purpose: Handling of all the arp blacklist, 
- *          a list of provider ids, where the arpfilter
+ * Purpose: Handling of all the sp blacklist, 
+ *          a list of provider ids, where the idp plugin
  *          should not be active.
  *
  *
@@ -33,11 +33,11 @@ import ch.SWITCH.aai.uApprove.components.UApproveException;
  * Class SPBlacklistManager
  * 
  * This class reads a list of Shibboleth provider ids in regex format from an
- * .txt file. Whenever the arpfilter gets activated, it checks whether the
+ * .txt file. Whenever the idp plugin gets activated, it checks whether the
  * provider id matches one of these regular patterns and if so, then the
- * arpfilter lets the request immediately through. In other words, the blacklist
- * file contains a regex list of provider ids, where the arpfilter is turned
- * off. Use this class with caution as you can disable the ArpFilter and forget
+ * idp plugin lets the request immediately through. In other words, the blacklist
+ * file contains a regex list of provider ids, where the idp plugin is turned
+ * off. Use this class with caution as you can disable the idp plugin and forget
  * about it.
  * 
  * 
@@ -47,7 +47,7 @@ import ch.SWITCH.aai.uApprove.components.UApproveException;
  */
 
 public class SPBlacklistManager {
-  private static SPBlacklistManager arpBlackList = null;
+  private static SPBlacklistManager blacklistManager = null;
   private static ArrayList<Pattern> blackList;
   private static Logger LOG = LoggerFactory.getLogger(SPBlacklistManager.class);
   
@@ -71,8 +71,8 @@ public class SPBlacklistManager {
 
 
   public static synchronized void initialize(String filename) {
-    if (arpBlackList == null)
-        arpBlackList = new SPBlacklistManager(filename);
+    if (blacklistManager == null)
+      blacklistManager = new SPBlacklistManager(filename);
   }
 
   /**

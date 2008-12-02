@@ -1,8 +1,8 @@
-<%@ page import="ch.SWITCH.aai.arpviewer.Controller,
-     ch.SWITCH.aai.common.model.LogInfo,
-     ch.SWITCH.aai.common.model.UserLogInfo,
-     ch.SWITCH.aai.common.ConfigurationManager,
-     ch.SWITCH.aai.common.UApproveException,
+<%@ page import="ch.SWITCH.aai.uApprove.viewer.Controller,
+     ch.SWITCH.aai.uApprove.storage.LogInfo,
+     ch.SWITCH.aai.uApprove.storage.UserLogInfo,
+     ch.SWITCH.aai.uApprove.components.ConfigurationManager,
+     ch.SWITCH.aai.uApprove.components.UApproveException,
      org.slf4j.LoggerFactory,
      org.slf4j.Logger,
      java.util.Locale,
@@ -23,10 +23,10 @@
  *
  * 
  * Purpose: JSP page to allow a user to edit his/her own 
- *          ARP parameters.
+ *          parameters.
  *
  * Note: currently we do only allow to user to set/unset the global
- *       arp release of his/her attributes. Much more could be added here!
+ *       release of his/her attributes. Much more could be added here!
  * 
  * 
  * Author: C.Witzig
@@ -56,50 +56,50 @@ String sessionalize(HttpSession session, String key, String value) throws UAppro
  %>
  <%
  try {
-Logger LOG = LoggerFactory.getLogger("useredit.jsp");
-
-LOG.debug("arpconfigs="+getServletContext().getInitParameter(Controller.INITPAR_CONFIG));
-ConfigurationManager.initialize(getServletContext().getInitParameter(Controller.INITPAR_CONFIG));
-LogInfo.initialize(ConfigurationManager.getParam(ConfigurationManager.COMMON_STORE_TYPE));
-LogInfo storage = LogInfo.getInstance();
-
-String returnURL;
-String username;
-String providerId;
-String hiddenField = "<input type=\"hidden\" name=\"";
- if (request.getParameter(Controller.GETPAR_STANDALONE) != null ) {
-   LOG.info("standalone call");
-   // assure that the username is set in a appropiate way
-   username = request.getRemoteUser();
-   returnURL = request.getParameter(Controller.GETPAR_STANDALONE);
-   hiddenField += Controller.GETPAR_STANDALONE;
- } else {
-   LOG.info("inline call");
-   username = (String) session.getAttribute(Controller.SESKEY_USERNAME);
-   returnURL = (String) session.getAttribute(Controller.SESKEY_RETURNURL);
-   providerId = (String) session.getAttribute(Controller.SESKEY_PROVIDERID);
-   hiddenField += ConfigurationManager.HTTP_PARAM_RETURNURL;
- }
-hiddenField += "\" value=\""+returnURL+"\">";
+	Logger LOG = LoggerFactory.getLogger("reset-approvals.jsp");
+	
+	LOG.debug("configs="+getServletContext().getInitParameter(Controller.INITPAR_CONFIG));
+	ConfigurationManager.initialize(getServletContext().getInitParameter(Controller.INITPAR_CONFIG));
+	LogInfo.initialize(ConfigurationManager.getParam(ConfigurationManager.COMMON_STORE_TYPE));
+	LogInfo storage = LogInfo.getInstance();
+	
+	String returnURL;
+	String principal;
+	String entityId;
+	String hiddenField = "<input type=\"hidden\" name=\"";
+	if (request.getParameter(Controller.GETPAR_STANDALONE) != null ) {
+	   LOG.debug("standalone call");
+	   // assure that the username is set in a appropiate way
+	   principal = request.getRemoteUser();
+	   returnURL = request.getParameter(Controller.GETPAR_STANDALONE);
+	   hiddenField += Controller.GETPAR_STANDALONE;
+	 } else {
+	   LOG.debug("inline call");
+	   principal = (String) session.getAttribute(Controller.SESKEY_PRINCIPAL);
+	   returnURL = (String) session.getAttribute(Controller.SESKEY_RETURNURL);
+	   entityId = (String) session.getAttribute(Controller.SESKEY_ENTITYID);
+	   hiddenField += ConfigurationManager.HTTP_PARAM_RETURNURL;
+  }
+  hiddenField += "\" value=\""+returnURL+"\">";
 
  //start debug
  LOG.debug("returnURL="+returnURL);
- LOG.debug("username="+username);
+ LOG.debug("principal="+principal);
   // end debug
 
 
 	// get the language dependent text
 	Locale locale =  Controller.createLocale(request.getLocale(), ConfigurationManager
-      .getParam(ConfigurationManager.ARPVIEWER_USE_LOCAL));
+      .getParam(ConfigurationManager.VIEWER_USELOCALE));
   
- ResourceBundle rb = ResourceBundle.getBundle( Controller.RB_USEREDIT, locale);
+ ResourceBundle rb = ResourceBundle.getBundle( Controller.RB_RESET, locale);
 	
 	// retrieve the user info
 
-	 if (username==null || username.equals(""))
+	 if (principal==null || principal.equals(""))
     throw new UApproveException("Username is not set, can't reset attribute release approval");
 	
-	UserLogInfo userLogInfo = storage.getData( username );
+	UserLogInfo userLogInfo = storage.getData( principal );
 	
 	if (userLogInfo==null) {
 	    //throw new UApproveException("User "+username+" unknown, can't reset attribute release approval");
@@ -107,13 +107,13 @@ hiddenField += "\" value=\""+returnURL+"\">";
 	}
 	
 	// Is this the callback?
-	// If so, adjust the global arp release if the user pressed confirm.
+	// If so, adjust the global release if the user pressed confirm.
 	// Next emove the flag from the return url and redirect to the resource
-	if ( request.getParameter(Controller.GETPAR_EDITCONFIRM) != null || request.getParameter(Controller.GETPAR_EDITCANCEL) != null ) {
-		if ( request.getParameter(Controller.GETPAR_EDITCONFIRM) != null ) {
+	if ( request.getParameter(Controller.GETPAR_RESET_CONFIRM) != null || request.getParameter(Controller.GETPAR_RESET_CANCEL) != null ) {
+		if ( request.getParameter(Controller.GETPAR_RESET_CONFIRM) != null ) {
 			userLogInfo.setGlobal( "no" );
-		  userLogInfo.clearArpRelease(); /* ALL */
-		  //userLogInfo.clearArpRelease(providerId); /* ONLY FOR THIS PROVIDER */
+		  userLogInfo.clearRelease(); /* ALL */
+		  //userLogInfo.clearRelease(entityId); /* ONLY FOR THIS PROVIDER */
 		  storage.update( userLogInfo );
 		}
 		response.sendRedirect( response.encodeURL( returnURL ) );
@@ -128,8 +128,8 @@ hiddenField += "\" value=\""+returnURL+"\">";
     	<form name="question" action="useredit.jsp">
 		<div align="right">
 		      <%=hiddenField%>
-        	<input type="submit" name="<%=Controller.GETPAR_EDITCANCEL%>" value="<%=(String) rb.getString( "lb_cancel") %>">
-        	<input type="submit" name="<%=Controller.GETPAR_EDITCONFIRM%>" value="<%=(String) rb.getString( "lb_confirm") %>">
+        	<input type="submit" name="<%=Controller.GETPAR_RESET_CANCEL%>" value="<%=(String) rb.getString( "lb_cancel") %>">
+        	<input type="submit" name="<%=Controller.GETPAR_RESET_CONFIRM%>" value="<%=(String) rb.getString( "lb_confirm") %>">
 		</div>
     	</form>
 	</div>

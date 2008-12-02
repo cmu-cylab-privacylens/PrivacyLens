@@ -1,5 +1,5 @@
-<%@page import="ch.SWITCH.aai.arpviewer.Controller"%>
-<%@page import="ch.SWITCH.aai.common.UApproveException"%>
+<%@page import="ch.SWITCH.aai.uApprove.viewer.Controller"%>
+<%@page import="ch.SWITCH.aai.uApprove.components.UApproveException"%>
 <%@ include file="header.jsp" %>
 
 

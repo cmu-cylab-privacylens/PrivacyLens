@@ -1,19 +1,3 @@
-/*
- * Class ArpBlackLis
- *
- * Copyright (c) 2005-2006 SWITCH - The Swiss Education & Research Network 
- *
- *
- * Purpose: Handling of all the arp blacklist, 
- *          a list of provider ids, where the arpfilter
- *          should not be active.
- *
- *
- * @author C.Witzig
- * @date 4.11.2006
- * 
- */
-
 package ch.SWITCH.aai.uApprove.viewer;
 
 import java.util.ArrayList;

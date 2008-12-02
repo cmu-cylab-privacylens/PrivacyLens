@@ -29,7 +29,7 @@ import edu.vt.middleware.crypt.CryptException;
 import edu.vt.middleware.crypt.symmetric.AES;
 
 /**
- * Arpviewer Controller Servlet
+ * uApprove Controller Servlet
  * 
  * Copyright (c) 2005-2006 SWITCH - The Swiss Education & Research Network
  * 
@@ -44,37 +44,37 @@ public class Controller extends HttpServlet {
 
   public static final String INITPAR_CONFIG = "Config";
 
-  private static final String PAGE_TERMS = "/terms.jsp";
-  private static final String PAGE_TERMSDECLINED = "/terms_declined.jsp";
-  private static final String PAGE_ARP = "/arp.jsp";
-  private static final String PAGE_ARPDECLINED = "/arp_declined.jsp";
-  private static final String PAGE_EDIT = "/useredit.jsp";
+  private static final String PAGE_TERMS = "/terms-of-use.jsp";
+  private static final String PAGE_TERMS_DECLINED = "/terms-of-use-declined.jsp";
+  private static final String PAGE_ATTRIBUTES = "/attributes.jsp";
+  private static final String PAGE_ATTRIBUTES_DECLINED = "/attributes-declined.jsp";
+  private static final String PAGE_RESET = "/reset-approvals.jsp";
   private static final String PAGE_ERROR = "/error.jsp";
 
-  public static final String GETPAR_TERMS_CONFIRM = "terms_confirm";
-  public static final String GETPAR_TERMS_AGREE = "iagreeterms";
-  public static final String GETPAR_TERMS_DECLINE = "terms_decline";
-  public static final String GETPAR_TERMS_DECLINE_BACK = "terms_declined_back";
-  public static final String GETPAR_ARP_CONFIRM = "arp_confirm";
-  public static final String GETPAR_ARP_AGREEGLOBAL = "iagreeglobal";
-  public static final String GETPAR_ARP_DECLINE = "arp_decline";
-  public static final String GETPAR_ARP_DECLINE_BACK = "arp_declined_back";
+  public static final String GETPAR_TERMS_CONFIRM = "terms-confirm";
+  public static final String GETPAR_TERMS_AGREE = "terms-agree";
+  public static final String GETPAR_TERMS_DECLINE = "terms-decline";
+  public static final String GETPAR_TERMS_DECLINE_BACK = "terms-decline-back";
+  public static final String GETPAR_ATTRIBUTES_CONFIRM = "attributes-confirm";
+  public static final String GETPAR_ATTRIBUTES_GLOBAL_CONSENT = "attributes-global-consent";
+  public static final String GETPAR_ATTRIBUTES_DECLINE = "attributes-decline";
+  public static final String GETPAR_ATTRIBUTES_DECLINE_BACK = "attributes-decline-back";
 
-  public static final String GETPAR_STANDALONE = "standalone_next_url";
-  public static final String GETPAR_EDITCANCEL = "CancelUseredit";
-  public static final String GETPAR_EDITCONFIRM = "ConfirmUseredit";
+  public static final String GETPAR_STANDALONE = "standalone-next-url";
+  public static final String GETPAR_RESET_CANCEL = "reset-cancel";
+  public static final String GETPAR_RESET_CONFIRM = "reset-confirm";
 
-  public static final String RB_TERMS = "resources_terms";
-  public static final String RB_TERMS_DECLINED = "resources_terms_declined";
-  public static final String RB_ARP = "resources_arp";
-  public static final String RB_ARP_DECLINED = "resources_arp_declined";
-  public static final String RB_USEREDIT = "resources_useredit";
+  public static final String RB_TERMS = "terms-of-use";
+  public static final String RB_TERMS_DECLINED = "terms-of-use-declined";
+  public static final String RB_ATTRIBUTES = "attributes";
+  public static final String RB_ATTRIBUTES_DECLINED = "attribtes-declined";
+  public static final String RB_RESET = "reset-approvals";
 
-  public static final String SESKEY_USERNAME = "username";
+  public static final String SESKEY_PRINCIPAL = "principal";
   public static final String SESKEY_RETURNURL = "returnURL";
-  public static final String SESKEY_PROVIDERID = "providerId";
+  public static final String SESKEY_ENTITYID = "entityId";
   public static final String SESKEY_ATTRIBUTES = "attributes";
-  public static final String SESKEY_GLOBALARP_DISABLED = "globalarp";
+  public static final String SESKEY_GLOBAL_CONSENT_POSSIBLE = "globalConsentPossible";
   public static final String SESKEY_LOCALE = "locale";
   public static final String SESKEY_ERROR = "error";
 
@@ -117,13 +117,13 @@ public class Controller extends HttpServlet {
         configurator.setContext(lc);
         lc.shutdownAndReset();
         configurator.doConfigure(ConfigurationManager
-            .getParam(ConfigurationManager.ARPVIEWER_LOGBACK_CONFIG));
+            .getParam(ConfigurationManager.VIEWER_LOGBACK_CONFIG));
       } catch (JoranException je) {
         throw new UApproveException(je);
       }
 
-      // initialize arp terms
-      String terms = ConfigurationManager.getParam(ConfigurationManager.COMMON_ARP_TERMS);
+      // initialize terms
+      String terms = ConfigurationManager.getParam(ConfigurationManager.COMMON_TERMS);
       if (terms != null && !terms.equals("")) {
         try {
           TermsOfUseManager.initalize(terms);
@@ -137,7 +137,7 @@ public class Controller extends HttpServlet {
       }
 
       // init attributeList
-      AttributeList.initialize(ConfigurationManager.getParam(ConfigurationManager.ARPVIEWER_ATTRIBUTELIST));
+      AttributeList.initialize(ConfigurationManager.getParam(ConfigurationManager.VIEWER_ATTRIBUTELIST));
       if (LOG.isDebugEnabled()) {
         LOG.debug("Content of attribute list:");
         for (String key : AttributeList.getWhiteList()) {
@@ -151,7 +151,7 @@ public class Controller extends HttpServlet {
       LOG.debug("LogInfo (storage) initialized with mode=" + storeType);
 
     } catch (UApproveException e) {
-      LOG.error("ArpViewer servlet initialization failed", e);
+      LOG.error("uApprove servlet initialization failed", e);
     }
 
     // initialize secret for decryption
@@ -168,11 +168,11 @@ public class Controller extends HttpServlet {
       HttpSession session = request.getSession();
       LogInfo storage = LogInfo.getInstance();
 
-      // get username
-      String username = decrypt(request
-          .getParameter(ConfigurationManager.HTTP_PARAM_USERNAME));
-      LOG.debug("username=" + username);
-      session.setAttribute(SESKEY_USERNAME, username);
+      // get principal
+      String principal = decrypt(request
+          .getParameter(ConfigurationManager.HTTP_PARAM_PRINCIPAL));
+      LOG.debug("principal=" + principal);
+      session.setAttribute(SESKEY_PRINCIPAL, principal);
 
       // get returnURL
       String returnURL = request
@@ -180,20 +180,20 @@ public class Controller extends HttpServlet {
       LOG.debug("returnURL=" + returnURL);
       session.setAttribute(SESKEY_RETURNURL, returnURL);
 
-      if (request.getParameter(ConfigurationManager.HTTP_PARAM_EDIT) != null) {
+      if (request.getParameter(ConfigurationManager.HTTP_PARAM_RESET) != null) {
         // start edit flow
         LOG.info("user want to edit the attribute release approval");
-        getServletContext().getRequestDispatcher(PAGE_EDIT).forward(request,
+        getServletContext().getRequestDispatcher(PAGE_RESET).forward(request,
             response);
         return;
       } else {
-        // Start arp flow
-        LOG.info("start arp viewer flow");
+        // Start flow
+        LOG.info("start viewer flow");
         // get providerId
-        String providerId = decrypt(request
+        String entityId = decrypt(request
             .getParameter(ConfigurationManager.HTTP_PARAM_PROVIDERID));
-        LOG.debug("providerId=" + providerId);
-        session.setAttribute(SESKEY_PROVIDERID, providerId);
+        LOG.debug("entityId=" + entityId);
+        session.setAttribute(SESKEY_ENTITYID, entityId);
 
         // get released attributes
         String serializedAttributesReleased = decrypt(request
@@ -204,21 +204,21 @@ public class Controller extends HttpServlet {
             .unserializeAttributes(serializedAttributesReleased);
         session.setAttribute(SESKEY_ATTRIBUTES, attributesReleased);
 
-        // get globalArpDisabled
-        boolean globalArpDisabled = ConfigurationManager
+        // get globalConsentPossible
+        boolean globalConsentPossible = ConfigurationManager
             .makeBoolean(ConfigurationManager
-                .getParam(ConfigurationManager.ARPVIEWER_GLOBAL_ARP_DISABLED));
-        LOG.debug("globalArpDisabled=" + globalArpDisabled);
-        session.setAttribute(SESKEY_GLOBALARP_DISABLED, globalArpDisabled);
+                .getParam(ConfigurationManager.VIEWER_GLOBAL_CONSENT));
+        LOG.debug("globalConsentPossible=" + globalConsentPossible);
+        session.setAttribute(SESKEY_GLOBAL_CONSENT_POSSIBLE, globalConsentPossible);
 
         // get the locale
         Locale locale = createLocale(request.getLocale(), ConfigurationManager
-            .getParam(ConfigurationManager.ARPVIEWER_USE_LOCAL));
+            .getParam(ConfigurationManager.VIEWER_USELOCALE));
         LOG.debug("locale=" + locale);
         session.setAttribute(SESKEY_LOCALE, locale);
 
         // getUserInfo
-        UserLogInfo userInfo = storage.getData(username);
+        UserLogInfo userInfo = storage.getData(principal);
         LOG.debug("userInfo=" + userInfo);
 
         if (userInfo == null) {
@@ -226,8 +226,8 @@ public class Controller extends HttpServlet {
             LOG.debug("first visit of the user, redirect to terms page");
             getServletContext().getRequestDispatcher(PAGE_TERMS).forward(request,response);
           } else {
-            LOG.debug("first visit of the user, redirect to arp page");
-            getServletContext().getRequestDispatcher(PAGE_ARP).forward(request,response);
+            LOG.debug("first visit of the user, redirect to attributes page");
+            getServletContext().getRequestDispatcher(PAGE_ATTRIBUTES).forward(request,response);
           }
           return;
         }
@@ -239,8 +239,8 @@ public class Controller extends HttpServlet {
           return;
         } 
         
-        LOG.debug("Terms are not used or current terms version are agreed by user, redirect to the arp page");
-        getServletContext().getRequestDispatcher(PAGE_ARP).forward(request,response);
+        LOG.debug("Terms are not used or current terms version are agreed by user, redirect to the attributes page");
+        getServletContext().getRequestDispatcher(PAGE_ATTRIBUTES).forward(request,response);
         return;
       }
     } catch (UApproveException e) {
@@ -253,7 +253,7 @@ public class Controller extends HttpServlet {
     try {
       // initialization
       HttpSession session = request.getSession();
-      LOG.info("GET received");
+      LOG.debug("GET received");
       ConfigurationManager.initialize(getServletContext().getInitParameter(
           INITPAR_CONFIG));
 
@@ -264,15 +264,15 @@ public class Controller extends HttpServlet {
       LogInfo storage = LogInfo.getInstance();
       LOG.debug("LogInfo (storage) initialized with mode=" + storeType);
 
-      String username = (String) session.getAttribute(SESKEY_USERNAME);
-      LOG.debug("username=" + username);
-      if (username == null || username.equals(""))
-        throw new UApproveException("Username is not set");
+      String principal = (String) session.getAttribute(SESKEY_PRINCIPAL);
+      LOG.debug("principal=" + principal);
+      if (principal == null || principal.equals(""))
+        throw new UApproveException("Principal is not set");
 
-      String providerId = (String) session.getAttribute(SESKEY_PROVIDERID);
-      LOG.debug("providerId=" + providerId);
+      String entityId = (String) session.getAttribute(SESKEY_ENTITYID);
+      LOG.debug("entityId=" + entityId);
 
-      UserLogInfo userInfo = storage.getData(username);
+      UserLogInfo userInfo = storage.getData(principal);
       LOG.debug("userInfo=" + userInfo);
 
       Collection<Attribute> attributesReleased = (Collection<Attribute>) session
@@ -282,16 +282,16 @@ public class Controller extends HttpServlet {
       LOG.debug("returnURL=" + returnURL);
 
       if (isGetParSet(request, GETPAR_TERMS_CONFIRM)) {
-        LOG.info("coming from terms confirmed");
+        LOG.debug("coming from terms confirmed");
         // check if the user agreed the terms
         if (isGetParSet(request, GETPAR_TERMS_AGREE)) {
-          LOG.info("user agreed terms, store, redirect to arp");
-          storeUserBasic(userInfo, username, TermsOfUseManager.getVersion());
-          getServletContext().getRequestDispatcher(PAGE_ARP).forward(request,
+          LOG.debug("user agreed terms, store, redirect to attributes");
+          storeUserBasic(userInfo, principal, TermsOfUseManager.getVersion());
+          getServletContext().getRequestDispatcher(PAGE_ATTRIBUTES).forward(request,
               response);
           return;
         } else {
-          LOG.info("user dont agreed terms, redirect again to terms");
+          LOG.debug("user dont agreed terms, redirect again to terms");
           getServletContext().getRequestDispatcher(PAGE_TERMS).forward(request,
               response);
           return;
@@ -299,83 +299,83 @@ public class Controller extends HttpServlet {
       }
 
       if (isGetParSet(request, GETPAR_TERMS_DECLINE)) {
-        LOG.info("coming from terms declined, redirect to decline page");
-        getServletContext().getRequestDispatcher(PAGE_TERMSDECLINED).forward(
+        LOG.debug("coming from terms declined, redirect to decline page");
+        getServletContext().getRequestDispatcher(PAGE_TERMS_DECLINED).forward(
             request, response);
         return;
       }
 
       if (isGetParSet(request, GETPAR_TERMS_DECLINE_BACK)) {
-        LOG.info("coming from terms declined back, redirect to terms page");
+        LOG.debug("coming from terms declined back, redirect to terms page");
         getServletContext().getRequestDispatcher(PAGE_TERMS).forward(request,
             response);
         return;
       }
 
-      if (isGetParSet(request, GETPAR_ARP_CONFIRM)) {
-        LOG.info("user agreed arp, store, redirect to returnURL="
+      if (isGetParSet(request, GETPAR_ATTRIBUTES_CONFIRM)) {
+        LOG.debug("user gave attribute release consent, store, redirect to returnURL="
             + response.encodeRedirectURL(returnURL));
         
         String termsVersion = useTerms ? TermsOfUseManager.getVersion() : "";
-        String arp = Attribute.serializeAttributeIDs(attributesReleased);
-        LOG.debug("store: username=" + username + " providerId=" + providerId
-            + " arp=" + arp + " terms=" + termsVersion + " global="
-            + isGetParSet(request, GETPAR_ARP_AGREEGLOBAL));
-        storeUser(userInfo, username, termsVersion, providerId, arp,
-            isGetParSet(request, GETPAR_ARP_AGREEGLOBAL));
+        String attributes = Attribute.serializeAttributeIDs(attributesReleased);
+        LOG.debug("store: principal=" + principal + " entityId=" + entityId
+            + " attributes=" + attributes + " terms=" + termsVersion + " globalConsent="
+            + isGetParSet(request, GETPAR_ATTRIBUTES_GLOBAL_CONSENT));
+        storeUser(userInfo, principal, termsVersion, entityId, attributes,
+            isGetParSet(request, GETPAR_ATTRIBUTES_GLOBAL_CONSENT));
         response.sendRedirect(response.encodeRedirectURL(returnURL));
         return;
       }
 
-      if (isGetParSet(request, GETPAR_ARP_DECLINE)) {
-        LOG.info("coming from arp declined, redirect to decline page");
-        getServletContext().getRequestDispatcher(PAGE_ARPDECLINED).forward(
+      if (isGetParSet(request, GETPAR_ATTRIBUTES_DECLINE)) {
+        LOG.debug("coming from attributes declined, redirect to decline page");
+        getServletContext().getRequestDispatcher(PAGE_ATTRIBUTES_DECLINED).forward(
             request, response);
         return;
       }
 
-      if (isGetParSet(request, GETPAR_ARP_DECLINE_BACK)) {
-        LOG.info("coming from arp declined back, redirect to arp page");
-        getServletContext().getRequestDispatcher(PAGE_ARP).forward(request,
+      if (isGetParSet(request, GETPAR_ATTRIBUTES_DECLINE_BACK)) {
+        LOG.debug("coming from attributes declined back, redirect to attributes page");
+        getServletContext().getRequestDispatcher(PAGE_ATTRIBUTES).forward(request,
             response);
         return;
       }
 
       // coming here is not ok
-      throw new UApproveException("ArpViewer flow error");
+      throw new UApproveException("uApprove viewer flow error");
     } catch (UApproveException e) {
       doError(request, response, e);
     }
   }
 
-  private void storeUser(UserLogInfo userInfo, String username,
-      String termsVersion, String providerId, String attributesReleased,
-      boolean globalApproval) throws UApproveException {
+  private void storeUser(UserLogInfo userInfo, String principal,
+      String termsVersion, String entityId, String attributesReleased,
+      boolean globalConsent) throws UApproveException {
     
     LOG.debug("storeUser");
     LogInfo storage = LogInfo.getInstance();
     if (userInfo == null) {
       LOG.debug("create new user");
       
-      userInfo = storage.addUserLogInfoData(username, "1.0", new Date()
-          .toString(), termsVersion, "no", providerId, attributesReleased);
+      userInfo = storage.addUserLogInfoData(principal, "1.0", new Date()
+          .toString(), termsVersion, "no", entityId, attributesReleased);
     } else {
        userInfo.setOndate(new Date().toString());
        userInfo.setTermsVersion(termsVersion);
-       userInfo.setGlobal(globalApproval ? "yes" : "no");
-       userInfo.addProviderId(providerId, attributesReleased);
+       userInfo.setGlobal(globalConsent ? "yes" : "no");
+       userInfo.addProviderId(entityId, attributesReleased);
     }
-    storage.update(userInfo, providerId);
+    storage.update(userInfo, entityId);
   }
 
-  private void storeUserBasic(UserLogInfo userInfo, String username,
+  private void storeUserBasic(UserLogInfo userInfo, String principal,
       String termsVersion) throws UApproveException {
     LOG.debug("storeUserBasic");
     LogInfo storage = LogInfo.getInstance();
     
     if (userInfo == null) {
       LOG.debug("create new user");
-      userInfo = storage.addUserLogInfoData(username, "1.0", new Date()
+      userInfo = storage.addUserLogInfoData(principal, "1.0", new Date()
           .toString(), termsVersion, "no", null, null);
     } else {
       userInfo.setTermsVersion(termsVersion);
@@ -398,11 +398,11 @@ public class Controller extends HttpServlet {
   }
 
   // parse resource (sp) host
-  public static String getResourceHost(String providerId) {
-    int i1 = providerId.indexOf("//") + 2;
-    int i2 = providerId.indexOf("/", i1);
-    return i2 > 0 ? providerId.substring(0, providerId.indexOf("/", providerId
-        .indexOf("//") + 2)) : providerId;
+  public static String getResourceHost(String entityId) {
+    int i1 = entityId.indexOf("//") + 2;
+    int i2 = entityId.indexOf("/", i1);
+    return i2 > 0 ? entityId.substring(0, entityId.indexOf("/", entityId
+        .indexOf("//") + 2)) : entityId;
   }
   
   // resolves displayName due to locale
@@ -431,7 +431,7 @@ public class Controller extends HttpServlet {
       IOException {
     HttpSession session = request.getSession();
     session.setAttribute(SESKEY_ERROR, e);
-    LOG.error("Arpviewer Error", e);
+    LOG.error("uApprove Error", e);
     session.getServletContext().getRequestDispatcher(PAGE_ERROR).forward(
         request, response);
   }

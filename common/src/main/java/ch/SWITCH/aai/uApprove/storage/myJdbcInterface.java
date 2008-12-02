@@ -1,399 +1,373 @@
 package ch.SWITCH.aai.uApprove.storage;
 
-import  java.io.*;
-import  java.sql.*;
-import  java.util.*;
+import java.io.*;
+import java.sql.*;
+import java.util.*;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
+/**
+ * Class myJdbcInterface
+ * 
+ * Copyright (c) 2005-2006 SWITCH - The Swiss Education & Research Network
+ * 
+ * Purpose: a very simple interface class to jdbc
+ * 
+ * This class reads jdbc connection parameters from a config file and creates a
+ * connection. Then we can execute a few sql statements and close the class.
+ * 
+ * Note: the class is NOT threadsafe
+ * 
+ * @author C.Witzig
+ * @date 15.1.2006
+ */
 
-/** 
-    Class myJdbcInterface
+public class myJdbcInterface {
 
-    Copyright (c) 2005-2006 SWITCH - The Swiss Education & Research Network
+  // / the configfile, where we get the connection parameters
+  private String myConfigFile;
 
-    Purpose: a very simple interface class to jdbc
+  // jdbc connection
+  private Connection myConnection;
 
-    This class reads jdbc connection parameters from a config file
-    and creates a connection. Then we can execute a few sql 
-    statements and close the class. 
-    
-    Note: the class is NOT threadsafe
+  // / jdbc statement
+  private Statement myStatement;
 
-    @author C.Witzig
+  // / max number retries - by default 1
+  private int myMaxRetries = 3;
 
-    @date 15.1.2006
-*/
+  // / driver class name
+  String myDriverClassName;
+
+  // / jdbc connection url
+  String myUrl;
+
+  // / db user
+  String myUser;
+
+  // / db password
+  String myPassword;
+
+  // sql commands
+  String sqlCommands;
+
+  // / flag whether the config file could be read properly
+  boolean bConfigFileRead = false;
+
+  boolean bConnected = false;
+
+  private static Logger LOG = LoggerFactory.getLogger(myJdbcInterface.class);
 
 
-public class myJdbcInterface 
-{
+  /**
+   * Class that defines the property keys in the property file. Note: if you
+   * change the keys in the corresponding property file, you must also change
+   * them here!
+   */
+  public class myJdbcConfigurationKeys {
+    public static final String keyDriver = "DbDriver";
 
-    /// the configfile, where we get the connection parameters
-    private String myConfigFile;
+    public static final String keyUrl = "DbUrl";
 
-    // jdbc connection
-    private Connection myConnection;
+    public static final String keyUser = "DbUser";
 
-    /// jdbc statement
-    private Statement myStatement;
+    public static final String keyPassword = "DbPassword";
 
-    /// max number retries - by default 1
-    private int myMaxRetries = 3;
-    
-    /// driver class name
-    String myDriverClassName;
+    public static final String keySqlCmds = "DbSqlCommandsFile";
 
-    /// jdbc connection url
-    String myUrl;
+  }
 
-    /// db user
-    String myUser;
+  /*------------------------------------------------------------------------
+    public member functions
+    ------------------------------------------------------------------------*/
 
-    /// db password
-    String myPassword;
-    
-    // sql commands
-    String sqlCommands;
+  /**
+   * Creator
+   * 
+   * @param the
+   *          config file with the jdbc connection
+   */
+  public myJdbcInterface(String theConfigFile) {
+    myConfigFile = theConfigFile;
+  }
 
-    /// flag whether the config file could be read properly
-    boolean bConfigFileRead = false;
+  /**
+   * creator
+   * 
+   * @param the
+   *          configfile with the jdbc connection parameters
+   * @param bDebug
+   *          whether debug is true or false
+   */
+  public myJdbcInterface(String theConfigFile, boolean theDebug) {
+    myConfigFile = theConfigFile;
+    bConfigFileRead = readConfigFile();
+  }
 
-    boolean bConnected = false;
+  public String getSqlCmds() {
+    return sqlCommands;
+  }
 
-    private static Logger LOG = LoggerFactory.getLogger( myJdbcInterface.class );
+  /**
+   * a simple main for testing
+   */
+  public static void main(String[] arguments) {
+    myJdbcInterface theDB = new myJdbcInterface("blla", true);
 
-    /// deprecated
-    private static boolean bDebug = false;
+    theDB.initialize();
 
-    /** Class that defines the property keys in the 
-	property file. Note: if you change the keys
-	in the corresponding property file, you must 
-	also change them here!
-    */
-    public class myJdbcConfigurationKeys
-    {
-	public static final String keyDriver = "DbDriver";
+    theDB.test1("select * from ShibProvider");
 
-	public static final String keyUrl = "DbUrl";
-
-	public static final String keyUser = "DbUser";
-
-	public static final String keyPassword = "DbPassword";
-	
-	public static final String keySqlCmds = "DbSqlCommandsFile";
-	
+    System.out.println("sleeping a while ... ");
+    try {
+      Thread.sleep(1000 * 86400);
+    } catch (InterruptedException ex) {
+      System.out.println("interrupted execption " + ex.toString());
     }
 
+    theDB.test1("select * from ShibProvider");
 
+    theDB.close();
 
-    /*------------------------------------------------------------------------
-      public member functions
-      ------------------------------------------------------------------------*/
+  }
 
+  /** sets the number of retries for execSQLFT */
+  public void setMaxRetries(int nMaxRetries) {
+    myMaxRetries = nMaxRetries;
+  }
 
-    /** Creator
-	@param the config file with the jdbc connection
-    */
-    public myJdbcInterface( String theConfigFile )
-    {
-	myConfigFile = theConfigFile;
+  /**
+   * executes a sql statement
+   * 
+   * @param the
+   *          sql statement as string
+   * @return the result set or null in case of error
+   */
+  public ResultSet execSql(String theSql, boolean bIsQuery) {
+    ResultSet rs = null;
+
+    try {
+      if (bIsQuery == true)
+        rs = myStatement.executeQuery(theSql);
+      else
+        myStatement.execute(theSql);
+
+      if (LOG.isDebugEnabled())
+        LOG.debug("myJdbcInterface.execSql: executeQuery *" + theSql
+            + "* done ");
+
+    } catch (SQLException ex) {
+      LOG.error("SQLException: " + ex.getMessage());
     }
 
+    return rs;
+  }
 
+  /**
+   * executes a sql statement in a fault tolerant way, i.e. at most myMaxTries
+   * tries will be made
+   * 
+   * @param the
+   *          sql statement as string
+   * @return the ResultSet or null
+   */
+  public ResultSet execSqlFT(String theSql, boolean bIsQuery)
+      throws SQLException {
+    int nTries = 0;
+    ResultSet rs = null;
 
+    do {
 
-    /** creator 
-	@param the configfile with the jdbc connection parameters
-	@param bDebug whether debug is true or false
-    */
-    public myJdbcInterface( String theConfigFile, boolean theDebug )
-    {
-	myConfigFile = theConfigFile;
+      if (LOG.isDebugEnabled())
+        LOG.debug("myJdbcInterface.execSqlFT: sql = *" + theSql + "* nTries = "
+            + nTries);
 
-	bConfigFileRead = readConfigFile();
-	
-	bDebug = theDebug;
+      try {
+        if (bIsQuery == true)
+          rs = myStatement.executeQuery(theSql);
+        else
+          myStatement.execute(theSql);
+
+        break;
+
+      } catch (SQLException ex) {
+        LOG
+            .error("myJdbcInterface.execSqlFT: SQLException: "
+                + ex.getMessage());
+
+        close();
+
+        initialize();
+
+      }
+
+    } while (nTries++ <= myMaxRetries);
+
+    if (nTries >= myMaxRetries)
+      throw new SQLException("myJdbcInterface.execSqlFT: SQLException:");
+    else if (nTries > 0) {
+      LOG
+          .warn("myJdcInterface.execSqlFT: communication link failure due to inactive db connection successfully restored");
+      LOG
+          .warn("                          [possible exceptions can safely be ignored]");
     }
 
+    return rs;
+  }
 
-    public String getSqlCmds() {
-      return sqlCommands;
+  /** closes the database connection */
+  public void close() {
+    if (LOG.isDebugEnabled())
+      LOG.debug("myJdbcInterface.close: entry");
+
+    try {
+
+      myStatement.close();
+
+    } catch (SQLException ex) {
+      LOG
+          .error("myJdbcInterface.close: statement exception = "
+              + ex.toString());
     }
 
-	
-    /** a simple main for testing 
-     */
-    public static void main(String[] arguments)
-    {
-        myJdbcInterface theDB = new myJdbcInterface( "blla", true );
+    try {
 
-	theDB.initialize();
+      myConnection.close();
 
-	theDB.test1( "select * from ShibProvider" );
+      bConnected = false;
 
-	System.out.println("sleeping a while ... ");
-	try {
-	    Thread.sleep( 1000 * 86400 );
-	}
-	catch ( InterruptedException ex ) {
-	    System.out.println("interrupted execption " + ex.toString() );
-	}
-
-	theDB.test1( "select * from ShibProvider" );
-
-	theDB.close();
-
+    } catch (SQLException ex) {
+      LOG.error("myJdbcInterface.close: connection exception = "
+          + ex.toString());
     }
 
+    if (LOG.isDebugEnabled())
+      LOG.debug("myJdbcInterface.close: done");
+  }
 
+  /*------------------------------------------------------------------------
+    private member functions
+    ------------------------------------------------------------------------*/
 
-    /** sets the number of retries for execSQLFT */
-    public void setMaxRetries( int nMaxRetries )
-    {
-	myMaxRetries = nMaxRetries;
+  /**
+   * reads the config file
+   * 
+   * @return true in case of success, false otherwise
+   */
+  private boolean readConfigFile() {
+
+    try {
+      File theFile = new File(myConfigFile);
+      if (!theFile.exists() || !theFile.isFile() || !theFile.canRead()) {
+        LOG.error("myJdbcInterface.readConfigFile: error reading file "
+            + myConfigFile);
+        return false;
+      }
+      Properties theProperties = new Properties();
+      theProperties.load(new FileInputStream(theFile));
+
+      myDriverClassName = theProperties.getProperty(
+          myJdbcConfigurationKeys.keyDriver).trim();
+      myUrl = theProperties.getProperty(myJdbcConfigurationKeys.keyUrl).trim();
+      myUser = theProperties.getProperty(myJdbcConfigurationKeys.keyUser)
+          .trim();
+      myPassword = theProperties.getProperty(
+          myJdbcConfigurationKeys.keyPassword).trim();
+      sqlCommands = theProperties.getProperty(
+          myJdbcConfigurationKeys.keySqlCmds).trim();
+
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("myJdbcInterface.readConfigFile: read file successfully");
+        LOG.debug("     driver = " + myDriverClassName + " url = " + myUrl
+            + " user = " + myUser);
+      }
+    } catch (Exception ex) {
+      LOG.error("myJdbcInterface.readConfigFile: execption " + ex.getMessage());
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * initializes the database connection
+   * 
+   * @return true in case of success, false otherwise
+   */
+  public boolean initialize() {
+    if (LOG.isDebugEnabled())
+      LOG.debug("myJdbcInterface.initialize: entry ");
+
+    if (bConfigFileRead == false) {
+      LOG
+          .error("myJdbcInterface.initialize: invalid database connection parameters: check file "
+              + myConfigFile);
+      return false;
     }
 
-
-
-
-
-
-
-    /** executes a sql statement
-	@param the sql statement as string
-	@return the result set or null in case of error
-    */
-    public ResultSet execSql( String theSql, boolean bIsQuery )
-    {
-	ResultSet rs = null;
-
-	try {
-	    if ( bIsQuery == true ) 
-		rs = myStatement.executeQuery( theSql );
-	    else
-		myStatement.execute( theSql );
-
-	    if ( LOG.isDebugEnabled() )
-		LOG.debug("myJdbcInterface.execSql: executeQuery *" + theSql + "* done " );
-
-	} catch (SQLException ex) {
-	    LOG.error("SQLException: " + ex.getMessage() );
-	}
-
-	return rs;
+    try {
+      Class.forName(myDriverClassName);
+      if (LOG.isDebugEnabled())
+        LOG.debug("myJdbcInterface.initialize: class.forName done ");
+    } catch (java.lang.ClassNotFoundException e) {
+      LOG
+          .error("myJdbcInterface.initialize: cannot find class "
+              + e.toString());
+      return false;
     }
 
+    try {
+      if (LOG.isDebugEnabled())
+        LOG
+            .debug("myJdbcInterface.initialize: about to try getConnection for *"
+                + myUrl + " user = " + myUser);
+      myConnection = DriverManager.getConnection(myUrl, myUser, myPassword);
 
+      if (LOG.isDebugEnabled())
+        LOG.debug("myJdbcInterface.initialize: getConnection done ");
 
-    /** executes a sql statement in a fault tolerant way, i.e.
-	at most myMaxTries tries will be made
-	@param the sql statement as string
-	@return the ResultSet or null
-    */
-    public ResultSet execSqlFT( String theSql, boolean bIsQuery )
-	throws SQLException
-    {
-	int nTries = 0;
-	ResultSet rs = null;
+      myStatement = myConnection.createStatement();
 
-	do {
+      bConnected = true;
 
-	    if ( LOG.isDebugEnabled() )
-		LOG.debug("myJdbcInterface.execSqlFT: sql = *" + theSql
-				   + "* nTries = " + nTries );
-       
-	    try {
-		if ( bIsQuery == true ) 
-		    rs = myStatement.executeQuery( theSql );
-		else
-		    myStatement.execute( theSql );
+      if (LOG.isDebugEnabled())
+        LOG.debug("myJdbcInterface.initialize: createStatement done ");
 
-		break;
-    
-	    } catch (SQLException ex) {
-		LOG.error("myJdbcInterface.execSqlFT: SQLException: " + ex.getMessage() );
-
-		close();
-
-		initialize();
-		    
-	    }
-
-
-	} while ( nTries++ <= myMaxRetries );
-
-	if ( nTries >= myMaxRetries )
-	    throw new SQLException("myJdbcInterface.execSqlFT: SQLException:");
-	else if ( nTries > 0 ) {
-	    LOG.warn("myJdcInterface.execSqlFT: communication link failure due to inactive db connection successfully restored");
-	    LOG.warn("                          [possible exceptions can safely be ignored]");
-	}
-
-	return rs;
+    } catch (SQLException ex) {
+      LOG.error("SQLException: " + ex.getMessage());
+      return false;
     }
 
+    return true;
+  }
 
+  public void identify() {
+    LOG.info("-----------------------------------------------");
+    LOG.info("myJdbcInterface: " + myDriverClassName + "  " + myUrl + " "
+        + myUser);
+    LOG.info("config file " + myConfigFile);
+    LOG.info("bConnected = " + bConnected);
+    LOG.info("-----------------------------------------------");
+  }
 
-    /** closes the database connection */
-    public void close()
-    {
-	if ( LOG.isDebugEnabled() )
-	    LOG.debug("myJdbcInterface.close: entry" );
+  /** a simple stupid test */
+  private void test1(String theSQL) {
+    System.out.println("");
+    System.out
+        .println("--------------- myJdbcInterface.test1: --------------------------");
+    try {
+      ResultSet rs = execSqlFT(theSQL, true);
 
-	try {
-
-	    myStatement.close();
-
-	} catch ( SQLException ex ) {
-	    LOG.error("myJdbcInterface.close: statement exception = " + ex.toString() );
-	}
-
-	try {
-
-	    myConnection.close();
-
-	    bConnected = false;
-
-	} catch ( SQLException ex ) {
-	    LOG.error("myJdbcInterface.close: connection exception = " + ex.toString() );
-	}
-
-	if ( LOG.isDebugEnabled() )
-	    LOG.debug("myJdbcInterface.close: done" );
+      while (rs != null && rs.next()) {
+        String s1 = rs.getString(1);
+        String s2 = rs.getString(2);
+        System.out.println("   " + s1 + " " + s2);
+      }
+    } catch (SQLException ex) {
+      System.out.println("myJdbcInterface.main: exeception in rs");
     }
 
-
-
-
-
-
-
-    /*------------------------------------------------------------------------
-      private member functions
-      ------------------------------------------------------------------------*/
-
-    /** reads the config file
-	@return true in case of success, false otherwise
-    */
-    private boolean readConfigFile()
-    {
-
-	try {
-		File theFile = new File( myConfigFile );
-		if ( ! theFile.exists() || ! theFile.isFile() || ! theFile.canRead() ) {
-			LOG.error("myJdbcInterface.readConfigFile: error reading file " +
-					   myConfigFile );
-			return false;
-		}
-		Properties theProperties = new Properties();
-	       theProperties.load( new FileInputStream( theFile ) );	
-	
-	       myDriverClassName = theProperties.getProperty( myJdbcConfigurationKeys.keyDriver ).trim();
-		myUrl = theProperties.getProperty( myJdbcConfigurationKeys.keyUrl ).trim();
-		myUser = theProperties.getProperty( myJdbcConfigurationKeys.keyUser ).trim();
-		myPassword = theProperties.getProperty( myJdbcConfigurationKeys.keyPassword ).trim();
-		sqlCommands = theProperties.getProperty( myJdbcConfigurationKeys.keySqlCmds ).trim();
-
-		if ( LOG.isDebugEnabled() ) {
-			LOG.debug("myJdbcInterface.readConfigFile: read file successfully" );
-			LOG.debug("     driver = " + myDriverClassName + 
-					" url = " + myUrl + " user = " + myUser );
-		}
-	} catch ( Exception ex ) {
-		LOG.error("myJdbcInterface.readConfigFile: execption " + 
-				ex.getMessage() );
-		return false;
-	}
-	return true;
-    }
-
-
-
-    /** initializes the database connection
-	@return true in case of success, false otherwise
-    */
-    public boolean initialize()
-    {
-	if ( LOG.isDebugEnabled() )
-	    LOG.debug("myJdbcInterface.initialize: entry " );
-
-	if ( bConfigFileRead == false ) {
-	    LOG.error("myJdbcInterface.initialize: invalid database connection parameters: check file " + 
-			       myConfigFile );
-	    return false;
-	}
-
-	try {
-	    Class.forName( myDriverClassName ); 
-	    if ( LOG.isDebugEnabled() )
-		LOG.debug("myJdbcInterface.initialize: class.forName done " );
-	} 
-	catch (java.lang.ClassNotFoundException e) {
-	    LOG.error("myJdbcInterface.initialize: cannot find class " + e.toString() );
-	    return false;
-	}
-	
-	try {
-	    if ( LOG.isDebugEnabled() )
-		LOG.debug("myJdbcInterface.initialize: about to try getConnection for *" + myUrl + 
-				   " user = " + myUser );
-	    myConnection = DriverManager.getConnection( myUrl, myUser, myPassword );
-
-	    if ( LOG.isDebugEnabled() )
-		LOG.debug("myJdbcInterface.initialize: getConnection done " );		
-
-	    myStatement = myConnection.createStatement();
-	    
-	    bConnected = true;
-
-	    if ( LOG.isDebugEnabled() )
-		LOG.debug("myJdbcInterface.initialize: createStatement done " );
-
-	    
-	} catch (SQLException ex) {
-	    LOG.error("SQLException: " + ex.getMessage());
-	    return false;
-	}
-
-	return true;
-    }
-
-
-
-    public void identify()
-    {
-	LOG.info("-----------------------------------------------");
-	LOG.info("myJdbcInterface: " + myDriverClassName + "  " 
-			   + myUrl + " " + myUser );
-	LOG.info("config file " + myConfigFile );
-	LOG.info("bConnected = " + bConnected );
-	LOG.info("-----------------------------------------------");
-    }
-
-
-    /** a simple stupid test */
-    private void test1( String theSQL )
-    {
-	System.out.println("");
-	System.out.println("--------------- myJdbcInterface.test1: --------------------------");
-	try {
-	    ResultSet rs = execSqlFT( theSQL,true );
-	    
-	    while ( rs != null && rs.next() ) {
-		String s1 = rs.getString( 1 );
-		String s2 = rs.getString( 2 );
-		System.out.println("   " + s1 + " " + s2 );
-	    }
-	}
-	catch ( SQLException ex ) {
-	    System.out.println("myJdbcInterface.main: exeception in rs" );
-	}
-	
-	System.out.println("");
-    }
-
-
+    System.out.println("");
+  }
 
 }
