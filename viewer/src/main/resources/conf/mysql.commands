@@ -1,0 +1,113 @@
+#----------------------------------------------------------------
+#
+# SQL commands for the mySql database
+#----------------------------
+
+# Note:
+#------
+# 1. select statements normally put the parameters into variable
+#    names, which will be picked by the code as these variable names
+#    (and not the column names).
+#
+#
+# Author: C.Witzig
+# Date: 21.2.2006
+#
+#
+#----------------------------------------------------------------
+#
+
+
+#
+# find the index for the "global" shibboleth provider
+# 
+selGlobalShibProvider = select idxShibProvider as idx from ShibProvider where spProviderName is null
+
+#
+# given the user name find its index in ArpUser
+#
+selIdxUser = select idxArpUser as idxUser from ArpUser where auUserName = '?'
+
+#
+# given the provider name find its index in ShibProvider
+#
+selShibProvider = select idxShibProvider as idxProvider from ShibProvider where spProviderName = '?'
+
+#
+# inserts a new Provider into the table ShibProvider
+#
+insShibProvider = insert into ShibProvider (spProviderName) values ( '?' )
+
+#
+# selects all the user info across the tables ArpUser, AttrReleaseApproval
+# ShibProvider
+#
+selArpInfoByUsername1 = select idxArpUser as idxUser, date_format(araTimeStamp,'%Y-%m-%d %H:%i%s') as ArpDate, araTermsVersion as TermsOfUseManager, araAttributes as Attributes, spProviderName as ShibProvider from ArpUser, AttrReleaseApproval, ShibProvider where auUserName='?' and idxArpUser=araIdxArpUser and araIdxShibProvider = idxShibProvider order by araTimeStamp desc
+
+selArpInfoByUsername2 = select idxArpUser as idxUser, auLastTermsVersion as TermsOfUseManager, auLastAccess as ArpDate from ArpUser where auUserName='?'
+
+#
+# inserts a new user into the table ArpUser
+#
+insUser = insert into ArpUser (auUserName, auLastTermsVersion, auFirstAccess, auLastAccess ) values ( '?', '?', now(), now() )
+
+#
+# updates the ArpUser table after every access (with login procedure or already logged with)
+#
+updUser = update ArpUser set auLastTermsVersion = '?', auFirstAccess=auFirstAccess, auLastAccess=now() where auUsername = '?'
+updUser1 = update ArpUser set auFirstAccess = auFirstAccess, auLastAccess = now() where auUserName = '?'
+
+#
+# select criteria to check whether the user has a global arp
+# (test on count(*) = cnt
+#
+selGlobalArp = select count(*) as cnt from AttrReleaseApproval, ArpUser, ShibProvider where idxArpUser=araIdxArpUser and idxShibProvider = araIdxShibProvider and spProviderName is null and auUserName = '?'
+
+#
+# inserts a new entry into the table AttrReleaseApproval.
+# There are two versions of it: once which does not add any attributes,
+# the other which adds the attributes
+#
+insAttrApproval = insert into AttrReleaseApproval ( araIdxArpUser, araIdxShibProvider, araTermsVersion,araAttributes ) values ( ?, ?, '?', null )
+
+insAttrApproval1 = insert into AttrReleaseApproval (araIdxArpUser, araIdxShibProvider, araTermsVersion, araAttributes ) values ( ?, ?, '?', '?' )
+
+#
+# delete an entry from the table AttrReleaseApproval
+#
+delAttrApproval = delete from AttrReleaseApproval where araIdxArpUser = ? and araIdxShibProvider = ?
+
+#
+# updates an entry in the table AttrReleaseApproval
+#
+updAttrApproval = update AttrReleaseApproval set araTermsVersion = '?', araAttributes = '?' where araIdxArpUser = ? and araIdxShibProvider = ?
+
+#
+# selects the index of the AttrReleaseApproval
+# (for the normal and the global case)
+#
+selIdxAttrApproval = select idxAttrReleaseApproval as idxApproval, araIdxArpUser as IdxUser, araIdxShibProvider as idxProvider, araTermsVersion as TermsVersion, araAttributes as Attributes from ArpUser, AttrReleaseApproval, ShibProvider where auUserName='?' and idxArpUser=araIdxArpUser and spProviderName = '?' and araIdxShibProvider = idxShibProvider order by araTimeStamp desc
+
+selIdxAttrApprovalGlobal = select idxAttrReleaseApproval as idxApproval, araIdxArpUser as IdxUser, araIdxShibProvider as idxProvider, araTermsVersion as TermsVersion, araAttributes as Attributes from ArpUser, AttrReleaseApproval, ShibProvider where auUserName='?' and idxArpUser=araIdxArpUser and spProviderName is null and araIdxShibProvider = idxShibProvider order by araTimeStamp desc
+
+#
+# adds a new provider access 
+#
+insProviderAccess = insert into ProviderAccess ( paIdxArpUser, paIdxShibProvider, paTermsVersion, paAttributesSent, paIdxAttrReleaseApproval, paTimeStamp ) values ( ?, ?, '?', '?', ?, now() )
+
+#
+# select all provider accesses that were made by a user
+# note: deprecated!
+#
+selIdxProviderAccess = select idxProviderAccess as idxPA from ProviderAccess, AttrReleaseApproval where paIdxAttrReleaseApproval=idxAttrReleaseApproval and araIdxArpUser=?
+
+#
+# clear the attribute release approval for a given ProviderAccess
+# (this is used when the user revokes the previous attribute release approvals)
+#
+clearReleaseForAccess = update ProviderAccess set paIdxAttrReleaseApproval = NULL, paTimeStamp = paTimeStamp where paIdxArpUser = ?
+
+#
+# delete the attribute release approvals for a given user
+#
+delAttrReleaseApprovals = delete from AttrReleaseApproval where araIdxArpUser = ?

@@ -125,7 +125,7 @@ public class ConfigurationManager {
     // check for configuration consistency
     String storetype = getParam(COMMON_STORE_TYPE);
     if ( storetype != null && !storetype.equals("")) {
-      if (!storetype.equalsIgnoreCase("File") && !storetype.equalsIgnoreCase("Database"))
+      if (!storetype.equalsIgnoreCase("file") && !storetype.equalsIgnoreCase("database"))
         throw new UApproveException("Store type ("+COMMON_STORE_TYPE+") has to be set to File or Database");
       // TODO check for values according store type
     }

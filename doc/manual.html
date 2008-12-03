@@ -89,12 +89,12 @@ dt {
 -->
 
 
-    </style> <title> Installation and configuration of uApprove (for Shibboleth Identity Provider 2.x) </title> 
+    </style> <title> Installation and configuration of uApprove (for Shibboleth Identity Provider 2) </title> 
 </head>
 <body>
 
 
-<h1> Installation and configuration of uApprove (for Shibboleth Identity Provider 2.x) </h1> <h2> Table of contents </h2> 
+<h1> Installation and configuration of uApprove (for Shibboleth Identity Provider 2) </h1> <h2> Table of contents </h2> 
 <ol>
   <li>
     <a href="#introduction"> Introduction</a> 
@@ -151,6 +151,12 @@ dt {
       The directory, where the uApprove config is located 
     </dd>
     <dt>
+      <code>/opt/shibboleth-identityprovider-2/uApprove</code> 
+    </dt>
+    <dd>
+      The Shibboleth IdP installation directory
+    </dd>    
+    <dt>
       <code>/opt/tomcat</code> 
     </dt>
     <dd>
@@ -189,23 +195,34 @@ dt {
 
 <div>
   Download and unzip the uApprove package: <pre class="console">
-wget http://www.switch.ch/downloads/uApprove-2.2.zip
-unzip uApprove-2.2.zip
+wget http://www.switch.ch/downloads/uApprove-2.2-bin.zip
+unzip uApprove-2.2-bin.zip
 </pre>
 </div>
 
+<fieldset class="warn"><legend>Warning</legend>
+If you are updating uApprove, be aware of overwrite you configuration files</fieldset>
+
+
+<h3> <a name="install"> </a> 3.1 IdP-Plugin </h3>
 <div>
   Copy libraries and configuration: <pre class="console">
-sudo cp ArpViewer-2.1/arpviewer.war /opt/tomcat/webapps
-sudo cp ArpViewer-2.1/to-idp-lib/*.jar /opt/tomcat/webapps/idp/WEB-INF/lib
-sudo cp -r ArpViewer-2.1/conf /etc/shibboleth-idp2/ArpViewer
+cd uApprove-2.2/
+unzip idp-plugin-2.2-bin.zip
+sudo cp idp-plugin-2.2/conf-template/* /etc/shibboleth-idp2/uApprove
+sudo cp idp-plugin-2.2/lib/* /opt/shibboleth-identityprovider-2/src/main/webapp/WEB-INF/lib/
 </pre>
-
-<fieldset class="warn"><legend>Warning</legend>If you are updating uApprove, be aware of overwrite you configuration files</fieldset>
-
 </div>
 
-
+<h3> <a name="install"> </a> 3.2 Viewer </h3>
+<div>
+  Copy libraries and configuration: <pre class="console">
+cd uApprove-2.2/
+unzip idp-viewer-2.2-bin.zip
+sudo cp viewer-2.2/conf-template/* /etc/shibboleth-idp2/uApprove  
+sudo cp -r viewer-2.2/webapp /opt/tomcat/webapps/uApprove
+</pre>
+</div>
 
 <h2> <a name="configuration"> </a> 4. Configuration </h2> 
 
@@ -231,18 +248,17 @@ First you have to decide which storage implementation should be used:
 
 <h4> File based </h4>
 <div>
-A file based storage hast to be setup in <tt>/etc/shibboleth-idp2/ArpViewer/common/Common.properties</tt>:
+A file based storage hast to be setup in <tt>/etc/shibboleth-idp2/uApprove/common.properties</tt>:
 <pre class="file">
-#ArpDbType = Database
-#ArpDbConfigFile = /path/to/config/common/DB.properties
+#storageType=database
+#databaseConfig=/path/to/config/database.properties
 
-ArpDbType = File
-ArpUserLogInfo = <tt class="customval">/etc/shibboleth-idp2/ArpViewer/common/LogInfo.xml</tt>
+storageType=file
+flatFile = <tt class="customval">/etc/shibboleth-idp2/uApprove/uApprove-log.xml</tt>
 </pre>  
 
-<fieldset class="note"><legend>Note</legend>Assure that <code>LogInfo.xml</code> is read- and 
+<fieldset class="note"><legend>Note</legend>Assure that <code>uApprove-log.xml</code> is read- and 
 writeable by Tomcat.</fieldset>
-
 </div>
 
 <h4> Database </h4>
@@ -252,18 +268,18 @@ First, a databases and a user have to be created:
 <pre class="console">
 mysql -u root -p
 mysql>
-CREATE DATABASE arpviewer;
-CREATE USER 'arpadmin'@'localhost' IDENTIFIED BY '<tt class="customval">arpadmin123'</tt>;
-GRANT USAGE ON *.* TO 'arpadmin'@'localhost';
-GRANT SELECT , INSERT , UPDATE , DELETE ON `arpviewer`.* TO 'arpadmin'@'localhost';
-ALTER DATABASE arpviewer DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+CREATE DATABASE uApprove;
+CREATE USER 'uApprove'@'localhost' IDENTIFIED BY '<tt class="customval">uApprove'</tt>;
+GRANT USAGE ON *.* TO 'uApprove'@'localhost';
+GRANT SELECT , INSERT , UPDATE , DELETE ON `uApprove`.* TO 'uApprove'@'localhost';
+ALTER DATABASE uApprove DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 </pre>
 
 Second, generate the table structures:
 <pre class="console">
 mysql -u root -p
 mysql>
-use arpviewer;
+use uApprove;
 
 create table ArpUser (
   idxArpUser int unsigned auto_increment primary key,
@@ -302,21 +318,21 @@ create table ProviderAccess (
 );
 </pre>
 
-A Database setup is configured in <tt>/etc/shibboleth-idp2/ArpViewer/common/Common.properties</tt>:
+A Database setup is configured in <tt>/etc/shibboleth-idp2/uApprove/common.properties</tt>:
 <pre class="file">
-ArpDbType = Database
-ArpDbConfigFile = <tt class="customval">/etc/shibboleth-idp2/ArpViewer/common/DB.properties</tt>
+storageType=database
+databaseConfig=/etc/shibboleth-idp2/uApprove/database.properties
 
-#ArpDbType = File
-#ArpUserLogInfo = /path/to/config/common/LogInfo.xml
+#storageType=file
+#flatFile=/path/to/config/uApprove-log.xml
 </pre>
 
-All database specific configuration is done in <tt>/etc/shibboleth-idp2/ArpViewer/common/DB.properties</tt>:
+All database specific configuration is done in <tt>/etc/shibboleth-idp2/uApprove/database.properties</tt>:
 <pre class="file">
 DbDriver = com.mysql.jdbc.Driver
-DbUrl = jdbc:mysql://localhost:3306/arpviewer
-DbUser = arpadmin
-DbPassword = <tt class="customval">arpadmin123</tt>
+DbUrl = jdbc:mysql://localhost:3306/uApprove
+DbUser = uApprove
+DbPassword = <tt class="customval">uApprove</tt>
 DbClean = delete from ProviderAccess where date_sub( curdate(), interval 90 day) > patimestamp 
 DbSqlCommandsFile = <tt class="customval">/etc/shibboleth-idp2/ArpViewer/common/SqlCmdsMySql.properties</tt>
 </pre>
