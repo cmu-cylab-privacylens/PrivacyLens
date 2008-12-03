@@ -59,22 +59,21 @@ public class myJdbcInterface {
 
   private static Logger LOG = LoggerFactory.getLogger(myJdbcInterface.class);
 
-
   /**
    * Class that defines the property keys in the property file. Note: if you
    * change the keys in the corresponding property file, you must also change
    * them here!
    */
   public class myJdbcConfigurationKeys {
-    public static final String keyDriver = "DbDriver";
+    public static final String keyDriver = "driver";
 
-    public static final String keyUrl = "DbUrl";
+    public static final String keyUrl = "url";
 
-    public static final String keyUser = "DbUser";
+    public static final String keyUser = "user";
 
-    public static final String keyPassword = "DbPassword";
+    public static final String keyPassword = "password";
 
-    public static final String keySqlCmds = "DbSqlCommandsFile";
+    public static final String keySqlCmds = "sqlCommands";
 
   }
 
