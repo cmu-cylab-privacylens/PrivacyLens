@@ -2,32 +2,30 @@
 <assembly>
     <id>bin</id>
     <formats>
-        <format>tar.gz</format>
+        <!--<format>tar.gz</format>-->
         <format>zip</format>
     </formats>
-    
-    <dependencySets>
-        <dependencySet>
-            <outputDirectory>/lib</outputDirectory>
-            <excludes>
-                <exclude>edu.internet2.middleware:shibboleth:*</exclude>
-            </excludes>
-            <includes>
-                <include>*:jar:*</include>
-            </includes>
-        </dependencySet>
-    </dependencySets>
-    
+        
     <fileSets>
         <!-- Documentation -->
         <fileSet>
             <directory>doc/</directory>
             <outputDirectory>/doc</outputDirectory>
         </fileSet>
-        <fileSet>
-            <directory>target/site/apidocs</directory>
-            <outputDirectory>/doc/api</outputDirectory>
-        </fileSet>
-    </fileSets>
-    
+     </fileSets>
+     
+     <files>       
+        <!--  IdP Plugin -->
+        <file>
+            <source>idp-plugin/target/idp-plugin-2.2-bin.zip</source>
+            <outputDirectory>/</outputDirectory>
+        </file>
+        
+        <!--  Viewer -->
+        <file>
+            <source>viewer/target/viewer-2.2-bin.zip</source>
+            <outputDirectory>/</outputDirectory>
+        </file>
+      </files>
+            
 </assembly>

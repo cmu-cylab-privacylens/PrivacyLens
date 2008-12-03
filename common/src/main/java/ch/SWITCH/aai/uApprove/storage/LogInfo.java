@@ -25,8 +25,8 @@ import org.slf4j.Logger;
  * 
  */
 public abstract class LogInfo {
-  public static final String STORE_TYPE_FILE = "File";
-  public static final String STORE_TYPE_DB = "Database";
+  public static final String STORE_TYPE_FILE = "file";
+  public static final String STORE_TYPE_DB = "database";
   
   private static LogInfo logInfo = null;
 

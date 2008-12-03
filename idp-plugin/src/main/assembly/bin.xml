@@ -2,16 +2,12 @@
 <assembly>
     <id>bin</id>
     <formats>
-        <format>tar.gz</format>
         <format>zip</format>
     </formats>
     
     <dependencySets>
         <dependencySet>
             <outputDirectory>/lib</outputDirectory>
-            <excludes>
-                <exclude>edu.internet2.middleware:shibboleth:*</exclude>
-            </excludes>
             <includes>
                 <include>*:jar:*</include>
             </includes>
@@ -19,14 +15,10 @@
     </dependencySets>
     
     <fileSets>
-        <!-- Documentation -->
+        <!-- Configuration template -->
         <fileSet>
-            <directory>doc/</directory>
-            <outputDirectory>/doc</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>target/site/apidocs</directory>
-            <outputDirectory>/doc/api</outputDirectory>
+            <directory>src/main/resources/conf</directory>
+            <outputDirectory>/conf-template</outputDirectory>
         </fileSet>
     </fileSets>
     
