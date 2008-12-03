@@ -21,11 +21,11 @@
   </logger>
  
   <logger name="ch.SWITCH.aai.uApprove.components"">
-    <level value="INFO" />
+    <level value="WARN" />
   </logger>
  
   <logger name="ch.SWITCH.aai.uApprove.storage"">
-    <level value="INFO" />
+    <level value="WARN" />
   </logger>
  
  <root>

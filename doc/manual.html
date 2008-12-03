@@ -329,68 +329,68 @@ databaseConfig=/etc/shibboleth-idp2/uApprove/database.properties
 
 All database specific configuration is done in <tt>/etc/shibboleth-idp2/uApprove/database.properties</tt>:
 <pre class="file">
-DbDriver = com.mysql.jdbc.Driver
-DbUrl = jdbc:mysql://localhost:3306/uApprove
-DbUser = uApprove
-DbPassword = <tt class="customval">uApprove</tt>
-DbClean = delete from ProviderAccess where date_sub( curdate(), interval 90 day) > patimestamp 
-DbSqlCommandsFile = <tt class="customval">/etc/shibboleth-idp2/ArpViewer/common/SqlCmdsMySql.properties</tt>
+driver=com.mysql.jdbc.Driver
+url=jdbc:mysql://localhost:3306/uApprove
+user=uApprove
+password=<tt class="customval">uApprove</tt>
+sqlCommands=<tt class="customval">/etc/shibboleth-idp2/uApprove/mysql.commands</tt>
 </pre>
 
 <fieldset class="note"><legend>Note</legend>If another SQL server than MySQL is used, the values above has to be adjusted.
 <br /> Don't forget to put according JDBC driver into the library folder. <br /> 
-If it is necessary, the SQL commands can be re-defined in <code>/etc/shibboleth-idp2/ArpViewer/common/SqlCmdsMySql.properties</code>
+If it is necessary, the SQL commands can be re-defined in <code>/etc/shibboleth-idp2/uApprove/foo.commands</code>
 </fieldset>
 </div>
 
 <h4> Other common configuration </h4>
 <div>
 The TermsOfUseManager, which shows a Terms of use text to the user is optional. If the TermsOfUseManager should be active, define the terms in  
-<tt>/etc/shibboleth-idp2/ArpViewer/common/Common.properties</tt>:
+<tt>/etc/shibboleth-idp2/uApprove/common.properties</tt>:
 
 <pre class="file">
-TermsOfUseManager = <tt class="customval">/etc/shibboleth-idp2/ArpViewer/common/TermsOfUseManager.xml</tt>
+termsOfUse=<tt class="customval">/etc/shibboleth-idp2/uApprove/terms-of-use.xml</tt>
 </pre>
 
 <fieldset class="note"><legend>Note</legend>
-The shipped <code>TermsOfUseManager.xml</code> is an empty one, which can be filled by custom terms of use version and text. <br />
-If you want see a real world example, pleas take a loot at the <a href="TermsOfUseManager_SWITCH.xml">SWITCHaai VHO terms of use</a>.
+The shipped <code>terms-of-use.xml</code> is an empty one, which can be filled by custom terms of use version and text. <br />
+If you want see a real world example, pleas take a look at the SWITCHaai VHO terms of use (<code>doc/terms-of-use-SWITCH.xml</code>).
 </fieldset>
 
 <p>
-Cause the ArpFilter and the ArpViewer web application exchange some confidential information, this is
-encrypted and decrypted by a shared secret (128 bit, 16 characters) in <tt>/etc/shibboleth-idp2/ArpViewer/common/Common.properties</tt>:
+Cause the IdP plugin and the viewer application exchange some confidential information, this is
+encrypted and decrypted by a shared secret (128 bit, 16 characters) in <tt>/etc/shibboleth-idp2/uApprove/common.properties</tt>:
 </p>
 
 <pre class="file">
-SharedSecret = <tt class="customval">!4's-50_$3Cr#T,|Zn`t_i7?</tt>
+sharedSecret=<tt class="customval">!4's-50_$3Cr#T,|Zn`t_i7?</tt>
 </pre>
 
 </div>
-<h3>4.2 ArpFilter configuration </h3>
+
+<h3>4.2 IdP plugin configuration </h3>
 
 <h4> Shibboleth IdP adjustments </h4>
 
-The ArpFilter has to be enabled within Shibboleth IdP web application <tt>/opt/tomcat/webapps/idp/WEB-INF/web.xml</tt>:
+The IdP plugin has to be enabled within Shibboleth IdP web application <tt>/opt/shibboleth-identityprovider-2/src/main/webapp/WEB-INF/web.xml</tt>:
 
 <pre class="file">
 &lt;web-app&gt;
   ...
 <tt class="customval">  
   &lt;filter&gt;
-    &lt;filter-name&gt;ArpFilter&lt;/filter-name&gt;
-    &lt;filter-class&gt;ch.SWITCH.aai.arpfilter.ArpFilter&lt;/filter-class&gt;
+    &lt;filter-name&gt;uApprove IdP plugin&lt;/filter-name&gt;
+    &lt;filter-class&gt;ch.SWITCH.aai.uApprove.idp-plugin.Plugin&lt;/filter-class&gt;
     &lt;init-param&gt;
       &lt;param-name&gt;Config&lt;/param-name&gt;
       &lt;param-value&gt;
-        /etc/shibboleth-idp2/ArpViewer/arpfilter/ArpFilter.properties;
-        /etc/shibboleth-idp2/ArpViewer/common/Common.properties;
+        /etc/shibboleth-idp2/uApprove/idp-plugin.properties;
+        /etc/shibboleth-idp2/uApprove/common.properties;
       &lt;/param-value&gt;
     &lt;/init-param&gt;
   &lt;/filter&gt;
 
   &lt;filter-mapping&gt;
-    &lt;filter-name&gt;ArpFilter&lt;/filter-name&gt;
+    &lt;filter-name&gt;uApprove IdP plugin&lt;/filter-name&gt;
     &lt;url-pattern&gt;/profile/*&lt;/url-pattern&gt;
     &lt;dispatcher&gt;REQUEST&lt;/dispatcher&gt;
     &lt;dispatcher&gt;FORWARD&lt;/dispatcher&gt;
@@ -399,17 +399,25 @@ The ArpFilter has to be enabled within Shibboleth IdP web application <tt>/opt/t
 &lt;/web-app&gt;
 </pre>
 
+<h5> Redeployment of Shibboleth IdP</h5>
+<div>
+<pre class="console">
+cd >/opt/shibboleth-identityprovider-2/
+sudo sh install.sh
+</pre>
+</div>
+
 <p>
-The ArpBlacklist defines Resources which are excluded from the attribute release approval. <br />
-The ArpBlacklist is optional and can be configured by 
-<tt>/etc/shibboleth-idp2/ArpViewer/arpfilter/ArpFilter.properties</tt>:
+The SP blacklist defines Resources which are excluded from the user consent. <br />
+The SP blacklist is optional and can be configured by 
+<tt>/etc/shibboleth-idp2/uApprove/idp-plugin.properties</tt>:
 </p>
 
 <pre class="file">
-SPBlacklistManager = <tt class="customval">/etc/shibboleth-idp2/ArpViewer/arpfilter/SPBlacklistManager.txt</tt>
+spBlacklist=<tt class="customval">/etc/shibboleth-idp2/uApprove/sp-blacklist</tt>
 </pre>
 
-In <code> SPBlacklistManager.txt </code> each line defines a regular expression pattern for black listed resource identifier:
+In <code>sp-blacklist</code>, each line defines a regular expression pattern for black listed resource identifier:
 <pre class="file">
 # Example 1: specific resource
 https://sp\.example\.org/shibboleth
@@ -423,23 +431,23 @@ https://.*\.example\.org/.*
 
 <p>
 If the database storage is used, it is possible to log each provider access, which means every attribute release is stored in the database.
-<br /> It is also possible, that the ArpFilter runs in monitoring only mode, which logs every provider access, but do not interact with the user (4 attribute release approval)
-<br /> If the ArpViewer web application is used, the ArpFilter has to know, where it is deployed.
-<br /> it is possible to tell the Arpfilter, that it should take care about <i>isPassive</i> requests.
-<br /> The configuration is done in <tt>/etc/shibboleth-idp2/ArpViewer/arpfilter/ArpFilter.properties</tt>:
+<br /> It is also possible, that the IdP plugin runs in monitoring only mode, which logs every provider access, but do not interact with the user (for user consent)
+<br /> If the viewer web application is used, the IdP plugin has to know, where it is deployed.
+<br /> it is possible to tell the IdP plugin, that it should take care about <i>isPassive</i> requests.
+<br /> The configuration is done in <tt>/etc/shibboleth-idp2/uApprove/idp-plugin.properties</tt>:
 <p>
 <pre class="file">
-LogProviderAccess = <tt class="customval">false</tt>
-MonitoringOnly = <tt class="customval">false</tt>
-ArpViewerDeployPath = <tt class="customval">https://idp.example.org/arpviewer/Controller</tt>
-IsPassiveSupport = <tt class="customval">false</tt>
+logProviderAccess=<tt class="customval">false</tt>
+monitoringOnly=<tt class="customval">false</tt>
+uApproveViewer=<tt class="customval">https://idp.example.org/uApprove/Controller</tt>
+isPassiveSupport=<tt class="customval">false</tt>
 </pre>
 </div>
-<h3> 4.3 ArpViewer configuration </h3>
+<h3> 4.3 Viewer configuration </h3>
 
 <p>
-Adjust the ArpViewer web application according you configuration directory in
-<tt>/opt/tomcat/webapps/arpviewer/WEB-INF/web.xml</tt>:
+Adjust the viewer application according you configuration directory in
+<tt>/opt/tomcat/webapps/uApprove/WEB-INF/web.xml</tt>:
 </p>
 <pre class="file">
 &lt;web-app&gt;
@@ -447,8 +455,8 @@ Adjust the ArpViewer web application according you configuration directory in
   &lt;context-param&gt;
     &lt;param-name&gt;Config&lt;/param-name&gt;
     &lt;param-value&gt;
-        <tt class="customval">/etc/shibboleth-idp2/ArpViewer/arpviewer/ArpViewer.properties;</tt>
-        <tt class="customval">/etc/shibboleth-idp2/ArpViewer/common/Common.properties;</tt>
+        <tt class="customval">/etc/shibboleth-idp2/uApprove/viewer.properties;</tt>
+        <tt class="customval">/etc/shibboleth-idp2/uApprove/common.properties;</tt>
     &lt;/param-value&gt;
   &lt;/context-param&gt;
   ...
@@ -458,19 +466,19 @@ Adjust the ArpViewer web application according you configuration directory in
 <h4> Attributes and localization </h4>
 
 <div>
-The ArpViewer web application shows all attributes which will be released for the current user to the 
+The viewer web application shows all attributes which will be released for the current user to the 
 target resource.
 
 <p>
 It is possible to define a order of the attribute listing and if necessary, attributes can also be hidden.
-The configuration of the attribute list is optional done by <tt> /etc/shibboleth-idp2/ArpViewer/arpviewer/ArpViewer.properties</tt>:
+The configuration of the attribute list is optional done by <tt> /etc/shibboleth-idp2/uApprove/viewer.properties</tt>:
 </p>
 
 <pre class="file">
-AttrListFileName = <tt class="customval">/etc/shibboleth-idp2/ArpViewer/arpviewer/AttributeList.txt</tt>
+attributeList=<tt class="customval">/etc/shibboleth-idp2/uApprove/attribute-list</tt>
 </pre>
 
-An <code> AttributeList.txt </code> can be look like:
+An <code>attribute-list</code> can be look like:
 <pre class="file">
 # Defined attribute order
 surname
@@ -484,13 +492,13 @@ postalAddress
 </pre>
 
 <fieldset class="note"><legend>Note</legend>
-The attribute name in <code>AttributeList.txt</code> has to comply with the attribute id in
+The attribute name in <code>attribute-list</code> has to comply with the attribute id in
 <code> /etc/shibboleth-idp2/attribute-resolver.xml</code>
 </fieldset>
 
 <p>
-The ArpViewer web application ist multi lingual for the static text and dynamic text, like attribute names and descrptions.
-<br /> For the static text, the following languages are supported: en, de, fr, it.
+The viewer web application ist multi lingual for the static text and dynamic text, like attribute names and descrptions.
+<br /> For the static text, the following languages are supported: en, de, fr, it, pt.
 <br /> For the attribute names and descriptions, the localized content is taken from <tt> /etc/shibboleth-idp2/attribute-resolver.xml</tt> 
 (Shibboleth IdP resolver). It's possible to adjust or extent it:
 </p>
@@ -516,45 +524,45 @@ The ArpViewer web application ist multi lingual for the static text and dynamic 
 </pre>
 
 <fieldset class="note"><legend>Note</legend>
-For the SWITCHaai attributes, there is a prepared <a href="attribute-descriptions.xml">attribute-descriptions.xml</a> for the languages: en, de, fr, it.
+For the SWITCHaai attributes, there is a prepared <code>doc/attribute-descriptions.xml</code> for the languages: en, de, fr, it.
 </fieldset>
 <p>
-The ArpViewer uses the language from the users browsers request, if that language is not available, the default locale <i>en</i> will be taken.
-<br /> It is possible to enforce a specific language. This can be defined optional in <tt> /etc/shibboleth-idp2/ArpViewer/arpviewer/ArpViewer.properties</tt>:
+The viewer uses the language from the users browsers request, if that language is not available, the default locale <i>en</i> will be taken.
+<br /> It is possible to enforce a specific language. This can be defined optional in <tt> /etc/shibboleth-idp2/uApprove/viewer.properties</tt>:
 </p>
 <pre class="file">
-UseLocale = <tt class="customval">US_en</tt>
+useLocale=<tt class="customval">US_en</tt>
 </pre>
 </div>
 
-<h4> Global attribute release approval </h4>
+<h4> Global consent </h4>
 <div>
-If it is required, that a user gives to each different resource access, an approval, global attribute releas approval has to be disabled in 
-<tt> /etc/shibboleth-idp2/ArpViewer/arpviewer/ArpViewer.properties</tt>:
-
+It is possible that a user can give global attribute release consent, which mean, that she/he is never be asked again by uApprove.
+If it is required, that a user has to give consent to each different resource access, global consent has to be disabled in 
+<tt> /etc/shibboleth-idp2/uApprove/viewer.properties</tt>:
 <pre class="file">
-GlobalArpDisabled = <tt class="customval">true</tt>
+globalConsentPossible=<tt class="customval">true</tt>
 </pre>
 </div>
+
 <h4> <a name="vlog"></a> Logging </h4>
-
 <div>
-The ArpViewer web application uses LogBack (see <a href="#references">references</a>) like the Shibboleth IdP.
+The viewer web application uses LogBack (see <a href="#references">references</a>) like the Shibboleth IdP.
 <br />
-The logback configuration file is defined in <tt> /etc/shibboleth-idp2/ArpViewer/arpviewer/ArpViewer.properties</tt>:
+The logback configuration file is defined in <tt> /etc/shibboleth-idp2/uApprove/viewer.properties</tt>:
 
 <pre class="file">
-LoggingConfig = <tt class="customval">/etc/shibboleth-idp2/ArpViewer/arpviewer/logback.xml</tt>
+loggingConfig=<tt class="customval">/etc/shibboleth-idp2/uApprove/logging.xml</tt>
 </pre>
 
 
-Adjust <code> logback.xml </code> for the log location, assure that the file is writeable by Tomcat:
+Adjust <code>logging.xml</code> for the log location, assure that the file is writeable by Tomcat:
 
 <pre class="file">
 &lt;configuration&gt;
   ...
   &lt;appender class="ch.qos.logback.core.FileAppender" name="RootFileAppender"&gt;
-    &lt;file&gt;<tt class="customval">/path/to/log/arpviewer.log</tt>&lt;/file&gt;
+    &lt;file&gt;<tt class="customval">/var/log/log/shibboleth-idp2/uApprove.log</tt>&lt;/file&gt;
     ...
   &lt;/appender&gt;
   ... 
@@ -564,13 +572,13 @@ Adjust <code> logback.xml </code> for the log location, assure that the file is 
 
 <h4> Apache in front of Tomcat</h4>
 <div>
-If you are using Aache HTTPd in front of your Tomcat setup, mount the ArpViewer web application in 
+If you are using Aache HTTPd in front of your Tomcat setup, mount the viewer web application in 
 <tt>/etc/apache2/sites-enabled/idp.example.org</tt>:
 
 <pre class="file">
 &lt;VirtualHost idp.example.org:443&gt;
   ...
-  JkMount  /arpviewer/*  ajp13_worker
+  JkMount  /uApprove/*  ajp13_worker
   ...
 &lt;/VirtualHost&gt;
 </pre>
@@ -580,10 +588,10 @@ Restart Aache HTTPd:
 sudo /etc/init.d/apache2 restart
 </pre>
 </div>
-<h3> 4.4 Edit settings configuration </h3>
+<h3> 4.4 Reset-approvals configuration </h3>
 
 <div>
-The optional <i> Reset settings application </i> can be operated in two ways:
+The optional <i> reset-approvals</i> can be operated in two ways:
 <dl>
   <dt>In-flow mode</dt>
   <dd> The In-flow operation means, that a user can reset his setting during the login process. As exampple this is done by a checkbox on the login form. </dd>
@@ -592,17 +600,17 @@ The optional <i> Reset settings application </i> can be operated in two ways:
 </dl>
 
 <fieldset class="warn"><legend>Warning</legend>
-The <i> Edit settings application </i> can only used with a database setup.
+The <i> reset-approvals </i> application can only used with a database setup.
 </fieldset>
 </div>
 
 <h4> In-flow mode </h4>
 <div>
-For enabling the In-Flow <i> Reset settings application </i>, the Shibboleth UsernamePassword login form
+For enabling the In-Flow <i> reset-approvals </i> application, the Shibboleth UsernamePassword login form
 <tt>/opt/tomcat/webapps/idp/login.jsp</tt> can be adapted by adding a checkbox:
 
 <fieldset class="warn"><legend>Warning</legend>
-Followed, the In-Flow <i> Reset settings application </i> configuration is for the shipped UsernamePassword
+Followed, the In-Flow <i> reset-settings </i> application configuration is for the shipped JAAS UsernamePassword
 login handler. If you are using another login handler (i.e. RemoteUser) you have to assure, that the GET
 parameter is transmitted to the IdP plugin. 
 </fieldset>
@@ -615,8 +623,8 @@ parameter is transmitted to the IdP plugin.
   ...
     <tt class="customval">&lt;tr&gt;
       &lt;td colspan="2"&gt;
-        &lt;input type="checkbox" name="editarpsettings" value="on" /&gt;
-        Reset my login preferences
+        &lt;input type="checkbox" name="resetuserconsent" value="true" /&gt;
+        Reset my attribute release approvals
       &lt;/td&gt;
     &lt;/tr&gt;</tt>
   &lt;/table&gt;
@@ -631,7 +639,7 @@ For the standalone mode, the JSP has to be protected either by container managed
 that the <code>REMOTE_USER</code> is provided.
 
 <p>
-The standalone JSP can be called like <code> https://idp.example.org/uApprove/useredit.jsp?standalone_next_url=http://go.here.org/after/reset</code>. The parameter <code>standalone_next_url</code> has to be set.
+The standalone JSP can be called like <code> https://idp.example.org/uApprove/reset-settings.jsp?standalone_next_url=http://go.here.org/after/reset</code>. The parameter <code>standalone_next_url</code> has to be set.
 </p>
 </div>
 
@@ -639,7 +647,6 @@ The standalone JSP can be called like <code> https://idp.example.org/uApprove/us
 
 <div>
 Restart Tomcat:
-
 <pre class="console">
 sudo /opt/tomcat/bin/shutdown.sh &amp;&amp; sleep 10 &amp;&amp; sudo /opt/tomcat/bin/startup.sh
 </pre>
