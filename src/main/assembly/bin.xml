@@ -17,13 +17,13 @@
      <files>       
         <!--  IdP Plugin -->
         <file>
-            <source>idp-plugin/target/idp-plugin-2.2-bin.zip</source>
+            <source>idp-plugin/target/idp-plugin-${project.version}-bin.zip</source>
             <outputDirectory>/</outputDirectory>
         </file>
         
         <!--  Viewer -->
         <file>
-            <source>viewer/target/viewer-2.2-bin.zip</source>
+            <source>viewer/target/viewer-${project.version}-bin.zip</source>
             <outputDirectory>/</outputDirectory>
         </file>
       </files>

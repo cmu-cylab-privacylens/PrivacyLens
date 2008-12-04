@@ -16,7 +16,7 @@
 
 /*
  *--------------------------------------------------------------------------
- * useredit.jsp:
+ * reset-approvals.jsp:
  * --------------
  * 
  *  Copyright (c) 2005-2006 SWITCH - The Swiss Education & Research Network
@@ -125,13 +125,13 @@ String sessionalize(HttpSession session, String key, String value) throws UAppro
     	<p>  <%= (String) rb.getString("explanation") %> </p>
 
 	<div class="form-fields">
-    	<form name="question" action="useredit.jsp">
+  <form name="question" action="reset-approvals.jsp">
 		<div align="right">
 		      <%=hiddenField%>
         	<input type="submit" name="<%=Controller.GETPAR_RESET_CANCEL%>" value="<%=(String) rb.getString( "lb_cancel") %>">
         	<input type="submit" name="<%=Controller.GETPAR_RESET_CONFIRM%>" value="<%=(String) rb.getString( "lb_confirm") %>">
 		</div>
-    	</form>
+   </form>
 	</div>
 <%
  } catch (UApproveException e){

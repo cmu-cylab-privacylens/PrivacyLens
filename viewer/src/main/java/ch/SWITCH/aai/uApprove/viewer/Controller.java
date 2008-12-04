@@ -67,7 +67,7 @@ public class Controller extends HttpServlet {
   public static final String RB_TERMS = "terms-of-use";
   public static final String RB_TERMS_DECLINED = "terms-of-use-declined";
   public static final String RB_ATTRIBUTES = "attributes";
-  public static final String RB_ATTRIBUTES_DECLINED = "attribtes-declined";
+  public static final String RB_ATTRIBUTES_DECLINED = "attributes-declined";
   public static final String RB_RESET = "reset-approvals";
 
   public static final String SESKEY_PRINCIPAL = "principal";

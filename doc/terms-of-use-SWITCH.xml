@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<TermsOfUseManager>
+<TermsOfUse>
 <version>1.2</version>
-<termsText><![CDATA[SWITCH AAI Services
+<text><![CDATA[SWITCH AAI Services
 Terms of Use
 (ToU)
 Version 1.00 of 13 October 2004
@@ -19,5 +19,5 @@ Version 1.00 of 13 October 2004
 6. You hereby commit to adhere to the SWITCH Acceptable Use Policy (hereinafter: AUP), i.e. the General Rules of Use for SWITCH Services and the General Service Conditions, as posted at http://www.switch.ch/network/aup.html#GRU. As these ToU, the AUP are subject to changes without prior notice. We strongly recommend that you visit the above link periodically to stay abreast of such changes. In case of discrepancies between the AUP and these ToU, the latter shall prevail.
 
 7. These ToU and your use of the Services shall be governed by Swiss law, and you submit to the exclusive jurisdiction of the courts of 8001 Zurich.
-]]></termsText>
-</TermsOfUseManager>
+]]></text>
+</TermsOfUse>

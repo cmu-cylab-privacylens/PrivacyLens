@@ -98,9 +98,9 @@ public class TermsOfUseManager {
    * @throws UApproveException 
    */
   public static String getTermsText() throws UApproveException {
-    if (termsVersion == null)
+    if (termsText == null)
       throw new UApproveException(TermsOfUseManager.class+" is not initialisized");
-   if (termsVersion.trim().equals(""))
+   if (termsText.trim().equals(""))
      LOG.warn(TermsOfUseManager.class +" Terms text is not set");
     return termsText;
   }
@@ -132,7 +132,7 @@ public class TermsOfUseManager {
                     if ("version".equals(n.getNodeName())) {
                       termsVersion = t.getNodeValue();
                     }
-                    if ("termsText".equals(n.getNodeName())) {
+                    if ("text".equals(n.getNodeName())) {
                       termsText = t.getNodeValue();
                       break;
                     }

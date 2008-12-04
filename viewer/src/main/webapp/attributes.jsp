@@ -82,7 +82,7 @@
 
 
 <!--- ------------------ table with the attributes ------------------ -->
-<script type="text/javascript" src="js/wz_tooltip.js"></script>
+<script type="text/javascript" src="scripts/wz_tooltip.js"></script>
 
 <center>
 <table cellpadding="0" cellspacing="0">
