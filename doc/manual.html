@@ -190,13 +190,18 @@ dt {
   Remove the attribute <i>servletPath</i>.
   </fieldset>
   
+  <fieldset class="warn"><legend>Warning</legend>
+  If you are updating from an existing ArpViewer 2.x to uApprove, please consult the new configuration
+  files, cause they changed.
+  </fieldset>
+  
 </div>
 <h2> <a name="install"> </a> 3. Installation </h2> 
 
 <div>
   Download and unzip the uApprove package: <pre class="console">
-wget http://www.switch.ch/downloads/uApprove-2.2-bin.zip
-unzip uApprove-2.2-bin.zip
+wget http://www.switch.ch/downloads/uApprove-2.1.1-bin.zip
+unzip uApprove-2.1.1-bin.zip
 </pre>
 </div>
 
@@ -207,20 +212,20 @@ If you are updating uApprove, be aware of overwrite you configuration files</fie
 <h3> <a name="install"> </a> 3.1 IdP-Plugin </h3>
 <div>
   Copy libraries and configuration: <pre class="console">
-cd uApprove-2.2/
-unzip idp-plugin-2.2-bin.zip
-sudo cp idp-plugin-2.2/conf-template/* /etc/shibboleth-idp2/uApprove
-sudo cp idp-plugin-2.2/lib/* /opt/shibboleth-identityprovider-2/src/main/webapp/WEB-INF/lib/
+cd uApprove-2.1.1/
+unzip idp-plugin-2.1.1-bin.zip
+sudo cp idp-plugin-2.1.1/conf-template/* /etc/shibboleth-idp2/uApprove
+sudo cp idp-plugin-2.1.1/lib/* /opt/shibboleth-identityprovider-2/src/main/webapp/WEB-INF/lib/
 </pre>
 </div>
 
 <h3> <a name="install"> </a> 3.2 Viewer </h3>
 <div>
   Copy libraries and configuration: <pre class="console">
-cd uApprove-2.2/
-unzip idp-viewer-2.2-bin.zip
-sudo cp viewer-2.2/conf-template/* /etc/shibboleth-idp2/uApprove  
-sudo cp -r viewer-2.2/webapp /opt/tomcat/webapps/uApprove
+cd uApprove-2.1.1/
+unzip viewer-2.1.1-bin.zip
+sudo cp viewer-2.1.1/conf-template/* /etc/shibboleth-idp2/uApprove  
+sudo cp -r viewer-2.1.1/webapp /opt/tomcat/webapps/uApprove
 </pre>
 </div>
 
@@ -379,7 +384,7 @@ The IdP plugin has to be enabled within Shibboleth IdP web application <tt>/opt/
 <tt class="customval">  
   &lt;filter&gt;
     &lt;filter-name&gt;uApprove IdP plugin&lt;/filter-name&gt;
-    &lt;filter-class&gt;ch.SWITCH.aai.uApprove.idp-plugin.Plugin&lt;/filter-class&gt;
+    &lt;filter-class&gt;ch.SWITCH.aai.uApprove.idpplugin.Plugin&lt;/filter-class&gt;
     &lt;init-param&gt;
       &lt;param-name&gt;Config&lt;/param-name&gt;
       &lt;param-value&gt;
@@ -402,7 +407,7 @@ The IdP plugin has to be enabled within Shibboleth IdP web application <tt>/opt/
 <h5> Redeployment of Shibboleth IdP</h5>
 <div>
 <pre class="console">
-cd >/opt/shibboleth-identityprovider-2/
+cd /opt/shibboleth-identityprovider-2/
 sudo sh install.sh
 </pre>
 </div>
@@ -572,18 +577,21 @@ Adjust <code>logging.xml</code> for the log location, assure that the file is wr
 
 <h4> Apache in front of Tomcat</h4>
 <div>
-If you are using Aache HTTPd in front of your Tomcat setup, mount the viewer web application in 
+If you are using Apache HTTPd in front of your Tomcat setup, proxy the viewer web application in 
 <tt>/etc/apache2/sites-enabled/idp.example.org</tt>:
 
 <pre class="file">
 &lt;VirtualHost idp.example.org:443&gt;
   ...
-  JkMount  /uApprove/*  ajp13_worker
+  &lt;Location /uApprove&gt;
+    Allow from all
+    ProxyPass ajp://localhost:8009/uApprove
+  &lt;/Location&gt;
   ...
 &lt;/VirtualHost&gt;
 </pre>
 
-Restart Aache HTTPd:
+Restart Apache HTTPd:
 <pre class="console">
 sudo /etc/init.d/apache2 restart
 </pre>
