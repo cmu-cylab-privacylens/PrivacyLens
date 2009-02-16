@@ -1,23 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="common/src/main/java"/>
-  <classpathentry kind="src" path="idp-plugin/src/main/java"/>
-  <classpathentry kind="src" path="viewer/src/main/java"/>
-
-  <classpathentry kind="src" path="common/src/main/resources"/>
-  <classpathentry kind="src" path="idp-plugin/src/main/resources"/>
-  <classpathentry kind="src" path="viewer/src/main/resources"/>
-  <classpathentry kind="src" path="viewer/src/main/webapp"/>
-
-  <classpathentry kind="src" path="common/src/test/java"/>
-  <classpathentry kind="src" path="idp-plugin/src/test/java"/>
-  <classpathentry kind="src" path="viewer/src/test/java"/>
-
-  <classpathentry kind="src" path="common/src/test/resources"/>
-  <classpathentry kind="src" path="idp-plugin/src/test/resources"/>
-  <classpathentry kind="src" path="viewer/src/test/resources"/>
-
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
+	<classpathentry kind="src" path="common/src/test/java"/>
+	<classpathentry excluding="**" kind="src" output="common/src/main/resources" path="common/src/main/resources"/>
+	<classpathentry excluding="**" kind="src" output="common/src/test/resources" path="common/src/test/resources"/>
+	<classpathentry kind="src" path="idp-plugin/src/main/java"/>
+	<classpathentry kind="src" path="idp-plugin/src/test/java"/>
+	<classpathentry excluding="**" kind="src" output="idp-plugin/src/main/resources" path="idp-plugin/src/main/resources"/>
+	<classpathentry excluding="**" kind="src" output="idp-plugin/src/test/resources" path="idp-plugin/src/test/resources"/>
+	<classpathentry kind="src" path="viewer/src/main/java"/>
+	<classpathentry kind="src" path="viewer/src/test/java"/>
+	<classpathentry excluding="**" kind="src" output="viewer/src/main/resources" path="viewer/src/main/resources"/>
+	<classpathentry excluding="**" kind="src" output="viewer/src/test/resources" path="viewer/src/test/resources"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.devzuz.q.maven.jdt.core.mavenClasspathContainer"/>
 	<classpathentry kind="con" path="org.maven.ide.eclipse.MAVEN2_CLASSPATH_CONTAINER"/>
 	<classpathentry kind="output" path="target/classes"/>
