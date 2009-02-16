@@ -15,32 +15,34 @@
 
 surname
 givenName
-mail
-uniqueID
-matriculationNumber
+email
+swissEduPersonUniqueID
+swissEduPersonMatriculationNumber
 telephoneNumber
 postalAddress
 uid
 employeeNumber
-dateOfBirth
-gender
+swissEduPersonDateOfBirth
+swissEduPersonGender
 preferredLanguage
 homePhone
 homePostalAddress
 mobile
-homeOrganization
-homeOrganizationType
-affiliation
-studyBranch1
-studyBranch2
-studyBranch3
-studyLevel
-staffCategory
-orgDN
-orgUnitDN
-entitlement
+swissEduPersonHomeOrganization
+swissEduPersonHomeOrganizationType
+eduPersonAffiliation
+swissEduPersonStudyBranch1
+swissEduPersonStudyBranch2
+swissEduPersonStudyBranch3
+swissEduPersonStudyLevel
+swissEduPersonStaffCategory
+eduPersonOrgDN
+eduPersonOrgUnitDN
+eduPersonEntitlement
 
 # transientId and persistenId are not shown, cause it makes no sense
-# for the end user
-!persistentId
+# # for the end user
+!eduPersonTargetedID
+!persistentID
 !transientId
+

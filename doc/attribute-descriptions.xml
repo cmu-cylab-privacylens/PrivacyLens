@@ -468,12 +468,12 @@
         <resolver:Dependency ref="myLDAP" />
         <resolver:DisplayName xml:lang="en">User ID</resolver:DisplayName>
         <resolver:DisplayName xml:lang="de">Benutzer ID</resolver:DisplayName>
-        <resolver:DisplayName xml:lang="fr"></resolver:DisplayName>
+        <resolver:DisplayName xml:lang="fr">ID utilisateur</resolver:DisplayName>
         <resolver:DisplayName xml:lang="it"></resolver:DisplayName>
 	<resolver:DisplayName xml:lang="pt">User ID</resolver:DisplayName>
         <resolver:DisplayDescription xml:lang="en">A unique identifier for a person, mainly used for user identification within the user's home organization.</resolver:DisplayDescription>
         <resolver:DisplayDescription xml:lang="de">Eine eindeutige Nummer für eine Person, welche hauptsächlich zur Identifikation innerhalb der Organisation benutzt wird.</resolver:DisplayDescription>
-        <resolver:DisplayDescription xml:lang="fr"></resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="fr">Un identifiant unique de l'utilisateur.</resolver:DisplayDescription>
         <resolver:DisplayDescription xml:lang="it"></resolver:DisplayDescription>
 	<resolver:DisplayDescription xml:lang="pt">Identificador do utilizador</resolver:DisplayDescription>
 

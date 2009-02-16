@@ -36,13 +36,13 @@ import edu.vt.middleware.crypt.symmetric.AES;
 
 /**
  * Class Plugin:
- * 
+ *
  * Copyright (c) 2005-2006 SWITCH - The Swiss Education & Research Network
  */
 public class Plugin implements Filter {
 
   private static final String INITPAR_CONFIG = "Config";
-  
+
   private static final String CONTIDP_REASON_MONITORING_ONLY = "Monitoring only mode";
   private static final String CONTIDP_REASON_BLACKLIST = "Provider is in blacklist";
   private static final String CONTIDP_REASON_GLOBAL_CONSENT = "User has given global attribute release consent";
@@ -121,15 +121,15 @@ public class Plugin implements Filter {
     request.getSession().setAttribute(LoginContext.LOGIN_CONTEXT_KEY, loginCtx);
     // action URL format:
     // https://host.domain.com/uApprove/Controller/?returnUrl=https://idp.domain.com/Authn/RemoteUser&editsettings=true;
-    
+
     boolean isPassive = loginCtx.isPassiveAuthRequired();
     boolean isPassiveSupported = ConfigurationManager.makeBoolean(ConfigurationManager.getParam(ConfigurationManager.PLUGIN_ISPASSIVE_SUPPORT));
     LOG.debug("isPassive={}, isPassiveSupport={}", isPassive, isPassiveSupported);
-    
+
     if (isPassive && isPassiveSupported) {
       throw new PassiveAuthenticationException("Passive authentication is required, uApprove does support it, but can not, because user interaction is required");
     }
-    
+
     // action URL format:
     // https://host.domain.com/uApprove/Controller/?returnUrl=https://idp.domain.com/Authn/RemoteUser&editsettings=true;
     String action = ConfigurationManager
@@ -182,7 +182,7 @@ public class Plugin implements Filter {
       // initialize configuration
       ConfigurationManager
           .initialize(filterConfig.getInitParameter(INITPAR_CONFIG));
-      
+
       // initialize terms
       String terms = ConfigurationManager.getParam(ConfigurationManager.COMMON_TERMS);
       if (terms != null && !terms.equals("")) {
@@ -202,13 +202,13 @@ public class Plugin implements Filter {
           .getParam(ConfigurationManager.PLUGIN_SP_BLACKLIST));
 
       // get the attribute authority and RelyingPartyConfigurationManager from the shibboleth idp context
-      
+
       // extra flexibility, addicted to Chad
       String saml2AAId = filterConfig.getInitParameter("saml2AAId");
       if (saml2AAId == null || saml2AAId.equals("")) {
         saml2AAId = "shibboleth.SAML2AttributeAuthority";
       }
-      
+
       String relyingPartyConfigurationManagerId = filterConfig.getInitParameter("relyingPartyConfigurationManagerId");
       if (relyingPartyConfigurationManagerId == null || relyingPartyConfigurationManagerId.equals("")) {
         relyingPartyConfigurationManagerId = "shibboleth.RelyingPartyConfigurationManager";
@@ -216,23 +216,23 @@ public class Plugin implements Filter {
 
       if ((saml2AA = (SAML2AttributeAuthority) filterConfig.getServletContext().getAttribute(saml2AAId)) == null)
         throw new UApproveException("Unable to load SAML2 AA from shibboleth idp context");
-      
+
       if ((relyingPartyConfigurationManager = (SAMLMDRelyingPartyConfigurationManager) filterConfig.getServletContext().getAttribute(relyingPartyConfigurationManagerId)) == null)
         throw new UApproveException("Unable to load RelyingPartyConfigurationManager from shibboleth idp context");
-      
+
       // initialize AttributeDumper
       AttributeDumper.initialize(saml2AA, relyingPartyConfigurationManager);
 
       // initialize secret for encryption
       sharedSecret = ConfigurationManager.getParam(ConfigurationManager.COMMON_SHARED_SECRET);
-      
+
       // check if the filter only should work on a specified authnContextClassRef
       String accr = filterConfig.getInitParameter("authnContextClassRef");
       if (accr != null && !accr.equals("")) {
         authnContextClassRef = accr;
         LOG.info("IdP plugin is only working on this specific authnContextClassRef {}", authnContextClassRef);
       }
-      
+
     } catch (UApproveException e) {
       LOG.error("Unable to initialize uApprove IdP plugin", e);
       return;
@@ -246,9 +246,9 @@ public class Plugin implements Filter {
   public void doFilter(ServletRequest servletRequest,
       ServletResponse servletResponse, FilterChain filterChain) throws ServletException, IOException {
     try {
-      
+
       LOG.trace("IdP plugin entry on path {}",((HttpServletRequest) servletRequest).getServletPath());
-      
+
       // only work on HTTPRequests / responses
       if (!(servletRequest instanceof HttpServletRequest)
           && !(servletResponse instanceof HttpServletResponse)) {
@@ -256,7 +256,7 @@ public class Plugin implements Filter {
         LOG.error("IdP plugin only work on HTTPRequests / responses");
         return;
       }
-      
+
       HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
       // search logincontext in httpsession
       LoginContext loginCtx = (LoginContext) httpServletRequest
@@ -270,13 +270,13 @@ public class Plugin implements Filter {
         // search logincontext in request scope
         loginCtx = (LoginContext) httpServletRequest.getAttribute(LoginContext.LOGIN_CONTEXT_KEY);
       }
-      
+
       if (loginCtx == null) {
         LOG.debug("LoginContext not found, this must be the first visit to profile servlet");
         filterChain.doFilter(servletRequest, servletResponse);
         return;
       }
-      
+
       // check login context for errors
       AuthenticationException authenticationFailure = loginCtx.getAuthenticationFailure();
       if (authenticationFailure != null) {
@@ -284,7 +284,7 @@ public class Plugin implements Filter {
         filterChain.doFilter(servletRequest, servletResponse);
         return;
       }
-      
+
       // check if the filter only should work on a specified authnContextClassRef
       LOG.trace("LoginContext authenticationMethod{}",loginCtx.getAuthenticationMethod());
       if (authnContextClassRef != null && !authnContextClassRef.equals(loginCtx.getAuthenticationMethod())) {
@@ -292,7 +292,7 @@ public class Plugin implements Filter {
         filterChain.doFilter(servletRequest, servletResponse);
         return;
       }
-      
+
       // initialize storage handler (stupid, but true)
       String storeType = ConfigurationManager
           .getParam(ConfigurationManager.COMMON_STORE_TYPE);
@@ -312,17 +312,20 @@ public class Plugin implements Filter {
         LOG.trace("IdP Session principal name is {}", idpSession.getPrincipalName());
         LOG.trace("IdP Session subject is {}", idpSession.getSubject());
         principal = idpSession.getPrincipalName();
+      } else if (loginCtx != null) {
+    	  LOG.trace("LoginContext principal is {}", loginCtx.getPrincipalName());
+    	  principal = loginCtx.getPrincipalName();
       }
 
       if (principal==null || principal.equals(""))
          throw new UApproveException("No principal found, assure authentication");
-      
+
       LOG.debug("doFilter: principal=" + principal);
-      
+
       // get the entityId from shib context
       String entityId = loginCtx.getRelyingPartyId();
       LOG.debug("doFilter: entityId={}", entityId);
-      
+
       LOG.info("uApprove touched for {} ==> {}", principal, entityId);
 
       // get the attributes released for user and provider id;
@@ -387,7 +390,7 @@ public class Plugin implements Filter {
         String userTermsVersion = userInfo.getTermsVersion();
         LOG.debug("doFilter: terms changed termsVersion=" + termsVersion);
         LOG.debug("doFilter: terms changed userTermsVersion=" + userTermsVersion);
-  
+
         if (termsVersion != null
             && !userTermsVersion.equalsIgnoreCase(termsVersion)) {
           ((HttpServletResponse) servletResponse).getWriter().write(
@@ -463,10 +466,10 @@ public class Plugin implements Filter {
     }
 
   }
-  
+
   private void doError(HttpServletResponse response, UApproveException e) throws IOException {
     LOG.error("uApprove error",e);
-    
+
     response.setContentType("text/html");
     String htmlErrorMessage = "<span style=\"font:bold 16px monospace;color:red;\">uApprove error</span><br><br><br>";
     htmlErrorMessage += "<span style=\"font:bold 12px monospace;color:black;\">Message:</span><br><br>";
@@ -474,7 +477,7 @@ public class Plugin implements Filter {
     htmlErrorMessage += "<tt>----------------------------------------------</tt><br>";
     htmlErrorMessage += "<tt>Please try again or contact your administrator</tt>";
     response.getWriter().write(htmlErrorMessage);
-    
+
   }
-  
+
 }
