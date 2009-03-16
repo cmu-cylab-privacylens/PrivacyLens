@@ -261,11 +261,12 @@ public class Plugin implements Filter {
       // search logincontext in httpsession
       LoginContext loginCtx = (LoginContext) httpServletRequest
           .getSession().getAttribute(LoginContext.LOGIN_CONTEXT_KEY);
+      // TODO LoginContext is no public interface, it causes problems by edit settings and HA setups
       if (loginCtx != null) {
-        //loginCtx put here by IdP plugin, remove it now
-        LOG.debug("Returning from Viewer? Transferring LoginContext back to Request Scope");
-        httpServletRequest.setAttribute(LoginContext.LOGIN_CONTEXT_KEY, loginCtx);
-        httpServletRequest.getSession().removeAttribute(LoginContext.LOGIN_CONTEXT_KEY);
+          //loginCtx put here by IdP plugin, remove it now
+          LOG.debug("Returning from Viewer? Transferring LoginContext back to Request Scope");
+          httpServletRequest.setAttribute(LoginContext.LOGIN_CONTEXT_KEY, loginCtx);
+          httpServletRequest.getSession().removeAttribute(LoginContext.LOGIN_CONTEXT_KEY);
       } else {
         // search logincontext in request scope
         loginCtx = (LoginContext) httpServletRequest.getAttribute(LoginContext.LOGIN_CONTEXT_KEY);
