@@ -1,5 +1,6 @@
 package ch.SWITCH.aai.uApprove.components;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -13,10 +14,11 @@ import org.json.simple.JSONValue;
 
 
 
-public class Attribute {
-  
+public class Attribute implements Serializable {
+
+  private static final long serialVersionUID = -7555070485991286595L;
   private static final String ATTR_DELIMITER = ":";
-  
+
   public String attributeID;
   public Map<String, String> attributeNames;
   public Map<String, String> attributeDescriptions;
@@ -55,33 +57,33 @@ public static boolean compareAttributeRelease(String approved, String current) {
 
 public static String serializeAttributes(Collection<Attribute> attributes) {
 
-  JSONArray result = new JSONArray();   
+  JSONArray result = new JSONArray();
   for (Iterator<Attribute> attrIter = attributes.iterator(); attrIter.hasNext();) {
     JSONObject attribute = new JSONObject();
     Attribute attr = attrIter.next();
-    
+
     JSONObject names = new JSONObject();
     for (Iterator<String> nameIter = attr.attributeNames.keySet().iterator(); nameIter.hasNext();) {
       String key = nameIter.next();
       names.put(key, attr.attributeNames.get(key));
     }
-    
+
     JSONObject descs = new JSONObject();
     for (Iterator<String> descIter = attr.attributeDescriptions.keySet().iterator(); descIter.hasNext();) {
       String key = descIter.next();
       descs.put(key, attr.attributeDescriptions.get(key));
     }
-    
+
     JSONArray values = new JSONArray();
     for (Iterator<String> valueIter = attr.attributeValues.iterator(); valueIter.hasNext();) {
       values.add(valueIter.next());
     }
-    
+
     attribute.put("attributeId", attr.attributeID);
     attribute.put("attributeNames", names);
     attribute.put("attributeDescriptions", descs);
     attribute.put("attributeValues", values);
-    
+
     result.add(attribute);
   }
   // return JSONObject.escape(result.toString());
@@ -89,39 +91,39 @@ public static String serializeAttributes(Collection<Attribute> attributes) {
 }
 
 public static Collection<Attribute> unserializeAttributes(String serializedAttributes) {
-  
+
   Collection<Attribute> result = new ArrayList<Attribute>();
   for (Iterator<JSONObject> attrIter = ((JSONArray)JSONValue.parse(serializedAttributes)).iterator(); attrIter.hasNext();) {
     JSONObject attribute = attrIter.next();
-   
+
     Map<String, String> attributeNames = new HashMap<String, String>();
     JSONObject names = (JSONObject)JSONValue.parse(attribute.get("attributeNames").toString());
     for (Iterator<String> nameIter = names.keySet().iterator(); nameIter.hasNext();) {
       String key = nameIter.next();
       attributeNames.put(key, (String)names.get(key));
     }
-    
+
     Map<String, String> attributeDescriptions = new HashMap<String, String>();
     JSONObject descs = (JSONObject)JSONValue.parse(attribute.get("attributeDescriptions").toString());
     for (Iterator<String> descIter = descs.keySet().iterator(); descIter.hasNext();) {
       String key = descIter.next();
       attributeDescriptions.put(key, (String)descs.get(key));
     }
-    
+
     Collection<String> attributeValues = new ArrayList<String>();
     for (Iterator<String> valueIter = ((JSONArray)JSONValue.parse(attribute.get("attributeValues").toString())).iterator(); valueIter.hasNext();) {
       attributeValues.add(valueIter.next());
     }
-    
+
     Attribute a = new Attribute();
     a.attributeID = (String)attribute.get("attributeId");
     a.attributeNames = attributeNames;
     a.attributeDescriptions = attributeDescriptions;
     a.attributeValues = attributeValues;
-    
+
     result.add(a);
   }
-  
+
   return result;
 }
 
