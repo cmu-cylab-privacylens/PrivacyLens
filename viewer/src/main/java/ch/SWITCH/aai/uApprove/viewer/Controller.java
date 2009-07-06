@@ -27,6 +27,7 @@ import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import edu.vt.middleware.crypt.CryptException;
 import edu.vt.middleware.crypt.symmetric.AES;
+import edu.vt.middleware.crypt.util.Base64Converter;
 
 /**
  * uApprove Controller Servlet
@@ -95,9 +96,10 @@ public class Controller extends HttpServlet {
     try {
       aes.setIV("SWITCHaai rules".getBytes());
       aes
-          .setPrivateKey(new SecretKeySpec(sharedSecret.getBytes(), 0, 16,
+          .setKey(new SecretKeySpec(sharedSecret.getBytes(), 0, 16,
               "AES"));
-      return new String(aes.decryptFromBase64(value));
+      return new String(aes.decrypt(value, new Base64Converter()));
+
     } catch (CryptException e) {
       LOG.error("Decryption failed", e);
       throw new UApproveException(e);
