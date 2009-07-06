@@ -33,6 +33,7 @@ import edu.internet2.middleware.shibboleth.idp.authn.PassiveAuthenticationExcept
 import edu.internet2.middleware.shibboleth.idp.session.Session;
 import edu.vt.middleware.crypt.CryptException;
 import edu.vt.middleware.crypt.symmetric.AES;
+import edu.vt.middleware.crypt.util.Base64Converter;
 
 /**
  * Class Plugin:
@@ -69,10 +70,10 @@ public class Plugin implements Filter {
     try {
       aes.setIV("SWITCHaai rules".getBytes());
       aes
-          .setPrivateKey(new SecretKeySpec(sharedSecret.getBytes(), 0, 16,
+          .setKey(new SecretKeySpec(sharedSecret.getBytes(), 0, 16,
               "AES"));
       ;
-      return aes.encryptToBase64(value);
+      return aes.encrypt(value.getBytes(), new Base64Converter());
     } catch (CryptException e) {
       LOG.error("Encryptin failed", e);
       throw new UApproveException(e);
@@ -88,7 +89,7 @@ public class Plugin implements Filter {
     // create user hack
     if (userInfo == null) {
       userInfo = storage.addUserLogInfoData(username, "1.0", new Date()
-          .toString(), "", "yes", null, null);
+          .toString(), "", "no", providerId, null);
       storage.update(userInfo);
       LOG.info("continue2IdP, user was not existent, created one");
     }
