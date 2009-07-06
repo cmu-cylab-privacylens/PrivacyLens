@@ -262,6 +262,20 @@ public class Plugin implements Filter {
       // search logincontext in httpsession
       LoginContext loginCtx = (LoginContext) httpServletRequest
           .getSession().getAttribute(LoginContext.LOGIN_CONTEXT_KEY);
+    
+      LOG.trace("Dumping the request attributes");
+      for (java.util.Enumeration attributes = httpServletRequest.getAttributeNames(); attributes.hasMoreElements() ;) {
+      	String attrName = (String) attributes.nextElement();
+      	LOG.trace("Attribute {} has value {}", attrName, httpServletRequest.getAttribute(attrName));
+      }
+      LOG.trace("http servlet query string is \"{}\"", httpServletRequest.getQueryString() );
+      
+      if ( ( httpServletRequest.getQueryString() != null ) && !httpServletRequest.getQueryString().equals("") && (loginCtx != null) ) {
+    	LOG.warn("The query string is not empty, this must be a new session, discarding the login context");
+    	loginCtx = null;
+    	httpServletRequest.getSession().removeAttribute(LoginContext.LOGIN_CONTEXT_KEY);
+      }
+      
       // TODO LoginContext is no public interface, it causes problems by edit settings and HA setups
       if (loginCtx != null) {
           //loginCtx put here by IdP plugin, remove it now
