@@ -401,10 +401,23 @@ public class Controller extends HttpServlet {
 
   // parse resource (sp) host
   public static String getResourceHost(String entityId) {
-    int i1 = entityId.indexOf("//") + 2;
-    int i2 = entityId.indexOf("/", i1);
-    return i2 > 0 ? entityId.substring(0, entityId.indexOf("/", entityId
-        .indexOf("//") + 2)) : entityId;
+    int i1 = entityId.indexOf("//");
+    int i2 = entityId.indexOf("/", i1+2);
+    LOG.debug("entityId received = \"" + entityId + "\"");
+
+    // return just the sp.example.org component out of https://sp.example.org/shibboleth
+    if ( i2 >= 0 )
+       entityId = entityId.substring(i1 + 2, i2);
+    else if ( i1 >= 0 )
+       entityId = entityId.substring(i1 + 2);
+
+    // return just the sp.example.org component out of urn:mace:federation.org:sp.example.org
+    if (entityId.indexOf(':')>=0) {
+    	entityId = entityId.substring(entityId.lastIndexOf(':')+1);
+    }
+    LOG.debug("hostname extracted = \"" + entityId + "\"");
+
+    return entityId;
   }
   
   // resolves displayName due to locale
