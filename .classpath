@@ -12,7 +12,7 @@
 	<classpathentry kind="src" path="viewer/src/test/java"/>
 	<classpathentry excluding="**" kind="src" output="viewer/src/main/resources" path="viewer/src/main/resources"/>
 	<classpathentry excluding="**" kind="src" output="viewer/src/test/resources" path="viewer/src/test/resources"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.launching.macosx.MacOSXType/JVM 1.6"/>
 	<classpathentry kind="con" path="org.devzuz.q.maven.jdt.core.mavenClasspathContainer"/>
 	<classpathentry kind="con" path="org.maven.ide.eclipse.MAVEN2_CLASSPATH_CONTAINER"/>
 	<classpathentry kind="output" path="target/classes"/>

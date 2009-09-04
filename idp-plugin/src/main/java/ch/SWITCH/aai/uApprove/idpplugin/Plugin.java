@@ -177,6 +177,44 @@ public class Plugin implements Filter {
     LOG.trace("continue2Viewer: mode=Viewer postForm={}", postForm);
     return postForm;
   }
+  
+  private LoginContext retrieveLoginContext(HttpServletRequest httpServletRequest) {
+	  LoginContext loginCtx = null;
+	  
+	  
+      // search logincontext in httpsession
+      loginCtx = (LoginContext) httpServletRequest
+          .getSession().getAttribute(LoginContext.LOGIN_CONTEXT_KEY);
+      LOG.trace("LoginContext in HTTP Session: {}", loginCtx != null);
+    
+      LOG.trace("Dumping the request attributes");
+      for (java.util.Enumeration attributes = httpServletRequest.getAttributeNames(); attributes.hasMoreElements() ;) {
+      	String attrName = (String) attributes.nextElement();
+      	LOG.trace("Attribute {} has value {}", attrName, httpServletRequest.getAttribute(attrName));
+      }
+      LOG.trace("http servlet query string is \"{}\"", httpServletRequest.getQueryString() );
+      
+      if ( ( httpServletRequest.getQueryString() != null ) && !httpServletRequest.getQueryString().equals("") && (loginCtx != null) ) {
+    	LOG.warn("The query string is not empty, this must be a new session, discarding the login context");
+    	loginCtx = null;
+    	httpServletRequest.getSession().removeAttribute(LoginContext.LOGIN_CONTEXT_KEY);
+      }
+      
+      // TODO LoginContext is no public interface, it causes problems by edit settings and HA setups
+      if (loginCtx != null) {
+          //loginCtx put here by IdP plugin, remove it now
+          LOG.debug("Returning from Viewer? Transferring LoginContext back to Request Scope");
+          httpServletRequest.setAttribute(LoginContext.LOGIN_CONTEXT_KEY, loginCtx);
+          httpServletRequest.getSession().removeAttribute(LoginContext.LOGIN_CONTEXT_KEY);
+      } else {
+        // search logincontext in request scope
+        loginCtx = (LoginContext) httpServletRequest.getAttribute(LoginContext.LOGIN_CONTEXT_KEY);
+        LOG.trace("LoginContext in HTTP Request: {}", loginCtx != null);
+      }
+      
+      return loginCtx;
+	  
+  }
 
   public void init(FilterConfig filterConfig) {
     try {
@@ -259,33 +297,8 @@ public class Plugin implements Filter {
       }
 
       HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
-      // search logincontext in httpsession
-      LoginContext loginCtx = (LoginContext) httpServletRequest
-          .getSession().getAttribute(LoginContext.LOGIN_CONTEXT_KEY);
-    
-      LOG.trace("Dumping the request attributes");
-      for (java.util.Enumeration attributes = httpServletRequest.getAttributeNames(); attributes.hasMoreElements() ;) {
-      	String attrName = (String) attributes.nextElement();
-      	LOG.trace("Attribute {} has value {}", attrName, httpServletRequest.getAttribute(attrName));
-      }
-      LOG.trace("http servlet query string is \"{}\"", httpServletRequest.getQueryString() );
-      
-      if ( ( httpServletRequest.getQueryString() != null ) && !httpServletRequest.getQueryString().equals("") && (loginCtx != null) ) {
-    	LOG.warn("The query string is not empty, this must be a new session, discarding the login context");
-    	loginCtx = null;
-    	httpServletRequest.getSession().removeAttribute(LoginContext.LOGIN_CONTEXT_KEY);
-      }
-      
-      // TODO LoginContext is no public interface, it causes problems by edit settings and HA setups
-      if (loginCtx != null) {
-          //loginCtx put here by IdP plugin, remove it now
-          LOG.debug("Returning from Viewer? Transferring LoginContext back to Request Scope");
-          httpServletRequest.setAttribute(LoginContext.LOGIN_CONTEXT_KEY, loginCtx);
-          httpServletRequest.getSession().removeAttribute(LoginContext.LOGIN_CONTEXT_KEY);
-      } else {
-        // search logincontext in request scope
-        loginCtx = (LoginContext) httpServletRequest.getAttribute(LoginContext.LOGIN_CONTEXT_KEY);
-      }
+
+      LoginContext loginCtx = retrieveLoginContext(httpServletRequest);
 
       if (loginCtx == null) {
         LOG.debug("LoginContext not found, this must be the first visit to profile servlet");

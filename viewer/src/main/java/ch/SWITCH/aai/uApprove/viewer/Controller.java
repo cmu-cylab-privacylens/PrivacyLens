@@ -117,7 +117,7 @@ public class Controller extends HttpServlet {
       try {
         JoranConfigurator configurator = new JoranConfigurator();
         configurator.setContext(lc);
-        lc.shutdownAndReset();
+        lc.reset();
         configurator.doConfigure(ConfigurationManager
             .getParam(ConfigurationManager.VIEWER_LOGBACK_CONFIG));
       } catch (JoranException je) {
