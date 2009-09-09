@@ -140,11 +140,8 @@ public class LogInfoJdbc extends LogInfo {
         idx = rs.getInt("idxUser");
 
     } catch (SQLException ex) {
-      if (bDebug)
-        System.out.println("LogInfoJdbc.getUserIndex: user = " + username + " "
-            + ex.getMessage());
-      throw new UApproveException("LogInfoJdbc.getUserIndex: exception "
-          + ex.getMessage());
+    	LOG.error("LogInfoJdbc.getUserIndex: user = {}, {}", username, ex);
+    	throw new UApproveException(ex);
     }
 
     return idx;
@@ -166,16 +163,14 @@ public class LogInfoJdbc extends LogInfo {
         idx = rs.getInt("idxProvider");
 
     } catch (SQLException ex) {
-      if (bDebug)
-        System.out.println("LogInfoJdbc.getProviderIndex: user = "
-            + sProviderName + " " + ex.getMessage());
-      throw new UApproveException("LogInfoJdbc.getProviderIndex: exception "
-          + ex.getMessage());
+      	
+        LOG.error("LogInfoJdbc.getProviderIndex: provider = {}, {}",
+            sProviderName, ex);
+        throw new UApproveException(ex);
     }
 
-    if (bDebug)
-      System.out.println("LogInfoJdbc.getProviderIndex: provider "
-          + sProviderName + " has index " + idx);
+    LOG.debug("LogInfoJdbc.getProviderIndex: provider {} has index {}",
+    		sProviderName, idx);
 
     return idx;
   }
@@ -189,13 +184,10 @@ public class LogInfoJdbc extends LogInfo {
     try {
       theDB.execSqlFT(sql, false);
     } catch (SQLException ex) {
-      throw new UApproveException("LogInfoJdbc.addProvider: exception "
-          + ex.getMessage());
+      throw new UApproveException(ex);
     }
 
-    if (bDebug)
-      System.out.println("LogInfoJdbc.addProvider: added provider "
-          + sProviderName);
+    LOG.debug("LogInfoJdbc.addProvider: added provider {}", sProviderName);
   }
 
   private UserLogInfo getUserArpInfoByName(String theUserName)
@@ -255,17 +247,12 @@ public class LogInfoJdbc extends LogInfo {
 
         userArp = new UserLogInfo(theUserName, "dummy", sDate, sTermsVersion,
             sGlobal, mapProviderIds);
-        if (bDebug) {
-          System.out
-              .println("LogInfoJdbc.getUserArpByname1: UserLogInfo dump:");
-          userArp.dump();
-        }
+        LOG.debug("LogInfoJdbc.getUserArpByname1: UserLogInfo dump:");
+        userArp.dump();
       }
     } catch (SQLException ex) {
-      System.out.println("LogInfo.getUserArpInfoByName1: SQL exception "
-          + ex.getMessage());
-      throw new UApproveException(
-          "LogInfoJdbc.getUserArpInfoByName1: exception " + ex.getMessage());
+      	LOG.error("LogInfo.getUserArpInfoByName1: SQL exception {}", ex);
+      	throw new UApproveException(ex);
     }
 
     return userArp;
@@ -293,8 +280,7 @@ public class LogInfoJdbc extends LogInfo {
 
     theSQL = theSQL.replaceFirst("\\?", theUserName);
 
-    if (bDebug)
-      System.out.println("getUserArpInfoByName2: sql = " + theSQL);
+    LOG.debug("getUserArpInfoByName2: sql = {}", theSQL);
 
     ResultSet rs = null;
 
@@ -315,17 +301,12 @@ public class LogInfoJdbc extends LogInfo {
 
         userArp = new UserLogInfo(theUserName, "dummy", sDate, sTermsVersion,
             sGlobal, mapProviderIds);
-        if (bDebug) {
-          System.out
-              .println("LogInfoJdbc.getUserArpByname2: UserLogInfo dump:");
-          userArp.dump();
-        }
+        LOG.debug("LogInfoJdbc.getUserArpByname2: UserLogInfo dump:");
+        userArp.dump();
       }
     } catch (SQLException ex) {
-      System.out.println("LogInfo.getUserArpInfoByName2: SQL exception "
-          + ex.getMessage());
-      throw new UApproveException(
-          "LogInfoJdbc.getUserArpInfoByName2: exception " + ex.getMessage());
+      	LOG.error("LogInfo.getUserArpInfoByName2: SQL exception ", ex);
+      	throw new UApproveException(ex);
     }
 
     return userArp;
@@ -342,8 +323,7 @@ public class LogInfoJdbc extends LogInfo {
     try {
       theDB.execSqlFT(sql, false);
     } catch (SQLException ex) {
-      throw new UApproveException("LogInfoJdbc.createUser: exception "
-          + ex.getMessage());
+      throw new UApproveException(ex);
     }
   }
 
@@ -362,8 +342,7 @@ public class LogInfoJdbc extends LogInfo {
     try {
       theDB.execSqlFT(sql, false);
     } catch (SQLException ex) {
-      throw new UApproveException("LogInfoJdbc.updateUser: exception "
-          + ex.getMessage());
+      throw new UApproveException(ex);
     }
   }
 
@@ -382,13 +361,11 @@ public class LogInfoJdbc extends LogInfo {
         nCount = rs.getInt(1);
 
     } catch (SQLException ex) {
-      throw new UApproveException("LogInfoJdbc.createUser: exception "
-          + ex.getMessage());
+      throw new UApproveException(ex);
     }
 
-    if (bDebug)
-      System.out.println("LogInfoJdbc.hasUserGlobalArp: user = " + theUsername
-          + " has global " + nCount);
+    LOG.debug("LogInfoJdbc.hasUserGlobalArp: user = {} has global {}",
+    		theUsername, nCount);
 
     return nCount == 1 ? true : false;
   }
@@ -434,8 +411,7 @@ public class LogInfoJdbc extends LogInfo {
       theDB.execSqlFT(sql, false);
 
     } catch (SQLException ex) {
-      throw new UApproveException("LogInfoJdbc.getGlobalShibProvider: "
-          + ex.getMessage());
+      throw new UApproveException(ex);
     }
 
     return;
@@ -464,13 +440,9 @@ public class LogInfoJdbc extends LogInfo {
 
       theDB.execSqlFT(theSql, false);
 
-      if (bDebug)
-        System.out
-            .println("LogInfoJdbc.updateAttrReleaseApp: updating release approval for "
-                + theUsername + " " + theProviderId + " " + theAttr);
+      LOG.debug("LogInfoJdbc.updateAttrReleaseApp: updating release approval for "+theUsername+" {} {}", theProviderId, theAttr);
     } catch (Exception ex) {
-      throw new UApproveException("LogInfoJdbc.updateAttrReleaseApp: "
-          + ex.getMessage());
+      throw new UApproveException(ex);
     }
 
     return;
@@ -500,21 +472,17 @@ public class LogInfoJdbc extends LogInfo {
 
       theDB.execSqlFT(theSql, false);
 
-      if (bDebug)
-        System.out
-            .println("LogInfoJdbc.addAttrReleaseApp: adding release approval for "
-                + theUsername + " " + theProviderId + " " + theAttr);
+      
+      LOG.debug("LogInfoJdbc.updateAttrReleaseApp: updating release approval for "+theUsername+" {} {}", theProviderId, theAttr);
     } catch (Exception ex) {
-      throw new UApproveException("LogInfoJdbc.addAttrReleaseApp: "
-          + ex.getMessage());
+      throw new UApproveException(ex);
     }
 
     return;
   }
 
   private void clearUserArpEntries(String theUserName) throws UApproveException {
-    if (bDebug)
-      System.out.println("clear user arp entries");
+    LOG.debug("clear user arp entries");
 
     int idxUser = getUserIndex(theUserName);
 
@@ -536,10 +504,8 @@ public class LogInfoJdbc extends LogInfo {
 
       theDB.execSqlFT(sql2, false);
     } catch (Exception ex) {
-      System.out.println("LogInfoJdbc.clearUserArp: exception "
-          + ex.getMessage());
-      throw new UApproveException("LogInfoJdbc.clearUserArpEntries: "
-          + ex.getMessage());
+      LOG.error("LogInfoJdbc.clearUserArp: exception {}", ex);
+      throw new UApproveException(ex);
     }
   }
 
@@ -733,13 +699,8 @@ public class LogInfoJdbc extends LogInfo {
   public synchronized void updateProviderAccess(String theUsername,
       String theProvider, boolean bGlobal) throws UApproveException {
 
-    if (bDebug)
-      System.out
-          .println("LogInfoJdbc.updateArpProviderAccess: cannot find approval for user "
-              + theUsername
-              + " provider = "
-              + theProvider
-              + " with global access " + bGlobal);
+    LOG.debug("LogInfoJdbc.updateArpProviderAccess: cannot find approval for user "
+              + theUsername + " provider = " + theProvider + " with global access " + bGlobal);
 
     try {
 
@@ -809,12 +770,10 @@ public class LogInfoJdbc extends LogInfo {
 
       theDB.execSqlFT(theSQL, false);
     } catch (SQLException ex) {
-      System.out.println("LogInfo.updateArpProviderAccess: ex = "
-          + ex.getMessage());
-      throw new UApproveException(
-          "LogInfoJdbc.updateArpProviderAccess: cannot find approval for user "
-              + theUsername + " provider = " + theProvider
-              + " with global access " + bGlobal);
+    	LOG.error("LogInfoJdbc.updateArpProviderAccess:" +
+      		"cannot find approval for user "+theUsername+", provider = {} with with global access {}",
+      		theProvider, bGlobal);
+    	throw new UApproveException(ex);
     }
 
   }
@@ -843,11 +802,8 @@ public class LogInfoJdbc extends LogInfo {
 
       theDB.execSqlFT(theSQL, false);
     } catch (SQLException ex) {
-      System.out.println("LogInfo.updateArpProviderAccessWithNoARA: ex = "
-          + ex.getMessage());
-      throw new UApproveException(
-          "LogInfoJdbc.updateArpProviderAccessWithNoARA: SQL exception "
-              + ex.getMessage());
+      LOG.error("LogInfo.updateArpProviderAccessWithNoARA: {}", ex);
+      throw new UApproveException(ex);
     }
 
   }
