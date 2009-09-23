@@ -145,7 +145,7 @@ dt {
       The DNS name of the Identity Provider
     </dd>
     <dt>
-      <code>/etc/shibboleth-idp2/uApprove</code>
+      <code>/etc/shibboleth-idp/uApprove</code>
     </dt>
     <dd>
       The directory, where the uApprove config is located
@@ -181,6 +181,9 @@ dt {
     <dd>
       If a SQL Database as storage is used. A SQL Server has to be prepared.
       <br /> Shipped uApprove is already configured for MySQL, but another SQL Server can be adapted.
+      Brook Schofield documented how to use 
+      <a href="http://wiki.unisa.edu.au/display/AAI/uApprove">
+      uApprove with an Oracle database</a>.
     </dd>
   </dl>
 
@@ -214,7 +217,7 @@ If you are updating uApprove, be aware of overwrite you configuration files</fie
   Copy libraries and configuration: <pre class="console">
 cd uApprove-2.1.2/
 unzip idp-plugin-2.1.2-bin.zip
-sudo cp idp-plugin-2.1.2/conf-template/* /etc/shibboleth-idp2/uApprove
+sudo cp idp-plugin-2.1.2/conf-template/* /etc/shibboleth-idp/uApprove
 sudo cp idp-plugin-2.1.2/lib/* /opt/shibboleth-identityprovider-2/src/main/webapp/WEB-INF/lib/
 </pre>
 </div>
@@ -224,7 +227,7 @@ sudo cp idp-plugin-2.1.2/lib/* /opt/shibboleth-identityprovider-2/src/main/webap
   Copy libraries and configuration: <pre class="console">
 cd uApprove-2.1.2/
 unzip viewer-2.1.2-bin.zip
-sudo cp viewer-2.1.2/conf-template/* /etc/shibboleth-idp2/uApprove
+sudo cp viewer-2.1.2/conf-template/* /etc/shibboleth-idp/uApprove
 sudo cp -r viewer-2.1.2/webapp /opt/tomcat/webapps/uApprove
 </pre>
 </div>
@@ -253,13 +256,13 @@ First you have to decide which storage implementation should be used:
 
 <h4> File based </h4>
 <div>
-A file based storage hast to be setup in <tt>/etc/shibboleth-idp2/uApprove/common.properties</tt>:
+A file based storage hast to be setup in <tt>/etc/shibboleth-idp/uApprove/common.properties</tt>:
 <pre class="file">
 #storageType=database
 #databaseConfig=/path/to/config/database.properties
 
 storageType=file
-flatFile = <tt class="customval">/etc/shibboleth-idp2/uApprove/uApprove-log.xml</tt>
+flatFile = <tt class="customval">/etc/shibboleth-idp/uApprove/uApprove-log.xml</tt>
 </pre>
 
 <fieldset class="note"><legend>Note</legend>Assure that <code>uApprove-log.xml</code> is read- and
@@ -323,37 +326,37 @@ create table ProviderAccess (
 );
 </pre>
 
-A Database setup is configured in <tt>/etc/shibboleth-idp2/uApprove/common.properties</tt>:
+A Database setup is configured in <tt>/etc/shibboleth-idp/uApprove/common.properties</tt>:
 <pre class="file">
 storageType=database
-databaseConfig=/etc/shibboleth-idp2/uApprove/database.properties
+databaseConfig=/etc/shibboleth-idp/uApprove/database.properties
 
 #storageType=file
 #flatFile=/path/to/config/uApprove-log.xml
 </pre>
 
-All database specific configuration is done in <tt>/etc/shibboleth-idp2/uApprove/database.properties</tt>:
+All database specific configuration is done in <tt>/etc/shibboleth-idp/uApprove/database.properties</tt>:
 <pre class="file">
 driver=com.mysql.jdbc.Driver
-url=jdbc:mysql://localhost:3306/uApprove
+url=jdbc:mysql://localhost:3306/uApprove?autoReconnect=true
 user=uApprove
 password=<tt class="customval">uApprove</tt>
-sqlCommands=<tt class="customval">/etc/shibboleth-idp2/uApprove/mysql.commands</tt>
+sqlCommands=<tt class="customval">/etc/shibboleth-idp/uApprove/mysql.commands</tt>
 </pre>
 
 <fieldset class="note"><legend>Note</legend>If another SQL server than MySQL is used, the values above has to be adjusted.
 <br /> Don't forget to put according JDBC driver into the library folder. <br />
-If it is necessary, the SQL commands can be re-defined in <code>/etc/shibboleth-idp2/uApprove/foo.commands</code>
+If it is necessary, the SQL commands can be re-defined in <code>/etc/shibboleth-idp/uApprove/foo.commands</code>
 </fieldset>
 </div>
 
 <h4> Other common configuration </h4>
 <div>
 The TermsOfUseManager, which shows a Terms of use text to the user is optional. If the TermsOfUseManager should be active, define the terms in
-<tt>/etc/shibboleth-idp2/uApprove/common.properties</tt>:
+<tt>/etc/shibboleth-idp/uApprove/common.properties</tt>:
 
 <pre class="file">
-termsOfUse=<tt class="customval">/etc/shibboleth-idp2/uApprove/terms-of-use.xml</tt>
+termsOfUse=<tt class="customval">/etc/shibboleth-idp/uApprove/terms-of-use.xml</tt>
 </pre>
 
 <fieldset class="note"><legend>Note</legend>
@@ -363,7 +366,7 @@ If you want see a real world example, pleas take a look at the SWITCHaai VHO ter
 
 <p>
 Cause the IdP plugin and the viewer application exchange some confidential information, this is
-encrypted and decrypted by a shared secret (128 bit, 16 characters) in <tt>/etc/shibboleth-idp2/uApprove/common.properties</tt>:
+encrypted and decrypted by a shared secret (128 bit, 16 characters) in <tt>/etc/shibboleth-idp/uApprove/common.properties</tt>:
 </p>
 
 <pre class="file">
@@ -393,8 +396,8 @@ The IdP plugin has to be enabled within Shibboleth IdP web application <tt>/opt/
     &lt;init-param&gt;
       &lt;param-name&gt;Config&lt;/param-name&gt;
       &lt;param-value&gt;
-        /etc/shibboleth-idp2/uApprove/idp-plugin.properties;
-        /etc/shibboleth-idp2/uApprove/common.properties;
+        /etc/shibboleth-idp/uApprove/idp-plugin.properties;
+        /etc/shibboleth-idp/uApprove/common.properties;
       &lt;/param-value&gt;
     &lt;/init-param&gt;
   &lt;/filter&gt;
@@ -420,11 +423,11 @@ sudo sh install.sh
 <p>
 The SP blacklist defines Resources which are excluded from the user consent. <br />
 The SP blacklist is optional and can be configured by
-<tt>/etc/shibboleth-idp2/uApprove/idp-plugin.properties</tt>:
+<tt>/etc/shibboleth-idp/uApprove/idp-plugin.properties</tt>:
 </p>
 
 <pre class="file">
-spBlacklist=<tt class="customval">/etc/shibboleth-idp2/uApprove/sp-blacklist</tt>
+spBlacklist=<tt class="customval">/etc/shibboleth-idp/uApprove/sp-blacklist</tt>
 </pre>
 
 In <code>sp-blacklist</code>, each line defines a regular expression pattern for black listed resource identifier:
@@ -444,7 +447,7 @@ If the database storage is used, it is possible to log each provider access, whi
 <br /> It is also possible, that the IdP plugin runs in monitoring only mode, which logs every provider access, but do not interact with the user (for user consent)
 <br /> If the viewer web application is used, the IdP plugin has to know, where it is deployed.
 <br /> it is possible to tell the IdP plugin, that it should take care about <i>isPassive</i> requests.
-<br /> The configuration is done in <tt>/etc/shibboleth-idp2/uApprove/idp-plugin.properties</tt>:
+<br /> The configuration is done in <tt>/etc/shibboleth-idp/uApprove/idp-plugin.properties</tt>:
 <p>
 <pre class="file">
 logProviderAccess=<tt class="customval">false</tt>
@@ -465,8 +468,8 @@ Adjust the viewer application according you configuration directory in
   &lt;context-param&gt;
     &lt;param-name&gt;Config&lt;/param-name&gt;
     &lt;param-value&gt;
-        <tt class="customval">/etc/shibboleth-idp2/uApprove/viewer.properties;</tt>
-        <tt class="customval">/etc/shibboleth-idp2/uApprove/common.properties;</tt>
+        <tt class="customval">/etc/shibboleth-idp/uApprove/viewer.properties;</tt>
+        <tt class="customval">/etc/shibboleth-idp/uApprove/common.properties;</tt>
     &lt;/param-value&gt;
   &lt;/context-param&gt;
   ...
@@ -481,11 +484,11 @@ target resource.
 
 <p>
 It is possible to define a order of the attribute listing and if necessary, attributes can also be hidden.
-The configuration of the attribute list is optional done by <tt> /etc/shibboleth-idp2/uApprove/viewer.properties</tt>:
+The configuration of the attribute list is optional done by <tt> /etc/shibboleth-idp/uApprove/viewer.properties</tt>:
 </p>
 
 <pre class="file">
-attributeList=<tt class="customval">/etc/shibboleth-idp2/uApprove/attribute-list</tt>
+attributeList=<tt class="customval">/etc/shibboleth-idp/uApprove/attribute-list</tt>
 </pre>
 
 An <code>attribute-list</code> can be look like:
@@ -503,13 +506,13 @@ postalAddress
 
 <fieldset class="note"><legend>Note</legend>
 The attribute name in <code>attribute-list</code> has to comply with the attribute id in
-<code> /etc/shibboleth-idp2/attribute-resolver.xml</code>
+<code> /etc/shibboleth-idp/attribute-resolver.xml</code>
 </fieldset>
 
 <p>
 The viewer web application ist multi lingual for the static text and dynamic text, like attribute names and descrptions.
 <br /> For the static text, the following languages are supported: en, de, fr, it, pt.
-<br /> For the attribute names and descriptions, the localized content is taken from <tt> /etc/shibboleth-idp2/attribute-resolver.xml</tt>
+<br /> For the attribute names and descriptions, the localized content is taken from <tt> /etc/shibboleth-idp/attribute-resolver.xml</tt>
 (Shibboleth IdP resolver). It's possible to adjust or extent it:
 </p>
 <pre class="file">
@@ -538,7 +541,7 @@ For the SWITCHaai attributes, there is a prepared <code>doc/attribute-descriptio
 </fieldset>
 <p>
 The viewer uses the language from the users browsers request, if that language is not available, the default locale <i>en</i> will be taken.
-<br /> It is possible to enforce a specific language. This can be defined optional in <tt> /etc/shibboleth-idp2/uApprove/viewer.properties</tt>:
+<br /> It is possible to enforce a specific language. This can be defined optional in <tt> /etc/shibboleth-idp/uApprove/viewer.properties</tt>:
 </p>
 <pre class="file">
 useLocale=<tt class="customval">US_en</tt>
@@ -549,7 +552,7 @@ useLocale=<tt class="customval">US_en</tt>
 <div>
 It is possible that a user can give global attribute release consent, which mean, that she/he is never be asked again by uApprove.
 If it is required, that a user has to give consent to each different resource access, global consent has to be disabled in
-<tt> /etc/shibboleth-idp2/uApprove/viewer.properties</tt>:
+<tt> /etc/shibboleth-idp/uApprove/viewer.properties</tt>:
 <pre class="file">
 globalConsentPossible=<tt class="customval">true</tt>
 </pre>
@@ -559,10 +562,10 @@ globalConsentPossible=<tt class="customval">true</tt>
 <div>
 The viewer web application uses LogBack (see <a href="#references">references</a>) like the Shibboleth IdP.
 <br />
-The logback configuration file is defined in <tt> /etc/shibboleth-idp2/uApprove/viewer.properties</tt>:
+The logback configuration file is defined in <tt> /etc/shibboleth-idp/uApprove/viewer.properties</tt>:
 
 <pre class="file">
-loggingConfig=<tt class="customval">/etc/shibboleth-idp2/uApprove/logging.xml</tt>
+loggingConfig=<tt class="customval">/etc/shibboleth-idp/uApprove/logging.xml</tt>
 </pre>
 
 
@@ -572,7 +575,7 @@ Adjust <code>logging.xml</code> for the log location, assure that the file is wr
 &lt;configuration&gt;
   ...
   &lt;appender class="ch.qos.logback.core.FileAppender" name="RootFileAppender"&gt;
-    &lt;file&gt;<tt class="customval">/var/log/shibboleth-idp2/uApprove.log</tt>&lt;/file&gt;
+    &lt;file&gt;<tt class="customval">/var/log/shibboleth-idp/uApprove.log</tt>&lt;/file&gt;
     ...
   &lt;/appender&gt;
   ...
@@ -678,7 +681,7 @@ Check the logs, if the startup of the IdP and uApprove web application was succe
 <h3>6.1 Logging </h3>
 <div>
 Cause the IdP plugin runs within the Shibboleth IdP web application, it uses the IdP logger. The IdP logger
-is configured by <tt>/etc/shibboleth-idp2/logging.xml</tt>:
+is configured by <tt>/etc/shibboleth-idp/logging.xml</tt>:
 
 <pre class="file">
 ...

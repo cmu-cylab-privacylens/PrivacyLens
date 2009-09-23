@@ -108,29 +108,6 @@ public class myJdbcInterface {
     return sqlCommands;
   }
 
-  /**
-   * a simple main for testing
-   */
-  public static void main(String[] arguments) {
-    myJdbcInterface theDB = new myJdbcInterface("blla", true);
-
-    theDB.initialize();
-
-    theDB.test1("select * from ShibProvider");
-
-    System.out.println("sleeping a while ... ");
-    try {
-      Thread.sleep(1000 * 86400);
-    } catch (InterruptedException ex) {
-      System.out.println("interrupted execption " + ex.toString());
-    }
-
-    theDB.test1("select * from ShibProvider");
-
-    theDB.close();
-
-  }
-
   /** sets the number of retries for execSQLFT */
   public void setMaxRetries(int nMaxRetries) {
     myMaxRetries = nMaxRetries;
@@ -348,25 +325,4 @@ public class myJdbcInterface {
     LOG.info("bConnected = " + bConnected);
     LOG.info("-----------------------------------------------");
   }
-
-  /** a simple stupid test */
-  private void test1(String theSQL) {
-    System.out.println("");
-    System.out
-        .println("--------------- myJdbcInterface.test1: --------------------------");
-    try {
-      ResultSet rs = execSqlFT(theSQL, true);
-
-      while (rs != null && rs.next()) {
-        String s1 = rs.getString(1);
-        String s2 = rs.getString(2);
-        System.out.println("   " + s1 + " " + s2);
-      }
-    } catch (SQLException ex) {
-      System.out.println("myJdbcInterface.main: exeception in rs");
-    }
-
-    System.out.println("");
-  }
-
 }

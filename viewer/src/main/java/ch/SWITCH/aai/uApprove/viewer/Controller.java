@@ -27,6 +27,7 @@ import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import edu.vt.middleware.crypt.CryptException;
 import edu.vt.middleware.crypt.symmetric.AES;
+import edu.vt.middleware.crypt.symmetric.SymmetricAlgorithm;
 import edu.vt.middleware.crypt.util.Base64Converter;
 
 /**
@@ -92,13 +93,13 @@ public class Controller extends HttpServlet {
   }
 
   private String decrypt(String value) throws UApproveException {
-    AES aes = new AES();
+    final SymmetricAlgorithm alg = new AES();
+    alg.setIV("uApprove initial vector".substring(0, 16).getBytes());
+    alg.setKey(new SecretKeySpec(sharedSecret.getBytes(), 0, 16, AES.ALGORITHM));
+
     try {
-      aes.setIV("SWITCHaai rules".getBytes());
-      aes
-          .setKey(new SecretKeySpec(sharedSecret.getBytes(), 0, 16,
-              "AES"));
-      return new String(aes.decrypt(value, new Base64Converter()));
+      alg.initDecrypt();
+      return new String(alg.decrypt(value, new Base64Converter()));
 
     } catch (CryptException e) {
       LOG.error("Decryption failed", e);

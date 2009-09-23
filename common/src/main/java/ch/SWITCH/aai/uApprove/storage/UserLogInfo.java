@@ -159,17 +159,17 @@ public class UserLogInfo {
   
 
   public void dump() {
-    LOG.info("UserLogInfo.dump: " + " user = " + username + " version = "
+    LOG.debug("UserLogInfo.dump: " + " user = " + username + " version = "
         + version + " ondate  = " + ondate + " termsVersion = " + termsVersion
         + " global = " + global);
-    LOG.info("List of accepted providerIds ");
+    LOG.debug("List of accepted providerIds ");
     if (mapProviderIds != null) {
       Set<String> keySet = mapProviderIds.keySet();
       Iterator<String> it = keySet.iterator();
       while (it.hasNext()) {
         String key = it.next();
         String value = mapProviderIds.get(key);
-        LOG.info("    " + key + " = <" + value + "> ");
+        LOG.debug("    " + key + " = <" + value + "> ");
       }
     }
   }

@@ -10,9 +10,11 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -21,8 +23,8 @@ import org.slf4j.LoggerFactory;
 
 import ch.SWITCH.aai.uApprove.components.Attribute;
 import ch.SWITCH.aai.uApprove.components.ConfigurationManager;
-import ch.SWITCH.aai.uApprove.components.UApproveException;
 import ch.SWITCH.aai.uApprove.components.TermsOfUseManager;
+import ch.SWITCH.aai.uApprove.components.UApproveException;
 import ch.SWITCH.aai.uApprove.storage.LogInfo;
 import ch.SWITCH.aai.uApprove.storage.UserLogInfo;
 import edu.internet2.middleware.shibboleth.common.attribute.provider.SAML2AttributeAuthority;
@@ -31,8 +33,10 @@ import edu.internet2.middleware.shibboleth.idp.authn.AuthenticationException;
 import edu.internet2.middleware.shibboleth.idp.authn.LoginContext;
 import edu.internet2.middleware.shibboleth.idp.authn.PassiveAuthenticationException;
 import edu.internet2.middleware.shibboleth.idp.session.Session;
+import edu.internet2.middleware.shibboleth.idp.util.HttpServletHelper;
 import edu.vt.middleware.crypt.CryptException;
 import edu.vt.middleware.crypt.symmetric.AES;
+import edu.vt.middleware.crypt.symmetric.SymmetricAlgorithm;
 import edu.vt.middleware.crypt.util.Base64Converter;
 
 /**
@@ -63,27 +67,26 @@ public class Plugin implements Filter {
   private SAML2AttributeAuthority saml2AA;
   private SAMLMDRelyingPartyConfigurationManager relyingPartyConfigurationManager;
   private String authnContextClassRef = null;
-
+  private ServletContext servletContext = null;
+  
   // data encryption method
   private String encrypt(String value) throws UApproveException {
-    AES aes = new AES();
-    try {
-      aes.setIV("SWITCHaai rules".getBytes());
-      aes
-          .setKey(new SecretKeySpec(sharedSecret.getBytes(), 0, 16,
-              "AES"));
-      ;
-      return aes.encrypt(value.getBytes(), new Base64Converter());
+    final SymmetricAlgorithm alg = new AES();
+    alg.setIV("uApprove initial vector".substring(0, 16).getBytes());
+	alg.setKey(new SecretKeySpec(sharedSecret.getBytes(), 0, 16, AES.ALGORITHM));
+	try {
+      alg.initEncrypt();
+      return alg.encrypt(value.getBytes(), new Base64Converter());
     } catch (CryptException e) {
-      LOG.error("Encryptin failed", e);
+      LOG.error("Encryption failed", e);
       throw new UApproveException(e);
     }
   }
 
   // method to continue to the identity provider (skip filter)
   private void continue2IdP(String reason, LogInfo storage,
-      UserLogInfo userInfo, String username, String providerId,
-      boolean globalARA, boolean approvalGiven) throws UApproveException {
+    UserLogInfo userInfo, String username, String providerId,
+    boolean globalARA, boolean approvalGiven) throws UApproveException {
     LOG.info("continue2Idp, reason: " + reason);
 
     // create user hack
@@ -108,6 +111,7 @@ public class Plugin implements Filter {
     } else {
       LOG.info("continue2IdP: provider access not logged");
     }
+    
     return;
   }
 
@@ -118,11 +122,7 @@ public class Plugin implements Filter {
       UApproveException, PassiveAuthenticationException {
     LOG.info("Continue to uApprove viewer, reason: " + reason);
     LOG.debug(" returnURL=" + returnURL);
-    LOG.debug("Saving LoginContext to HTTP Session for further use");
-    request.getSession().setAttribute(LoginContext.LOGIN_CONTEXT_KEY, loginCtx);
-    // action URL format:
-    // https://host.domain.com/uApprove/Controller/?returnUrl=https://idp.domain.com/Authn/RemoteUser&editsettings=true;
-
+ 
     boolean isPassive = loginCtx.isPassiveAuthRequired();
     boolean isPassiveSupported = ConfigurationManager.makeBoolean(ConfigurationManager.getParam(ConfigurationManager.PLUGIN_ISPASSIVE_SUPPORT));
     LOG.debug("isPassive={}, isPassiveSupport={}", isPassive, isPassiveSupported);
@@ -175,49 +175,62 @@ public class Plugin implements Filter {
         + "           <input type=\"submit\" value=\"Continue\"/>"
         + "       </noscript>" + "     </form>" + "   </body>" + " </html>";
     LOG.trace("continue2Viewer: mode=Viewer postForm={}", postForm);
+    
     return postForm;
   }
   
-  private LoginContext retrieveLoginContext(HttpServletRequest httpServletRequest) {
-	  LoginContext loginCtx = null;
+  private void transferLoginContext2IdP(LoginContext loginCtx, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+	  HttpServletHelper.unbindLoginContext(HttpServletHelper.getStorageService(servletContext), servletContext, httpServletRequest, httpServletResponse);
+	  HttpServletHelper.bindLoginContext(loginCtx, httpServletRequest);
+  }
+  
+  private void transferLoginContext2uApprove(LoginContext loginCtx, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+	  HttpServletHelper.bindLoginContext(loginCtx, HttpServletHelper.getStorageService(servletContext), servletContext, httpServletRequest, httpServletResponse);
+  }
+  
+  private LoginContext retrieveLoginContext(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+	  LoginContext loginCtx = HttpServletHelper.getLoginContext(HttpServletHelper.getStorageService(servletContext), servletContext, httpServletRequest);
+	  /*
+	  Cookie loginCtxCookie = HttpServletHelper.getCookie(httpServletRequest, HttpServletHelper.LOGIN_CTX_KEY_NAME);
 	  
+	  LOG.trace("Retrieving login context, LoginContext {}", loginCtx);
+	  LOG.trace("Retrieving login context, Cookie {}", loginCtxCookie);
+	  if (loginCtxCookie != null ) {
+		  LOG.trace("Cookie age {}", loginCtxCookie.getMaxAge());
+		  LOG.trace("Cookie value {}", loginCtxCookie.getValue());
+	  }
 	  
-      // search logincontext in httpsession
-      loginCtx = (LoginContext) httpServletRequest
-          .getSession().getAttribute(LoginContext.LOGIN_CONTEXT_KEY);
-      LOG.trace("LoginContext in HTTP Session: {}", loginCtx != null);
-    
-      LOG.trace("Dumping the request attributes");
-      for (java.util.Enumeration attributes = httpServletRequest.getAttributeNames(); attributes.hasMoreElements() ;) {
-      	String attrName = (String) attributes.nextElement();
-      	LOG.trace("Attribute {} has value {}", attrName, httpServletRequest.getAttribute(attrName));
-      }
-      LOG.trace("http servlet query string is \"{}\"", httpServletRequest.getQueryString() );
-      
-      if ( ( httpServletRequest.getQueryString() != null ) && !httpServletRequest.getQueryString().equals("") && (loginCtx != null) ) {
-    	LOG.warn("The query string is not empty, this must be a new session, discarding the login context");
-    	loginCtx = null;
-    	httpServletRequest.getSession().removeAttribute(LoginContext.LOGIN_CONTEXT_KEY);
-      }
-      
-      // TODO LoginContext is no public interface, it causes problems by edit settings and HA setups
-      if (loginCtx != null) {
-          //loginCtx put here by IdP plugin, remove it now
-          LOG.debug("Returning from Viewer? Transferring LoginContext back to Request Scope");
-          httpServletRequest.setAttribute(LoginContext.LOGIN_CONTEXT_KEY, loginCtx);
-          httpServletRequest.getSession().removeAttribute(LoginContext.LOGIN_CONTEXT_KEY);
-      } else {
-        // search logincontext in request scope
-        loginCtx = (LoginContext) httpServletRequest.getAttribute(LoginContext.LOGIN_CONTEXT_KEY);
-        LOG.trace("LoginContext in HTTP Request: {}", loginCtx != null);
-      }
-      
-      return loginCtx;
+	  if (loginCtx == null && loginCtxCookie == null) {
+		  LOG.trace("First request");
+		  return loginCtx;
+	  }
 	  
+	  if (loginCtx != null && loginCtxCookie != null && loginCtxCookie.getMaxAge() == 0) {
+		  LOG.trace("After authentication");
+
+		  HttpServletHelper.bindLoginContext(loginCtx, HttpServletHelper.getStorageService(servletContext), servletContext, httpServletRequest, httpServletResponse);
+		  return loginCtx;
+	  }
+	  
+	  if (loginCtx != null && loginCtxCookie != null && loginCtxCookie.getMaxAge() == -1) {
+		  LOG.trace("After approval");
+		  HttpServletHelper.unbindLoginContext(HttpServletHelper.getStorageService(servletContext), servletContext, httpServletRequest, httpServletResponse);
+		  HttpServletHelper.bindLoginContext(loginCtx, httpServletRequest);
+		  return loginCtx;
+	  }
+	  */
+	  return loginCtx;
   }
 
   public void init(FilterConfig filterConfig) {
     try {
+    
+      // get servlet context
+      servletContext = filterConfig.getServletContext();	  
+      if (servletContext == null) {
+        throw new UApproveException("No servlet context");
+      }
+		  
       // initialize configuration
       ConfigurationManager
           .initialize(filterConfig.getInitParameter(INITPAR_CONFIG));
@@ -297,9 +310,11 @@ public class Plugin implements Filter {
       }
 
       HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
+      HttpServletResponse httpServletResponse = (HttpServletResponse) servletResponse;
 
-      LoginContext loginCtx = retrieveLoginContext(httpServletRequest);
-
+      LoginContext loginCtx = retrieveLoginContext(httpServletRequest, httpServletResponse);
+      LOG.trace("LoginContext loaded: {}", loginCtx != null);
+      
       if (loginCtx == null) {
         LOG.debug("LoginContext not found, this must be the first visit to profile servlet");
         filterChain.doFilter(servletRequest, servletResponse);
@@ -322,26 +337,22 @@ public class Plugin implements Filter {
         return;
       }
 
-      // initialize storage handler (stupid, but true)
-      String storeType = ConfigurationManager
-          .getParam(ConfigurationManager.COMMON_STORE_TYPE);
-      LogInfo.initialize(storeType);
-      LogInfo storage = LogInfo.getInstance();
-      LOG.debug("LogInfo (storage) initialized with mode=" + storeType);
-
       // set the content type of the response to html, needed by POST
       ((HttpServletResponse) servletResponse).setContentType("text/html");
 
       // get the principal
       String principal = null;
+ 
       // try from IdP Session
-      Session idpSession = (Session) ((HttpServletRequest) servletRequest).getAttribute(Session.HTTP_SESSION_BINDING_ATTRIBUTE);
+      Session idpSession = HttpServletHelper.getUserSession(httpServletRequest);
+
       LOG.trace("IdP Session is {}", idpSession);
       if (idpSession != null) {
         LOG.trace("IdP Session principal name is {}", idpSession.getPrincipalName());
         LOG.trace("IdP Session subject is {}", idpSession.getSubject());
         principal = idpSession.getPrincipalName();
-      } else if (loginCtx != null) {
+    
+      } if (loginCtx != null) {
     	  LOG.trace("LoginContext principal is {}", loginCtx.getPrincipalName());
     	  principal = loginCtx.getPrincipalName();
       }
@@ -362,10 +373,17 @@ public class Plugin implements Filter {
           principal, entityId);
 
       // get referer
-      String referer = ((HttpServletRequest) servletRequest).getRequestURL()
+      String referer = httpServletRequest.getRequestURL()
           .toString();
       LOG.debug("doFilter: referer={}", referer);
 
+      // initialize storage handler (stupid, but true)
+      String storeType = ConfigurationManager
+          .getParam(ConfigurationManager.COMMON_STORE_TYPE);
+      LogInfo.initialize(storeType);
+      LogInfo storage = LogInfo.getInstance();
+      LOG.debug("LogInfo (storage) initialized with mode=" + storeType);
+      
       // getUserInfo
       UserLogInfo userInfo = storage.getData(principal);
       LOG.debug("userInfo=" + userInfo);
@@ -376,7 +394,7 @@ public class Plugin implements Filter {
       LOG.debug("globalConsentGiven=" + globalConsentGiven);
 
       // set edit settings flag
-      boolean resetConsent = (((HttpServletRequest) servletRequest)
+      boolean resetConsent = (httpServletRequest
           .getParameter(ConfigurationManager.HTTP_PARAM_RESET) != null);
       LOG.debug("resetConsent=" + resetConsent);
 
@@ -387,6 +405,8 @@ public class Plugin implements Filter {
           .getParam(ConfigurationManager.PLUGIN_MONITORING_ONLY))) {
         continue2IdP(CONTIDP_REASON_MONITORING_ONLY, storage, userInfo,
             principal, entityId, globalConsentGiven, false);
+        
+        transferLoginContext2IdP(loginCtx, httpServletRequest, httpServletResponse);
         filterChain.doFilter(servletRequest, servletResponse);
         return;
       }
@@ -395,19 +415,22 @@ public class Plugin implements Filter {
       if (SPBlacklistManager.containsItem(entityId)) {
         continue2IdP(CONTIDP_REASON_BLACKLIST, storage, userInfo, principal,
             entityId, globalConsentGiven, false);
+        transferLoginContext2IdP(loginCtx, httpServletRequest, httpServletResponse);
         filterChain.doFilter(servletRequest, servletResponse);
         return;
       }
 
       if (userInfo == null) {
-        ((HttpServletResponse) servletResponse).getWriter().write(
+    	transferLoginContext2uApprove(loginCtx, httpServletRequest, httpServletResponse);
+        httpServletResponse.getWriter().write(
             post2Viewer(CONTV_REASON_FIRSTVISIT, resetConsent, referer,
                 principal, entityId, attributesReleased, httpServletRequest, loginCtx));
         return;
       }
       // check if the user wants to reset the settings
       if (resetConsent) {
-        ((HttpServletResponse) servletResponse).getWriter().write(
+    	transferLoginContext2uApprove(loginCtx, httpServletRequest, httpServletResponse);
+        httpServletResponse.getWriter().write(
             post2Viewer(CONTV_REASON_RESETCONSENT, resetConsent, referer,
                 principal, entityId, attributesReleased, httpServletRequest, loginCtx));
         return;
@@ -422,7 +445,8 @@ public class Plugin implements Filter {
 
         if (termsVersion != null
             && !userTermsVersion.equalsIgnoreCase(termsVersion)) {
-          ((HttpServletResponse) servletResponse).getWriter().write(
+          transferLoginContext2uApprove(loginCtx, httpServletRequest, httpServletResponse);
+          httpServletResponse.getWriter().write(
               post2Viewer(CONTV_REASON_TERMSCHANGED, resetConsent, referer,
                   principal, entityId, attributesReleased, httpServletRequest, loginCtx));
           return;
@@ -435,6 +459,7 @@ public class Plugin implements Filter {
       if (ConfigurationManager.makeBoolean(userInfo.getGlobal())) {
         continue2IdP(CONTIDP_REASON_GLOBAL_CONSENT, storage, userInfo,
             principal, entityId, globalConsentGiven, true);
+        transferLoginContext2IdP(loginCtx, httpServletRequest, httpServletResponse);
         filterChain.doFilter(servletRequest, servletResponse);
         return;
       }
@@ -448,6 +473,7 @@ public class Plugin implements Filter {
       if (attributes == null || attributes.equals("")) {
         continue2IdP(CONTIDP_REASON_NOATTRIBUTES, storage, userInfo, principal,
             entityId, globalConsentGiven, false);
+        transferLoginContext2IdP(loginCtx, httpServletRequest, httpServletResponse);
         filterChain.doFilter(servletRequest, servletResponse);
         return;
       }
@@ -457,7 +483,8 @@ public class Plugin implements Filter {
       LOG.debug("doFilter: user contains entityId="
           + userInfo.containsProviderId(entityId));
       if (entityId != null && !userInfo.containsProviderId(entityId)) {
-        ((HttpServletResponse) servletResponse).getWriter().write(
+    	  transferLoginContext2uApprove(loginCtx, httpServletRequest, httpServletResponse);
+    	  httpServletResponse.getWriter().write(
             post2Viewer(CONTV_REASON_NEWPROVIDER, resetConsent, referer,
                 principal, entityId, attributesReleased, httpServletRequest, loginCtx));
         return;
@@ -470,7 +497,8 @@ public class Plugin implements Filter {
       LOG.debug("doFilter: attributes to be released  =" + attributes);
       if (!Attribute.compareAttributeRelease(userInfo
           .getAttributesForProviderId(entityId), attributes)) {
-        ((HttpServletResponse) servletResponse).getWriter().write(
+    	  transferLoginContext2uApprove(loginCtx, httpServletRequest, httpServletResponse);
+    	  httpServletResponse.getWriter().write(
             post2Viewer(CONTV_REASON_ATTRCHANGED, resetConsent, referer,
                 principal, entityId, attributesReleased, httpServletRequest, loginCtx));
         return;
@@ -479,6 +507,7 @@ public class Plugin implements Filter {
       // the user has already given attribute release approval to this provider
       continue2IdP(CONTIDP_REASON_PROVIDER_APPROVAL, storage, userInfo,
           principal, entityId, globalConsentGiven, true);
+      transferLoginContext2IdP(loginCtx, httpServletRequest, httpServletResponse);
       filterChain.doFilter(servletRequest, servletResponse);
       return;
 
@@ -487,7 +516,9 @@ public class Plugin implements Filter {
         return;
     } catch (AuthenticationException e) {
       LOG.error("AuthenticationException", e);
-      LoginContext loginContext = (LoginContext) ((HttpServletRequest) servletRequest).getSession().getAttribute(LoginContext.LOGIN_CONTEXT_KEY);
+      // This behavoir might change in the future. If no loginContext
+      // is found, we need to call bind() somewhere(?)
+      LoginContext loginContext = retrieveLoginContext((HttpServletRequest)servletRequest, (HttpServletResponse)servletResponse);
       loginContext.setAuthenticationFailure(e);
       loginContext.setPrincipalAuthenticated(false);
       filterChain.doFilter(servletRequest, servletResponse);
