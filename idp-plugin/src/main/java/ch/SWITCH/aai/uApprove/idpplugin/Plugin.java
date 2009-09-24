@@ -14,7 +14,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -189,37 +188,7 @@ public class Plugin implements Filter {
   }
   
   private LoginContext retrieveLoginContext(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-	  LoginContext loginCtx = HttpServletHelper.getLoginContext(HttpServletHelper.getStorageService(servletContext), servletContext, httpServletRequest);
-	  /*
-	  Cookie loginCtxCookie = HttpServletHelper.getCookie(httpServletRequest, HttpServletHelper.LOGIN_CTX_KEY_NAME);
-	  
-	  LOG.trace("Retrieving login context, LoginContext {}", loginCtx);
-	  LOG.trace("Retrieving login context, Cookie {}", loginCtxCookie);
-	  if (loginCtxCookie != null ) {
-		  LOG.trace("Cookie age {}", loginCtxCookie.getMaxAge());
-		  LOG.trace("Cookie value {}", loginCtxCookie.getValue());
-	  }
-	  
-	  if (loginCtx == null && loginCtxCookie == null) {
-		  LOG.trace("First request");
-		  return loginCtx;
-	  }
-	  
-	  if (loginCtx != null && loginCtxCookie != null && loginCtxCookie.getMaxAge() == 0) {
-		  LOG.trace("After authentication");
-
-		  HttpServletHelper.bindLoginContext(loginCtx, HttpServletHelper.getStorageService(servletContext), servletContext, httpServletRequest, httpServletResponse);
-		  return loginCtx;
-	  }
-	  
-	  if (loginCtx != null && loginCtxCookie != null && loginCtxCookie.getMaxAge() == -1) {
-		  LOG.trace("After approval");
-		  HttpServletHelper.unbindLoginContext(HttpServletHelper.getStorageService(servletContext), servletContext, httpServletRequest, httpServletResponse);
-		  HttpServletHelper.bindLoginContext(loginCtx, httpServletRequest);
-		  return loginCtx;
-	  }
-	  */
-	  return loginCtx;
+	  return HttpServletHelper.getLoginContext(HttpServletHelper.getStorageService(servletContext), servletContext, httpServletRequest);
   }
 
   public void init(FilterConfig filterConfig) {
@@ -255,7 +224,7 @@ public class Plugin implements Filter {
 
       // get the attribute authority and RelyingPartyConfigurationManager from the shibboleth idp context
 
-      // extra flexibility, addicted to Chad
+      // extra flexibility, devoted to Chad
       String saml2AAId = filterConfig.getInitParameter("saml2AAId");
       if (saml2AAId == null || saml2AAId.equals("")) {
         saml2AAId = "shibboleth.SAML2AttributeAuthority";
@@ -516,8 +485,6 @@ public class Plugin implements Filter {
         return;
     } catch (AuthenticationException e) {
       LOG.error("AuthenticationException", e);
-      // This behavoir might change in the future. If no loginContext
-      // is found, we need to call bind() somewhere(?)
       LoginContext loginContext = retrieveLoginContext((HttpServletRequest)servletRequest, (HttpServletResponse)servletResponse);
       loginContext.setAuthenticationFailure(e);
       loginContext.setPrincipalAuthenticated(false);
