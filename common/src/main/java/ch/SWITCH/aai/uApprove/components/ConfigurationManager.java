@@ -46,7 +46,7 @@ public class ConfigurationManager {
   // common used constants
   public static final String HTTP_PARAM_RETURNURL = "returnurl";
   public static final String HTTP_PARAM_RESET = "resetuserconsent";
-  public static final String HTTP_PARAM_PROVIDERID = "providerid";
+  public static final String HTTP_PARAM_RELYINGPARTY = "relyingParty";
   public static final String HTTP_PARAM_ATTRIBUTES = "attributes";
   public static final String HTTP_PARAM_PRINCIPAL = "principal";
   

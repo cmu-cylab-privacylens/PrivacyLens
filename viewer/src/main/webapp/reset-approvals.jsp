@@ -2,6 +2,7 @@
      ch.SWITCH.aai.uApprove.storage.LogInfo,
      ch.SWITCH.aai.uApprove.storage.UserLogInfo,
      ch.SWITCH.aai.uApprove.components.ConfigurationManager,
+     ch.SWITCH.aai.uApprove.components.RelyingParty,
      ch.SWITCH.aai.uApprove.components.UApproveException,
      org.slf4j.LoggerFactory,
      org.slf4j.Logger,
@@ -77,7 +78,7 @@ String sessionalize(HttpSession session, String key, String value) throws UAppro
 	   LOG.debug("inline call");
 	   principal = (String) session.getAttribute(Controller.SESKEY_PRINCIPAL);
 	   returnURL = (String) session.getAttribute(Controller.SESKEY_RETURNURL);
-	   entityId = (String) session.getAttribute(Controller.SESKEY_ENTITYID);
+	   entityId = ((RelyingParty) session.getAttribute(Controller.SESKEY_RELYINGPARTY)).getEntityId();
 	   hiddenField += ConfigurationManager.HTTP_PARAM_RETURNURL;
   }
   hiddenField += "\" value=\""+returnURL+"\">";

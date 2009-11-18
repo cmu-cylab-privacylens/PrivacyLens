@@ -3,7 +3,9 @@ package ch.SWITCH.aai.uApprove.viewer;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.Locale;
+import java.util.Map;
 
 
 import javax.crypto.spec.SecretKeySpec;
@@ -17,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.SWITCH.aai.uApprove.components.ConfigurationManager;
+import ch.SWITCH.aai.uApprove.components.RelyingParty;
 import ch.SWITCH.aai.uApprove.components.UApproveException;
 import ch.SWITCH.aai.uApprove.components.TermsOfUseManager;
 import ch.SWITCH.aai.uApprove.components.Attribute;
@@ -74,7 +77,7 @@ public class Controller extends HttpServlet {
 
   public static final String SESKEY_PRINCIPAL = "principal";
   public static final String SESKEY_RETURNURL = "returnURL";
-  public static final String SESKEY_ENTITYID = "entityId";
+  public static final String SESKEY_RELYINGPARTY = "relyingParty";
   public static final String SESKEY_ATTRIBUTES = "attributes";
   public static final String SESKEY_GLOBAL_CONSENT_POSSIBLE = "globalConsentPossible";
   public static final String SESKEY_LOCALE = "locale";
@@ -166,11 +169,25 @@ public class Controller extends HttpServlet {
       throws ServletException, IOException {
     try {
       LOG.info("POST received");
-
+     
       // initialization
       HttpSession session = request.getSession();
       LogInfo storage = LogInfo.getInstance();
-
+      
+      // debugging
+      RelyingParty rpdebug = (RelyingParty)session.getAttribute(SESKEY_RELYINGPARTY);
+      LOG.trace("RelyingParty before entering reading request, entityId={}",
+    		  rpdebug==null?"Not Set":rpdebug.getEntityId());
+      
+      /*
+      Enumeration<String> e = session.getAttributeNames();
+      while (e.hasMoreElements()) {
+    	  String key = e.nextElement();
+    	  Object value = session.getAttribute(key);
+    	  LOG.trace("{} => {}", key, value);
+      }
+      */
+      
       // get principal
       String principal = decrypt(request
           .getParameter(ConfigurationManager.HTTP_PARAM_PRINCIPAL));
@@ -193,10 +210,15 @@ public class Controller extends HttpServlet {
         // Start flow
         LOG.info("start viewer flow");
         // get providerId
-        String entityId = decrypt(request
-            .getParameter(ConfigurationManager.HTTP_PARAM_PROVIDERID));
-        LOG.debug("entityId=" + entityId);
-        session.setAttribute(SESKEY_ENTITYID, entityId);
+        
+        LOG.debug("RP decrypted, serialized: {}", decrypt(request
+                .getParameter(ConfigurationManager.HTTP_PARAM_RELYINGPARTY)));
+
+        RelyingParty relyingParty = new RelyingParty(decrypt(request
+            .getParameter(ConfigurationManager.HTTP_PARAM_RELYINGPARTY)));
+
+        LOG.debug("entityId=" + relyingParty.getEntityId());
+        session.setAttribute(SESKEY_RELYINGPARTY, relyingParty);
 
         // get released attributes
         String serializedAttributesReleased = decrypt(request
@@ -223,7 +245,8 @@ public class Controller extends HttpServlet {
         // getUserInfo
         UserLogInfo userInfo = storage.getData(principal);
         LOG.debug("userInfo=" + userInfo);
-
+        
+        
         if (userInfo == null) {
           if (useTerms) {
             LOG.debug("first visit of the user, redirect to terms page");
@@ -272,8 +295,8 @@ public class Controller extends HttpServlet {
       if (principal == null || principal.equals(""))
         throw new UApproveException("Principal is not set");
 
-      String entityId = (String) session.getAttribute(SESKEY_ENTITYID);
-      LOG.debug("entityId=" + entityId);
+      RelyingParty relyingParty = (RelyingParty) session.getAttribute(SESKEY_RELYINGPARTY);
+      LOG.debug("entityId=" + relyingParty.getEntityId());
 
       UserLogInfo userInfo = storage.getData(principal);
       LOG.debug("userInfo=" + userInfo);
@@ -321,10 +344,10 @@ public class Controller extends HttpServlet {
         
         String termsVersion = useTerms ? TermsOfUseManager.getVersion() : "";
         String attributes = Attribute.serializeAttributeIDs(attributesReleased);
-        LOG.debug("store: principal=" + principal + " entityId=" + entityId
+        LOG.debug("store: principal=" + principal + " entityId=" + relyingParty.getEntityId()
             + " attributes=" + attributes + " terms=" + termsVersion + " globalConsent="
             + isGetParSet(request, GETPAR_ATTRIBUTES_GLOBAL_CONSENT));
-        storeUser(userInfo, principal, termsVersion, entityId, attributes,
+        storeUser(userInfo, principal, termsVersion, relyingParty.getEntityId(), attributes,
             isGetParSet(request, GETPAR_ATTRIBUTES_GLOBAL_CONSENT));
         response.sendRedirect(response.encodeRedirectURL(returnURL));
         return;
@@ -401,7 +424,7 @@ public class Controller extends HttpServlet {
   }
 
   // parse resource (sp) host
-  public static String getResourceHost(String entityId) {
+  private static String getResourceHost(String entityId) {
     int i1 = entityId.indexOf("//");
     int i2 = entityId.indexOf("/", i1+2);
     LOG.debug("entityId received = \"" + entityId + "\"");
@@ -419,6 +442,31 @@ public class Controller extends HttpServlet {
     LOG.debug("hostname extracted = \"" + entityId + "\"");
 
     return entityId;
+  }
+  
+  public static String getRelyingPartyName(RelyingParty relyingParty, Locale locale) {
+	  
+	  Map <String, String> names =  relyingParty.getRpNames();
+	  String name = names.get(locale.getLanguage());
+	  if (name != null)
+		  return name;
+	  name = names.get(Locale.ENGLISH.getLanguage());
+	  if (name != null)
+		  return name;
+	  
+	  return getResourceHost(relyingParty.getEntityId());
+  }
+  
+  public static String getRelyingPartyDesc(RelyingParty relyingParty, Locale locale) {
+	  Map <String, String> descs =  relyingParty.getRpDescriptions();
+	  String desc = descs.get(locale.getLanguage());
+	  if (desc != null)
+		  return desc;
+	  desc = descs.get(Locale.ENGLISH.getLanguage());
+	  if (desc != null)
+		  return desc;
+	  
+	  return "";
   }
   
   // resolves displayName due to locale

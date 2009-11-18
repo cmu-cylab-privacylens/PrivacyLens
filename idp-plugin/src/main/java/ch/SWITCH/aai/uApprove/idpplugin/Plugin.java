@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import ch.SWITCH.aai.uApprove.components.Attribute;
 import ch.SWITCH.aai.uApprove.components.ConfigurationManager;
+import ch.SWITCH.aai.uApprove.components.RelyingParty;
 import ch.SWITCH.aai.uApprove.components.TermsOfUseManager;
 import ch.SWITCH.aai.uApprove.components.UApproveException;
 import ch.SWITCH.aai.uApprove.storage.LogInfo;
@@ -84,14 +85,14 @@ public class Plugin implements Filter {
 
   // method to continue to the identity provider (skip filter)
   private void continue2IdP(String reason, LogInfo storage,
-    UserLogInfo userInfo, String username, String providerId,
+    UserLogInfo userInfo, String username, RelyingParty relyingParty,
     boolean globalARA, boolean approvalGiven) throws UApproveException {
     LOG.info("continue2Idp, reason: " + reason);
 
     // create user hack
     if (userInfo == null) {
       userInfo = storage.addUserLogInfoData(username, "1.0", new Date()
-          .toString(), "", "no", providerId, null);
+          .toString(), "", "no", relyingParty.getEntityId(), null);
       storage.update(userInfo);
       LOG.info("continue2IdP, user was not existent, created one");
     }
@@ -99,11 +100,11 @@ public class Plugin implements Filter {
     if (ConfigurationManager.makeBoolean(ConfigurationManager
         .getParam(ConfigurationManager.PLUGIN_LOG_PROVIDER_ACCESS))) {
       if (approvalGiven) {
-        storage.updateProviderAccess(username, providerId, globalARA);
+        storage.updateProviderAccess(username, relyingParty.getEntityId(), globalARA);
         LOG
             .info("continue2IdP: provider access logged with attribute release approval");
       } else {
-        storage.updateProviderAccessWithNoARA(username, providerId);
+        storage.updateProviderAccessWithNoARA(username, relyingParty.getEntityId());
         LOG
             .info("continue2IdP: provider access logged without attribute release approval");
       }
@@ -116,7 +117,7 @@ public class Plugin implements Filter {
 
   // method to continue to the uApprove web application (leave IdP)
   private String post2Viewer(String reason, boolean resetConsent,
-      String returnURL, String principal, String entityId,
+      String returnURL, String principal, RelyingParty relyingParty,
       Collection<Attribute> attributesReleased, HttpServletRequest request, LoginContext loginCtx) throws
       UApproveException, PassiveAuthenticationException {
     LOG.info("Continue to uApprove viewer, reason: " + reason);
@@ -160,9 +161,9 @@ public class Plugin implements Filter {
         + encrypt(principal)
         + "\"/>"
         + "       <input type=\"hidden\" name=\""
-        + ConfigurationManager.HTTP_PARAM_PROVIDERID
+        + ConfigurationManager.HTTP_PARAM_RELYINGPARTY
         + "\" value=\""
-        + encrypt(entityId)
+        + encrypt(relyingParty.serialize())
         + "\"/>"
         + "       <input type=\"hidden\" name=\""
         + ConfigurationManager.HTTP_PARAM_ATTRIBUTES
@@ -330,16 +331,16 @@ public class Plugin implements Filter {
          throw new UApproveException("No principal found, assure authentication");
 
       LOG.debug("doFilter: principal=" + principal);
-
-      // get the entityId from shib context
-      String entityId = loginCtx.getRelyingPartyId();
-      LOG.debug("doFilter: entityId={}", entityId);
-
-      LOG.info("uApprove touched for {} ==> {}", principal, entityId);
-
+      
+      // get relyingParty
+      MetadataAccess metadataAccess = new MetadataAccess(relyingPartyConfigurationManager);
+      RelyingParty relyingParty = metadataAccess.getRelyingPartyInfo(loginCtx.getRelyingPartyId());
+            
+      LOG.info("uApprove touched for {} ==> {}", principal, relyingParty.getEntityId());
+      
       // get the attributes released for user and provider id;
       Collection<Attribute> attributesReleased = AttributeDumper.getAttributes(
-          principal, entityId);
+          principal, relyingParty.getEntityId());
 
       // get referer
       String referer = httpServletRequest.getRequestURL()
@@ -373,7 +374,7 @@ public class Plugin implements Filter {
       if (ConfigurationManager.makeBoolean(ConfigurationManager
           .getParam(ConfigurationManager.PLUGIN_MONITORING_ONLY))) {
         continue2IdP(CONTIDP_REASON_MONITORING_ONLY, storage, userInfo,
-            principal, entityId, globalConsentGiven, false);
+            principal, relyingParty, globalConsentGiven, false);
         
         transferLoginContext2IdP(loginCtx, httpServletRequest, httpServletResponse);
         filterChain.doFilter(servletRequest, servletResponse);
@@ -381,9 +382,9 @@ public class Plugin implements Filter {
       }
 
       // providerId in black list
-      if (SPBlacklistManager.containsItem(entityId)) {
+      if (SPBlacklistManager.containsItem(relyingParty.getEntityId())) {
         continue2IdP(CONTIDP_REASON_BLACKLIST, storage, userInfo, principal,
-            entityId, globalConsentGiven, false);
+        		relyingParty, globalConsentGiven, false);
         transferLoginContext2IdP(loginCtx, httpServletRequest, httpServletResponse);
         filterChain.doFilter(servletRequest, servletResponse);
         return;
@@ -393,7 +394,7 @@ public class Plugin implements Filter {
     	transferLoginContext2uApprove(loginCtx, httpServletRequest, httpServletResponse);
         httpServletResponse.getWriter().write(
             post2Viewer(CONTV_REASON_FIRSTVISIT, resetConsent, referer,
-                principal, entityId, attributesReleased, httpServletRequest, loginCtx));
+                principal, relyingParty, attributesReleased, httpServletRequest, loginCtx));
         return;
       }
       // check if the user wants to reset the settings
@@ -401,7 +402,7 @@ public class Plugin implements Filter {
     	transferLoginContext2uApprove(loginCtx, httpServletRequest, httpServletResponse);
         httpServletResponse.getWriter().write(
             post2Viewer(CONTV_REASON_RESETCONSENT, resetConsent, referer,
-                principal, entityId, attributesReleased, httpServletRequest, loginCtx));
+                principal, relyingParty, attributesReleased, httpServletRequest, loginCtx));
         return;
       }
 
@@ -417,7 +418,7 @@ public class Plugin implements Filter {
           transferLoginContext2uApprove(loginCtx, httpServletRequest, httpServletResponse);
           httpServletResponse.getWriter().write(
               post2Viewer(CONTV_REASON_TERMSCHANGED, resetConsent, referer,
-                  principal, entityId, attributesReleased, httpServletRequest, loginCtx));
+                  principal, relyingParty, attributesReleased, httpServletRequest, loginCtx));
           return;
         }
       }
@@ -427,7 +428,7 @@ public class Plugin implements Filter {
           + userInfo.getGlobal());
       if (ConfigurationManager.makeBoolean(userInfo.getGlobal())) {
         continue2IdP(CONTIDP_REASON_GLOBAL_CONSENT, storage, userInfo,
-            principal, entityId, globalConsentGiven, true);
+            principal, relyingParty, globalConsentGiven, true);
         transferLoginContext2IdP(loginCtx, httpServletRequest, httpServletResponse);
         filterChain.doFilter(servletRequest, servletResponse);
         return;
@@ -441,41 +442,41 @@ public class Plugin implements Filter {
       // check if there are any attributes
       if (attributes == null || attributes.equals("")) {
         continue2IdP(CONTIDP_REASON_NOATTRIBUTES, storage, userInfo, principal,
-            entityId, globalConsentGiven, false);
+        		relyingParty, globalConsentGiven, false);
         transferLoginContext2IdP(loginCtx, httpServletRequest, httpServletResponse);
         filterChain.doFilter(servletRequest, servletResponse);
         return;
       }
 
       // check if it is users first visited to this provider
-      LOG.debug("doFilter: entityId=" + entityId);
+      LOG.debug("doFilter: entityId=" + relyingParty.getEntityId());
       LOG.debug("doFilter: user contains entityId="
-          + userInfo.containsProviderId(entityId));
-      if (entityId != null && !userInfo.containsProviderId(entityId)) {
+          + userInfo.containsProviderId(relyingParty.getEntityId()));
+      if (relyingParty != null && !userInfo.containsProviderId(relyingParty.getEntityId())) {
     	  transferLoginContext2uApprove(loginCtx, httpServletRequest, httpServletResponse);
     	  httpServletResponse.getWriter().write(
             post2Viewer(CONTV_REASON_NEWPROVIDER, resetConsent, referer,
-                principal, entityId, attributesReleased, httpServletRequest, loginCtx));
+                principal, relyingParty, attributesReleased, httpServletRequest, loginCtx));
         return;
       }
 
       // check if the there are attributes, which not are already approved for
       // release
       LOG.debug("doFilter: attributes already approved="
-          + userInfo.getAttributesForProviderId(entityId));
+          + userInfo.getAttributesForProviderId(relyingParty.getEntityId()));
       LOG.debug("doFilter: attributes to be released  =" + attributes);
       if (!Attribute.compareAttributeRelease(userInfo
-          .getAttributesForProviderId(entityId), attributes)) {
+          .getAttributesForProviderId(relyingParty.getEntityId()), attributes)) {
     	  transferLoginContext2uApprove(loginCtx, httpServletRequest, httpServletResponse);
     	  httpServletResponse.getWriter().write(
             post2Viewer(CONTV_REASON_ATTRCHANGED, resetConsent, referer,
-                principal, entityId, attributesReleased, httpServletRequest, loginCtx));
+                principal, relyingParty, attributesReleased, httpServletRequest, loginCtx));
         return;
       }
 
       // the user has already given attribute release approval to this provider
       continue2IdP(CONTIDP_REASON_PROVIDER_APPROVAL, storage, userInfo,
-          principal, entityId, globalConsentGiven, true);
+          principal, relyingParty, globalConsentGiven, true);
       transferLoginContext2IdP(loginCtx, httpServletRequest, httpServletResponse);
       filterChain.doFilter(servletRequest, servletResponse);
       return;

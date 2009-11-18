@@ -1,6 +1,7 @@
 <%@ page
 	import="
    ch.SWITCH.aai.uApprove.viewer.Controller,
+   ch.SWITCH.aai.uApprove.components.RelyingParty,
 	 java.util.*,
 	 javax.servlet.*"%>
 
@@ -43,8 +44,9 @@
 
 
 <%
-String entityId = (String) session.getAttribute(Controller.SESKEY_ENTITYID);
-ResourceBundle rb = ResourceBundle.getBundle( Controller.RB_TERMS_DECLINED, (Locale) session.getAttribute(Controller.SESKEY_LOCALE) );
+RelyingParty relyingParty = (RelyingParty) session.getAttribute(Controller.SESKEY_RELYINGPARTY);
+Locale locale = (Locale) session.getAttribute(Controller.SESKEY_LOCALE);
+ResourceBundle rb = ResourceBundle.getBundle( Controller.RB_TERMS_DECLINED, locale );
 
 
 
@@ -52,18 +54,20 @@ out.println( "<p><strong>" + (String) rb.getString("title") + "</strong></p>" );
 String[] sKeys = { "txt1", "txt2", "txt3" };
 for ( int i = 0; i < sKeys.length; i++ ) {
         String sText = (String) rb.getString( sKeys[i] );
-        sText = sText.replaceFirst( "\\?", Controller.getResourceHost(entityId) );
+        sText = sText.replaceFirst( "\\?", Controller.getRelyingPartyName(relyingParty, locale) );
         out.println( sText );
 }
 
 
 %>
 
-<div class="login-field">
+
+<%@page import="ch.SWITCH.aai.uApprove.components.RelyingParty"%><div
+	class="login-field">
 <form name="question" action="Controller">
 <div align="left"><input type="submit"
 	name="<%= Controller.GETPAR_TERMS_DECLINE_BACK %>"
-	value="<%= rb.getString( "label_back") %>"></div>
+	value='<%= rb.getString( "label_back") %>'></div>
 </form>
 </div>
 
