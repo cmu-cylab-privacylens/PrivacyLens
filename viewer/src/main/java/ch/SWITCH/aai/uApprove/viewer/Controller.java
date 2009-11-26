@@ -3,7 +3,6 @@ package ch.SWITCH.aai.uApprove.viewer;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
 
@@ -179,6 +178,8 @@ public class Controller extends HttpServlet {
       LOG.trace("RelyingParty before entering reading request, entityId={}",
     		  rpdebug==null?"Not Set":rpdebug.getEntityId());
       
+      
+      
       /*
       Enumeration<String> e = session.getAttributeNames();
       while (e.hasMoreElements()) {
@@ -200,6 +201,16 @@ public class Controller extends HttpServlet {
       LOG.debug("returnURL=" + returnURL);
       session.setAttribute(SESKEY_RETURNURL, returnURL);
 
+      // get relying
+      LOG.debug("RP decrypted, serialized: {}", decrypt(request
+              .getParameter(ConfigurationManager.HTTP_PARAM_RELYINGPARTY)));
+
+      RelyingParty relyingParty = new RelyingParty(decrypt(request
+          .getParameter(ConfigurationManager.HTTP_PARAM_RELYINGPARTY)));
+
+      LOG.debug("entityId=" + relyingParty.getEntityId());
+      session.setAttribute(SESKEY_RELYINGPARTY, relyingParty);
+      
       if (request.getParameter(ConfigurationManager.HTTP_PARAM_RESET) != null) {
         // start edit flow
         LOG.info("user want to edit the attribute release approval");
@@ -209,16 +220,6 @@ public class Controller extends HttpServlet {
       } else {
         // Start flow
         LOG.info("start viewer flow");
-        // get providerId
-        
-        LOG.debug("RP decrypted, serialized: {}", decrypt(request
-                .getParameter(ConfigurationManager.HTTP_PARAM_RELYINGPARTY)));
-
-        RelyingParty relyingParty = new RelyingParty(decrypt(request
-            .getParameter(ConfigurationManager.HTTP_PARAM_RELYINGPARTY)));
-
-        LOG.debug("entityId=" + relyingParty.getEntityId());
-        session.setAttribute(SESKEY_RELYINGPARTY, relyingParty);
 
         // get released attributes
         String serializedAttributesReleased = decrypt(request

@@ -38,14 +38,12 @@
       <version>${project.version}</version>
     </dependency>
 
-    <!-- Runtime dependencies -->
+    <!-- Compile dependencies-->
     <dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bcprov-jdk15</artifactId>
-      <version>1.43</version>
-      <scope>runtime</scope>
+      <groupId>edu.vt.middleware</groupId>
+      <artifactId>vt-crypt</artifactId>
+      <version>2.0.1</version>
     </dependency>
-
 
     <!-- Provided dependencies -->
     <dependency>

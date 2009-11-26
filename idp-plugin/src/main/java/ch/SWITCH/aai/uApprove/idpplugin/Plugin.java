@@ -284,6 +284,11 @@ public class Plugin implements Filter {
 
       LoginContext loginCtx = retrieveLoginContext(httpServletRequest, httpServletResponse);
       LOG.trace("LoginContext loaded: {}", loginCtx != null);
+      if (loginCtx != null) {
+    	  LOG.trace("LoginContext {}", loginCtx);
+    	  LOG.trace("LoginContext Session ID: {}", loginCtx.getSessionID());
+      }
+      
       
       if (loginCtx == null) {
         LOG.debug("LoginContext not found, this must be the first visit to profile servlet");
