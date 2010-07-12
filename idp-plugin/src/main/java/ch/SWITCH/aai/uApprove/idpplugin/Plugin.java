@@ -14,6 +14,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -32,6 +33,7 @@ import edu.internet2.middleware.shibboleth.common.relyingparty.provider.SAMLMDRe
 import edu.internet2.middleware.shibboleth.idp.authn.AuthenticationException;
 import edu.internet2.middleware.shibboleth.idp.authn.LoginContext;
 import edu.internet2.middleware.shibboleth.idp.authn.PassiveAuthenticationException;
+import edu.internet2.middleware.shibboleth.idp.session.ServiceInformation;
 import edu.internet2.middleware.shibboleth.idp.session.Session;
 import edu.internet2.middleware.shibboleth.idp.util.HttpServletHelper;
 import edu.vt.middleware.crypt.CryptException;
@@ -180,19 +182,94 @@ public class Plugin implements Filter {
   }
   
   private void transferLoginContext2IdP(LoginContext loginCtx, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-	  HttpServletHelper.unbindLoginContext(HttpServletHelper.getStorageService(servletContext), servletContext, httpServletRequest, httpServletResponse);
+	  
+	  LOG.trace("Transfer LoginContext to IdP (before unbind from SS)");
+	  retrieveLoginContext(httpServletRequest,httpServletResponse);
+
+	  Cookie cookie = HttpServletHelper.getCookie(httpServletRequest, HttpServletHelper.LOGIN_CTX_KEY_NAME);
+	  LOG.trace("Cookie is {}", cookie == null ? null : cookie.getValue());
+	  
+	  LoginContext temp = HttpServletHelper.unbindLoginContext(HttpServletHelper.getStorageService(servletContext), servletContext, httpServletRequest, httpServletResponse);
+	  httpServletRequest.setAttribute(HttpServletHelper.LOGIN_CTX_KEY_NAME, null);
+
+	  LOG.trace("Return context of unbind:");
+	  dumpLoginContext(temp);
+	  
+	  LOG.trace("Transfer LoginContext to IdP (after unbind from SS)");
+	  retrieveLoginContext(httpServletRequest,httpServletResponse);
+	  
+	  LOG.trace("Transfer LoginContext to IdP (before bind to request)");
+	  retrieveLoginContext(httpServletRequest,httpServletResponse);
 	  HttpServletHelper.bindLoginContext(loginCtx, httpServletRequest);
+	  LOG.trace("Transfer LoginContext to IdP (after bind to request)");
+	  retrieveLoginContext(httpServletRequest,httpServletResponse);
   }
   
   private void transferLoginContext2uApprove(LoginContext loginCtx, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-	  HttpServletHelper.bindLoginContext(loginCtx, HttpServletHelper.getStorageService(servletContext), servletContext, httpServletRequest, httpServletResponse);
+	  LOG.trace("Transfer LoginContext to uApprove (before bind to SS)");
+	  retrieveLoginContext(httpServletRequest,httpServletResponse);
+	  HttpServletHelper.bindLoginContext(loginCtx, HttpServletHelper.getStorageService(servletContext), servletContext, httpServletRequest, httpServletResponse);	  
+	  LOG.trace("Transfer LoginContext to uApprove (after bind to SS)");
+	  retrieveLoginContext(httpServletRequest,httpServletResponse);
   }
   
   private LoginContext retrieveLoginContext(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-	  return HttpServletHelper.getLoginContext(HttpServletHelper.getStorageService(servletContext), servletContext, httpServletRequest);
+	  LOG.trace("Retrieving LoginContext");
+	  LoginContext loginContext = HttpServletHelper.getLoginContext(HttpServletHelper.getStorageService(servletContext), servletContext, httpServletRequest);	  
+	  dumpLoginContext(loginContext);
+	  
+	  // Hack
+	  /*
+	  if (loginContext != null  && loginContext.getSessionID() == null) {
+		Session idpSession = retrieveUsersIdPSession(httpServletRequest);
+		LOG.trace("Set LoginContext SessionID from users session");
+		loginContext.setSessionID(idpSession.getSessionID());
+	  }*/
+	  
+	  return loginContext;
   }
 
-  public void init(FilterConfig filterConfig) {
+  private void dumpLoginContext(LoginContext loginContext) {
+	LOG.trace("=== DUMP LoginContext ===");
+	if (loginContext == null) {
+		LOG.trace("NULL");
+	} else {
+		LOG.trace("LoginContext: {}", loginContext);
+		LOG.trace("SessionID:    {}", loginContext.getSessionID());
+		LOG.trace("Principal:    {}", loginContext.getPrincipalName());	
+		LOG.trace("RelyingParty: {}", loginContext.getRelyingPartyId());
+		LOG.trace("AuthMethod:   {}", loginContext.getAuthenticationMethod());
+		LOG.trace("AuthTime:     {}", loginContext.getAuthenticationInstant());
+	}
+	LOG.trace("=========================");
+  }
+  
+  private Session retrieveUsersIdPSession(HttpServletRequest httpServletRequest) {
+	  Session idpSession = HttpServletHelper.getUserSession(httpServletRequest);
+	  dumpIdPSession(idpSession);
+	  return idpSession;
+  }
+  
+  private void dumpIdPSession(Session idpSession) {
+		LOG.trace("=== DUMP IdP Session ===");
+		if (idpSession == null) {
+			LOG.trace("NULL");
+		} else {
+			LOG.trace("IdPSession:   {}", idpSession);
+			LOG.trace("SessionID:    {}", idpSession.getSessionID());
+			LOG.trace("Principal:    {}", idpSession.getPrincipalName());
+			LOG.trace("Subject:      {}", idpSession.getSubject());	
+			LOG.trace("LastActivity: {}", idpSession.getLastActivityInstant());
+			LOG.trace("ServiceInformation:");
+			for (String key: idpSession.getServicesInformation().keySet()) {
+				ServiceInformation info = idpSession.getServicesInformation().get(key);
+				LOG.trace("  Service {}: entityId = {}", key, info.getEntityID());
+			}
+		}
+		LOG.trace("=========================");
+  }
+
+public void init(FilterConfig filterConfig) {
     try {
     
       // get servlet context
@@ -281,15 +358,12 @@ public class Plugin implements Filter {
 
       HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
       HttpServletResponse httpServletResponse = (HttpServletResponse) servletResponse;
+      
+      // Remove unwished cookies
+      httpServletRequest = Workarrounds.removeLoginContextCookie(httpServletRequest);
 
       LoginContext loginCtx = retrieveLoginContext(httpServletRequest, httpServletResponse);
-      LOG.trace("LoginContext loaded: {}", loginCtx != null);
-      if (loginCtx != null) {
-    	  LOG.trace("LoginContext {}", loginCtx);
-    	  LOG.trace("LoginContext Session ID: {}", loginCtx.getSessionID());
-      }
-      
-      
+            
       if (loginCtx == null) {
         LOG.debug("LoginContext not found, this must be the first visit to profile servlet");
         filterChain.doFilter(servletRequest, servletResponse);
@@ -305,8 +379,7 @@ public class Plugin implements Filter {
       }
 
       // check if the filter only should work on a specified authnContextClassRef
-      LOG.trace("LoginContext authenticationMethod{}",loginCtx.getAuthenticationMethod());
-      if (authnContextClassRef != null && !authnContextClassRef.equals(loginCtx.getAuthenticationMethod())) {
+      if (authnContextClassRef != null && loginCtx != null && !authnContextClassRef.equals(loginCtx.getAuthenticationMethod())) {
         LOG.debug("Skip IdP plugin on authN request with authentication method {}", loginCtx.getAuthenticationMethod());
         filterChain.doFilter(servletRequest, servletResponse);
         return;
@@ -319,16 +392,11 @@ public class Plugin implements Filter {
       String principal = null;
  
       // try from IdP Session
-      Session idpSession = HttpServletHelper.getUserSession(httpServletRequest);
-
-      LOG.trace("IdP Session is {}", idpSession);
+      Session idpSession = retrieveUsersIdPSession(httpServletRequest);
       if (idpSession != null) {
-        LOG.trace("IdP Session principal name is {}", idpSession.getPrincipalName());
-        LOG.trace("IdP Session subject is {}", idpSession.getSubject());
         principal = idpSession.getPrincipalName();
     
       } if (loginCtx != null) {
-    	  LOG.trace("LoginContext principal is {}", loginCtx.getPrincipalName());
     	  principal = loginCtx.getPrincipalName();
       }
 
