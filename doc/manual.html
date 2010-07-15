@@ -1,0 +1,810 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+
+<style type="text/css" media="screen">
+<!--
+
+body
+{
+  background-color: white;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  color: black;
+  margin:10px;
+}
+
+a {color: #1b3e93; }
+
+div {margin-bottom:20px;}
+
+p {line-height:125%;}
+
+h1 { color: rgb(0,43,127); font-size: 18px; font-weight: bold;}
+h2 { color: rgb(0,43,127); font-size: 16px; font-weight: bold;}
+h3 { color: rgb(0,43,127); font-size: 14px; font-weight: bold;}
+h4 { color: rgb(0,43,127); font-size: 12px; font-weight: bold;}
+
+tt { font-weight: bold; }
+
+.customval { color: #ff004b; }
+
+.strike {text-decoration:line-through;}
+
+fieldset.note {
+  border-style:solid;
+  border-width: 1px;
+  border-color: #00247d;
+  background-color: #d9e8ec;
+  padding: 1em;
+  width:85em;
+  padding-top:0px;
+  margin-top:5px;
+}
+
+fieldset.warn {
+  border-style:solid;
+  border-width: 1px;
+  border-color: #ff004b;
+  background-color: #edccd1;
+  padding: 1em;
+  width:85em;
+  padding-top:0px;
+  margin-top:5px;
+}
+
+legend {font-weight: bold;}
+
+.prodfed {color: #2b0080;}
+
+.testfed {color: #19803c;}
+
+dt {
+  margin-top:5px;
+  font-style:italic;
+}
+
+.console
+{
+  background-color: #f2f4f5;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #4d4d4d;
+  padding: 1em;
+  width:85em;
+}
+
+.file
+{
+  background-color: #fff8a1;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #4d4d4d;
+  padding: 1em;
+  width:85em;
+}
+
+-->
+
+
+    </style> <title> Installation and configuration of uApprove (for Shibboleth Identity Provider 2.x) </title>
+</head>
+<body>
+
+
+<h1> Installation and configuration of uApprove (for Shibboleth Identity Provider 2.x) </h1> <h2> Table of contents </h2>
+<ol>
+  <li>
+    <a href="#introduction"> Introduction</a>
+  </li>
+  <li>
+    <a href="#prerequisites"> Prerequisites</a>
+  </li>
+  <li>
+    <a href="#install"> Installation </a>
+  </li>
+  <li>
+    <a href="#configuration"> Configuration</a>
+  </li>
+    <li>
+    <a href="#run"> Run </a>
+  </li>
+  <li>
+    <a href="#troubleshooting"> Troubleshooting</a>
+  </li>
+  <li>
+    <a href="#references"> References</a>
+  </li>
+    <li>
+    <a href="#bugsandfeatures"> Bugs &amp; Features </a>
+  </li>
+    </li>
+    <li>
+    <a href="#update"> Update </a>
+  </li>
+</ol>
+<h2> <a name="introduction"> </a> 1. Introduction </h2>
+
+<p>
+ uApprove is an application which allows an end user to view the attribute set which will be sent
+ to the visiting resource.
+
+ </p>
+
+<p>
+  This guide describes the installation &amp; configuration of a the <a href="http://www.switch.ch/aai/support/tools/#uApprove">uApprove</a> for <a href="http://shibboleth.internet2.edu/"> Shibboleth Identity Provider (IdP) 2.x </a>.
+  <br />
+  It covers the installation the IdP plugin as well as uApprove viewer application and their configuration with
+  a flat file based or SQL based (Database) storage.
+</p>
+<div>
+  The example values used in this guide are:
+  <dl>
+    <dt>
+      <code>idp.example.org</code>
+    </dt>
+    <dd>
+      The DNS name of the Identity Provider
+    </dd>
+    <dt>
+      <code>/etc/shibboleth/uapprove</code>
+    </dt>
+    <dd>
+      The directory, where the uApprove config is located
+    </dd>
+    <dt>
+      <code>/opt/shibboleth-identityprovider-2.1.x</code>
+    </dt>
+    <dd>
+      The Shibboleth IdP installation directory
+    </dd>
+    <dt>
+      <code>/opt/tomcat</code>
+    </dt>
+    <dd>
+      The directory, where Tomcat is installed.
+    </dd>
+  </dl>
+</div>
+
+<h2> <a name="prerequisites"> </a> 2. Prerequisites </h2>
+<div>
+  Before start install and configure uApprove, assure that the following prerequisites are met:
+  <dl>
+    <dt>
+      Shibboleth Identity Provider 2.1.4 or greater.
+    </dt>
+    <dd>
+      Shibboleth Identity Provider has to be deployed properly. <br /> That implied that Java and Tomcat are working.
+    </dd>
+    <dt>
+      SQL Database
+    </dt>
+    <dd>
+      If a SQL Database as storage is used. A SQL Server has to be prepared.
+      <br /> Shipped uApprove is already configured for MySQL, but another SQL Server can be adapted.
+      Brook Schofield documented how to use 
+      <a href="http://wiki.unisa.edu.au/display/AAI/uApprove">
+      uApprove with an Oracle database</a>.
+    </dd>
+  </dl>
+
+
+
+</div>
+<h2> <a name="install"> </a> 3. Installation </h2>
+
+<div>
+  Download and unzip the uApprove package: <pre class="console">
+wget http://www.switch.ch/aai/downloads/uApprove-2.1.4-bin.zip
+unzip uApprove-2.1.4-bin.zip
+</pre>
+</div>
+
+<fieldset class="warn"><legend>Warning</legend>
+  If you are updating uApprove, please take a look at the
+  <a href="#update">update</a> section.
+</fieldset>
+
+
+<h3> <a name="install"> </a> 3.1 IdP-Plugin </h3>
+<div>
+  Copy libraries and configuration: <pre class="console">
+cd uApprove-2.1.4/
+unzip idp-plugin-2.1.4-bin.zip
+sudo cp idp-plugin-2.1.4/conf-template/* /etc/shibboleth/uapprove
+sudo cp idp-plugin-2.1.4/lib/* /opt/shibboleth-identityprovider-2.1.x/lib/
+</pre>
+</div>
+
+<h3> <a name="install"> </a> 3.2 Viewer </h3>
+<div>
+  Copy libraries and configuration: <pre class="console">
+cd uApprove-2.1.4/
+unzip viewer-2.1.4-bin.zip
+sudo cp viewer-2.1.4/conf-template/* /etc/shibboleth/uapprove
+</pre>
+</div>
+
+<h2> <a name="configuration"> </a> 4. Configuration </h2>
+
+<p> uApprove consist of two pieces of software, the IdP plugin which runs within the IdP context
+and the uApprove viewer application which is separated.
+<br />
+Both of them use a common data storage and the according libraries to operate with it.
+</p>
+
+
+<h3>4.1 uApprove common: Storage etc. </h3>
+
+<div>
+First you have to decide which storage implementation should be used:
+
+<dl>
+<dt> File based </dt>
+<dd> This is only recommended for small installation (&lt; 100 users)</dd>
+<dt> SQL Database </dt>
+<dd> MySQL database is fully suppored, but any SQL Database which has an JDBC connector should work. May be advanced configuration is needed.</dd>
+</dl>
+</div>
+
+<h4> File based </h4>
+<div>
+A file based storage hast to be setup in <tt>/etc/shibboleth/uapprove/common.properties</tt>:
+<pre class="file">
+#storageType=database
+#databaseConfig=/path/to/config/database.properties
+
+storageType=file
+flatFile = <tt class="customval">/etc/shibboleth/uapprove/uApprove-log.xml</tt>
+</pre>
+
+<fieldset class="note"><legend>Note</legend>Assure that <code>uApprove-log.xml</code> is read- and
+writeable by Tomcat.</fieldset>
+</div>
+
+<h4> Database </h4>
+
+<div>
+First, a databases and a user have to be created:
+<pre class="console">
+mysql -u root -p
+mysql>
+CREATE DATABASE uApprove;
+CREATE USER 'uApprove'@'localhost' IDENTIFIED BY '<tt class="customval">uApprove'</tt>;
+GRANT USAGE ON *.* TO 'uApprove'@'localhost';
+GRANT SELECT , INSERT , UPDATE , DELETE ON `uApprove`.* TO 'uApprove'@'localhost';
+ALTER DATABASE uApprove DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+</pre>
+
+Second, generate the table structures:
+<pre class="console">
+mysql -u root -p
+mysql>
+use uApprove;
+
+create table ArpUser (
+  idxArpUser int unsigned auto_increment primary key,
+  auUserName varchar(255) not null,
+  auLastTermsVersion varchar(255),
+  auFirstAccess timestamp,
+  auLastAccess timestamp
+);
+create index idxUserName on ArpUser (auUserName );
+
+create table ShibProvider (
+  idxShibProvider int unsigned auto_increment primary key,
+  spProviderName varchar(255)
+);
+insert into ShibProvider (idxShibProvider) values (1);
+create index idxProvidername on ShibProvider (spProviderName);
+
+create table AttrReleaseApproval (
+  idxAttrReleaseApproval int unsigned auto_increment primary key,
+  araIdxArpUser int unsigned references ArpUser ( idxArpUser ),
+  araIdxShibProvider int unsigned references ShibProvider( idxShibProvider ),
+  araTimeStamp timestamp not null,
+  araTermsVersion varchar(255),
+  araAttributes text(2048)
+);
+
+create table ProviderAccess (
+  idxProviderAccess int unsigned auto_increment primary key,
+  paIdxArpUser int unsigned references ArpUser( idxArpUser ),
+  paIdxShibProvider int unsigned references ShibProvider( idxShibProvider ),
+  paAttributesSent text,
+  paTermsVersion varchar(255),
+  paIdxAttrReleaseApproval int unsigned references AttrReleaseApproval ( idxAttrReleaseApproval ),
+  paShibHandle varchar(255),
+  paTimeStamp timestamp not null
+);
+</pre>
+
+A Database setup is configured in <tt>/etc/shibboleth/uapprove/common.properties</tt>:
+<pre class="file">
+storageType=database
+databaseConfig=/etc/shibboleth/uapprove/database.properties
+
+#storageType=file
+#flatFile=/path/to/config/uApprove-log.xml
+</pre>
+
+All database specific configuration is done in <tt>/etc/shibboleth/uapprove/database.properties</tt>:
+<pre class="file">
+driver=com.mysql.jdbc.Driver
+url=jdbc:mysql://localhost:3306/uApprove?autoReconnect=true
+user=uApprove
+password=<tt class="customval">uApprove</tt>
+sqlCommands=<tt class="customval">/etc/shibboleth/uapprove/mysql.commands</tt>
+</pre>
+
+<fieldset class="note"><legend>Note</legend>If another SQL server than MySQL is used, the values above has to be adjusted.
+<br /> Don't forget to put according JDBC driver into the library folder. <br />
+If it is necessary, the SQL commands can be re-defined in <code>/etc/shibboleth/uapprove/foo.commands</code>
+</fieldset>
+</div>
+
+<h4> Other common configuration </h4>
+<div>
+The TermsOfUseManager, which shows a Terms of use text to the user is optional. If the TermsOfUseManager should be active, define the terms in
+<tt>/etc/shibboleth/uapprove/common.properties</tt>:
+
+<pre class="file">
+termsOfUse=<tt class="customval">/etc/shibboleth/uapprove/terms-of-use.xml</tt>
+</pre>
+
+<fieldset class="note"><legend>Note</legend>
+The shipped <code>terms-of-use.xml</code> is an empty one, which can be filled by custom terms of use version and text. <br />
+If you want see a real world example, pleas take a look at the SWITCHaai VHO terms of use (<code>doc/terms-of-use-SWITCH.xml</code>).
+</fieldset>
+
+<p>
+Cause the IdP plugin and the viewer application exchange some confidential information, this is
+encrypted and decrypted by a shared secret (128 bit, 16 characters) in <tt>/etc/shibboleth/uapprove/common.properties</tt>:
+</p>
+
+<pre class="file">
+sharedSecret=<tt class="customval">!4's-50_$3Cr#T,|Zn`t_i7?</tt>
+</pre>
+
+For easy creating a random value, containing 16 chars, you can use the following command:
+<pre class="console">
+openssl rand -base64 16 2>/dev/null
+</pre>
+
+</div>
+
+<h3>4.2 IdP plugin configuration </h3>
+
+<h4> Shibboleth IdP adjustments </h4>
+
+The IdP plugin has to be enabled within Shibboleth IdP web application <tt>/opt/shibboleth-identityprovider-2.1.x/src/main/webapp/WEB-INF/web.xml</tt>:
+
+<pre class="file">
+&lt;web-app&gt;
+  ...
+<tt class="customval">
+  &lt;filter&gt;
+    &lt;filter-name&gt;uApprove IdP plugin&lt;/filter-name&gt;
+    &lt;filter-class&gt;ch.SWITCH.aai.uApprove.idpplugin.Plugin&lt;/filter-class&gt;
+    &lt;init-param&gt;
+      &lt;param-name&gt;Config&lt;/param-name&gt;
+      &lt;param-value&gt;
+        /etc/shibboleth/uapprove/idp-plugin.properties;
+        /etc/shibboleth/uapprove/common.properties;
+      &lt;/param-value&gt;
+    &lt;/init-param&gt;
+  &lt;/filter&gt;
+
+  &lt;filter-mapping&gt;
+    &lt;filter-name&gt;uApprove IdP plugin&lt;/filter-name&gt;
+    &lt;url-pattern&gt;/profile/*&lt;/url-pattern&gt;
+    &lt;dispatcher&gt;REQUEST&lt;/dispatcher&gt;
+    &lt;dispatcher&gt;FORWARD&lt;/dispatcher&gt;
+  &lt;/filter-mapping&gt;
+</tt>
+&lt;/web-app&gt;
+</pre>
+
+<h5> Redeployment of Shibboleth IdP</h5>
+<div>
+<pre class="console">
+cd /opt/shibboleth-identityprovider-2.1.x/
+sudo sh install.sh
+</pre>
+</div>
+
+<p>
+The SP blacklist defines Resources which are excluded from the user consent. <br />
+The SP blacklist is optional and can be configured by
+<tt>/etc/shibboleth/uapprove/idp-plugin.properties</tt>:
+</p>
+
+<pre class="file">
+spBlacklist=<tt class="customval">/etc/shibboleth/uapprove/sp-blacklist</tt>
+</pre>
+
+In <code>sp-blacklist</code>, each line defines a regular expression pattern for black listed resource identifier:
+<pre class="file">
+# Example 1: specific resource
+https://sp\.example\.org/shibboleth
+
+# Example 2: all applications within a Service Provider
+https://sp\.example\.org/.*
+
+# Example 3: all Service Provider within a specific domain
+https://.*\.example\.org/.*
+</pre>
+
+<p>
+If the database storage is used, it is possible to log each provider access, which means every attribute release is stored in the database.
+<br /> It is also possible, that the IdP plugin runs in monitoring only mode, which logs every provider access, but do not interact with the user (for user consent)
+<br /> If the viewer web application is used, the IdP plugin has to know, where it is deployed.
+<br /> it is possible to tell the IdP plugin, that it should take care about <i>isPassive</i> requests.
+<br /> The configuration is done in <tt>/etc/shibboleth/uapprove/idp-plugin.properties</tt>:
+<p>
+<pre class="file">
+logProviderAccess=<tt class="customval">false</tt>
+monitoringOnly=<tt class="customval">false</tt>
+uApproveViewer=<tt class="customval">https://idp.example.org/uApprove/Controller</tt>
+isPassiveSupport=<tt class="customval">false</tt>
+</pre>
+</div>
+<h3> 4.3 Viewer configuration </h3>
+
+<p>
+	Define a tomcat deployment descriptor for the uApprove webapp in
+	<tt>/opt/tomcat/conf/Catalina/localhost/uApprove.xml</tt>:
+</p>
+<pre class="file">
+&lt;Context docBase="<tt class="customval">/opt/uapprove/webapp/uApprove.war</tt>"
+         privileged="true"
+         antiResourceLocking="false"
+         antiJARLocking="false"
+         unpackWAR="false" /&gt;                             
+</pre>
+
+<p>
+Adjust the viewer application according you configuration directory in
+<tt>uApprove-2.1.4/viewer-2.1.4/webapp/WEB-INF/web.xml</tt>:
+</p>
+<pre class="file">
+&lt;web-app&gt;
+  ...
+  &lt;context-param&gt;
+    &lt;param-name&gt;Config&lt;/param-name&gt;
+    &lt;param-value&gt;
+        <tt class="customval">/etc/shibboleth/uapprove/viewer.properties;</tt>
+        <tt class="customval">/etc/shibboleth/uapprove/common.properties;</tt>
+    &lt;/param-value&gt;
+  &lt;/context-param&gt;
+  ...
+&lt;web-app&gt;
+</pre>
+
+<h5> Redeployment of the uApprove webapp</h5>
+<div>
+
+<pre class="console">cd uApprove-2.1.4/viewer-2.1.4/
+sudo ant deploy -Duapprove.deployment=<tt class="customval">/opt/uapprove/webapp</tt>
+</pre>
+</div>
+
+
+<h4> Attributes and localization </h4>
+
+<div>
+The viewer web application shows all attributes which will be released for the current user to the
+target resource.
+
+<p>
+It is possible to define a order of the attribute listing and if necessary, attributes can also be hidden.
+The configuration of the attribute list is optional done by <tt> /etc/shibboleth/uapprove/viewer.properties</tt>:
+</p>
+
+<pre class="file">
+attributeList=<tt class="customval">/etc/shibboleth/uapprove/attribute-list</tt>
+</pre>
+
+An <code>attribute-list</code> can be look like:
+<pre class="file">
+# Defined attribute order
+surname
+givenName
+postalAddress
+...
+
+# attributes to hide
+!persistentId
+!transientId
+</pre>
+
+<fieldset class="note"><legend>Note</legend>
+The attribute name in <code>attribute-list</code> has to comply with the attribute id in
+<code> /etc/shibboleth-idp/attribute-resolver.xml</code>
+</fieldset>
+
+<p>
+The viewer web application ist multi lingual for the static text and dynamic text, like attribute names and descrptions.
+<br /> For the static text, the following languages are supported: en, de, fr, it, pt.
+<br /> For the attribute names and descriptions, the localized content is taken from <tt> /etc/shibboleth-idp/attribute-resolver.xml</tt>
+(Shibboleth IdP resolver). It's possible to adjust or extent it:
+</p>
+<pre class="file">
+...
+<!-- Business postal address -->
+&lt;resolver:AttributeDefinition id="postalAddress" xsi:type="Simple" xmlns="urn:mace:shibboleth:2.0:resolver:ad" sourceAttributeID="postalAddress"&gt;
+  &lt;resolver:Dependency ref="myLDAP" /&gt;
+  &lt;resolver:DisplayName xml:lang="en"&gt;Business postal address&lt;/resolver:DisplayName&gt;
+  &lt;resolver:DisplayName xml:lang="de"&gt;Gesch&auml;ftsadresse&lt;/resolver:DisplayName&gt;
+  &lt;resolver:DisplayName xml:lang="fr"&gt;Adresse Professionnelle&lt;/resolver:DisplayName&gt;
+  &lt;resolver:DisplayName xml:lang="it"&gt;Indirizzo professionale&lt;/resolver:DisplayName&gt;
+  &lt;resolver:DisplayDescription xml:lang="en"&gt;Business postal address: Campus or office address&lt;/resolver:DisplayDescription&gt;
+  &lt;resolver:DisplayDescription xml:lang="de"&gt;Adresse am Arbeitsplatz&lt;/resolver:DisplayDescription&gt;
+  &lt;resolver:DisplayDescription xml:lang="fr"&gt;Adresse de l'institut, de l'universite&lt;/resolver:DisplayDescription&gt;
+  &lt;resolver:DisplayDescription xml:lang="it"&gt;Indirizzo professionale: Indirizzo dell'istituto o dell'ufficio&lt;/resolver:DisplayDescription&gt;
+  &lt;resolver:AttributeEncoder xsi:type="SAML1String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder"
+                             name="urn:mace:dir:attribute-def:postalAddress" /&gt;
+  &lt;resolver:AttributeEncoder xsi:type="SAML2String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder"
+                             name="urn:oid:2.5.4.16" friendlyName="postalAddress" /&gt;
+&lt;/resolver:AttributeDefinition&gt;
+...
+</pre>
+
+<fieldset class="note"><legend>Note</legend>
+For the SWITCHaai attributes, there is a prepared <code>doc/attribute-descriptions.xml</code> for the languages: en, de, fr, it.
+</fieldset>
+<p>
+The viewer uses the language from the users browsers request, if that language is not available, the default locale <i>en</i> will be taken.
+<br /> It is possible to enforce a specific language. This can be defined optional in <tt> /etc/shibboleth/uapprove/viewer.properties</tt>:
+</p>
+<pre class="file">
+useLocale=<tt class="customval">US_en</tt>
+</pre>
+</div>
+
+<h4> Global consent </h4>
+<div>
+It is possible that a user can give global attribute release consent, which mean, that she/he is never be asked again by uApprove.
+If it is required, that a user has to give consent to each different resource access, global consent has to be disabled in
+<tt> /etc/shibboleth/uapprove/viewer.properties</tt>:
+<pre class="file">
+globalConsentPossible=<tt class="customval">true</tt>
+</pre>
+</div>
+
+<h4> <a name="vlog"></a> Logging </h4>
+<div>
+The viewer web application uses LogBack (see <a href="#references">references</a>) like the Shibboleth IdP.
+<br />
+The logback configuration file is defined in <tt> /etc/shibboleth/uapprove/viewer.properties</tt>:
+
+<pre class="file">
+loggingConfig=<tt class="customval">/etc/shibboleth/uapprove/logging.xml</tt>
+</pre>
+
+
+Adjust <code>logging.xml</code> for the log location, assure that the file is writeable by Tomcat:
+
+<pre class="file">
+&lt;configuration&gt;
+  ...
+  &lt;appender class="ch.qos.logback.core.FileAppender" name="RootFileAppender"&gt;
+    &lt;file&gt;<tt class="customval">/var/log/shibboleth-idp/uApprove.log</tt>&lt;/file&gt;
+    ...
+  &lt;/appender&gt;
+  ...
+&lt;/configuration&gt;
+</pre>
+</div>
+
+<h4> Apache in front of Tomcat</h4>
+<div>
+If you are using Apache HTTPd in front of your Tomcat setup, proxy the viewer web application in
+<tt>/etc/apache2/sites-enabled/idp.example.org</tt>:
+
+<pre class="file">
+&lt;VirtualHost idp.example.org:443&gt;
+  ...
+  &lt;Location /uApprove&gt;
+    Allow from all
+    ProxyPass ajp://localhost:8009/uApprove
+  &lt;/Location&gt;
+  ...
+&lt;/VirtualHost&gt;
+</pre>
+
+Restart Apache HTTPd:
+<pre class="console">
+sudo /etc/init.d/apache2 restart
+</pre>
+</div>
+<h3> 4.4 Reset-approvals configuration </h3>
+
+<div>
+The optional <i> reset-approvals</i> can be operated in two ways:
+<dl>
+  <dt>In-flow mode</dt>
+  <dd> The In-flow operation means, that a user can reset his setting during the login process. As exampple this is done by a checkbox on the login form. </dd>
+  <dt>Standalone mode</dt>
+  <dd>The standalone operation can is as JSP which can be called directly.</dd>
+</dl>
+
+<fieldset class="warn"><legend>Warning</legend>
+The <i> reset-approvals </i> application can only used with a database setup.
+</fieldset>
+</div>
+
+<h4> In-flow mode </h4>
+<div>
+For enabling the In-Flow <i> reset-approvals </i> application, the Shibboleth UsernamePassword login form
+<tt>/opt/tomcat/webapps/idp/login.jsp</tt> can be adapted by adding a checkbox:
+
+<fieldset class="warn"><legend>Warning</legend>
+Followed, the In-Flow <i> reset-settings </i> application configuration is for the shipped JAAS UsernamePassword
+login handler. If you are using another login handler (i.e. RemoteUser) you have to assure, that the GET
+parameter is transmitted to the IdP plugin.
+</fieldset>
+</div>
+
+<pre class="file">
+...
+&lt;form ...&gt;
+  &lt;table&gt;
+  ...
+    <tt class="customval">&lt;tr&gt;
+      &lt;td colspan="2"&gt;
+        &lt;input type="checkbox" name="resetuserconsent" value="true" /&gt;
+        Reset my attribute release approvals
+      &lt;/td&gt;
+    &lt;/tr&gt;</tt>
+  &lt;/table&gt;
+&lt;/form&gt;
+...
+</pre>
+</div>
+
+<h4> Standalone mode </h4>
+<div>
+For the standalone mode, the JSP has to be protected either by container managed authentication or Shibboleth Service Provider,
+that the <code>REMOTE_USER</code> is provided.
+
+<p>
+The standalone JSP can be called like <code> https://idp.example.org/uApprove/reset-approvals.jsp?standalone_next_url=http://go.here.org/after/reset</code>. The parameter <code>standalone_next_url</code> has to be set.
+</p>
+</div>
+
+<h2> <a name="run"> </a>5. Run </h2>
+
+<div>
+Restart Tomcat:
+<pre class="console">
+sudo /opt/tomcat/bin/shutdown.sh &amp;&amp; sleep 10 &amp;&amp; sudo /opt/tomcat/bin/startup.sh
+</pre>
+
+<fieldset class="note"><legend>Note</legend>
+If the Tomcat manager (<code>http://idp.example.org:8080/manager/html/</code>) is installed, web applications can easily be restarted separate.
+</fieldset>
+
+<fieldset class="note"><legend>Note</legend>
+Check the logs, if the startup of the IdP and uApprove web application was succesful. <br /> If it was succesful, try to access any Service Provider using your Identity Provider.
+</fieldset>
+</div>
+
+<h2> <a name="troubleshooting"> </a> 6. Troubleshooting </h2>
+
+<h3>6.1 Logging </h3>
+<div>
+Cause the IdP plugin runs within the Shibboleth IdP web application, it uses the IdP logger. The IdP logger
+is configured by <tt>/etc/shibboleth-idp/logging.xml</tt>:
+
+<pre class="file">
+...
+&lt;logger name="ch.SWITCH.aai"&gt;
+  &lt;level value="DEBUG" /&gt;
+&lt;/logger&gt;
+...
+</pre>
+
+
+The logging of uApprove viewer application is <a href="#vlog">configured as described</a>. Adjust the log level to <code>DEBUG</code>.
+</div>
+
+<h3>Tomcat, Jasper JSP compiling for 1.5 target </h3>
+<div>
+  uApprove is shipped for a JDK 1.5 target. However your Tomcat setup runs with an JDK  &ge; 1.5, it could be that the
+  Jasper engine compiles the JSP's on the fly for another target (e.g. 1.3).
+  The following configuration in <tt>TOMCAT_HOME\conf\web.xml</tt> specifies for which target the JSP's has to be compiled:
+<pre class="file">
+&lt;servlet&gt;
+  ...
+  &lt;init-param&gt;
+    &lt;param-name&gt;compilerSourceVM&lt;/param-name&gt;
+    &lt;param-value&gt;1.5&lt;/param-value&gt;
+  &lt;/init-param&gt;
+  &lt;init-param&gt;
+    &lt;param-name&gt;compilerTargetVM&lt;/param-name&gt;
+    &lt;param-value&gt;1.5&lt;/param-value&gt;
+  &lt;/init-param&gt;
+  ...
+&lt;/servlet&gt;
+</pre>
+
+</div>
+
+<h2> <a name="references"> </a> 7. References </h2>
+<div>
+  <ul>
+    <li>
+      <a href="http://www.switch.ch/aai/docs/shibboleth/SWITCH/2.1/idp/install-idp-2.1-debian.html"> Shibboleth Identity Provider 2.1 deployment guide</a>
+    </li>
+    <li>
+      <a href="http://logback.qos.ch/manual/"> LogBack manual</a>
+    </li>
+  </ul>
+</div>
+
+<h2> <a name="bugsandfeatures"> </a> 8. Bugs &amp; features </h2>
+<p>
+Please send bugs, improvements and feature requests to
+<a href=mailto:aai@switch.ch?Subject=uApprove>aai@switch.ch</a>.
+</p>
+
+<h2> <a name="update"> </a> 9. Update </h2>
+<p>
+  This section explains, how to update uApprove 2.1.x to 2.1.x+n.
+  The prerequisites are that uApprobe is already deployed sucessfully.
+  
+  <fieldset class="warn"><legend>Warning</legend>
+    If you are updating from 2.0 to 2.x, make sure that the <i>PreviousSession LoginHandler</i> in
+    <i>handler.xml</i> is restored to the original value.<br />
+    Remove the attribute <i>servletPath</i>.
+  </fieldset>
+
+  <fieldset class="warn"><legend>Warning</legend>
+    If you are updating from an existing ArpViewer 2.x to uApprove, please consult the new configuration
+    files, cause they changed.
+  </fieldset>
+ 
+  <fieldset class="warn"><legend>Warning</legend>
+    If you are updating uApprove, be aware of overwrite you configuration files
+  </fieldset>
+    
+  <ol>
+    <li>Download the <a href="http://www.switch.ch/aai/support/tools/uApprove.html#versions">latest</a> release</li>
+    <li> Unzip uApprove:
+      <pre class="console">unzip uApprove-2.1.x+n-bin.zip
+unzip uApprove-2.1.x+n/viewer-2.1.x+n-bin.zip -d uApprove-2.1.x+n/
+unzip uApprove-2.1.x+n/idp-plugin-2.1.x+n-bin.zip -d uApprove-2.1.x+n/</pre>
+    </li>
+    <li> Copy the plugin libaries into the IdP install directory and <strong>remove the old ones, if they exists</strong>:
+    <pre class="console">cp uApprove-2.1.x+n/idp-plugin-2.1.x+n/lib/* /opt/shibboleth-identityprovider-2.1.x/lib/</pre>
+    </li>
+    <li>
+    	Reuse the old <code>web.xml</code>:
+    	<pre class="console">cp uApprove-2.1.x/viewer-2.1.x/webapp/web.xml uApprove-2.1.x+n/viewer-2.1.x+n/webapp/WEB-INF/
+    	</pre>    
+    </li>
+    <li>
+    	If you have customized JSPs, stylesheets or logo copy them over as well.
+    </li>
+    <li>
+    	Redeploy the IdP:
+      <pre class="console">cd /opt/shibboleth-identityprovider-2.1.x/
+sh install.sh
+</pre>
+    </li>
+    <li>
+      Redeploy the uApprove webapp:
+      <pre class="console">/opt/tomcat/bin/shutdown.sh
+      cd uApprove-2.1.x+n/viewer-2.1.x+n/
+	  ant deploy -Duapprove.deployment=<tt class="customval">/opt/uapprove/webapp</tt>
+      /opt/tomcat/bin/startup.sh</pre>
+    </li>
+  </ol>
+<p>
+
+</body>
+</html>
