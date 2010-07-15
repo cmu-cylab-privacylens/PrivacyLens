@@ -339,7 +339,7 @@ public void init(FilterConfig filterConfig) {
   }
 
   public void destroy() {
-    LOG.info("destroyed");
+    LOG.debug("destroyed");
   }
 
   public void doFilter(ServletRequest servletRequest,
@@ -362,10 +362,18 @@ public void init(FilterConfig filterConfig) {
       // Remove unwished cookies
       httpServletRequest = Workarrounds.removeLoginContextCookie(httpServletRequest);
 
+      // Get Login Context and IdP Session
       LoginContext loginCtx = retrieveLoginContext(httpServletRequest, httpServletResponse);
+      Session idpSession = retrieveUsersIdPSession(httpServletRequest);
             
       if (loginCtx == null) {
         LOG.debug("LoginContext not found, this must be the first visit to profile servlet");
+        filterChain.doFilter(servletRequest, servletResponse);
+        return;
+      }
+      
+      if (idpSession == null) {
+        LOG.debug("No IdP session found");
         filterChain.doFilter(servletRequest, servletResponse);
         return;
       }
@@ -392,15 +400,15 @@ public void init(FilterConfig filterConfig) {
       String principal = null;
  
       // try from IdP Session
-      Session idpSession = retrieveUsersIdPSession(httpServletRequest);
+
       if (idpSession != null) {
         principal = idpSession.getPrincipalName();
     
       } if (loginCtx != null) {
-    	  principal = loginCtx.getPrincipalName();
+    	principal = loginCtx.getPrincipalName();
       }
 
-      if (principal==null || principal.equals(""))
+      if (principal == null || principal.equals(""))
          throw new UApproveException("No principal found, assure authentication");
 
       LOG.debug("doFilter: principal=" + principal);

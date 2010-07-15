@@ -108,7 +108,7 @@ public class ConfigurationManager {
         return "/uApprove/Controller";
     }
     
-    LOG.debug("{} => {}", new Object[] {configKey, value});
+    //LOG.debug("{} => {}", new Object[] {configKey, value});
     return (value != null) ? value.trim() : null;
   }
   

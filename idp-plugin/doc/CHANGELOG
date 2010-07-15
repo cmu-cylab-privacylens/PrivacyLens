@@ -1,0 +1,52 @@
+2.1.4       xx.xx.2009        HR
+================================
+ - Support SP Names and Descriptions
+ - Attribute Filter plugin by Chad
+ - Documentation adjusted
+ - Installscript for the webapp
+ - Cleanup dependencies
+
+2.1.3       24.09.2009        HR
+================================
+ - Using HTTPHelper classes from
+   Shibboleth to deal with the LoginContext
+ - crypt-1.5 replaced by vt-crypt-2.0 
+
+2.1.1/2.1.2 17.02.2009        HR
+================================
+ - Some bugfixes
+
+2.1         03.09.2008        HR
+================================
+ - Major change on ArpFilter design
+   RemoteUser based authentication is
+   not more required. Special acknowledgment to
+   Adam Lantos from niif.hu for the idea and patch and
+   Chad La Joie for best IdP internals support.
+ - Support for isPassive mode
+ - Undocumented feature to run ArpViewer only on
+   specified AuthnContextClassReferences for testing
+   and demonstrating purposes.
+ - Documentation adjustments
+
+2.0.2       06.06.2008        HR
+================================
+ - Populating IdP RequestContext right
+ - Trim configuration values
+ - Do not show empty attributes
+   Nullpointer Bug
+ - No error, when reseting non existent user.
+   Do redirect.
+ - Documentation cleanup
+
+2.0.1       15.04.2008        HR
+================================
+- Issue SAML2ScopedString attributes
+  AttributeObj.toString() instead of verification
+  if instanceOf String. User has to blacklist
+  Non-String attributes.
+
+2.0.0       09.04.2008        HR
+================================
+- Release for Shibboleth IdP 2.0
+ 

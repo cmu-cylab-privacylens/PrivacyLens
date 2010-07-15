@@ -1,0 +1,504 @@
+<AttributeResolver>
+    <!-- Other stuff here -->
+
+
+
+    <!-- SWITCHaai attributes -->
+
+    <!-- Attributes that are mandatory to implement -->
+
+    <!-- E-mail -->
+    <resolver:AttributeDefinition id="mail" xsi:type="Simple" xmlns="urn:mace:shibboleth:2.0:resolver:ad" sourceAttributeID="mail">
+        <resolver:Dependency ref="myLDAP" />
+        <resolver:DisplayName xml:lang="en">E-mail</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="de">E-Mail</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="fr">Email</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="it">E-mail</resolver:DisplayName>
+	<resolver:DisplayName xml:lang="pt">E-mail</resolver:DisplayName>
+        <resolver:DisplayDescription xml:lang="en">E-Mail: Preferred address for e-mail to be sent to this person</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="de">E-Mail Adresse</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="fr">Exemple: jean.martin@example.ch</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="it">E-Mail: L'indirizzo e-mail preferito dall'utente</resolver:DisplayDescription>
+	<resolver:DisplayDescription xml:lang="pt">E-Mail: Endere&ccedil;o de correio electronico</resolver:DisplayDescription>
+        
+        <resolver:AttributeEncoder xsi:type="SAML1String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:mace:dir:attribute-def:mail" />
+        <resolver:AttributeEncoder xsi:type="SAML2String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:oid:0.9.2342.19200300.100.1.3" friendlyName="mail" />
+    </resolver:AttributeDefinition>
+
+
+    <!-- Home organization -->
+    <resolver:AttributeDefinition id="homeOrganization" xsi:type="Simple" xmlns="urn:mace:shibboleth:2.0:resolver:ad" sourceAttributeID="swissEduPersonHomeOrganization">
+        <resolver:Dependency ref="myStaticAttributes" />
+        <resolver:DisplayName xml:lang="en">Home organization</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="de">Heimorganisation</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="fr">Organisation</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="it">Home organization</resolver:DisplayName>
+	<resolver:DisplayName xml:lang="pt">Institui&ccedil;&atilde;o de Origem</resolver:DisplayName>
+        <resolver:DisplayDescription xml:lang="en">Home Organization: Domain name of a Home Organization</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="de">Domain Name der Heimorganisation</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="fr">Nom de domaine de l'organisation: unizh.ch, unil.ch, ...</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="it">Home Organization: Nome di dominio dell'organizzazione. Esempio: unizh.ch, unil.ch, ...</resolver:DisplayDescription>
+	<resolver:DisplayDescription xml:lang="pt">Institui&ccedil;&atilde;o de origem: Dom&icute;nio da sua Institui&ccedil;&atilde;o. Exemplo: unizh.ch, unil.ch, ...</resolver:DisplayDescription>
+        <resolver:AttributeEncoder xsi:type="SAML1String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:mace:switch.ch:attribute-def:swissEduPersonHomeOrganization" />
+        <resolver:AttributeEncoder xsi:type="SAML2String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:oid:2.16.756.1.2.5.1.1.4" friendlyName="swissEduPersonHomeOrganization" />
+    </resolver:AttributeDefinition>
+
+
+    <!-- Home organization type -->
+    <resolver:AttributeDefinition id="homeOrganizationType" xsi:type="Simple" xmlns="urn:mace:shibboleth:2.0:resolver:ad" sourceAttributeID="swissEduPersonHomeOrganizationType">
+        <resolver:Dependency ref="myStaticAttributes" />
+        <resolver:DisplayName xml:lang="en">Home organization type</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="de">Typ der Heimorganisation</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="fr">Type d'Organisation</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="it">Tipo di Home organization</resolver:DisplayName>
+	<resolver:DisplayName xml:lang="pt">Tipo de Institui&ccedil;&atilde;o de origem</resolver:DisplayName>
+        <resolver:DisplayDescription xml:lang="en">Home Organization Type: Type of a Home Organization</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="de">Kategorie der Heimorganisation</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="fr">Type d'organisation: university, uas, vho, others, ...</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="it">Tipo di Home Organization: Il tipo di Home Organization. Esempio: università, vho,...</resolver:DisplayDescription>
+	<resolver:DisplayDescription xml:lang="en">Tipo de Institui&ccedil;&atilde;o de origem: Representa o tipo de Institui&ccedil;&atilde;o de origem</resolver:DisplayDescription>
+        <resolver:AttributeEncoder xsi:type="SAML1String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:mace:switch.ch:attribute-def:swissEduPersonHomeOrganizationType" />
+        <resolver:AttributeEncoder xsi:type="SAML2String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:oid:2.16.756.1.2.5.1.1.5" friendlyName="swissEduPersonHomeOrganizationType" />
+    </resolver:AttributeDefinition>
+
+
+    <!-- Affiliation -->
+    <resolver:AttributeDefinition id="affiliation" xsi:type="Simple" xmlns="urn:mace:shibboleth:2.0:resolver:ad" sourceAttributeID="eduPersonAffiliation">
+        <resolver:Dependency ref="myLDAP" />
+        <resolver:DisplayName xml:lang="en">Affiliation</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="de">Zugehörigkeit</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="fr">Affiliation</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="it">Tipo di membro</resolver:DisplayName>
+	<resolver:DisplayName xml:lang="pt">Tipo de utilizador</resolver:DisplayName>
+        <resolver:DisplayDescription xml:lang="en">Affiliation: Type of affiliation with Home Organization</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="de">Art der Zugehörigkeit zur Heimorganisation</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="fr">Type d'affiliation dans l'organisation: student, staff, affiliate, ...</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="it">Tipo di membro: Tipo di lavoro svolto per l'organizzazione. Esempio: studente, staff, ...</resolver:DisplayDescription>
+	<resolver:DisplayDescription xml:lang="pt">Tipo de utilizador: tipo de utilizador na organiza&ccedil;&atilde;o. Exemplo: Estudante, ...</resolver:DisplayDescription>
+        <resolver:AttributeEncoder xsi:type="SAML1String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:mace:dir:attribute-def:eduPersonAffiliation" />
+        <resolver:AttributeEncoder xsi:type="SAML2String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:oid:1.3.6.1.4.1.5923.1.1.1.1" friendlyName="eduPersonAffiliation" />
+    </resolver:AttributeDefinition>
+
+
+    <!-- Unique ID -->
+    <resolver:AttributeDefinition id="uniqueID" xsi:type="Simple" xmlns="urn:mace:shibboleth:2.0:resolver:ad" sourceAttributeID="swissEduPersonUniqueID">
+        <resolver:Dependency ref="myLDAP" />
+        <resolver:DisplayName xml:lang="en">Unique ID</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="de">Eindeutige ID</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="fr">Unique ID</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="it">ID unico</resolver:DisplayName>
+	<resolver:DisplayName xml:lang="pt">ID &ucute;nico</resolver:DisplayName>
+        <resolver:DisplayDescription xml:lang="en">Unique ID: A unique identifier for a person, mainly for inter-institutional user identification.</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="de">Eindeutige Benützeridentifikation</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="fr">L'identifiant unique de l'utilisateur au seins de l'AAI.</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="it">ID unico: un ID personale che identifica chiaramente l'utente in seno alla sua organizzazione</resolver:DisplayDescription>
+	<resolver:DisplayDescription xml:lang="pt">ID &ucute;nico: Identificador pessoal que identifica claramente o utilizador na sua organiza&ccedil;&atilde;o</resolver:DisplayDescription>
+
+        <resolver:AttributeEncoder xsi:type="SAML1String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:mace:switch.ch:attribute-def:swissEduPersonUniqueID" />
+        <resolver:AttributeEncoder xsi:type="SAML2String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:oid:2.16.756.1.2.5.1.1.1" friendlyName="swissEduPersonUniqueID" />
+    </resolver:AttributeDefinition>
+
+
+    <!-- Surname -->
+    <resolver:AttributeDefinition id="surname" xsi:type="Simple" xmlns="urn:mace:shibboleth:2.0:resolver:ad" sourceAttributeID="sn">
+        <resolver:Dependency ref="myLDAP" />
+        <resolver:DisplayName xml:lang="en">Surname</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="de">Nachname</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="fr">Nom de Famille</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="it">Cognome</resolver:DisplayName>
+	<resolver:DisplayName xml:lang="pt">Nome de Fam&icute;lia</resolver:DisplayName>
+        <resolver:DisplayDescription xml:lang="en">Surname or family name</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="de">Familienname</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="fr">Nome de famille de l'utilisateur.</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="it">Cognome</resolver:DisplayDescription>
+	<resolver:DisplayDescription xml:lang="pt">Nome de Fam&icute;lia</resolver:DisplayDescription>
+
+        <resolver:AttributeEncoder xsi:type="SAML1String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:mace:dir:attribute-def:sn" />
+        <resolver:AttributeEncoder xsi:type="SAML2String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:oid:2.5.4.4" friendlyName="surname" />
+    </resolver:AttributeDefinition>
+
+
+    <!-- Given name -->
+    <resolver:AttributeDefinition id="givenName" xsi:type="Simple" xmlns="urn:mace:shibboleth:2.0:resolver:ad" sourceAttributeID="givenName">
+        <resolver:Dependency ref="myLDAP" />
+        <resolver:DisplayName xml:lang="en">Given name</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="de">Vorname</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="fr">Prénom</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="it">Nome</resolver:DisplayName>
+	<resolver:DisplayName xml:lang="pt">Nome</resolver:DisplayName>
+        <resolver:DisplayDescription xml:lang="en">Given name of a person</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="de">Vorname</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="fr">Prénom de l'utilisateur.</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="it">Nome</resolver:DisplayDescription>
+	<resolver:DisplayDescription xml:lang="pt">Nome</resolver:DisplayDescription>
+
+        <resolver:AttributeEncoder xsi:type="SAML1String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:mace:dir:attribute-def:givenName" />
+        <resolver:AttributeEncoder xsi:type="SAML2String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:oid:2.5.4.42" friendlyName="givenName" />
+    </resolver:AttributeDefinition>
+
+    <!-- Attributes that are recommended to implement -->
+
+
+    <!-- Business postal address -->
+    <resolver:AttributeDefinition id="postalAddress" xsi:type="Simple" xmlns="urn:mace:shibboleth:2.0:resolver:ad" sourceAttributeID="postalAddress">
+        <resolver:Dependency ref="myLDAP" />
+        <resolver:DisplayName xml:lang="en">Business postal address</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="de">Geschäftsadresse</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="fr">Adresse Professionnelle</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="it">Indirizzo professionale</resolver:DisplayName>
+	<resolver:DisplayName xml:lang="pt">Morada</resolver:DisplayName>
+        <resolver:DisplayDescription xml:lang="en">Business postal address: Campus or office address</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="de">Adresse am Arbeitsplatz</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="fr">Adresse de l'institut, de l'université</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="it">Indirizzo professionale: Indirizzo dell'istituto o dell'ufficio</resolver:DisplayDescription>
+	<resolver:DisplayDescription xml:lang="pt">Morada da institui&ccedil;&atilde;o</resolver:DisplayDescription>
+
+        <resolver:AttributeEncoder xsi:type="SAML1String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:mace:dir:attribute-def:postalAddress" />
+        <resolver:AttributeEncoder xsi:type="SAML2String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:oid:2.5.4.16" friendlyName="postalAddress" />
+    </resolver:AttributeDefinition>
+
+
+    <!-- Business phone number -->
+    <resolver:AttributeDefinition id="telephoneNumber" xsi:type="Simple" xmlns="urn:mace:shibboleth:2.0:resolver:ad" sourceAttributeID="telephoneNumber">
+        <resolver:Dependency ref="myLDAP" />
+        <resolver:DisplayName xml:lang="en">Business phone number</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="de">Telefon Geschäft</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="fr">Teléphone Professionnel</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="it">Numero di telefono dell'ufficio</resolver:DisplayName>
+	<resolver:DisplayName xml:lang="pt">Telefone</resolver:DisplayName>
+        <resolver:DisplayDescription xml:lang="en">Business phone number: Office or campus phone number</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="de">Telefonnummer am Arbeitsplatz</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="fr">Teléphone de l'institut, de l'université</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="it">Numero di telefono dell'ufficio</resolver:DisplayDescription>
+	<resolver:DisplayDescription xml:lang="pt">N&ucute;mero de telefone</resolver:DisplayDescription>
+
+        <resolver:AttributeEncoder xsi:type="SAML1String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:mace:dir:attribute-def:telephoneNumber" />
+        <resolver:AttributeEncoder xsi:type="SAML2String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:oid:2.5.4.20" friendlyName="telephoneNumber" />
+    </resolver:AttributeDefinition>
+
+
+    <!-- Study branch 3 -->
+    <resolver:AttributeDefinition id="studyBranch3" xsi:type="Simple" xmlns="urn:mace:shibboleth:2.0:resolver:ad" sourceAttributeID="swissEduPersonStudyBranch3">
+        <resolver:Dependency ref="myLDAP" />
+        <resolver:DisplayName xml:lang="en">Study branch 3</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="de">Studienrichtung 3</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="fr">Branche d'étude 3</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="it">Branca di studio 3</resolver:DisplayName>
+	<resolver:DisplayName xml:lang="pt">Curso</resolver:DisplayName>
+        <resolver:DisplayDescription xml:lang="en">Study branch 3: Study branch of a student</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="de">Detaillierte Klassifikation der Studienrichtung</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="fr">Branche d'étude de l'étudiant: 1201</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="it">Branca di studio 3: Tipo di studio</resolver:DisplayDescription>
+	<resolver:DisplayDescription xml:lang="pt">Curso</resolver:DisplayDescription>
+
+        <resolver:AttributeEncoder xsi:type="SAML1String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:mace:switch.ch:attribute-def:swissEduPersonStudyBranch3" />
+        <resolver:AttributeEncoder xsi:type="SAML2String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:oid:2.16.756.1.2.5.1.1.8" friendlyName="swissEduPersonStudyBranch3" />
+    </resolver:AttributeDefinition>
+
+
+    <!-- Study level -->
+    <resolver:AttributeDefinition id="studyLevel" xsi:type="Simple" xmlns="urn:mace:shibboleth:2.0:resolver:ad" sourceAttributeID="swissEduPersonStudyLevel">
+        <resolver:Dependency ref="myLDAP" />
+        <resolver:DisplayName xml:lang="en">Study level</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="de">Studienniveau</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="fr">Niveau d'étude</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="it">Livello di studio</resolver:DisplayName>
+	<resolver:DisplayName xml:lang="pt">N&icute;vel de estudo</resolver:DisplayName>
+        <resolver:DisplayDescription xml:lang="en">Study level of a student in a particular Study branch 3</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="de">Studienniveau und detaillierte Studienrichtung</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="fr">Niveau d'étude de la branche d'étude 3: 1201-15</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="it">Livello di studio per la branca di studio 3</resolver:DisplayDescription>
+	<resolver:DisplayDescription xml:lang="pt">N&icute;vel de estudo no curso</resolver:DisplayDescription>
+
+        <resolver:AttributeEncoder xsi:type="SAML1String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:mace:switch.ch:attribute-def:swissEduPersonStudyLevel" />
+        <resolver:AttributeEncoder xsi:type="SAML2String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:oid:2.16.756.1.2.5.1.1.9" friendlyName="swissEduPersonStudyLevel" />
+    </resolver:AttributeDefinition>
+
+
+    <!-- Staff category -->
+    <resolver:AttributeDefinition id="staffCategory" xsi:type="Simple" xmlns="urn:mace:shibboleth:2.0:resolver:ad" sourceAttributeID="swissEduPersonStaffCategory">
+        <resolver:Dependency ref="myLDAP" />
+        <resolver:DisplayName xml:lang="en">Staff category</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="de">Anstellungskategorie</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="fr">Catégorie du Personnel</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="it">Categoria per membri dello staff</resolver:DisplayName>
+	<resolver:DisplayName xml:lang="pt">Categoria de utilizador</resolver:DisplayName>
+        <resolver:DisplayDescription xml:lang="en">Staff category: Workbranch of a staff member</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="de">Anstellungskategorie</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="fr">Classification du corps intermédiaire: 100, 200, 300</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="it">Categoria per membri dello staff: Classificazione per il corpo intermedio</resolver:DisplayDescription>
+	<resolver:DisplayDescription xml:lang="pt">Categoria de membro na organiza&ccedil;&atilde;o</resolver:DisplayDescription>
+
+        <resolver:AttributeEncoder xsi:type="SAML1String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:mace:switch.ch:attribute-def:swissEduPersonStaffCategory" />
+        <resolver:AttributeEncoder xsi:type="SAML2String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:oid:2.16.756.1.2.5.1.1.10" friendlyName="swissEduPersonStaffCategory" />
+    </resolver:AttributeDefinition>
+
+
+    <!-- Matriculation number -->
+    <resolver:AttributeDefinition id="matriculationNumber" xsi:type="Simple" xmlns="urn:mace:shibboleth:2.0:resolver:ad" sourceAttributeID="swissEduPersonMatriculationNumber">
+        <resolver:Dependency ref="myLDAP" />
+        <resolver:DisplayName xml:lang="en">Matriculation number</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="de">Immatrikulations Nummer</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="fr"></resolver:DisplayName>
+        <resolver:DisplayName xml:lang="it"></resolver:DisplayName>
+	<resolver:DisplayName xml:lang="pt">N&ucute;mero de matricula</resolver:DisplayName>
+        <resolver:DisplayDescription xml:lang="en">Matriculation number of a student</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="de">Immatrikulations Nummer eines Studenten</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="fr"></resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="it"></resolver:DisplayDescription>
+	<resolver:DisplayDescription xml:lang="pt">N&ucute;mero de matricula de estudante</resolver:DisplayDescription>
+
+        <resolver:AttributeEncoder xsi:type="SAML1String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:mace:switch.ch:attribute-def:swissEduPersonMatriculationNumber" />
+        <resolver:AttributeEncoder xsi:type="SAML2String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:oid:2.16.756.1.2.5.1.1.11" friendlyName="swissEduPersonMatriculationNumber" />
+    </resolver:AttributeDefinition>
+
+    <!-- Attributes that are optional to implement -->
+
+
+    <!-- Date of birth -->
+    <resolver:AttributeDefinition id="dateOfBirth" xsi:type="Simple" xmlns="urn:mace:shibboleth:2.0:resolver:ad" sourceAttributeID="swissEduPersonDateOfBirth">
+        <resolver:Dependency ref="myLDAP" />
+        <resolver:DisplayName xml:lang="en">Date of birth</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="de">Geburtsdatum</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="fr">Date de Naissance</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="it">Data di nascita</resolver:DisplayName>
+	<resolver:DisplayName xml:lang="pt">Data de nascimento</resolver:DisplayName>
+        <resolver:DisplayDescription xml:lang="en">Date of Birth: The date of birth of the person (see RFC 3339)</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="de">Geburtsdatum (siehe RFC 3339)</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="fr">Exemple: 20060219 pour 19 février 2006 (voir RFC3339)</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="it">Data di nascita: La data di nascita della persona (cfr. RFC 3339)</resolver:DisplayDescription>
+	<resolver:DisplayDescription xml:lang="it">Data de nascimento do utilizador (cfr. RFC 3339)</resolver:DisplayDescription>
+
+        <resolver:AttributeEncoder xsi:type="SAML1String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:mace:switch.ch:attribute-def:swissEduPersonDateOfBirth" />
+        <resolver:AttributeEncoder xsi:type="SAML2String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:oid:2.16.756.1.2.5.1.1.2" friendlyName="swissEduPersonDateOfBirth" />
+    </resolver:AttributeDefinition>
+
+
+    <!-- Gender -->
+    <resolver:AttributeDefinition id="gender" xsi:type="Simple" xmlns="urn:mace:shibboleth:2.0:resolver:ad" sourceAttributeID="swissEduPersonGender">
+        <resolver:Dependency ref="myLDAP" />
+        <resolver:DisplayName xml:lang="en">Gender</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="de">Geschlecht</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="fr">Sexe</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="it">Sesso</resolver:DisplayName>
+	<resolver:DisplayName xml:lang="pt">Sexo</resolver:DisplayName>
+        <resolver:DisplayDescription xml:lang="en">Gender: The state of being male or female (see ISO 5218)</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="de">Mann oder Frau (siehe ISO 5218)</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="fr">Exemple: 0 pour inconnu, 1 pour masculin et 2 pour féminin (voir ISO5218)</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="it">Sesso: maschile o femminile (cfr. ISO 5218)</resolver:DisplayDescription>
+	<resolver:DisplayDescription xml:lang="pt">Sexo: Masculino e Feminino (cfr. ISO 5218)</resolver:DisplayDescription>
+
+        <resolver:AttributeEncoder xsi:type="SAML1String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:mace:switch.ch:attribute-def:swissEduPersonGender" />
+        <resolver:AttributeEncoder xsi:type="SAML2String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:oid:2.16.756.1.2.5.1.1.3" friendlyName="swissEduPersonGender" />
+    </resolver:AttributeDefinition>
+
+
+    <!-- Preferred Language -->
+    <resolver:AttributeDefinition id="preferredLanguage" xsi:type="Simple" xmlns="urn:mace:shibboleth:2.0:resolver:ad" sourceAttributeID="preferredLanguage">
+        <resolver:Dependency ref="myLDAP" />
+        <resolver:DisplayName xml:lang="en">Preferred Language</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="de">Bevorzugte Sprache</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="fr">Langue par Défaut</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="it">Lingua preferita</resolver:DisplayName>
+	<resolver:DisplayName xml:lang="pt">L&icute;ngua preferida</resolver:DisplayName>
+        <resolver:DisplayDescription xml:lang="en">Preferred language: Users preferred language (see RFC1766)</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="de">Bevorzugte Sprache (see RFC1766)</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="fr">Exemple: fr, de, it, en, ... (voir RFC1766)</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="it">Lingua preferita: La lingua preferita dall'utente (cfr. RFC1766)</resolver:DisplayDescription>
+	<resolver:DisplayDescription xml:lang="pt">L&icute;ngua preferida: L&icute;ngua preferida do utilizador (cfr. RFC1766)</resolver:DisplayDescription>
+
+        <resolver:AttributeEncoder xsi:type="SAML1String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:mace:dir:attribute-def:preferredLanguage" />
+        <resolver:AttributeEncoder xsi:type="SAML2String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:oid:2.16.840.1.113730.3.1.39" friendlyName="preferredLanguage" />
+    </resolver:AttributeDefinition>
+
+
+    <!-- Home postal address -->
+    <resolver:AttributeDefinition id="homePostalAddress" xsi:type="Simple" xmlns="urn:mace:shibboleth:2.0:resolver:ad" sourceAttributeID="homePostalAddress">
+        <resolver:Dependency ref="myLDAP" />
+        <resolver:DisplayName xml:lang="en">Home postal address</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="de">Heimadressse</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="fr">Adresse Personnelle</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="it">Indirizzo personale</resolver:DisplayName>
+	<resolver:DisplayName xml:lang="pt">Morada Pessoal</resolver:DisplayName>
+        <resolver:DisplayDescription xml:lang="en">Home postal address: Home address of the user</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="de">Heimadresse</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="fr">Exemple: Avenue de la Gare 14$8000 Zurich ($ comme séparateur de ligne)</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="it">Indirizzo personale: Indirizzo dove abita l'utente</resolver:DisplayDescription>
+	<resolver:DisplayDescription xml:lang="pt">Morada Pessoal: Morada do utilizador</resolver:DisplayDescription>
+
+        <resolver:AttributeEncoder xsi:type="SAML1String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:mace:dir:attribute-def:homePostalAddress" />
+        <resolver:AttributeEncoder xsi:type="SAML2String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:oid:0.9.2342.19200300.100.1.39" friendlyName="homePostalAddress" />
+    </resolver:AttributeDefinition>
+
+
+    <!-- Private phone number -->
+    <resolver:AttributeDefinition id="homePhone" xsi:type="Simple" xmlns="urn:mace:shibboleth:2.0:resolver:ad" sourceAttributeID="homePhone">
+        <resolver:Dependency ref="myLDAP" />
+        <resolver:DisplayName xml:lang="en">Private phone number</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="de">Telefon Privat</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="fr">Teléphone Personnel</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="it">Numero di telefono privato</resolver:DisplayName>
+	<resolver:DisplayName xml:lang="pt">N&ucute;mero de telefone privado</resolver:DisplayName>
+        <resolver:DisplayDescription xml:lang="en">Private phone number</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="de">Private Telefonnummer</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="fr">Exemple: +41 44 111 223344</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="it">Numero di telefono privato</resolver:DisplayDescription>
+	<resolver:DisplayDescription xml:lang="pt">N&ucute;mero de telefone privado do utilizador</resolver:DisplayDescription>
+
+        <resolver:AttributeEncoder xsi:type="SAML1String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:mace:dir:attribute-def:homePhone" />
+        <resolver:AttributeEncoder xsi:type="SAML2String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:oid:0.9.2342.19200300.100.1.20" friendlyName="homePhone" />
+    </resolver:AttributeDefinition>
+
+
+    <!-- Mobile phone number -->
+    <resolver:AttributeDefinition id="mobile" xsi:type="Simple" xmlns="urn:mace:shibboleth:2.0:resolver:ad" sourceAttributeID="mobile">
+        <resolver:Dependency ref="myLDAP" />
+        <resolver:DisplayName xml:lang="en">Mobile phone number</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="de">Telefon Mobil</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="fr">Numéro de Mobile</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="it">Numero di celluluare</resolver:DisplayName>
+	<resolver:DisplayName xml:lang="pt">N&ucute;mero de telem&ocute;vel</resolver:DisplayName>
+        <resolver:DisplayDescription xml:lang="en">Mobile phone number</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="de">Mobile Telefonnummer</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="fr">Numéro de teléphone mobile: +41 79 111 222333</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="it">Numero di cellulare</resolver:DisplayDescription>
+	<resolver:DisplayDescription xml:lang="pt">N&ucute;mero de telem&ocute;vel do utilizador</resolver:DisplayDescription>
+
+        <resolver:AttributeEncoder xsi:type="SAML1String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:mace:dir:attribute-def:mobile" />
+        <resolver:AttributeEncoder xsi:type="SAML2String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:oid:0.9.2342.19200300.100.1.41" friendlyName="mobile" />
+    </resolver:AttributeDefinition>
+
+
+    <!-- Study branch 1 -->
+    <resolver:AttributeDefinition id="studyBranch1" xsi:type="Simple" xmlns="urn:mace:shibboleth:2.0:resolver:ad" sourceAttributeID="swissEduPersonStudyBranch1">
+        <resolver:Dependency ref="myLDAP" />
+        <resolver:DisplayName xml:lang="en">Study branch 1</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="de">Studienrichtung 1</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="fr">Branche d'étude 1</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="it">Branca di studio 1</resolver:DisplayName>
+	<resolver:DisplayName xml:lang="pt"></resolver:DisplayName>
+        <resolver:DisplayDescription xml:lang="en">Study branch 1: Study branch of a student, first level of classification</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="de">Allgemeine Klassifikation der Studienrichtung</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="fr">Niveau supérieur de la classification: 1</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="it">Branca di studio 1: Primo livello di classificazione per studenti</resolver:DisplayDescription>
+	<resolver:DisplayDescription xml:lang="pt"></resolver:DisplayDescription>
+
+        <resolver:AttributeEncoder xsi:type="SAML1String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:mace:switch.ch:attribute-def:swissEduPersonStudyBranch1" />
+        <resolver:AttributeEncoder xsi:type="SAML2String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:oid:2.16.756.1.2.5.1.1.6" friendlyName="swissEduPersonStudyBranch1" />
+    </resolver:AttributeDefinition>
+
+
+    <!-- Study branch 2 -->
+    <resolver:AttributeDefinition id="studyBranch2" xsi:type="Simple" xmlns="urn:mace:shibboleth:2.0:resolver:ad" sourceAttributeID="swissEduPersonStudyBranch2">
+        <resolver:Dependency ref="myLDAP" />
+        <resolver:DisplayName xml:lang="en">Study branch 2</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="de">Studienrichtung 2</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="fr">Branche d'étude 2</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="it">Branca di studio 2</resolver:DisplayName>
+	<resolver:DisplayName xml:lang="pt"></resolver:DisplayName>
+        <resolver:DisplayDescription xml:lang="en">Study branch 2: Study branch of a student, intermediate level of classification</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="de">Spezifischere Klassifikation der Studienrichtung</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="fr">Niveau intermédiaire de la classification: 11</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="pt"></resolver:DisplayDescription>
+
+        <resolver:AttributeEncoder xsi:type="SAML1String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:mace:switch.ch:attribute-def:swissEduPersonStudyBranch2" />
+        <resolver:AttributeEncoder xsi:type="SAML2String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:oid:2.16.756.1.2.5.1.1.7" friendlyName="swissEduPersonStudyBranch2" />
+    </resolver:AttributeDefinition>
+
+
+    <!-- Organization path -->
+    <resolver:AttributeDefinition id="orgDN" xsi:type="Simple" xmlns="urn:mace:shibboleth:2.0:resolver:ad" sourceAttributeID="eduPersonOrgDN">
+        <resolver:Dependency ref="myLDAP" />
+        <resolver:DisplayName xml:lang="en">Organization path</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="de">Name Organisation</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="fr">DN de l'Organisation</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="it">DN dell'organizzazione</resolver:DisplayName>
+	<resolver:DisplayName xml:lang="pt">Nome da Organiza&ccedil;&atilde;o</resolver:DisplayName>
+        <resolver:DisplayDescription xml:lang="en">Organization path: The distinguished name (DN) of the directory entry representing the organization with which the person is associated</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="de">Name des Verzeichniseintrags der Heimorganisation</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="fr">Le DN (distinguished name) dans le ré;pertoire de l'organisation.</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="it">DN dell'organizzazione: Il DN dell'organizzazione a cui è associato questo utente</resolver:DisplayDescription>
+	<resolver:DisplayDescription xml:lang="pt">Nome da Organiza&ccedil;&atilde;o do utilizador</resolver:DisplayDescription>
+
+        <resolver:AttributeEncoder xsi:type="SAML1String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:mace:dir:attribute-def:eduPersonOrgDN" />
+        <resolver:AttributeEncoder xsi:type="SAML2String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:oid:1.3.6.1.4.1.5923.1.1.1.3" friendlyName="eduPersonOrgDN" />
+    </resolver:AttributeDefinition>
+
+
+    <!-- Organizational unit path -->
+    <resolver:AttributeDefinition id="orgUnitDN" xsi:type="Simple" xmlns="urn:mace:shibboleth:2.0:resolver:ad" sourceAttributeID="eduPersonOrgUnitDN">
+        <resolver:Dependency ref="myLDAP" />
+        <resolver:DisplayName xml:lang="en">Organizational unit path</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="de">Name der Organisationseinheit</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="fr">DN de l'Unité</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="it">DN dell'unità</resolver:DisplayName>
+	<resolver:DisplayName xml:lang="pt">Departamento</resolver:DisplayName>
+        <resolver:DisplayDescription xml:lang="en">Organization unit path: The distinguished name (DN) of the directory entries representing the person's Organizational Unit(s)</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="de">Name des Verzeichniseintrags der Organisationseinheit</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="fr">Le DN (distinguished name) de l'unité dans le répertoire de l'organisation.</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="it">DN dell'unità: Il DN dell'unità per questo utente nella sua organizzazione</resolver:DisplayDescription>
+	<resolver:DisplayDescription xml:lang="pt">Departamento</resolver:DisplayDescription>
+
+        <resolver:AttributeEncoder xsi:type="SAML1String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:mace:dir:attribute-def:eduPersonOrgUnitDN" />
+        <resolver:AttributeEncoder xsi:type="SAML2String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:oid:1.3.6.1.4.1.5923.1.1.1.4" friendlyName="eduPersonOrgUnitDN" />
+    </resolver:AttributeDefinition>
+
+
+    <!-- Entitlement -->
+    <resolver:AttributeDefinition id="entitlement" xsi:type="Simple" xmlns="urn:mace:shibboleth:2.0:resolver:ad" sourceAttributeID="eduPersonEntitlement">
+        <resolver:Dependency ref="myLDAP" />
+        <resolver:DisplayName xml:lang="en">Entitlement</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="de">Berechtigung</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="fr">Entitlement</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="it">Membro di</resolver:DisplayName>
+	<resolver:DisplayName xml:lang="pt">T&icute;tulo</resolver:DisplayName>
+        <resolver:DisplayDescription xml:lang="en">Member of: URI (either URL or URN) that indicates a set of rights to specific resources based on an agreement across the releavant community</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="de">Zeichenkette, die Rechte für spezifischen Ressourcen beschreibt</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="fr">Membre de: URI (soit une URL ou une URN) décrivant un droit spécific d'accès.</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="it">Membro di: URI (sia URL o URN) che rappresenta diritti specifici d'accesso validi in tutta la community</resolver:DisplayDescription>
+	<resolver:DisplayDescription xml:lang="pt">URI (retractado por um URN ou URL) que indica um conjunto de direitos para recursos espec&icute;ficos. </resolver:DisplayDescription>
+
+        <resolver:AttributeEncoder xsi:type="SAML1String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:mace:dir:attribute-def:eduPersonEntitlement" />
+        <resolver:AttributeEncoder xsi:type="SAML2String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:oid:1.3.6.1.4.1.5923.1.1.1.7" friendlyName="eduPersonEntitlement" />
+    </resolver:AttributeDefinition>
+
+
+    <!-- User ID -->
+    <resolver:AttributeDefinition id="uid" xsi:type="Simple" xmlns="urn:mace:shibboleth:2.0:resolver:ad" sourceAttributeID="uid">
+        <resolver:Dependency ref="myLDAP" />
+        <resolver:DisplayName xml:lang="en">User ID</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="de">Benutzer ID</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="fr">ID utilisateur</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="it"></resolver:DisplayName>
+	<resolver:DisplayName xml:lang="pt">User ID</resolver:DisplayName>
+        <resolver:DisplayDescription xml:lang="en">A unique identifier for a person, mainly used for user identification within the user's home organization.</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="de">Eine eindeutige Nummer für eine Person, welche hauptsächlich zur Identifikation innerhalb der Organisation benutzt wird.</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="fr">Un identifiant unique de l'utilisateur.</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="it"></resolver:DisplayDescription>
+	<resolver:DisplayDescription xml:lang="pt">Identificador do utilizador</resolver:DisplayDescription>
+
+        <resolver:AttributeEncoder xsi:type="SAML1String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:mace:dir:attribute-def:uid" />
+        <resolver:AttributeEncoder xsi:type="SAML2String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:oid:0.9.2342.19200300.100.1.1" friendlyName="uid" />
+    </resolver:AttributeDefinition>
+
+
+    <!-- Employee number -->
+    <resolver:AttributeDefinition id="employeeNumber" xsi:type="Simple" xmlns="urn:mace:shibboleth:2.0:resolver:ad" sourceAttributeID="employeeNumber">
+        <resolver:Dependency ref="myLDAP" />
+        <resolver:DisplayName xml:lang="en">Employee number</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="de">Mitarbeiter Nummer</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="fr"></resolver:DisplayName>
+        <resolver:DisplayName xml:lang="it"></resolver:DisplayName>
+	<resolver:DisplayName xml:lang="pt">N&ucute;mero de empregado</resolver:DisplayName>
+        <resolver:DisplayDescription xml:lang="en">Identifies an employee within an organization</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="de">Identifiziert einen Mitarbeiter innerhalb der Organisation</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="fr"></resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="it"></resolver:DisplayDescription>
+	<resolver:DisplayDescription xml:lang="pt">N&ucute;mero de empregado</resolver:DisplayDescription>
+
+        <resolver:AttributeEncoder xsi:type="SAML1String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:mace:dir:attribute-def:employeeNumber" />
+        <resolver:AttributeEncoder xsi:type="SAML2String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:oid:2.16.840.1.113730.3.1.3" friendlyName="employeeNumber" />
+    </resolver:AttributeDefinition>
+
+    <!-- Other stuff here -->
+</AttributeResolver>
