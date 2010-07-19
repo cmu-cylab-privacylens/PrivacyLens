@@ -6,8 +6,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 
-
-import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -17,20 +15,17 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.SWITCH.aai.uApprove.components.ConfigurationManager;
-import ch.SWITCH.aai.uApprove.components.RelyingParty;
-import ch.SWITCH.aai.uApprove.components.UApproveException;
-import ch.SWITCH.aai.uApprove.components.TermsOfUseManager;
 import ch.SWITCH.aai.uApprove.components.Attribute;
+import ch.SWITCH.aai.uApprove.components.ConfigurationManager;
+import ch.SWITCH.aai.uApprove.components.Crypt;
+import ch.SWITCH.aai.uApprove.components.RelyingParty;
+import ch.SWITCH.aai.uApprove.components.TermsOfUseManager;
+import ch.SWITCH.aai.uApprove.components.UApproveException;
 import ch.SWITCH.aai.uApprove.storage.LogInfo;
 import ch.SWITCH.aai.uApprove.storage.UserLogInfo;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
-import edu.vt.middleware.crypt.CryptException;
-import edu.vt.middleware.crypt.symmetric.AES;
-import edu.vt.middleware.crypt.symmetric.SymmetricAlgorithm;
-import edu.vt.middleware.crypt.util.Base64Converter;
 
 /**
  * uApprove Controller Servlet
@@ -84,29 +79,14 @@ public class Controller extends HttpServlet {
 
   private static Logger LOG = LoggerFactory.getLogger(Controller.class);
 
-  private String sharedSecret;
   private boolean useTerms = false;
+  private Crypt crypt;
 
   private boolean isGetParSet(HttpServletRequest request, String par) {
     if (request.getParameter(par) == null
         || request.getParameter(par).equals(""))
       return false;
     return true;
-  }
-
-  private String decrypt(String value) throws UApproveException {
-    final SymmetricAlgorithm alg = new AES();
-    alg.setIV("uApprove initial vector".substring(0, 16).getBytes());
-    alg.setKey(new SecretKeySpec(sharedSecret.getBytes(), 0, 16, AES.ALGORITHM));
-
-    try {
-      alg.initDecrypt();
-      return new String(alg.decrypt(value, new Base64Converter()));
-
-    } catch (CryptException e) {
-      LOG.error("Decryption failed", e);
-      throw new UApproveException(e);
-    }
   }
 
   public void init() throws ServletException {
@@ -160,8 +140,8 @@ public class Controller extends HttpServlet {
     }
 
     // initialize secret for decryption
-    sharedSecret = ConfigurationManager
-        .getParam(ConfigurationManager.COMMON_SHARED_SECRET);
+    String sharedSecret = ConfigurationManager.getParam(ConfigurationManager.COMMON_SHARED_SECRET);
+    crypt = new Crypt(sharedSecret);
   }
 
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -190,7 +170,7 @@ public class Controller extends HttpServlet {
       */
       
       // get principal
-      String principal = decrypt(request
+      String principal = crypt.decrypt(request
           .getParameter(ConfigurationManager.HTTP_PARAM_PRINCIPAL));
       LOG.debug("principal=" + principal);
       session.setAttribute(SESKEY_PRINCIPAL, principal);
@@ -202,10 +182,10 @@ public class Controller extends HttpServlet {
       session.setAttribute(SESKEY_RETURNURL, returnURL);
 
       // get relying
-      LOG.debug("RP decrypted, serialized: {}", decrypt(request
+      LOG.debug("RP decrypted, serialized: {}", crypt.decrypt(request
               .getParameter(ConfigurationManager.HTTP_PARAM_RELYINGPARTY)));
 
-      RelyingParty relyingParty = new RelyingParty(decrypt(request
+      RelyingParty relyingParty = new RelyingParty(crypt.decrypt(request
           .getParameter(ConfigurationManager.HTTP_PARAM_RELYINGPARTY)));
 
       LOG.debug("entityId=" + relyingParty.getEntityId());
@@ -222,7 +202,7 @@ public class Controller extends HttpServlet {
         LOG.info("start viewer flow");
 
         // get released attributes
-        String serializedAttributesReleased = decrypt(request
+        String serializedAttributesReleased = crypt.decrypt(request
             .getParameter(ConfigurationManager.HTTP_PARAM_ATTRIBUTES));
         LOG.debug("serializedAttributesReleased="
             + serializedAttributesReleased);
@@ -302,8 +282,7 @@ public class Controller extends HttpServlet {
       UserLogInfo userInfo = storage.getData(principal);
       LOG.debug("userInfo=" + userInfo);
 
-      Collection<Attribute> attributesReleased = (Collection<Attribute>) session
-          .getAttribute(SESKEY_ATTRIBUTES);
+      Collection<Attribute> attributesReleased = (Collection<Attribute>) session.getAttribute(SESKEY_ATTRIBUTES);
 
       String returnURL = (String) session.getAttribute(SESKEY_RETURNURL);
       LOG.debug("returnURL=" + returnURL);
@@ -491,14 +470,11 @@ public class Controller extends HttpServlet {
   }
   
 
-  public static void doError(HttpServletRequest request,
-      HttpServletResponse response, UApproveException e) throws ServletException,
-      IOException {
+  public static void doError(HttpServletRequest request, HttpServletResponse response, UApproveException e) throws ServletException, IOException {
     HttpSession session = request.getSession();
     session.setAttribute(SESKEY_ERROR, e);
     LOG.error("uApprove Error", e);
-    session.getServletContext().getRequestDispatcher(PAGE_ERROR).forward(
-        request, response);
+    session.getServletContext().getRequestDispatcher(PAGE_ERROR).forward(request, response);
   }
 
 }

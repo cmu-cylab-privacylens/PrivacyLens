@@ -5,9 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.opensaml.saml2.metadata.ServiceDescription;
@@ -16,7 +13,6 @@ import org.opensaml.saml2.metadata.ServiceName;
 public class RelyingParty implements Serializable {
 
 	private static final long serialVersionUID = 4022033377848736850L;
-	private static Logger LOG = LoggerFactory.getLogger(RelyingParty.class);
 
 	private String entityId;
 	private Map<String, String> rpNames;

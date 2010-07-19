@@ -7,12 +7,13 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import edu.internet2.middleware.shibboleth.idp.util.HttpServletHelper;
 
 
 public class Workarrounds {
-	
-	private static Logger LOG = LoggerFactory.getLogger(Workarrounds.class);
 	
 	public static HttpServletRequest removeLoginContextCookie(HttpServletRequest request) {
 		return new FilteredCookieRequest(request);
@@ -20,14 +21,14 @@ public class Workarrounds {
 	
 	private static class FilteredCookieRequest extends HttpServletRequestWrapper {
 		
-		private static Logger LOG = LoggerFactory.getLogger(FilteredCookieRequest.class);
+		private static Logger logger = LoggerFactory.getLogger(FilteredCookieRequest.class);
 		
 		public FilteredCookieRequest(HttpServletRequest request) {
 			super(request);
 	    }
 		
 		public Cookie[] getCookies() {
-			LOG.debug("overwritten");
+			logger.debug("overwritten");
 			Cookie[] cookies = super.getCookies();
 			if (cookies == null)
 				return null;

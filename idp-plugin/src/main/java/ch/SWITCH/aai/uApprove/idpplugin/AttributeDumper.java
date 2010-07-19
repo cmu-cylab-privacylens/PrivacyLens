@@ -87,7 +87,7 @@ public class AttributeDumper {
     for (BaseAttribute attr : attributes.values()) {
      
       Collection<String> attributeValues = new ArrayList<String>();
-      for (Iterator iter = attr.getValues().iterator(); iter.hasNext();) {
+      for (Iterator<?> iter = attr.getValues().iterator(); iter.hasNext();) {
         Object valueObj = iter.next();
         //String value =  valueObj instanceof String ? (String)valueObj : "Non-string attribute value";
         if (valueObj != null && !valueObj.toString().trim().equals("")) {

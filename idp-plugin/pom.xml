@@ -21,22 +21,12 @@
 
   <dependencies>
     <!-- Compile dependencies-->
-
-
     <dependency>
       <groupId>ch.SWITCH.aai.uApprove</groupId>
       <artifactId>common</artifactId>
       <version>${project.version}</version>
     </dependency>
-
-    <!-- Provided dependencies -->
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <version>2.4</version>
-      <scope>provided</scope>
-    </dependency>
-
+    
     <dependency>
       <groupId>edu.internet2.middleware</groupId>
       <artifactId>shibboleth-identityprovider</artifactId>
@@ -44,25 +34,7 @@
       <scope>provided</scope>
     </dependency>
 
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <version>0.9.17</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>1.5.8</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <!-- Runtime dependencies -->
-
-    <!-- Test dependencies -->
-
-   </dependencies>
-
+  </dependencies>
 	<build>
 		<plugins>
 			<plugin>

@@ -77,8 +77,6 @@ public class LogInfoJdbc extends LogInfo {
 
     public static final String insProviderAccess = "insProviderAccess";
 
-    public static final String selIdxProviderAccess = "selIdxProviderAccess";
-
     public static final String clearReleaseForAccess = "clearReleaseForAccess";
 
     public static final String delAttrReleaseApprovals = "delAttrReleaseApprovals";

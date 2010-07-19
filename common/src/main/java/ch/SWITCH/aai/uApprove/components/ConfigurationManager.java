@@ -16,13 +16,7 @@ package ch.SWITCH.aai.uApprove.components;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-
 import java.util.Properties;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-
-import ch.SWITCH.aai.uApprove.components.UApproveException;
 
 public class ConfigurationManager {
   
@@ -50,7 +44,6 @@ public class ConfigurationManager {
   public static final String HTTP_PARAM_ATTRIBUTES = "attributes";
   public static final String HTTP_PARAM_PRINCIPAL = "principal";
   
-  private static Logger LOG = LoggerFactory.getLogger( ConfigurationManager.class );
   private static ConfigurationManager configurationManager = null;
   private static Properties properties = null;
 
