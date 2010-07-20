@@ -53,6 +53,7 @@ public class Dispatcher {
 	
 	private void transferLoginContextToIdP(HttpServletRequest request, HttpServletResponse response) {
 		LoginContext loginContext = getLoginContext(request);
+		logger.debug("Transfer LoginContext to IdP");
 		HttpServletHelper.unbindLoginContext(HttpServletHelper.getStorageService(servletContext), servletContext, request, response);
 		request.setAttribute(HttpServletHelper.LOGIN_CTX_KEY_NAME, null);
 		HttpServletHelper.bindLoginContext(loginContext, request);
@@ -60,12 +61,14 @@ public class Dispatcher {
 	
 	private void transferLoginContextToViewer(HttpServletRequest request, HttpServletResponse response) {
 		LoginContext loginContext = getLoginContext(request);
+		logger.debug("Transfer LoginContext to uApprove");
 		HttpServletHelper.bindLoginContext(loginContext, HttpServletHelper.getStorageService(servletContext), servletContext, request, response);	  
 	}
 
 	public void dispatchToIdP(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws UApproveException {
 		transferLoginContextToIdP(request, response);
 		try {
+			logger.debug("Dispatch to IdP");
 			filterChain.doFilter(request, response);
 		} catch (Exception e) {
 			logger.error("Error dispatching to IdP", e);
@@ -86,6 +89,7 @@ public class Dispatcher {
 	    
 	    transferLoginContextToViewer(request, response);
 	 	try {
+	 		logger.debug("Dispatch to uApprove");
 			response.getWriter().write(postForm);
 		} catch (IOException e) {
 			throw new UApproveException(e);

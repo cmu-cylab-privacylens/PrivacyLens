@@ -39,7 +39,7 @@ public class AttributeDumper {
   public synchronized static void initialize(SAML2AttributeAuthority saml2AA, SAMLMDRelyingPartyConfigurationManager relyingPartyConfigurationManager) {
     if (dumper == null) 
         dumper = new AttributeDumper(saml2AA, relyingPartyConfigurationManager);
-    LOG.info("AttributeDumper initialized");
+    LOG.debug("AttributeDumper initialized");
   }
 
   public static Collection<Attribute> getAttributes(String username,
@@ -83,7 +83,7 @@ public class AttributeDumper {
     }
 
     Collection<Attribute> result = new ArrayList<Attribute>();
-    LOG.debug("DIRECT OUTPUT FROM RESOLVING");
+    LOG.trace("DIRECT OUTPUT FROM RESOLVING");
     for (BaseAttribute attr : attributes.values()) {
      
       Collection<String> attributeValues = new ArrayList<String>();

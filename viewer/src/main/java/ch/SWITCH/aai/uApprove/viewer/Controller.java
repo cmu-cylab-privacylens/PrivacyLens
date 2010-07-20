@@ -116,18 +116,16 @@ public class Controller extends HttpServlet {
           throw new UApproveException(e);
         }
         useTerms = true;
-        LOG.info("TermsOfUseManager loaded, version=" + TermsOfUseManager.getVersion());
+        LOG.debug("TermsOfUseManager loaded, version=" + TermsOfUseManager.getVersion());
       } else {
-        LOG.info("No TermsOfUseManager gonna be used");
+        LOG.debug("No TermsOfUseManager gonna be used");
       }
 
       // init attributeList
       AttributeList.initialize(ConfigurationManager.getParam(ConfigurationManager.VIEWER_ATTRIBUTELIST));
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("Content of attribute list:");
-        for (String key : AttributeList.getWhiteList()) {
-          LOG.debug("{}", key);
-        }
+      LOG.debug("Content of attribute list:");
+      for (String key : AttributeList.getWhiteList()) {
+        LOG.debug("{}", key);
       }
       // storage init
       String storeType = ConfigurationManager
@@ -147,8 +145,7 @@ public class Controller extends HttpServlet {
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
     try {
-      LOG.info("POST received");
-     
+    
       // initialization
       HttpSession session = request.getSession();
       LogInfo storage = LogInfo.getInstance();
@@ -199,8 +196,6 @@ public class Controller extends HttpServlet {
         return;
       } else {
         // Start flow
-        LOG.info("start viewer flow");
-
         // get released attributes
         String serializedAttributesReleased = crypt.decrypt(request
             .getParameter(ConfigurationManager.HTTP_PARAM_ATTRIBUTES));
@@ -241,12 +236,12 @@ public class Controller extends HttpServlet {
 
         // has user agreed to the current terms version
         if (useTerms && !userInfo.getTermsVersion().equals(TermsOfUseManager.getVersion())) {
-          LOG.debug("current terms version are not agreed by user, redirect to the terms page");
+          LOG.info("current terms version are not agreed by user, redirect to the terms page");
           getServletContext().getRequestDispatcher(PAGE_TERMS).forward(request,response);
           return;
         } 
         
-        LOG.debug("Terms are not used or current terms version are agreed by user, redirect to the attributes page");
+        LOG.info("Terms are not used or current terms version are agreed by user, redirect to the attributes page");
         getServletContext().getRequestDispatcher(PAGE_ATTRIBUTES).forward(request,response);
         return;
       }
@@ -260,7 +255,6 @@ public class Controller extends HttpServlet {
     try {
       // initialization
       HttpSession session = request.getSession();
-      LOG.debug("GET received");
       ConfigurationManager.initialize(getServletContext().getInitParameter(
           INITPAR_CONFIG));
 
@@ -291,13 +285,13 @@ public class Controller extends HttpServlet {
         LOG.debug("coming from terms confirmed");
         // check if the user agreed the terms
         if (isGetParSet(request, GETPAR_TERMS_AGREE)) {
-          LOG.debug("user agreed terms, store, redirect to attributes");
+          LOG.info("user agreed terms, store, redirect to attributes");
           storeUserBasic(userInfo, principal, TermsOfUseManager.getVersion());
           getServletContext().getRequestDispatcher(PAGE_ATTRIBUTES).forward(request,
               response);
           return;
         } else {
-          LOG.debug("user dont agreed terms, redirect again to terms");
+          LOG.info("user dont agreed terms, redirect again to terms");
           getServletContext().getRequestDispatcher(PAGE_TERMS).forward(request,
               response);
           return;
@@ -319,7 +313,7 @@ public class Controller extends HttpServlet {
       }
 
       if (isGetParSet(request, GETPAR_ATTRIBUTES_CONFIRM)) {
-        LOG.debug("user gave attribute release consent, store, redirect to returnURL="
+        LOG.info("user gave attribute release consent, store, redirect to returnURL="
             + response.encodeRedirectURL(returnURL));
         
         String termsVersion = useTerms ? TermsOfUseManager.getVersion() : "";
@@ -341,7 +335,7 @@ public class Controller extends HttpServlet {
       }
 
       if (isGetParSet(request, GETPAR_ATTRIBUTES_DECLINE_BACK)) {
-        LOG.debug("coming from attributes declined back, redirect to attributes page");
+        LOG.info("coming from attributes declined back, redirect to attributes page");
         getServletContext().getRequestDispatcher(PAGE_ATTRIBUTES).forward(request,
             response);
         return;

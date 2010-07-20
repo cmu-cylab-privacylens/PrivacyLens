@@ -97,8 +97,7 @@ public class LogInfoJdbc extends LogInfo {
     try {
 
       // "select idxShibProvider as idx from ShibProvider where spProviderName is null";
-      String sql = (String) theSqlCmds
-          .getProperty(keySqlCmd.selGlobalShibProvider);
+      String sql = (String) theSqlCmds.getProperty(keySqlCmd.selGlobalShibProvider);
 
       ResultSet rs = theDB.execSqlFT(sql, true);
 
@@ -162,13 +161,11 @@ public class LogInfoJdbc extends LogInfo {
 
     } catch (SQLException ex) {
       	
-        LOG.error("LogInfoJdbc.getProviderIndex: provider = {}, {}",
-            sProviderName, ex);
+        LOG.error("Provider = {}, {}",sProviderName, ex);
         throw new UApproveException(ex);
     }
 
-    LOG.debug("LogInfoJdbc.getProviderIndex: provider {} has index {}",
-    		sProviderName, idx);
+    LOG.debug("Pprovider {} has index {}", sProviderName, idx);
 
     return idx;
   }
@@ -214,8 +211,7 @@ public class LogInfoJdbc extends LogInfo {
     // String theSQL =
     // "select idxArpUser as idxUser, date_format(araTimeStamp,'%Y-%m-%d %H:%i%s') as ArpDate, araTermsVersion as TermsOfUseManager, araAttributes as Attributes, spProviderName as ShibProvider from ArpUser, AttrReleaseApproval, ShibProvider where auUserName='?' and idxArpUser=araIdxArpUser and araIdxShibProvider = idxShibProvider order by araTimeStamp desc";
 
-    String theSQL = (String) theSqlCmds
-        .getProperty(keySqlCmd.selArpInfoByUsername1);
+    String theSQL = (String) theSqlCmds.getProperty(keySqlCmd.selArpInfoByUsername1);
 
     theSQL = theSQL.replaceFirst("\\?", theUserName);
 
@@ -243,13 +239,10 @@ public class LogInfoJdbc extends LogInfo {
             mapProviderIds.put(sKey, rs.getString("Attributes"));
         }
 
-        userArp = new UserLogInfo(theUserName, "dummy", sDate, sTermsVersion,
-            sGlobal, mapProviderIds);
-        LOG.debug("LogInfoJdbc.getUserArpByname1: UserLogInfo dump:");
-        userArp.dump();
+        userArp = new UserLogInfo(theUserName, "dummy", sDate, sTermsVersion, sGlobal, mapProviderIds);
       }
     } catch (SQLException ex) {
-      	LOG.error("LogInfo.getUserArpInfoByName1: SQL exception {}", ex);
+      	LOG.error("SQL exception", ex);
       	throw new UApproveException(ex);
     }
 
@@ -273,8 +266,7 @@ public class LogInfoJdbc extends LogInfo {
     // String theSQL =
     // "select idxArpUser as idxUser, auLastTermsVersion as TermsOfUseManager from ArpUser where auUserName='?'";
 
-    String theSQL = (String) theSqlCmds
-        .getProperty(keySqlCmd.selArpInfoByUsername2);
+    String theSQL = (String) theSqlCmds.getProperty(keySqlCmd.selArpInfoByUsername2);
 
     theSQL = theSQL.replaceFirst("\\?", theUserName);
 
@@ -297,10 +289,7 @@ public class LogInfoJdbc extends LogInfo {
         if (sDate == null)
           sDate = rs.getString("ArpDate");
 
-        userArp = new UserLogInfo(theUserName, "dummy", sDate, sTermsVersion,
-            sGlobal, mapProviderIds);
-        LOG.debug("LogInfoJdbc.getUserArpByname2: UserLogInfo dump:");
-        userArp.dump();
+        userArp = new UserLogInfo(theUserName, "dummy", sDate, sTermsVersion, sGlobal, mapProviderIds);
       }
     } catch (SQLException ex) {
       	LOG.error("LogInfo.getUserArpInfoByName2: SQL exception ", ex);
@@ -546,31 +535,21 @@ public class LogInfoJdbc extends LogInfo {
     try {
       File theFile = new File(theSqlFile);
       if (!theFile.exists() || !theFile.isFile() || !theFile.canRead()) {
-        System.out
-            .println("myJdbcInterface.readSqlCommands: error reading file "
-                + theSqlFile);
-        throw new UApproveException(
-            "LogInfoJdbc.readSqlCommands: cannot read file " + theSqlFile);
+        throw new UApproveException("Cannot read file " + theSqlFile);
 
       }
       theSqlCmds = new Properties();
       theSqlCmds.load(new FileInputStream(theFile));
 
       if (bDebug) {
-        System.out.println("LogInfoJdbc.readSqlCommands: dump of all commands");
         Enumeration theEnums = theSqlCmds.propertyNames();
         for (Enumeration e =  theSqlCmds.propertyNames(); e.hasMoreElements();) {
           String theKey = (String) e.nextElement();
-          System.out.println("       cmd [" + theKey + "] = "
-              + (String) theSqlCmds.getProperty(theKey));
         }
       }
 
     } catch (Exception ex) {
-      System.out.println("LogInfoJdbc.readSqlCommands: ex " + ex.getMessage());
-      throw new UApproveException(
-          "LogInfoJdbc.readSqlCommands: ex reading sql command file"
-              + theSqlFile + " " + ex.getMessage());
+      throw new UApproveException("Reading sql command file "+ theSqlFile + " " + ex.getMessage());
     }
   }
 
@@ -606,7 +585,7 @@ public class LogInfoJdbc extends LogInfo {
       theUserInfo = getUserArpInfoByName(username);
 
     } catch (UApproveException ex) {
-      System.out.println("LogInfoJdbc.getData: excption = " + ex.toString());
+      LOG.error("Exception ", ex);
       theUserInfo = null;
     }
     return theUserInfo;
@@ -675,11 +654,8 @@ public class LogInfoJdbc extends LogInfo {
         addAttrReleaseApp(theUserData.getUsername(), theUserData
             .getTermsVersion(), theProviderId, theAttr);
     } catch (Exception ex) {
-      System.out.println("LogInfoJdbc.update: exception " + ex.getMessage());
       LOG.error("Exception.", ex);
-      throw new UApproveException(
-          "LogInfoJdbc.update: got exception trying to store user "
-              + theUserData.getUsername() + " ex = " + ex.getMessage());
+      throw new UApproveException("Exception trying to store user", ex);
     }
 
   }
@@ -800,7 +776,7 @@ public class LogInfoJdbc extends LogInfo {
 
       theDB.execSqlFT(theSQL, false);
     } catch (SQLException ex) {
-      LOG.error("LogInfo.updateArpProviderAccessWithNoARA: {}", ex);
+      LOG.error("SQLException", ex);
       throw new UApproveException(ex);
     }
 

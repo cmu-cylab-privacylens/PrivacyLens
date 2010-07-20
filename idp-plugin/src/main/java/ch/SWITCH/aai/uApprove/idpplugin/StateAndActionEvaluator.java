@@ -5,8 +5,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.SWITCH.aai.uApprove.components.Crypt;
-
 import edu.internet2.middleware.shibboleth.idp.authn.AuthenticationException;
 import edu.internet2.middleware.shibboleth.idp.authn.LoginContext;
 import edu.internet2.middleware.shibboleth.idp.session.ServiceInformation;
@@ -16,7 +14,7 @@ public class StateAndActionEvaluator {
 
 	private static enum State {NO_LOGIN_CONTEXT, NO_SESSION, AUTH_FAILURE, NOT_SPECIFIC_AUTH_CTX, PRINCIPAL_AUTHENTICATED, UNKNOWN};
 	public static enum Action {PASS_TO_IDP, CHECK_ACCESS, UNKNOWN};
-	private final Logger logger = LoggerFactory.getLogger(Crypt.class);
+	private final Logger logger = LoggerFactory.getLogger(StateAndActionEvaluator.class);
 	private final Dispatcher dispatcher;
 	
 	public StateAndActionEvaluator(Dispatcher dispatcher) {
@@ -55,8 +53,10 @@ public class StateAndActionEvaluator {
 	}
 	
 	public Action evaluateAction(HttpServletRequest request, String authnContextClassRef) {
+		State state = evaluateState(request, authnContextClassRef);
+		logger.debug("State evaluated is {}", state);
 		
-		switch (evaluateState(request, authnContextClassRef)) {
+		switch (state) {
 			case NO_LOGIN_CONTEXT:
 				return Action.PASS_TO_IDP;
 			case NO_SESSION:

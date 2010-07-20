@@ -89,7 +89,7 @@ public class UApproveContextBuilder {
 		}
 	
 		public String toString() {
-			return principal+" --> "+relyingParty;
+			return principal+" --> "+relyingParty.getEntityId();
 		}
 	}
 	

@@ -19,6 +19,7 @@ import ch.SWITCH.aai.uApprove.components.Attribute;
 import ch.SWITCH.aai.uApprove.components.ConfigurationManager;
 import ch.SWITCH.aai.uApprove.components.TermsOfUseManager;
 import ch.SWITCH.aai.uApprove.components.UApproveException;
+import ch.SWITCH.aai.uApprove.idpplugin.StateAndActionEvaluator.Action;
 import ch.SWITCH.aai.uApprove.idpplugin.UApproveContextBuilder.UApproveContext;
 import ch.SWITCH.aai.uApprove.storage.LogInfo;
 import ch.SWITCH.aai.uApprove.storage.UserLogInfo;
@@ -64,9 +65,9 @@ public class Plugin implements Filter {
           throw new UApproveException(e);
         }
         useTerms = true;
-        logger.info("Terms of use version {} loaded", TermsOfUseManager.getVersion());
+        logger.debug("Terms of use version {} loaded", TermsOfUseManager.getVersion());
       } else {
-    	  logger.info("No terms of use are configured");
+    	logger.debug("No terms of use are configured");
       }
 
       // initialize sp blacklist
@@ -77,8 +78,10 @@ public class Plugin implements Filter {
       String accr = filterConfig.getInitParameter("authnContextClassRef");
       if (accr != null && !accr.equals("")) {
         authnContextClassRef = accr;
-        logger.info("uApprove is only enabled on authnContextClassRef {}", authnContextClassRef);
+        logger.debug("uApprove is only enabled on authnContextClassRef {}", authnContextClassRef);
       }
+      
+      logger.info("uApprove plugin initialized");
   }
 
   public void destroy() {}
@@ -98,7 +101,11 @@ public class Plugin implements Filter {
       }
       
       try {
-		  switch (evaluator.evaluateAction(request, authnContextClassRef)) {
+    	  
+    	  Action action = evaluator.evaluateAction(request, authnContextClassRef);
+    	  logger.debug("Action evaluated is {}", action);
+    	  
+		  switch (action) {
 		  	case PASS_TO_IDP:
 		  		dispatcher.dispatchToIdP(request, response, filterChain);
 		  		return;
@@ -118,94 +125,102 @@ public class Plugin implements Filter {
 	UApproveContext context = contextBuilder.buildContext(request);
 	logger.info("uApprove access: {}", context);
 	
-    // initialize storage handler (stupid, but true)
-    String storeType = ConfigurationManager.getParam(ConfigurationManager.COMMON_STORE_TYPE);
-    LogInfo.initialize(storeType);
-    LogInfo storage = LogInfo.getInstance();
-	
-    // getUserInfo
-    UserLogInfo userInfo = storage.getData(context.getPrincipal());
-    
-	// create user, if not existent
-	if (userInfo == null) {
-		userInfo = storage.addUserLogInfoData(context.getPrincipal(), "1.0", new Date().toString(), "", "no", context.getRelyingParty().getEntityId(), null);
-		storage.update(userInfo);
-	}
+	UserLogInfo userInfo = getUserInfo(context);
+	logger.debug("Stored user information {}", userInfo);
     
     // set global ARA flag
     boolean globalConsentGiven = ConfigurationManager.makeBoolean(userInfo.getGlobal());
 
-	// check monitoring mode only
+    logger.trace("check monitoring mode only");
  	if (ConfigurationManager.makeBoolean(ConfigurationManager.getParam(ConfigurationManager.PLUGIN_MONITORING_ONLY))) {
- 		logger.debug("monitoring mode only");
- 		logAccess(storage, context, globalConsentGiven, false);
+ 		logger.info("monitoring mode only");
+ 		logAccess(context, globalConsentGiven, false);
  		dispatcher.dispatchToIdP(request, response, filterChain);
         return;
 	}
  	
-    // check if relying party is in black list
+ 	logger.trace("check if relying party is in black list");
     if (SPBlacklistManager.containsItem(context.getRelyingParty().getEntityId())) {
- 		logger.debug("relying party is in black list");
- 		logAccess(storage, context, globalConsentGiven, false);
+ 		logger.info("relying party is in black list");
+ 		logAccess(context, globalConsentGiven, false);
  		dispatcher.dispatchToIdP(request, response, filterChain);
  		return;
     }
 
-      // check if the user wants to reset the settings
-      if (context.resetConsent()) {
-    	  logger.debug("user wants to reset the settings");
-    	  dispatcher.dispatchToViewer(request, response, context);
-        return;
-      }
-
-      // check if the terms changed
-      if (useTerms) {
-        String termsVersion = TermsOfUseManager.getVersion();
-        String userTermsVersion = userInfo.getTermsVersion();
-        if (!userTermsVersion.equalsIgnoreCase(termsVersion)) {
-        	logger.debug("user has not agreed to terms of use version {}", termsVersion);
-        	dispatcher.dispatchToViewer(request, response, context);
-        }
-        return;
-      }
-     
-      // check if user has given global approval
-      if (ConfigurationManager.makeBoolean(userInfo.getGlobal())) {
-   		logger.debug("user has given global approval");
- 		logAccess(storage, context, globalConsentGiven, false);
- 		dispatcher.dispatchToIdP(request, response, filterChain);
-        return;
-      }
-
-      // get attributes which will be released
-      String attributes = Attribute.serializeAttributeIDs(context.getAttributesReleased());
-
-      // check if it is users first visit to relying party
-      // TODO is this check needed?
-      if (!userInfo.containsProviderId(context.getRelyingParty().getEntityId())) {
-      	logger.debug("users first visit to relying party {}", context.getRelyingParty());
-    	dispatcher.dispatchToViewer(request, response, context);
-    	return;
-      }
-      
-      // check if the there are ant attributes, which not are already approved for release to relying party 
-      if (!Attribute.compareAttributeRelease(userInfo.getAttributesForProviderId(context.getRelyingParty().getEntityId()), attributes)) {
-        logger.debug("attributes, which not are already approved for release to relying party {}", context.getRelyingParty());
-      	dispatcher.dispatchToViewer(request, response, context);
-      	return;
-      }
-    
-      // the user has already given attribute release approval to this relying party
-      logger.debug("user has already given attribute release approval to this relying party {}", context.getRelyingParty());
-      logAccess(storage, context, globalConsentGiven, false);
-      dispatcher.dispatchToIdP(request, response, filterChain);
+    logger.trace("check if the user wants to reset the settings");
+    if (context.resetConsent()) {
+	  logger.info("user wants to reset the settings");
+	  dispatcher.dispatchToViewer(request, response, context);
       return;
+    }
 
+    logger.trace("check if the terms of use changed");
+    if (useTerms) {
+      String termsVersion = TermsOfUseManager.getVersion();
+      String userTermsVersion = userInfo.getTermsVersion();
+      if (!userTermsVersion.equalsIgnoreCase(termsVersion)) {
+    	logger.info("user has not agreed to terms of use version {}", termsVersion);
+    	dispatcher.dispatchToViewer(request, response, context);
+        return;
+      }
+    }
+    
+    logger.trace("check if user has given global approval");
+    if (ConfigurationManager.makeBoolean(userInfo.getGlobal())) {
+	  logger.info("user has given global approval");
+      logAccess(context, globalConsentGiven, false);
+      dispatcher.dispatchToIdP(request, response, filterChain);
+	  return;
+	}
+    
+    // TODO is this check needed?
+    logger.trace("check if it is users first visit to relying party");
+    if (!userInfo.containsProviderId(context.getRelyingParty().getEntityId())) {
+      logger.info("users first visit to relying party {}", context.getRelyingParty());
+      dispatcher.dispatchToViewer(request, response, context);
+      return;
+    }
+
+    String attributes = Attribute.serializeAttributeIDs(context.getAttributesReleased());
+    logger.trace("Attributes which will be released {}", attributes);
+    
+    logger.trace("check if the there are ant attributes, which not are already approved for release to relying party");
+    if (!Attribute.compareAttributeRelease(userInfo.getAttributesForProviderId(context.getRelyingParty().getEntityId()), attributes)) {
+      logger.info("attributes, which not are already approved for release to relying party {}", context.getRelyingParty());
+      dispatcher.dispatchToViewer(request, response, context);
+      return;
+    }
+    
+    logger.info("user has already given attribute release approval to this relying party {}", context.getRelyingParty());
+    logAccess(context, globalConsentGiven, false);
+    dispatcher.dispatchToIdP(request, response, filterChain);
+    return;
   }
   
-  private void logAccess(LogInfo storage, UApproveContext context, boolean globalARA, boolean approvalGiven) throws UApproveException {		
+  private LogInfo getStorage() throws UApproveException {
+	  String storeType = ConfigurationManager.getParam(ConfigurationManager.COMMON_STORE_TYPE);
+	  LogInfo.initialize(storeType);
+	  return LogInfo.getInstance(); 
+  }
+  
+  private UserLogInfo getUserInfo(UApproveContext context) throws UApproveException {
+	LogInfo storage = getStorage();	  
+    // getUserInfo
+    UserLogInfo userInfo = storage.getData(context.getPrincipal());   
+	// create user, if not existent
+	if (userInfo == null) {
+		logger.debug("user is not existent, create a new user");
+		userInfo = storage.addUserLogInfoData(context.getPrincipal(), "1.0", new Date().toString(), "", "no", context.getRelyingParty().getEntityId(), null);
+		storage.update(userInfo);
+	}	
+	return userInfo;
+  }
+  
+  private void logAccess(UApproveContext context, boolean globalARA, boolean approvalGiven) throws UApproveException {		
 	// Is provider access logging enabled
     if (ConfigurationManager.makeBoolean(ConfigurationManager.getParam(ConfigurationManager.PLUGIN_LOG_PROVIDER_ACCESS))) {
+    	logger.debug("log provider access {}", context);
+    	LogInfo storage = getStorage();
     	if (approvalGiven) {
             storage.updateProviderAccess(context.getPrincipal(), context.getRelyingParty().getEntityId(), globalARA);
     	} else {

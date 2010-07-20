@@ -158,22 +158,11 @@ public class UserLogInfo {
   }
   
 
-  public void dump() {
-    LOG.debug("UserLogInfo.dump: " + " user = " + username + " version = "
-        + version + " ondate  = " + ondate + " termsVersion = " + termsVersion
-        + " global = " + global);
-    LOG.debug("List of accepted providerIds ");
-    if (mapProviderIds != null) {
-      Set<String> keySet = mapProviderIds.keySet();
-      Iterator<String> it = keySet.iterator();
-      while (it.hasNext()) {
-        String key = it.next();
-        String value = mapProviderIds.get(key);
-        LOG.debug("    " + key + " = <" + value + "> ");
-      }
-    }
+  public String toString() {
+	return "username=" + username + ", global=" + global + ", mapProviderIds="
+			+ mapProviderIds + ", ondate=" + ondate + ", termsVersion="
+			+ termsVersion;
   }
-  
 
   
 }
