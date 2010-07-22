@@ -19,13 +19,13 @@ import ch.SWITCH.aai.uApprove.components.Crypt;
 import ch.SWITCH.aai.uApprove.components.RelyingParty;
 import ch.SWITCH.aai.uApprove.components.UApproveException;
 import ch.SWITCH.aai.uApprove.idpplugin.UApproveContextBuilder.UApproveContext;
+import ch.SWITCH.aai.uApprove.idpplugin.workaround.Workarounds;
 import edu.internet2.middleware.shibboleth.idp.authn.LoginContext;
-import edu.internet2.middleware.shibboleth.idp.session.Session;
 import edu.internet2.middleware.shibboleth.idp.util.HttpServletHelper;
 
 public class Dispatcher {
 
-	private final Logger logger = LoggerFactory.getLogger(Crypt.class);
+	private final Logger logger = LoggerFactory.getLogger(Dispatcher.class);
 	private final Crypt crypt;
 	private final ServletContext servletContext;
 	boolean isPassiveSupported;
@@ -41,27 +41,22 @@ public class Dispatcher {
 		return servletContext;
 	}
 	
-	public LoginContext getLoginContext(HttpServletRequest request) {
-		  LoginContext loginContext = HttpServletHelper.getLoginContext(HttpServletHelper.getStorageService(servletContext), servletContext, request);	  
-		  return loginContext;
+	public LoginContext getLoginContext(HttpServletRequest request) {		
+		LoginContext loginContext = HttpServletHelper.getLoginContext(HttpServletHelper.getStorageService(servletContext), servletContext, request);	  
+		logger.trace("LoginContext {} retrieved", loginContext);
+		return loginContext;
 	}
 	
-	public Session getIdPSession(HttpServletRequest request) {
-		  Session idpSession = HttpServletHelper.getUserSession(request);
-		  return idpSession;
-	}
-	
-	private void transferLoginContextToIdP(HttpServletRequest request, HttpServletResponse response) {
-		LoginContext loginContext = getLoginContext(request);
-		logger.debug("Transfer LoginContext to IdP");
+	private void transferLoginContextToIdP(HttpServletRequest request, HttpServletResponse response) {		
+		LoginContext loginContext = Workarounds.getLoginContext(servletContext, request);
+		logger.debug("Transfer LoginContext to IdP (unbind persistent, bind to request)");
 		HttpServletHelper.unbindLoginContext(HttpServletHelper.getStorageService(servletContext), servletContext, request, response);
-		request.setAttribute(HttpServletHelper.LOGIN_CTX_KEY_NAME, null);
 		HttpServletHelper.bindLoginContext(loginContext, request);
 	}
 	
 	private void transferLoginContextToViewer(HttpServletRequest request, HttpServletResponse response) {
 		LoginContext loginContext = getLoginContext(request);
-		logger.debug("Transfer LoginContext to uApprove");
+		logger.debug("Transfer LoginContext to uApprove (bind persistent)");
 		HttpServletHelper.bindLoginContext(loginContext, HttpServletHelper.getStorageService(servletContext), servletContext, request, response);	  
 	}
 

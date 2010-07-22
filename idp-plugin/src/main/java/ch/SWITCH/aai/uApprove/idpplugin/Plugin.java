@@ -92,31 +92,30 @@ public class Plugin implements Filter {
 	HttpServletRequest request;
 	HttpServletResponse response;
 	try {
-		request = (HttpServletRequest) servletRequest;
-    	response = (HttpServletResponse) servletResponse;
+	  request = (HttpServletRequest) servletRequest;
+      response = (HttpServletResponse) servletResponse;
 	} catch (ClassCastException e) {
-    	logger.warn("uApprove only works on HTTP requests / responses");
-    	filterChain.doFilter(servletRequest, servletResponse);
-		return;
-      }
-      
-      try {
-    	  
-    	  Action action = evaluator.evaluateAction(request, authnContextClassRef);
-    	  logger.debug("Action evaluated is {}", action);
-    	  
-		  switch (action) {
-		  	case PASS_TO_IDP:
-		  		dispatcher.dispatchToIdP(request, response, filterChain);
-		  		return;
-		  	case CHECK_ACCESS:
-		  		checkAccess(request, response, filterChain);
-		  		return;
-		  }
-      } catch (UApproveException e) {
-      	logger.error("uApprove error", e);
-      	throw new ServletException(e);
-      }
+       logger.warn("uApprove only works on HTTP requests / responses");
+       filterChain.doFilter(servletRequest, servletResponse);
+	   return;
+    }
+	
+    try {
+	  Action action = evaluator.evaluateAction(request, authnContextClassRef);
+	  logger.debug("Action evaluated is {}", action);
+	  
+	  switch (action) {
+	  	case PASS_TO_IDP:
+	  	  dispatcher.dispatchToIdP(request, response, filterChain);
+	  	  return;
+	  	case CHECK_ACCESS:
+	  	  checkAccess(request, response, filterChain);
+	  	  return;
+	  }
+    } catch (UApproveException e) {
+      logger.error("uApprove error", e);
+      throw new ServletException(e);
+    }
   }
   
   
@@ -186,12 +185,12 @@ public class Plugin implements Filter {
     
     logger.trace("check if the there are ant attributes, which not are already approved for release to relying party");
     if (!Attribute.compareAttributeRelease(userInfo.getAttributesForProviderId(context.getRelyingParty().getEntityId()), attributes)) {
-      logger.info("attributes, which not are already approved for release to relying party {}", context.getRelyingParty());
+      logger.info("attributes, which not are already approved for release to relying party {}", context.getRelyingParty().getEntityId());
       dispatcher.dispatchToViewer(request, response, context);
       return;
     }
     
-    logger.info("user has already given attribute release approval to this relying party {}", context.getRelyingParty());
+    logger.info("user has already given attribute release approval to this relying party {}", context.getRelyingParty().getEntityId());
     logAccess(context, globalConsentGiven, false);
     dispatcher.dispatchToIdP(request, response, filterChain);
     return;
