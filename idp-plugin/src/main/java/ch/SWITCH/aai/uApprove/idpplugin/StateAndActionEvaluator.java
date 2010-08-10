@@ -5,15 +5,13 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.SWITCH.aai.uApprove.idpplugin.workaround.Workarounds;
-
 import edu.internet2.middleware.shibboleth.idp.authn.AuthenticationException;
 import edu.internet2.middleware.shibboleth.idp.authn.LoginContext;
 
 public class StateAndActionEvaluator {
 
-	private static enum State {NO_LOGIN_CONTEXT, AUTH_FAILURE, NOT_SPECIFIC_AUTH_CTX, PRINCIPAL_AUTHENTICATED, UNKNOWN};
-	public static enum Action {PASS_TO_IDP, CHECK_ACCESS, UNKNOWN};
+	private static enum State {RETURN_FROM_UAPPROVE, NO_LOGIN_CONTEXT, AUTH_FAILURE, NOT_SPECIFIC_AUTH_CTX, PRINCIPAL_AUTHENTICATED, UNKNOWN};
+	public static enum Action {PASS_TO_IDP, RESTORE_LOGINCONTEXT_AND_PASS_TO_IDP, CHECK_ACCESS, UNKNOWN};
 	private final Logger logger = LoggerFactory.getLogger(StateAndActionEvaluator.class);
 	private final Dispatcher dispatcher;
 	
@@ -23,7 +21,12 @@ public class StateAndActionEvaluator {
 	
 	private State evaluateState(HttpServletRequest request, String authnContextClassRef) {    
 
-		LoginContext loginContext = Workarounds.getLoginContext(dispatcher.getServletContext(), request);
+		LoginContext loginContext = dispatcher.getLoginContext(request);
+		
+		if (request.getParameter(Dispatcher.UAPPROVE_RETURN_INDICATOR_PARAMETER) != null) {
+			return State.RETURN_FROM_UAPPROVE;
+		}
+		
 		if (loginContext == null) {
 			return State.NO_LOGIN_CONTEXT;
 		}
@@ -49,6 +52,8 @@ public class StateAndActionEvaluator {
 		logger.debug("State evaluated is {}", state);
 		
 		switch (state) {
+			case RETURN_FROM_UAPPROVE:
+				return Action.RESTORE_LOGINCONTEXT_AND_PASS_TO_IDP;
 			case NO_LOGIN_CONTEXT:
 				return Action.PASS_TO_IDP;
 			case AUTH_FAILURE:

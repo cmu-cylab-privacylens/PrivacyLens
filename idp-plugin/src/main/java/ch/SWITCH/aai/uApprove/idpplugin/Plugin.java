@@ -93,12 +93,13 @@ public class Plugin implements Filter {
 	HttpServletResponse response;
 	try {
 	  request = (HttpServletRequest) servletRequest;
-      response = (HttpServletResponse) servletResponse;
+	  response = (HttpServletResponse) servletResponse;
 	} catch (ClassCastException e) {
        logger.warn("uApprove only works on HTTP requests / responses");
        filterChain.doFilter(servletRequest, servletResponse);
 	   return;
     }
+	
 	
     try {
 	  Action action = evaluator.evaluateAction(request, authnContextClassRef);
@@ -108,6 +109,11 @@ public class Plugin implements Filter {
 	  	case PASS_TO_IDP:
 	  	  dispatcher.dispatchToIdP(request, response, filterChain);
 	  	  return;
+	  
+	  	case RESTORE_LOGINCONTEXT_AND_PASS_TO_IDP:
+	  	  dispatcher.dispatchToIdPWithLoginContext(request, response, filterChain);
+	      return;
+	  	  
 	  	case CHECK_ACCESS:
 	  	  checkAccess(request, response, filterChain);
 	  	  return;
@@ -175,7 +181,7 @@ public class Plugin implements Filter {
     // TODO is this check needed?
     logger.trace("check if it is users first visit to relying party");
     if (!userInfo.containsProviderId(context.getRelyingParty().getEntityId())) {
-      logger.info("users first visit to relying party {}", context.getRelyingParty());
+      logger.info("users first visit to relying party {}", context.getRelyingParty().getEntityId());
       dispatcher.dispatchToViewer(request, response, context);
       return;
     }

@@ -42,7 +42,7 @@ public class UApproveContextBuilder {
 	
 	public UApproveContext buildContext(HttpServletRequest request) throws UApproveException {
 		  LoginContext loginContext = dispatcher.getLoginContext(request);
-	      
+
 		  String principal = loginContext.getPrincipalName();
 		  
 		  if (principal == null || "".equals(principal))

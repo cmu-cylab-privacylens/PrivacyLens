@@ -19,17 +19,18 @@ import ch.SWITCH.aai.uApprove.components.Crypt;
 import ch.SWITCH.aai.uApprove.components.RelyingParty;
 import ch.SWITCH.aai.uApprove.components.UApproveException;
 import ch.SWITCH.aai.uApprove.idpplugin.UApproveContextBuilder.UApproveContext;
-import ch.SWITCH.aai.uApprove.idpplugin.workaround.Workarounds;
 import edu.internet2.middleware.shibboleth.idp.authn.LoginContext;
 import edu.internet2.middleware.shibboleth.idp.util.HttpServletHelper;
 
 public class Dispatcher {
 
+	public final static String UAPPROVE_RETURN_INDICATOR_PARAMETER = "uApproveReturn";
+	
 	private final Logger logger = LoggerFactory.getLogger(Dispatcher.class);
 	private final Crypt crypt;
 	private final ServletContext servletContext;
 	boolean isPassiveSupported;
-
+	
 	public Dispatcher(ServletContext servletContext) throws UApproveException  {
 		this.servletContext = servletContext;
 		isPassiveSupported  = ConfigurationManager.makeBoolean(ConfigurationManager.getParam(ConfigurationManager.PLUGIN_ISPASSIVE_SUPPORT));
@@ -42,26 +43,26 @@ public class Dispatcher {
 	}
 	
 	public LoginContext getLoginContext(HttpServletRequest request) {		
-		LoginContext loginContext = HttpServletHelper.getLoginContext(HttpServletHelper.getStorageService(servletContext), servletContext, request);	  
-		logger.trace("LoginContext {} retrieved", loginContext);
+		LoginContext loginContext = HttpServletHelper.getLoginContext(request);
+		logger.trace("Retrieve LoginContext from request {} ", loginContext);
 		return loginContext;
 	}
 	
-	private void transferLoginContextToIdP(HttpServletRequest request, HttpServletResponse response) {		
-		LoginContext loginContext = Workarounds.getLoginContext(servletContext, request);
-		logger.debug("Transfer LoginContext to IdP (unbind persistent, bind to request)");
+	private void restoreLoginContext(HttpServletRequest request, HttpServletResponse response) {
+		logger.debug("Retrieve LoginContext from storage and unbind");
+		LoginContext loginContext = HttpServletHelper.getLoginContext(HttpServletHelper.getStorageService(servletContext), servletContext, request);
 		HttpServletHelper.unbindLoginContext(HttpServletHelper.getStorageService(servletContext), servletContext, request, response);
+		logger.debug("Restore LoginContext '{}' to request", loginContext);
 		HttpServletHelper.bindLoginContext(loginContext, request);
 	}
 	
-	private void transferLoginContextToViewer(HttpServletRequest request, HttpServletResponse response) {
+	private void storeLoginContext(HttpServletRequest request, HttpServletResponse response) {
 		LoginContext loginContext = getLoginContext(request);
-		logger.debug("Transfer LoginContext to uApprove (bind persistent)");
-		HttpServletHelper.bindLoginContext(loginContext, HttpServletHelper.getStorageService(servletContext), servletContext, request, response);	  
+		logger.debug("Store LoginContext persistent");
+		HttpServletHelper.bindLoginContext(loginContext, HttpServletHelper.getStorageService(servletContext), servletContext, request, response);
 	}
-
+	
 	public void dispatchToIdP(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws UApproveException {
-		transferLoginContextToIdP(request, response);
 		try {
 			logger.debug("Dispatch to IdP");
 			filterChain.doFilter(request, response);
@@ -70,6 +71,11 @@ public class Dispatcher {
 			throw new UApproveException(e);
 		}
 	}
+	
+	public void dispatchToIdPWithLoginContext(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws UApproveException {
+		restoreLoginContext(request, response);
+		dispatchToIdP(request, response, filterChain);
+	}
 
 	public void dispatchToViewer(HttpServletRequest request, HttpServletResponse response, UApproveContext context) throws  UApproveException {
 		boolean isPassive = getLoginContext(request).isPassiveAuthRequired();
@@ -77,12 +83,14 @@ public class Dispatcher {
 		if (isPassive && isPassiveSupported) {
 			throw new UApproveException("Passive authentication is required, uApprove does support it, but can not, because user interaction is required");
 		}
-
-	 	String referer = request.getRequestURL().toString();   
-	 	String postForm = buildPostForm(context.resetConsent(), referer, context.getPrincipal(), context.getRelyingParty(), context.getAttributesReleased());
+	 	
+	 	String returnURL = request.getRequestURL().append("?"+UAPPROVE_RETURN_INDICATOR_PARAMETER).toString();
+	 	logger.debug("Builded returnURL is {}", returnURL);
+	 	
+	 	String postForm = buildPostForm(context.resetConsent(), returnURL, context.getPrincipal(), context.getRelyingParty(), context.getAttributesReleased());
 	    response.setContentType("text/html");
 	    
-	    transferLoginContextToViewer(request, response);
+	    storeLoginContext(request, response);
 	 	try {
 	 		logger.debug("Dispatch to uApprove");
 			response.getWriter().write(postForm);
