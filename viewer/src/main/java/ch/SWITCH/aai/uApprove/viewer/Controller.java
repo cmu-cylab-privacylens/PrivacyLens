@@ -118,7 +118,7 @@ public class Controller extends HttpServlet {
         useTerms = true;
         LOG.debug("TermsOfUseManager loaded, version=" + TermsOfUseManager.getVersion());
       } else {
-        LOG.debug("No TermsOfUseManager gonna be used");
+        LOG.debug("No TermsOfUseManager is used");
       }
 
       // init attributeList
@@ -149,23 +149,7 @@ public class Controller extends HttpServlet {
       // initialization
       HttpSession session = request.getSession();
       LogInfo storage = LogInfo.getInstance();
-      
-      // debugging
-      RelyingParty rpdebug = (RelyingParty)session.getAttribute(SESKEY_RELYINGPARTY);
-      LOG.trace("RelyingParty before entering reading request, entityId={}",
-    		  rpdebug==null?"Not Set":rpdebug.getEntityId());
-      
-      
-      
-      /*
-      Enumeration<String> e = session.getAttributeNames();
-      while (e.hasMoreElements()) {
-    	  String key = e.nextElement();
-    	  Object value = session.getAttribute(key);
-    	  LOG.trace("{} => {}", key, value);
-      }
-      */
-      
+            
       // get principal
       String principal = crypt.decrypt(request
           .getParameter(ConfigurationManager.HTTP_PARAM_PRINCIPAL));

@@ -10,8 +10,8 @@ import edu.internet2.middleware.shibboleth.idp.authn.LoginContext;
 
 public class StateAndActionEvaluator {
 
-	private static enum State {RETURN_FROM_UAPPROVE, NO_LOGIN_CONTEXT, AUTH_FAILURE, NOT_SPECIFIC_AUTH_CTX, PRINCIPAL_AUTHENTICATED, UNKNOWN};
-	public static enum Action {PASS_TO_IDP, RESTORE_LOGINCONTEXT_AND_PASS_TO_IDP, CHECK_ACCESS, UNKNOWN};
+	private static enum State {RETURN_FROM_UAPPROVE, RESET_UAPPROVE, NO_LOGIN_CONTEXT, AUTH_FAILURE, NOT_SPECIFIC_AUTH_CTX, PRINCIPAL_AUTHENTICATED, UNKNOWN};
+	public static enum Action {PASS_TO_IDP, RESTORE_LOGINCONTEXT_AND_PASS_TO_IDP, CHECK_ACCESS, RESTORE_LOGINCONTEXT_AND_CHECK_ACCESS, UNKNOWN};
 	private final Logger logger = LoggerFactory.getLogger(StateAndActionEvaluator.class);
 	private final Dispatcher dispatcher;
 	
@@ -22,6 +22,10 @@ public class StateAndActionEvaluator {
 	private State evaluateState(HttpServletRequest request, String authnContextClassRef) {    
 
 		LoginContext loginContext = dispatcher.getLoginContext(request);
+		
+		if (request.getParameter(Dispatcher.UAPPROVE_RESET_INDICATOR_PARAMETER) != null) {
+			return State.RESET_UAPPROVE;
+		}
 		
 		if (request.getParameter(Dispatcher.UAPPROVE_RETURN_INDICATOR_PARAMETER) != null) {
 			return State.RETURN_FROM_UAPPROVE;
@@ -52,6 +56,8 @@ public class StateAndActionEvaluator {
 		logger.debug("State evaluated is {}", state);
 		
 		switch (state) {
+			case RESET_UAPPROVE:
+				return Action.RESTORE_LOGINCONTEXT_AND_CHECK_ACCESS;
 			case RETURN_FROM_UAPPROVE:
 				return Action.RESTORE_LOGINCONTEXT_AND_PASS_TO_IDP;
 			case NO_LOGIN_CONTEXT:

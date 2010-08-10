@@ -25,6 +25,7 @@ import edu.internet2.middleware.shibboleth.idp.util.HttpServletHelper;
 public class Dispatcher {
 
 	public final static String UAPPROVE_RETURN_INDICATOR_PARAMETER = "uApproveReturn";
+	public final static String UAPPROVE_RESET_INDICATOR_PARAMETER = "uApproveReset";
 	
 	private final Logger logger = LoggerFactory.getLogger(Dispatcher.class);
 	private final Crypt crypt;
@@ -48,7 +49,7 @@ public class Dispatcher {
 		return loginContext;
 	}
 	
-	private void restoreLoginContext(HttpServletRequest request, HttpServletResponse response) {
+	public void restoreLoginContext(HttpServletRequest request, HttpServletResponse response) {
 		logger.debug("Retrieve LoginContext from storage and unbind");
 		LoginContext loginContext = HttpServletHelper.getLoginContext(HttpServletHelper.getStorageService(servletContext), servletContext, request);
 		HttpServletHelper.unbindLoginContext(HttpServletHelper.getStorageService(servletContext), servletContext, request, response);
@@ -56,7 +57,7 @@ public class Dispatcher {
 		HttpServletHelper.bindLoginContext(loginContext, request);
 	}
 	
-	private void storeLoginContext(HttpServletRequest request, HttpServletResponse response) {
+	public void storeLoginContext(HttpServletRequest request, HttpServletResponse response) {
 		LoginContext loginContext = getLoginContext(request);
 		logger.debug("Store LoginContext persistent");
 		HttpServletHelper.bindLoginContext(loginContext, HttpServletHelper.getStorageService(servletContext), servletContext, request, response);
@@ -72,11 +73,6 @@ public class Dispatcher {
 		}
 	}
 	
-	public void dispatchToIdPWithLoginContext(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws UApproveException {
-		restoreLoginContext(request, response);
-		dispatchToIdP(request, response, filterChain);
-	}
-
 	public void dispatchToViewer(HttpServletRequest request, HttpServletResponse response, UApproveContext context) throws  UApproveException {
 		boolean isPassive = getLoginContext(request).isPassiveAuthRequired();
 		
@@ -85,6 +81,11 @@ public class Dispatcher {
 		}
 	 	
 	 	String returnURL = request.getRequestURL().append("?"+UAPPROVE_RETURN_INDICATOR_PARAMETER).toString();
+	 	
+	 	if (context.resetConsent()) {
+	 		returnURL += "&" + UAPPROVE_RESET_INDICATOR_PARAMETER;
+	 	}
+	 	
 	 	logger.debug("Builded returnURL is {}", returnURL);
 	 	
 	 	String postForm = buildPostForm(context.resetConsent(), returnURL, context.getPrincipal(), context.getRelyingParty(), context.getAttributesReleased());

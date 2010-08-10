@@ -111,11 +111,17 @@ public class Plugin implements Filter {
 	  	  return;
 	  
 	  	case RESTORE_LOGINCONTEXT_AND_PASS_TO_IDP:
-	  	  dispatcher.dispatchToIdPWithLoginContext(request, response, filterChain);
+	  		dispatcher.restoreLoginContext(request, response);
+	  		dispatcher.dispatchToIdP(request, response, filterChain);
 	      return;
-	  	  
+	      
 	  	case CHECK_ACCESS:
-	  	  checkAccess(request, response, filterChain);
+		  	  checkAccess(request, response, filterChain);
+		  	  return;
+	      
+	  	case RESTORE_LOGINCONTEXT_AND_CHECK_ACCESS:
+	  		dispatcher.restoreLoginContext(request, response);
+	  		checkAccess(request, response, filterChain);
 	  	  return;
 	  }
     } catch (UApproveException e) {

@@ -46,6 +46,8 @@ public class RequestLoggingFilter implements Filter {
 				
 		);
 
+		// Add here logging statements of your choice by using the log* methods listed below
+		
 		chain.doFilter(request, response);
 	}
 	
