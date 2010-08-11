@@ -65,7 +65,7 @@ public class SPBlacklistManager {
         blackList.add(Pattern.compile(line));
       }
     } catch (Exception e) {
-      LOG.warn("Unable to load black list file={}. Black list is initialized empty", filename);
+      LOG.debug("Unable to load black list file {}. Black list is initialized empty", filename);
     }
   }
 

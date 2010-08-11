@@ -13,24 +13,28 @@
 # Example: !transientId
 # -----------------------------------------------------------
 
+uid
 surname
 givenName
-email
 swissEduPersonUniqueID
 swissEduPersonMatriculationNumber
-telephoneNumber
-postalAddress
-uid
 employeeNumber
+swissEduPersonCardUID
+eduPersonNickname
 swissEduPersonDateOfBirth
 swissEduPersonGender
 preferredLanguage
-homePhone
+email
 homePostalAddress
+postalAddress
+homePhone
+telephoneNumber
 mobile
 swissEduPersonHomeOrganization
 swissEduPersonHomeOrganizationType
 eduPersonAffiliation
+eduPersonScopedAffiliation
+eduPersonPrimaryAffiliation
 swissEduPersonStudyBranch1
 swissEduPersonStudyBranch2
 swissEduPersonStudyBranch3
@@ -38,11 +42,12 @@ swissEduPersonStudyLevel
 swissEduPersonStaffCategory
 eduPersonOrgDN
 eduPersonOrgUnitDN
+eduPersonPrimaryOrgUnitDN
 eduPersonEntitlement
+eduPersonAssurance
 
 # transientId and persistenId are not shown, cause it makes no sense
 # # for the end user
 !eduPersonTargetedID
-!persistentID
+!persistentId
 !transientId
-

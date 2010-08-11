@@ -4,9 +4,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Map;
 
-
-import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -16,17 +15,17 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.SWITCH.aai.uApprove.components.ConfigurationManager;
-import ch.SWITCH.aai.uApprove.components.UApproveException;
-import ch.SWITCH.aai.uApprove.components.TermsOfUseManager;
 import ch.SWITCH.aai.uApprove.components.Attribute;
+import ch.SWITCH.aai.uApprove.components.ConfigurationManager;
+import ch.SWITCH.aai.uApprove.components.Crypt;
+import ch.SWITCH.aai.uApprove.components.RelyingParty;
+import ch.SWITCH.aai.uApprove.components.TermsOfUseManager;
+import ch.SWITCH.aai.uApprove.components.UApproveException;
 import ch.SWITCH.aai.uApprove.storage.LogInfo;
 import ch.SWITCH.aai.uApprove.storage.UserLogInfo;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
-import edu.vt.middleware.crypt.CryptException;
-import edu.vt.middleware.crypt.symmetric.AES;
 
 /**
  * uApprove Controller Servlet
@@ -72,7 +71,7 @@ public class Controller extends HttpServlet {
 
   public static final String SESKEY_PRINCIPAL = "principal";
   public static final String SESKEY_RETURNURL = "returnURL";
-  public static final String SESKEY_ENTITYID = "entityId";
+  public static final String SESKEY_RELYINGPARTY = "relyingParty";
   public static final String SESKEY_ATTRIBUTES = "attributes";
   public static final String SESKEY_GLOBAL_CONSENT_POSSIBLE = "globalConsentPossible";
   public static final String SESKEY_LOCALE = "locale";
@@ -80,28 +79,14 @@ public class Controller extends HttpServlet {
 
   private static Logger LOG = LoggerFactory.getLogger(Controller.class);
 
-  private String sharedSecret;
   private boolean useTerms = false;
+  private Crypt crypt;
 
   private boolean isGetParSet(HttpServletRequest request, String par) {
     if (request.getParameter(par) == null
         || request.getParameter(par).equals(""))
       return false;
     return true;
-  }
-
-  private String decrypt(String value) throws UApproveException {
-    AES aes = new AES();
-    try {
-      aes.setIV("SWITCHaai rules".getBytes());
-      aes
-          .setPrivateKey(new SecretKeySpec(sharedSecret.getBytes(), 0, 16,
-              "AES"));
-      return new String(aes.decryptFromBase64(value));
-    } catch (CryptException e) {
-      LOG.error("Decryption failed", e);
-      throw new UApproveException(e);
-    }
   }
 
   public void init() throws ServletException {
@@ -115,7 +100,7 @@ public class Controller extends HttpServlet {
       try {
         JoranConfigurator configurator = new JoranConfigurator();
         configurator.setContext(lc);
-        lc.shutdownAndReset();
+        lc.reset();
         configurator.doConfigure(ConfigurationManager
             .getParam(ConfigurationManager.VIEWER_LOGBACK_CONFIG));
       } catch (JoranException je) {
@@ -131,18 +116,16 @@ public class Controller extends HttpServlet {
           throw new UApproveException(e);
         }
         useTerms = true;
-        LOG.info("TermsOfUseManager loaded, version=" + TermsOfUseManager.getVersion());
+        LOG.debug("TermsOfUseManager loaded, version=" + TermsOfUseManager.getVersion());
       } else {
-        LOG.info("No TermsOfUseManager gonna be used");
+        LOG.debug("No TermsOfUseManager is used");
       }
 
       // init attributeList
       AttributeList.initialize(ConfigurationManager.getParam(ConfigurationManager.VIEWER_ATTRIBUTELIST));
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("Content of attribute list:");
-        for (String key : AttributeList.getWhiteList()) {
-          LOG.debug("{}", key);
-        }
+      LOG.debug("Content of attribute list:");
+      for (String key : AttributeList.getWhiteList()) {
+        LOG.debug("{}", key);
       }
       // storage init
       String storeType = ConfigurationManager
@@ -155,21 +138,20 @@ public class Controller extends HttpServlet {
     }
 
     // initialize secret for decryption
-    sharedSecret = ConfigurationManager
-        .getParam(ConfigurationManager.COMMON_SHARED_SECRET);
+    String sharedSecret = ConfigurationManager.getParam(ConfigurationManager.COMMON_SHARED_SECRET);
+    crypt = new Crypt(sharedSecret);
   }
 
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
     try {
-      LOG.info("POST received");
-
+    
       // initialization
       HttpSession session = request.getSession();
       LogInfo storage = LogInfo.getInstance();
-
+            
       // get principal
-      String principal = decrypt(request
+      String principal = crypt.decrypt(request
           .getParameter(ConfigurationManager.HTTP_PARAM_PRINCIPAL));
       LOG.debug("principal=" + principal);
       session.setAttribute(SESKEY_PRINCIPAL, principal);
@@ -180,6 +162,16 @@ public class Controller extends HttpServlet {
       LOG.debug("returnURL=" + returnURL);
       session.setAttribute(SESKEY_RETURNURL, returnURL);
 
+      // get relying
+      LOG.debug("RP decrypted, serialized: {}", crypt.decrypt(request
+              .getParameter(ConfigurationManager.HTTP_PARAM_RELYINGPARTY)));
+
+      RelyingParty relyingParty = new RelyingParty(crypt.decrypt(request
+          .getParameter(ConfigurationManager.HTTP_PARAM_RELYINGPARTY)));
+
+      LOG.debug("entityId=" + relyingParty.getEntityId());
+      session.setAttribute(SESKEY_RELYINGPARTY, relyingParty);
+      
       if (request.getParameter(ConfigurationManager.HTTP_PARAM_RESET) != null) {
         // start edit flow
         LOG.info("user want to edit the attribute release approval");
@@ -188,15 +180,8 @@ public class Controller extends HttpServlet {
         return;
       } else {
         // Start flow
-        LOG.info("start viewer flow");
-        // get providerId
-        String entityId = decrypt(request
-            .getParameter(ConfigurationManager.HTTP_PARAM_PROVIDERID));
-        LOG.debug("entityId=" + entityId);
-        session.setAttribute(SESKEY_ENTITYID, entityId);
-
         // get released attributes
-        String serializedAttributesReleased = decrypt(request
+        String serializedAttributesReleased = crypt.decrypt(request
             .getParameter(ConfigurationManager.HTTP_PARAM_ATTRIBUTES));
         LOG.debug("serializedAttributesReleased="
             + serializedAttributesReleased);
@@ -220,7 +205,8 @@ public class Controller extends HttpServlet {
         // getUserInfo
         UserLogInfo userInfo = storage.getData(principal);
         LOG.debug("userInfo=" + userInfo);
-
+        
+        
         if (userInfo == null) {
           if (useTerms) {
             LOG.debug("first visit of the user, redirect to terms page");
@@ -234,12 +220,12 @@ public class Controller extends HttpServlet {
 
         // has user agreed to the current terms version
         if (useTerms && !userInfo.getTermsVersion().equals(TermsOfUseManager.getVersion())) {
-          LOG.debug("current terms version are not agreed by user, redirect to the terms page");
+          LOG.info("current terms version are not agreed by user, redirect to the terms page");
           getServletContext().getRequestDispatcher(PAGE_TERMS).forward(request,response);
           return;
         } 
         
-        LOG.debug("Terms are not used or current terms version are agreed by user, redirect to the attributes page");
+        LOG.info("Terms are not used or current terms version are agreed by user, redirect to the attributes page");
         getServletContext().getRequestDispatcher(PAGE_ATTRIBUTES).forward(request,response);
         return;
       }
@@ -253,7 +239,6 @@ public class Controller extends HttpServlet {
     try {
       // initialization
       HttpSession session = request.getSession();
-      LOG.debug("GET received");
       ConfigurationManager.initialize(getServletContext().getInitParameter(
           INITPAR_CONFIG));
 
@@ -269,14 +254,13 @@ public class Controller extends HttpServlet {
       if (principal == null || principal.equals(""))
         throw new UApproveException("Principal is not set");
 
-      String entityId = (String) session.getAttribute(SESKEY_ENTITYID);
-      LOG.debug("entityId=" + entityId);
+      RelyingParty relyingParty = (RelyingParty) session.getAttribute(SESKEY_RELYINGPARTY);
+      LOG.debug("entityId=" + relyingParty.getEntityId());
 
       UserLogInfo userInfo = storage.getData(principal);
       LOG.debug("userInfo=" + userInfo);
 
-      Collection<Attribute> attributesReleased = (Collection<Attribute>) session
-          .getAttribute(SESKEY_ATTRIBUTES);
+      Collection<Attribute> attributesReleased = (Collection<Attribute>) session.getAttribute(SESKEY_ATTRIBUTES);
 
       String returnURL = (String) session.getAttribute(SESKEY_RETURNURL);
       LOG.debug("returnURL=" + returnURL);
@@ -285,13 +269,13 @@ public class Controller extends HttpServlet {
         LOG.debug("coming from terms confirmed");
         // check if the user agreed the terms
         if (isGetParSet(request, GETPAR_TERMS_AGREE)) {
-          LOG.debug("user agreed terms, store, redirect to attributes");
+          LOG.info("user agreed terms, store, redirect to attributes");
           storeUserBasic(userInfo, principal, TermsOfUseManager.getVersion());
           getServletContext().getRequestDispatcher(PAGE_ATTRIBUTES).forward(request,
               response);
           return;
         } else {
-          LOG.debug("user dont agreed terms, redirect again to terms");
+          LOG.info("user dont agreed terms, redirect again to terms");
           getServletContext().getRequestDispatcher(PAGE_TERMS).forward(request,
               response);
           return;
@@ -313,15 +297,15 @@ public class Controller extends HttpServlet {
       }
 
       if (isGetParSet(request, GETPAR_ATTRIBUTES_CONFIRM)) {
-        LOG.debug("user gave attribute release consent, store, redirect to returnURL="
+        LOG.info("user gave attribute release consent, store, redirect to returnURL="
             + response.encodeRedirectURL(returnURL));
         
         String termsVersion = useTerms ? TermsOfUseManager.getVersion() : "";
         String attributes = Attribute.serializeAttributeIDs(attributesReleased);
-        LOG.debug("store: principal=" + principal + " entityId=" + entityId
+        LOG.debug("store: principal=" + principal + " entityId=" + relyingParty.getEntityId()
             + " attributes=" + attributes + " terms=" + termsVersion + " globalConsent="
             + isGetParSet(request, GETPAR_ATTRIBUTES_GLOBAL_CONSENT));
-        storeUser(userInfo, principal, termsVersion, entityId, attributes,
+        storeUser(userInfo, principal, termsVersion, relyingParty.getEntityId(), attributes,
             isGetParSet(request, GETPAR_ATTRIBUTES_GLOBAL_CONSENT));
         response.sendRedirect(response.encodeRedirectURL(returnURL));
         return;
@@ -335,7 +319,7 @@ public class Controller extends HttpServlet {
       }
 
       if (isGetParSet(request, GETPAR_ATTRIBUTES_DECLINE_BACK)) {
-        LOG.debug("coming from attributes declined back, redirect to attributes page");
+        LOG.info("coming from attributes declined back, redirect to attributes page");
         getServletContext().getRequestDispatcher(PAGE_ATTRIBUTES).forward(request,
             response);
         return;
@@ -398,11 +382,49 @@ public class Controller extends HttpServlet {
   }
 
   // parse resource (sp) host
-  public static String getResourceHost(String entityId) {
-    int i1 = entityId.indexOf("//") + 2;
-    int i2 = entityId.indexOf("/", i1);
-    return i2 > 0 ? entityId.substring(0, entityId.indexOf("/", entityId
-        .indexOf("//") + 2)) : entityId;
+  private static String getResourceHost(String entityId) {
+    int i1 = entityId.indexOf("//");
+    int i2 = entityId.indexOf("/", i1+2);
+    LOG.debug("entityId received = \"" + entityId + "\"");
+
+    // return just the sp.example.org component out of https://sp.example.org/shibboleth
+    if ( i2 >= 0 )
+       entityId = entityId.substring(i1 + 2, i2);
+    else if ( i1 >= 0 )
+       entityId = entityId.substring(i1 + 2);
+
+    // return just the sp.example.org component out of urn:mace:federation.org:sp.example.org
+    if (entityId.indexOf(':')>=0) {
+    	entityId = entityId.substring(entityId.lastIndexOf(':')+1);
+    }
+    LOG.debug("hostname extracted = \"" + entityId + "\"");
+
+    return entityId;
+  }
+  
+  public static String getRelyingPartyName(RelyingParty relyingParty, Locale locale) {
+	  
+	  Map <String, String> names =  relyingParty.getRpNames();
+	  String name = names.get(locale.getLanguage());
+	  if (name != null)
+		  return name;
+	  name = names.get(Locale.ENGLISH.getLanguage());
+	  if (name != null)
+		  return name;
+	  
+	  return getResourceHost(relyingParty.getEntityId());
+  }
+  
+  public static String getRelyingPartyDesc(RelyingParty relyingParty, Locale locale) {
+	  Map <String, String> descs =  relyingParty.getRpDescriptions();
+	  String desc = descs.get(locale.getLanguage());
+	  if (desc != null)
+		  return desc;
+	  desc = descs.get(Locale.ENGLISH.getLanguage());
+	  if (desc != null)
+		  return desc;
+	  
+	  return "";
   }
   
   // resolves displayName due to locale
@@ -426,14 +448,11 @@ public class Controller extends HttpServlet {
   }
   
 
-  public static void doError(HttpServletRequest request,
-      HttpServletResponse response, UApproveException e) throws ServletException,
-      IOException {
+  public static void doError(HttpServletRequest request, HttpServletResponse response, UApproveException e) throws ServletException, IOException {
     HttpSession session = request.getSession();
     session.setAttribute(SESKEY_ERROR, e);
     LOG.error("uApprove Error", e);
-    session.getServletContext().getRequestDispatcher(PAGE_ERROR).forward(
-        request, response);
+    session.getServletContext().getRequestDispatcher(PAGE_ERROR).forward(request, response);
   }
 
 }

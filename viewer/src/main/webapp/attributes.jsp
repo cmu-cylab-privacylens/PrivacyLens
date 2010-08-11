@@ -2,6 +2,7 @@
   ch.SWITCH.aai.uApprove.viewer.Controller,
   ch.SWITCH.aai.uApprove.components.Attribute,
   ch.SWITCH.aai.uApprove.viewer.AttributeList,
+  ch.SWITCH.aai.uApprove.components.RelyingParty,
   java.util.Map,
   java.util.List,
   java.util.Set,
@@ -57,7 +58,7 @@
 
 
 <%
-  String entityId = (String) session.getAttribute(Controller.SESKEY_ENTITYID);
+  RelyingParty relyingParty = (RelyingParty) session.getAttribute(Controller.SESKEY_RELYINGPARTY);
   boolean globalConsentPosibble = (Boolean) session.getAttribute(Controller.SESKEY_GLOBAL_CONSENT_POSSIBLE);
   Collection<Attribute> attributes = (Collection<Attribute>) session.getAttribute(Controller.SESKEY_ATTRIBUTES);
   Locale locale = (Locale) session.getAttribute(Controller.SESKEY_LOCALE);
@@ -74,7 +75,12 @@
 	// --------------------- Attribute Release table  ------------------- 
 
 	String sTxtExpl = (String) rb.getString( "txt_explanation" );
-	sTxtExpl = sTxtExpl.replaceFirst( "\\?", "<tt>" + Controller.getResourceHost(entityId) + "</tt>" ); 
+		
+	sTxtExpl = sTxtExpl.replaceFirst( "\\?",
+			"<tt onmouseover=\"Tip('"+Controller.getRelyingPartyDesc(relyingParty, locale)+"')\" onmouseout=\"UnTip()\">"
+			+ Controller.getRelyingPartyName(relyingParty, locale)
+			+ "</tt>");
+
 	out.println("<p>" + sTxtExpl + "</p>" );
 %>
 

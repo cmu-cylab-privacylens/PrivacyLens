@@ -108,29 +108,6 @@ public class myJdbcInterface {
     return sqlCommands;
   }
 
-  /**
-   * a simple main for testing
-   */
-  public static void main(String[] arguments) {
-    myJdbcInterface theDB = new myJdbcInterface("blla", true);
-
-    theDB.initialize();
-
-    theDB.test1("select * from ShibProvider");
-
-    System.out.println("sleeping a while ... ");
-    try {
-      Thread.sleep(1000 * 86400);
-    } catch (InterruptedException ex) {
-      System.out.println("interrupted execption " + ex.toString());
-    }
-
-    theDB.test1("select * from ShibProvider");
-
-    theDB.close();
-
-  }
-
   /** sets the number of retries for execSQLFT */
   public void setMaxRetries(int nMaxRetries) {
     myMaxRetries = nMaxRetries;
@@ -151,13 +128,11 @@ public class myJdbcInterface {
         rs = myStatement.executeQuery(theSql);
       else
         myStatement.execute(theSql);
-
-      if (LOG.isDebugEnabled())
-        LOG.debug("myJdbcInterface.execSql: executeQuery *" + theSql
-            + "* done ");
+      
+      LOG.debug("executeQuery *" + theSql + "* done ");
 
     } catch (SQLException ex) {
-      LOG.error("SQLException: " + ex.getMessage());
+      LOG.error("SQLException", ex);
     }
 
     return rs;
@@ -171,45 +146,32 @@ public class myJdbcInterface {
    *          sql statement as string
    * @return the ResultSet or null
    */
-  public ResultSet execSqlFT(String theSql, boolean bIsQuery)
-      throws SQLException {
+  public ResultSet execSqlFT(String theSql, boolean bIsQuery) throws SQLException {
     int nTries = 0;
     ResultSet rs = null;
 
     do {
-
-      if (LOG.isDebugEnabled())
-        LOG.debug("myJdbcInterface.execSqlFT: sql = *" + theSql + "* nTries = "
-            + nTries);
-
+    	LOG.debug("sql = *" + theSql + "* nTries = " + nTries);
       try {
         if (bIsQuery == true)
           rs = myStatement.executeQuery(theSql);
         else
           myStatement.execute(theSql);
-
         break;
 
       } catch (SQLException ex) {
-        LOG
-            .error("myJdbcInterface.execSqlFT: SQLException: "
-                + ex.getMessage());
-
+        LOG.error("SQLException", ex);
         close();
-
         initialize();
-
       }
 
     } while (nTries++ <= myMaxRetries);
-
+    
     if (nTries >= myMaxRetries)
-      throw new SQLException("myJdbcInterface.execSqlFT: SQLException:");
+      throw new SQLException("tries > maxRetries");
+   
     else if (nTries > 0) {
-      LOG
-          .warn("myJdcInterface.execSqlFT: communication link failure due to inactive db connection successfully restored");
-      LOG
-          .warn("                          [possible exceptions can safely be ignored]");
+      LOG.debug("communication link failure due to inactive db connection successfully restored");
     }
 
     return rs;
@@ -217,17 +179,13 @@ public class myJdbcInterface {
 
   /** closes the database connection */
   public void close() {
-    if (LOG.isDebugEnabled())
-      LOG.debug("myJdbcInterface.close: entry");
 
     try {
 
       myStatement.close();
 
     } catch (SQLException ex) {
-      LOG
-          .error("myJdbcInterface.close: statement exception = "
-              + ex.toString());
+      LOG.error("SQLException", ex);
     }
 
     try {
@@ -237,12 +195,9 @@ public class myJdbcInterface {
       bConnected = false;
 
     } catch (SQLException ex) {
-      LOG.error("myJdbcInterface.close: connection exception = "
-          + ex.toString());
+      LOG.error("SQLException", ex);
     }
 
-    if (LOG.isDebugEnabled())
-      LOG.debug("myJdbcInterface.close: done");
   }
 
   /*------------------------------------------------------------------------
@@ -259,30 +214,22 @@ public class myJdbcInterface {
     try {
       File theFile = new File(myConfigFile);
       if (!theFile.exists() || !theFile.isFile() || !theFile.canRead()) {
-        LOG.error("myJdbcInterface.readConfigFile: error reading file "
-            + myConfigFile);
+        LOG.error("Error reading file {}", myConfigFile);
         return false;
       }
       Properties theProperties = new Properties();
       theProperties.load(new FileInputStream(theFile));
 
-      myDriverClassName = theProperties.getProperty(
-          myJdbcConfigurationKeys.keyDriver).trim();
+      myDriverClassName = theProperties.getProperty(myJdbcConfigurationKeys.keyDriver).trim();
       myUrl = theProperties.getProperty(myJdbcConfigurationKeys.keyUrl).trim();
-      myUser = theProperties.getProperty(myJdbcConfigurationKeys.keyUser)
-          .trim();
-      myPassword = theProperties.getProperty(
-          myJdbcConfigurationKeys.keyPassword).trim();
-      sqlCommands = theProperties.getProperty(
-          myJdbcConfigurationKeys.keySqlCmds).trim();
+      myUser = theProperties.getProperty(myJdbcConfigurationKeys.keyUser).trim();
+      myPassword = theProperties.getProperty(myJdbcConfigurationKeys.keyPassword).trim();
+      sqlCommands = theProperties.getProperty(myJdbcConfigurationKeys.keySqlCmds).trim();
 
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("myJdbcInterface.readConfigFile: read file successfully");
-        LOG.debug("     driver = " + myDriverClassName + " url = " + myUrl
-            + " user = " + myUser);
-      }
+      LOG.debug("Read file successfully");
+      LOG.debug("driver = " + myDriverClassName + " url = " + myUrl + " user = " + myUser);
     } catch (Exception ex) {
-      LOG.error("myJdbcInterface.readConfigFile: execption " + ex.getMessage());
+      LOG.error("SQLException", ex);
       return false;
     }
     return true;
@@ -294,79 +241,32 @@ public class myJdbcInterface {
    * @return true in case of success, false otherwise
    */
   public boolean initialize() {
-    if (LOG.isDebugEnabled())
-      LOG.debug("myJdbcInterface.initialize: entry ");
-
     if (bConfigFileRead == false) {
-      LOG
-          .error("myJdbcInterface.initialize: invalid database connection parameters: check file "
-              + myConfigFile);
+      LOG.error("Invalid database connection parameters: check file {}", myConfigFile);
       return false;
     }
 
     try {
       Class.forName(myDriverClassName);
-      if (LOG.isDebugEnabled())
-        LOG.debug("myJdbcInterface.initialize: class.forName done ");
     } catch (java.lang.ClassNotFoundException e) {
-      LOG
-          .error("myJdbcInterface.initialize: cannot find class "
-              + e.toString());
+      LOG.error("Cannot find class", e);
       return false;
     }
 
     try {
-      if (LOG.isDebugEnabled())
-        LOG
-            .debug("myJdbcInterface.initialize: about to try getConnection for *"
-                + myUrl + " user = " + myUser);
+      LOG.debug("About to try getConnection for "+ myUrl + " user = " + myUser);
       myConnection = DriverManager.getConnection(myUrl, myUser, myPassword);
-
-      if (LOG.isDebugEnabled())
-        LOG.debug("myJdbcInterface.initialize: getConnection done ");
 
       myStatement = myConnection.createStatement();
 
       bConnected = true;
 
-      if (LOG.isDebugEnabled())
-        LOG.debug("myJdbcInterface.initialize: createStatement done ");
-
     } catch (SQLException ex) {
-      LOG.error("SQLException: " + ex.getMessage());
+      LOG.error("SQLException", ex);
       return false;
     }
 
     return true;
-  }
-
-  public void identify() {
-    LOG.info("-----------------------------------------------");
-    LOG.info("myJdbcInterface: " + myDriverClassName + "  " + myUrl + " "
-        + myUser);
-    LOG.info("config file " + myConfigFile);
-    LOG.info("bConnected = " + bConnected);
-    LOG.info("-----------------------------------------------");
-  }
-
-  /** a simple stupid test */
-  private void test1(String theSQL) {
-    System.out.println("");
-    System.out
-        .println("--------------- myJdbcInterface.test1: --------------------------");
-    try {
-      ResultSet rs = execSqlFT(theSQL, true);
-
-      while (rs != null && rs.next()) {
-        String s1 = rs.getString(1);
-        String s2 = rs.getString(2);
-        System.out.println("   " + s1 + " " + s2);
-      }
-    } catch (SQLException ex) {
-      System.out.println("myJdbcInterface.main: exeception in rs");
-    }
-
-    System.out.println("");
   }
 
 }

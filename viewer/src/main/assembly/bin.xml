@@ -30,6 +30,12 @@
             <directory>src/main/resources/conf</directory>
             <outputDirectory>/conf-template</outputDirectory>
         </fileSet>
+         <!-- Installscript -->
+        <fileSet>
+        	<includes>
+            	<include>build.xml</include>
+            </includes>
+        </fileSet>
     </fileSets>
     
 </assembly>
