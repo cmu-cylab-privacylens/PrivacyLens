@@ -217,6 +217,10 @@ public class LogInfoFile extends LogInfo {
     }
     return null;
   }
+  
+  public UserLogInfo getDataSimple(String username) {
+	  return getData(username);
+  }
 
   /**
    * Write LogInfo to xml file

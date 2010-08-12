@@ -101,8 +101,7 @@ public class Controller extends HttpServlet {
         JoranConfigurator configurator = new JoranConfigurator();
         configurator.setContext(lc);
         lc.reset();
-        configurator.doConfigure(ConfigurationManager
-            .getParam(ConfigurationManager.VIEWER_LOGBACK_CONFIG));
+        configurator.doConfigure(ConfigurationManager.getParam(ConfigurationManager.VIEWER_LOGBACK_CONFIG));
       } catch (JoranException je) {
         throw new UApproveException(je);
       }
@@ -116,16 +115,16 @@ public class Controller extends HttpServlet {
           throw new UApproveException(e);
         }
         useTerms = true;
-        LOG.debug("TermsOfUseManager loaded, version=" + TermsOfUseManager.getVersion());
+        LOG.debug("Terms of use loaded, version=" + TermsOfUseManager.getVersion());
       } else {
-        LOG.debug("No TermsOfUseManager is used");
+        LOG.debug("No Terms of use are used");
       }
 
       // init attributeList
       AttributeList.initialize(ConfigurationManager.getParam(ConfigurationManager.VIEWER_ATTRIBUTELIST));
-      LOG.debug("Content of attribute list:");
+      LOG.trace("Content of attribute list:");
       for (String key : AttributeList.getWhiteList()) {
-        LOG.debug("{}", key);
+        LOG.trace("{}", key);
       }
       // storage init
       String storeType = ConfigurationManager
@@ -151,23 +150,19 @@ public class Controller extends HttpServlet {
       LogInfo storage = LogInfo.getInstance();
             
       // get principal
-      String principal = crypt.decrypt(request
-          .getParameter(ConfigurationManager.HTTP_PARAM_PRINCIPAL));
+      String principal = crypt.decrypt(request.getParameter(ConfigurationManager.HTTP_PARAM_PRINCIPAL));
       LOG.debug("principal=" + principal);
       session.setAttribute(SESKEY_PRINCIPAL, principal);
 
       // get returnURL
-      String returnURL = request
-          .getParameter(ConfigurationManager.HTTP_PARAM_RETURNURL);
+      String returnURL = request.getParameter(ConfigurationManager.HTTP_PARAM_RETURNURL);
       LOG.debug("returnURL=" + returnURL);
       session.setAttribute(SESKEY_RETURNURL, returnURL);
 
       // get relying
-      LOG.debug("RP decrypted, serialized: {}", crypt.decrypt(request
-              .getParameter(ConfigurationManager.HTTP_PARAM_RELYINGPARTY)));
-
-      RelyingParty relyingParty = new RelyingParty(crypt.decrypt(request
-          .getParameter(ConfigurationManager.HTTP_PARAM_RELYINGPARTY)));
+      String relyingPartySerialized = crypt.decrypt(request.getParameter(ConfigurationManager.HTTP_PARAM_RELYINGPARTY));
+      LOG.debug("RP decrypted, serialized: {}", relyingPartySerialized);
+      RelyingParty relyingParty = new RelyingParty(relyingPartySerialized);
 
       LOG.debug("entityId=" + relyingParty.getEntityId());
       session.setAttribute(SESKEY_RELYINGPARTY, relyingParty);
@@ -175,36 +170,29 @@ public class Controller extends HttpServlet {
       if (request.getParameter(ConfigurationManager.HTTP_PARAM_RESET) != null) {
         // start edit flow
         LOG.info("user want to edit the attribute release approval");
-        getServletContext().getRequestDispatcher(PAGE_RESET).forward(request,
-            response);
+        getServletContext().getRequestDispatcher(PAGE_RESET).forward(request, response);
         return;
       } else {
         // Start flow
         // get released attributes
-        String serializedAttributesReleased = crypt.decrypt(request
-            .getParameter(ConfigurationManager.HTTP_PARAM_ATTRIBUTES));
-        LOG.debug("serializedAttributesReleased="
-            + serializedAttributesReleased);
-        Collection<Attribute> attributesReleased = Attribute
-            .unserializeAttributes(serializedAttributesReleased);
+        String serializedAttributesReleased = crypt.decrypt(request.getParameter(ConfigurationManager.HTTP_PARAM_ATTRIBUTES));
+        LOG.debug("serializedAttributesReleased are {}", serializedAttributesReleased);
+        Collection<Attribute> attributesReleased = Attribute.unserializeAttributes(serializedAttributesReleased);
         session.setAttribute(SESKEY_ATTRIBUTES, attributesReleased);
 
         // get globalConsentPossible
-        boolean globalConsentPossible = ConfigurationManager
-            .makeBoolean(ConfigurationManager
-                .getParam(ConfigurationManager.VIEWER_GLOBAL_CONSENT));
-        LOG.debug("globalConsentPossible=" + globalConsentPossible);
+        boolean globalConsentPossible = ConfigurationManager.makeBoolean(ConfigurationManager.getParam(ConfigurationManager.VIEWER_GLOBAL_CONSENT));
+        LOG.debug("globalConsentPossible is {}", globalConsentPossible);
         session.setAttribute(SESKEY_GLOBAL_CONSENT_POSSIBLE, globalConsentPossible);
 
         // get the locale
-        Locale locale = createLocale(request.getLocale(), ConfigurationManager
-            .getParam(ConfigurationManager.VIEWER_USELOCALE));
-        LOG.debug("locale=" + locale);
+        Locale locale = createLocale(request.getLocale(), ConfigurationManager.getParam(ConfigurationManager.VIEWER_USELOCALE));
+        LOG.debug("locale is {}", locale);
         session.setAttribute(SESKEY_LOCALE, locale);
 
         // getUserInfo
         UserLogInfo userInfo = storage.getData(principal);
-        LOG.debug("userInfo=" + userInfo);
+        LOG.debug("userInfo is {}", userInfo);
         
         
         if (userInfo == null) {
@@ -223,7 +211,7 @@ public class Controller extends HttpServlet {
           LOG.info("current terms version are not agreed by user, redirect to the terms page");
           getServletContext().getRequestDispatcher(PAGE_TERMS).forward(request,response);
           return;
-        } 
+        }
         
         LOG.info("Terms are not used or current terms version are agreed by user, redirect to the attributes page");
         getServletContext().getRequestDispatcher(PAGE_ATTRIBUTES).forward(request,response);
@@ -234,94 +222,108 @@ public class Controller extends HttpServlet {
     }
   }
 
-  protected void doGet(HttpServletRequest request, HttpServletResponse response)
-      throws ServletException, IOException {
+  protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     try {
       // initialization
       HttpSession session = request.getSession();
-      ConfigurationManager.initialize(getServletContext().getInitParameter(
-          INITPAR_CONFIG));
+      ConfigurationManager.initialize(getServletContext().getInitParameter(INITPAR_CONFIG));
 
       // initialize storage handler
-      String storeType = ConfigurationManager
-          .getParam(ConfigurationManager.COMMON_STORE_TYPE);
+      String storeType = ConfigurationManager.getParam(ConfigurationManager.COMMON_STORE_TYPE);
       LogInfo.initialize(storeType);
       LogInfo storage = LogInfo.getInstance();
-      LOG.debug("LogInfo (storage) initialized with mode=" + storeType);
+      LOG.debug("LogInfo (storage) initialized with mode {}", storeType);
 
       String principal = (String) session.getAttribute(SESKEY_PRINCIPAL);
-      LOG.debug("principal=" + principal);
-      if (principal == null || principal.equals(""))
+      LOG.debug("principal is {}", principal);
+      if (principal == null || principal.equals("")) {
         throw new UApproveException("Principal is not set");
+      }
 
       RelyingParty relyingParty = (RelyingParty) session.getAttribute(SESKEY_RELYINGPARTY);
-      LOG.debug("entityId=" + relyingParty.getEntityId());
+      LOG.debug("entityId is {}", relyingParty.getEntityId());
 
       UserLogInfo userInfo = storage.getData(principal);
-      LOG.debug("userInfo=" + userInfo);
+      // Ugly hack
+      UserLogInfo userInfoWithRightToU = storage.getDataSimple(principal);
+      userInfo.setTermsVersion(userInfoWithRightToU.getTermsVersion());
+      
+      LOG.debug("userInfo is {}", userInfo);
 
       Collection<Attribute> attributesReleased = (Collection<Attribute>) session.getAttribute(SESKEY_ATTRIBUTES);
-
+      LOG.debug("attributesReleased are {}", attributesReleased);
+      
       String returnURL = (String) session.getAttribute(SESKEY_RETURNURL);
-      LOG.debug("returnURL=" + returnURL);
+      LOG.debug("returnURL is {}", returnURL);
 
       if (isGetParSet(request, GETPAR_TERMS_CONFIRM)) {
         LOG.debug("coming from terms confirmed");
         // check if the user agreed the terms
         if (isGetParSet(request, GETPAR_TERMS_AGREE)) {
-          LOG.info("user agreed terms, store, redirect to attributes");
+          LOG.info("user agreed terms, store, redirect to attributes, if necessary");
           storeUserBasic(userInfo, principal, TermsOfUseManager.getVersion());
-          getServletContext().getRequestDispatcher(PAGE_ATTRIBUTES).forward(request,
-              response);
+          
+          // check if user has to be redirected to the attributes approval page
+          if (ConfigurationManager.makeBoolean(userInfo.getGlobal())) {
+        	  LOG.info("user has global consent");
+        	  response.sendRedirect(response.encodeRedirectURL(returnURL));
+        	  return;
+      	  }
+       
+          String approvedAttributes = userInfo.getAttributesForProviderId(relyingParty.getEntityId());
+          LOG.debug("approvedAttributes are {}", approvedAttributes);         
+          String serializedAttributeIDs = Attribute.serializeAttributeIDs(attributesReleased);
+          LOG.debug("serializedAttributeIDs to be released are {}", serializedAttributeIDs);
+          if (Attribute.compareAttributeRelease(approvedAttributes, serializedAttributeIDs)) {
+        	  LOG.info("user has already approved attributes for this relying party");
+        	  response.sendRedirect(response.encodeRedirectURL(returnURL));
+        	  return;
+          }
+          
+          getServletContext().getRequestDispatcher(PAGE_ATTRIBUTES).forward(request, response);
           return;
+          
         } else {
           LOG.info("user dont agreed terms, redirect again to terms");
-          getServletContext().getRequestDispatcher(PAGE_TERMS).forward(request,
-              response);
+          getServletContext().getRequestDispatcher(PAGE_TERMS).forward(request, response);
           return;
         }
       }
 
       if (isGetParSet(request, GETPAR_TERMS_DECLINE)) {
         LOG.debug("coming from terms declined, redirect to decline page");
-        getServletContext().getRequestDispatcher(PAGE_TERMS_DECLINED).forward(
-            request, response);
+        getServletContext().getRequestDispatcher(PAGE_TERMS_DECLINED).forward(request, response);
         return;
       }
 
       if (isGetParSet(request, GETPAR_TERMS_DECLINE_BACK)) {
         LOG.debug("coming from terms declined back, redirect to terms page");
-        getServletContext().getRequestDispatcher(PAGE_TERMS).forward(request,
-            response);
+        getServletContext().getRequestDispatcher(PAGE_TERMS).forward(request,response);
         return;
       }
 
       if (isGetParSet(request, GETPAR_ATTRIBUTES_CONFIRM)) {
-        LOG.info("user gave attribute release consent, store, redirect to returnURL="
-            + response.encodeRedirectURL(returnURL));
+        LOG.info("user gave attribute release consent, store, redirect to returnURL {}", response.encodeRedirectURL(returnURL));
         
         String termsVersion = useTerms ? TermsOfUseManager.getVersion() : "";
         String attributes = Attribute.serializeAttributeIDs(attributesReleased);
         LOG.debug("store: principal=" + principal + " entityId=" + relyingParty.getEntityId()
             + " attributes=" + attributes + " terms=" + termsVersion + " globalConsent="
             + isGetParSet(request, GETPAR_ATTRIBUTES_GLOBAL_CONSENT));
-        storeUser(userInfo, principal, termsVersion, relyingParty.getEntityId(), attributes,
-            isGetParSet(request, GETPAR_ATTRIBUTES_GLOBAL_CONSENT));
+        storeUser(userInfo, principal, termsVersion, relyingParty.getEntityId(), attributes, isGetParSet(request, GETPAR_ATTRIBUTES_GLOBAL_CONSENT));
         response.sendRedirect(response.encodeRedirectURL(returnURL));
         return;
       }
 
       if (isGetParSet(request, GETPAR_ATTRIBUTES_DECLINE)) {
         LOG.debug("coming from attributes declined, redirect to decline page");
-        getServletContext().getRequestDispatcher(PAGE_ATTRIBUTES_DECLINED).forward(
-            request, response);
+        getServletContext().getRequestDispatcher(PAGE_ATTRIBUTES_DECLINED).forward(request, response);
         return;
       }
 
       if (isGetParSet(request, GETPAR_ATTRIBUTES_DECLINE_BACK)) {
         LOG.info("coming from attributes declined back, redirect to attributes page");
-        getServletContext().getRequestDispatcher(PAGE_ATTRIBUTES).forward(request,
-            response);
+        getServletContext().getRequestDispatcher(PAGE_ATTRIBUTES).forward(request, response);
         return;
       }
 
@@ -339,10 +341,8 @@ public class Controller extends HttpServlet {
     LOG.debug("storeUser");
     LogInfo storage = LogInfo.getInstance();
     if (userInfo == null) {
-      LOG.debug("create new user");
-      
-      userInfo = storage.addUserLogInfoData(principal, "1.0", new Date()
-          .toString(), termsVersion, "no", entityId, attributesReleased);
+      LOG.debug("create new user");     
+      userInfo = storage.addUserLogInfoData(principal, "1.0", new Date().toString(), termsVersion, "no", entityId, attributesReleased);
     } else {
        userInfo.setOndate(new Date().toString());
        userInfo.setTermsVersion(termsVersion);
@@ -352,15 +352,13 @@ public class Controller extends HttpServlet {
     storage.update(userInfo, entityId);
   }
 
-  private void storeUserBasic(UserLogInfo userInfo, String principal,
-      String termsVersion) throws UApproveException {
+  private void storeUserBasic(UserLogInfo userInfo, String principal, String termsVersion) throws UApproveException {
     LOG.debug("storeUserBasic");
     LogInfo storage = LogInfo.getInstance();
     
     if (userInfo == null) {
       LOG.debug("create new user");
-      userInfo = storage.addUserLogInfoData(principal, "1.0", new Date()
-          .toString(), termsVersion, "no", null, null);
+      userInfo = storage.addUserLogInfoData(principal, "1.0", new Date().toString(), termsVersion, "no", null, null);
     } else {
       userInfo.setTermsVersion(termsVersion);
       userInfo.setOndate(new Date().toString());

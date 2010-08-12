@@ -223,7 +223,10 @@ public class Plugin implements Filter {
 		logger.debug("user is not existent, create a new user");
 		userInfo = storage.addUserLogInfoData(context.getPrincipal(), "1.0", new Date().toString(), "", "no", context.getRelyingParty().getEntityId(), null);
 		storage.update(userInfo);
-	}	
+	}
+    // Ugly hack
+    UserLogInfo userInfoWithRightToU = storage.getDataSimple(context.getPrincipal());
+    userInfo.setTermsVersion(userInfoWithRightToU.getTermsVersion());
 	return userInfo;
   }
   

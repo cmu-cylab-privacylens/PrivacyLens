@@ -57,6 +57,7 @@ public abstract class LogInfo {
 
   public abstract UserLogInfo getData(String username);
 
+  public abstract UserLogInfo getDataSimple(String username);
 
   // / Updates the user info for a given provider
   abstract public void update(UserLogInfo theUserData, String theProviderId)

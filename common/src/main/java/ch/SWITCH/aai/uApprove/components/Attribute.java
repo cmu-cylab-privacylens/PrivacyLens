@@ -30,28 +30,38 @@ public class Attribute implements Serializable {
 // interaction
 // with the storage: store, load, comparing
 // Format: ":attr1:attr2:attr3:" || ""
-public static String serializeAttributeIDs(Collection<Attribute> attributes) {
-  String result = "";
-  for (Iterator<Attribute> iterator = attributes.iterator(); iterator
-      .hasNext();) {
-    String id = iterator.next().attributeID;
-    result += ATTR_DELIMITER + id;
+  public static String serializeAttributeIDs(Collection<Attribute> attributes) {
+	  String result = "";
+	  for (Iterator<Attribute> iterator = attributes.iterator(); iterator.hasNext();) {
+		  String id = iterator.next().attributeID;
+		  result += ATTR_DELIMITER + id;
+	  }
+	  if (!result.equals("")) {
+		  result += ATTR_DELIMITER;
+	  }
+	  return result;
   }
-  if (!result.equals(""))
-    result += ATTR_DELIMITER;
-  return result;
-}
 
 
-public static boolean compareAttributeRelease(String approved, String current) {
-  StringTokenizer tokenizer = new StringTokenizer( current,ATTR_DELIMITER );
-  while (tokenizer.hasMoreElements()) {
-    String attr = (String) tokenizer.nextElement();
-    if (approved.indexOf(ATTR_DELIMITER+attr+ATTR_DELIMITER) == -1)
-      return false;
+  public static boolean compareAttributeRelease(String approved, String current) {
+  
+	  if (current.equals("")) {
+		  return true;
+	  }
+	  
+	  if (approved == null) {
+		  return false;
+	  }
+	
+	  StringTokenizer tokenizer = new StringTokenizer( current,ATTR_DELIMITER );
+	  while (tokenizer.hasMoreElements()) {
+		  String attr = (String) tokenizer.nextElement();
+		  if (approved.indexOf(ATTR_DELIMITER+attr+ATTR_DELIMITER) == -1) {
+			  return false;
+		  }
+	  }
+	  return true;
   }
-  return true;
-}
 
 
 

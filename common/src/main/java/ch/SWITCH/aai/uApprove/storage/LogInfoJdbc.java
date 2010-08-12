@@ -219,13 +219,16 @@ public class LogInfoJdbc extends LogInfo {
 
     try {
       rs = theDB.execSqlFT(theSQL, true);
+      LOG.trace("SQL {} executed", theSQL);
+
 
       String sTermsVersion = null;
       String sDate = null;
       String sGlobal = "no";
       Map<String, String> mapProviderIds = Collections.synchronizedSortedMap(new TreeMap<String, String>());
-
+      
       while (rs.next()) {
+    	LOG.trace("Iterate over results, row={}", rs.getRow());
         if (sTermsVersion == null)
           sTermsVersion = rs.getString("TermsOfUseManager");
         if (sDate == null)
@@ -239,6 +242,8 @@ public class LogInfoJdbc extends LogInfo {
             mapProviderIds.put(sKey, rs.getString("Attributes"));
         }
 
+        LOG.trace("Building UserInfo with sTermsVersion={}", sTermsVersion);
+        
         userArp = new UserLogInfo(theUserName, "dummy", sDate, sTermsVersion, sGlobal, mapProviderIds);
       }
     } catch (SQLException ex) {
@@ -270,12 +275,11 @@ public class LogInfoJdbc extends LogInfo {
 
     theSQL = theSQL.replaceFirst("\\?", theUserName);
 
-    LOG.debug("getUserArpInfoByName2: sql = {}", theSQL);
-
     ResultSet rs = null;
 
     try {
       rs = theDB.execSqlFT(theSQL, true);
+      LOG.trace("SQL {} executed", theSQL);
 
       String sTermsVersion = null;
       String sDate = null;
@@ -328,6 +332,7 @@ public class LogInfoJdbc extends LogInfo {
 
     try {
       theDB.execSqlFT(sql, false);
+      LOG.trace("SQL {} executed", sql);
     } catch (SQLException ex) {
       throw new UApproveException(ex);
     }
@@ -590,6 +595,16 @@ public class LogInfoJdbc extends LogInfo {
     }
     return theUserInfo;
 
+  }
+  
+  public UserLogInfo getDataSimple(String username) {
+	  UserLogInfo userInfo = null;
+	  try {
+		  userInfo = getUserArpInfoByName2(username);
+	} catch (UApproveException e) {
+	      LOG.error("Exception", e);
+	}
+	return userInfo;
   }
 
   /**
