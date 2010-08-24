@@ -121,8 +121,7 @@ dt {
     <li>
     <a href="#bugsandfeatures"> Bugs &amp; Features </a>
   </li>
-    </li>
-    <li>
+  <li>
     <a href="#update"> Update </a>
   </li>
 </ol>
@@ -206,7 +205,8 @@ dt {
 <div>
   Download and unzip the uApprove package: <pre class="console">
 wget http://www.switch.ch/aai/downloads/uApprove-2.1.4-bin.zip
-unzip uApprove-2.1.4-bin.zip -d /opt/uApprove
+unzip uApprove-2.1.4-bin.zip -d /opt/
+ln -s /opt/uApprove-2.1.4 /opt/uApprove
 </pre>
 </div>
 
@@ -220,8 +220,8 @@ unzip uApprove-2.1.4-bin.zip -d /opt/uApprove
 <div>
   Copy libraries and configuration: <pre class="console">
 cd /opt/uApprove
+mkdir conf logs war
 unzip idp-plugin-2.1.4-bin.zip
-mkdir conf
 cp idp-plugin-2.1.4/conf-template/* conf/
 cp idp-plugin-2.1.4/lib/* /opt/shibboleth-identityprovider/lib/
 </pre>
@@ -279,7 +279,7 @@ writeable by Tomcat.</fieldset>
 First, a databases and a user have to be created:
 <pre class="console">
 mysql -u root -p
-mysql>
+mysql&gt;
 CREATE DATABASE uApprove;
 CREATE USER 'uApprove'@'localhost' IDENTIFIED BY '<tt class="customval">uApprove'</tt>;
 GRANT USAGE ON *.* TO 'uApprove'@'localhost';
@@ -290,7 +290,7 @@ ALTER DATABASE uApprove DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 Second, generate the table structures:
 <pre class="console">
 mysql -u root -p
-mysql>
+mysql&gt;
 use uApprove;
 
 create table ArpUser (
@@ -377,12 +377,12 @@ encrypted and decrypted by a shared secret (128 bit, 16 characters) in <tt>/opt/
 </p>
 
 <pre class="file">
-sharedSecret=<tt class="customval">!4's-50_$3Cr#T,|Zn`t_i7?</tt>
+sharedSecret=<tt class="customval">QErDXYZEAoS6jooPvdBhQg==</tt>
 </pre>
 
 For easy creating a random value, containing 16 chars, you can use the following command:
 <pre class="console">
-openssl rand -base64 16 2>/dev/null
+openssl rand -base64 16 2&gt;/dev/null
 </pre>
 
 </div>
@@ -390,8 +390,10 @@ openssl rand -base64 16 2>/dev/null
 <h3>4.2 IdP plugin configuration </h3>
 
 <h4> Shibboleth IdP adjustments </h4>
-
-The IdP plugin has to be enabled within Shibboleth IdP web application <tt>/opt/shibboleth-identityprovider/src/main/webapp/WEB-INF/web.xml</tt>:
+<p>
+The IdP plugin has to be enabled within Shibboleth IdP web application
+<tt>/opt/shibboleth-identityprovider/src/main/webapp/WEB-INF/web.xml</tt>:
+</p>
 
 <pre class="file">
 &lt;web-app&gt;
@@ -420,12 +422,10 @@ The IdP plugin has to be enabled within Shibboleth IdP web application <tt>/opt/
 </pre>
 
 <h5> Redeployment of Shibboleth IdP</h5>
-<div>
 <pre class="console">
 cd /opt/shibboleth-identityprovider/
 sh install.sh
 </pre>
-</div>
 
 <p>
 The SP blacklist defines Resources which are excluded from the user consent. <br />
@@ -437,7 +437,10 @@ The SP blacklist is optional and can be configured by
 spBlacklist=<tt class="customval">/opt/uApprove/conf/sp-blacklist</tt>
 </pre>
 
-In <code>sp-blacklist</code>, each line defines a regular expression pattern for black listed resource identifier:
+<p>
+In <code>sp-blacklist</code>, each line defines a
+regular expression pattern for black listed resource identifier:
+</p>
 <pre class="file">
 # Example 1: specific resource
 https://sp\.example\.org/shibboleth
@@ -455,14 +458,14 @@ If the database storage is used, it is possible to log each provider access, whi
 <br /> If the viewer web application is used, the IdP plugin has to know, where it is deployed.
 <br /> it is possible to tell the IdP plugin, that it should take care about <i>isPassive</i> requests.
 <br /> The configuration is done in <tt>/opt/uApprove/conf/idp-plugin.properties</tt>:
-<p>
+</p>
 <pre class="file">
 logProviderAccess=<tt class="customval">false</tt>
 monitoringOnly=<tt class="customval">false</tt>
 uApproveViewer=<tt class="customval">https://idp.example.org/uApprove/Controller</tt>
 isPassiveSupport=<tt class="customval">false</tt>
 </pre>
-</div>
+
 <h3> 4.3 Viewer configuration </h3>
 
 <p>
@@ -499,7 +502,6 @@ Adjust the viewer application according you configuration directory in
 <div>
 
 <pre class="console">cd /opt/uApprove/viewer-2.1.4/
-mkdir war
 ant deploy -Duapprove.deployment=<tt class="customval">/opt/uApprove/war</tt>
 </pre>
 </div>
@@ -604,7 +606,7 @@ Adjust <code>logging.xml</code> for the log location, assure that the file is wr
 &lt;configuration&gt;
   ...
   &lt;appender class="ch.qos.logback.core.FileAppender" name="RootFileAppender"&gt;
-    &lt;file&gt;<tt class="customval">/var/log/shibboleth-idp/uApprove.log</tt>&lt;/file&gt;
+    &lt;file&gt;<tt class="customval">/opt/uApprove/logs/uApprove.log</tt>&lt;/file&gt;
     ...
   &lt;/appender&gt;
   ...
@@ -676,7 +678,6 @@ parameter is transmitted to the IdP plugin.
 &lt;/form&gt;
 ...
 </pre>
-</div>
 
 <h4> Standalone mode </h4>
 <div>
@@ -768,7 +769,8 @@ Please send bugs, improvements and feature requests to
 <p>
   This section explains, how to update uApprove 2.1.x to 2.1.4.
   The prerequisite is that uApprove is already deployed sucessfully.
-  
+</p>
+ 
   <fieldset class="warn"><legend>Warning</legend>
     If you are updating from IdP 2.0, make sure that the <i>PreviousSession LoginHandler</i> in
     <i>handler.xml</i> is restored to the original value.<br />
@@ -787,10 +789,13 @@ Please send bugs, improvements and feature requests to
   <ol>
     <li>Download the <a href="http://www.switch.ch/aai/uApprove/#versions">latest</a> release</li>
     <li> Unzip uApprove:
-      <pre class="console">unzip uApprove-2.1.4-bin.zip -d /opt/uApprove
+      <pre class="console">unzip uApprove-2.1.4-bin.zip -d /opt/
+rm /opt/uApprove
+ln -s /opt/uApprove-2.1.4 /opt/uApprove
 cd /opt/uApprove
+mkdir conf logs war
 unzip viewer-2.1.4-bin.zip
-unzip idp-plugin-2.1.4/</pre>
+unzip idp-plugin-2.1.4-bin.zip</pre>
     </li>
     <li> Copy the plugin libaries into the IdP install directory and <strong>remove the old ones
     (common-2.1.x.jar and idp-plugin-2.1.x.jar) as well as the dependencies
@@ -804,7 +809,11 @@ unzip idp-plugin-2.1.4/</pre>
     </li>
     <li>
       Reuse the old <code>web.xml</code>:
-      <pre class="console">cp viewer-2.1.x/webapp/WEB-INF/web.xml viewer-2.1.4/webapp/WEB-INF/</pre>    
+      <pre class="console">cp /opt/uApprove-2.1.x/viewer-2.1.x/webapp/WEB-INF/web.xml /opt/uApprove/viewer-2.1.4/webapp/WEB-INF/</pre>    
+    </li>
+    <li>
+      Copy your working configuration:
+      <pre class="console">cp /opt/uApprove-2.1.x/conf/* /opt/uApprove/conf/</pre>
     </li>
     <li>
       If you have customized JSPs, stylesheets or logo copy them over as well.
@@ -822,7 +831,6 @@ ant deploy -Duapprove.deployment=<tt class="customval">/opt/uApprove/war</tt>
 /opt/tomcat/bin/startup.sh</pre>
     </li>
   </ol>
-<p>
 
 </body>
 </html>

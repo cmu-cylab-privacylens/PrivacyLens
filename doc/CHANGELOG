@@ -2,6 +2,7 @@
 ================================
  - Support SP Names and Descriptions
  - Cleanup documentation
+   (Ack to Vladimir Mencl)
  - Cleanup dependencies
  - Webapp install script
  - Fixed LoginContext bug

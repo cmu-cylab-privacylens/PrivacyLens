@@ -226,7 +226,9 @@ public class Plugin implements Filter {
 	}
     // Ugly hack
     UserLogInfo userInfoWithRightToU = storage.getDataSimple(context.getPrincipal());
-    userInfo.setTermsVersion(userInfoWithRightToU.getTermsVersion());
+    if (userInfo!= null && userInfoWithRightToU != null) {
+  	  userInfo.setTermsVersion(userInfoWithRightToU.getTermsVersion());
+    }
 	return userInfo;
   }
   

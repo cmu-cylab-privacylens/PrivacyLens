@@ -11,8 +11,8 @@
 	<context-param>
 		<param-name>Config</param-name>
 		<param-value>
-        /path/to/uApprove-config/viewer.properties;
-        /path/to/uApprove-config/common.properties;
+        /opt/uApprove/conf/viewer.properties;
+        /opt/uApprove/conf/common.properties;
 		</param-value>
 	</context-param>
 

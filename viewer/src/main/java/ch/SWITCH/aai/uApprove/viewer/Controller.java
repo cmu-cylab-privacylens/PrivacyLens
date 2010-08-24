@@ -92,8 +92,7 @@ public class Controller extends HttpServlet {
   public void init() throws ServletException {
     try {
       // config init
-      ConfigurationManager.initialize(getServletContext().getInitParameter(
-          INITPAR_CONFIG));
+      ConfigurationManager.initialize(getServletContext().getInitParameter(INITPAR_CONFIG));
 
       // initializing logback
       LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
@@ -246,7 +245,9 @@ public class Controller extends HttpServlet {
       UserLogInfo userInfo = storage.getData(principal);
       // Ugly hack
       UserLogInfo userInfoWithRightToU = storage.getDataSimple(principal);
-      userInfo.setTermsVersion(userInfoWithRightToU.getTermsVersion());
+      if (userInfo!= null && userInfoWithRightToU != null) {
+    	  userInfo.setTermsVersion(userInfoWithRightToU.getTermsVersion());
+      }
       
       LOG.debug("userInfo is {}", userInfo);
 
@@ -262,6 +263,8 @@ public class Controller extends HttpServlet {
         if (isGetParSet(request, GETPAR_TERMS_AGREE)) {
           LOG.info("user agreed terms, store, redirect to attributes, if necessary");
           storeUserBasic(userInfo, principal, TermsOfUseManager.getVersion());
+          
+          userInfo = storage.getData(principal);
           
           // check if user has to be redirected to the attributes approval page
           if (ConfigurationManager.makeBoolean(userInfo.getGlobal())) {
