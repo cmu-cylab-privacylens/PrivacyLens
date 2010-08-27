@@ -22,7 +22,6 @@ import edu.internet2.middleware.shibboleth.idp.util.HttpServletHelper;
 
 public class RequestLoggingFilter implements Filter {
 
-	private static final Logger lcTracer = LoggerFactory.getLogger("LoginContextTracer");
 	private static final Logger logger = LoggerFactory.getLogger(RequestLoggingFilter.class);
 	private ServletContext context;
 	
@@ -35,15 +34,12 @@ public class RequestLoggingFilter implements Filter {
 		
 		String uri = httpRequest.getRequestURI() + "?" +httpRequest.getQueryString();
 		Cookie lcCookie = HttpServletHelper.getCookie(httpRequest, HttpServletHelper.LOGIN_CTX_KEY_NAME);
-		LoginContext loginContextOnRequest = HttpServletHelper.getLoginContext(httpRequest);
-		LoginContext loginContextPersistent = HttpServletHelper.getLoginContext(HttpServletHelper.getStorageService(context), context, httpRequest);
+		LoginContext loginContext = HttpServletHelper.getLoginContext(HttpServletHelper.getStorageService(context), context, httpRequest);
 				
-		lcTracer.info("Request to IdP\n" +
-				"  URI                  : " + uri + "\n" +
-				"  lcCookie              : " + cookieToString(lcCookie) + "\n" +
-				"  loginContextOnRequest : " + lcToString(loginContextOnRequest) + "\n" +
-				"  loginContextPersistent: " + lcToString(loginContextPersistent) + "\n"
-				
+		logger.debug("Request to IdP\n" +
+				"  URI         : " + uri + "\n" +
+				"  lcCookie    : " + cookieToString(lcCookie) + "\n" +
+				"  loginContext: " + lcToString(loginContext)			
 		);
 
 		// Add here logging statements of your choice by using the log* methods listed below
@@ -106,6 +102,7 @@ public class RequestLoggingFilter implements Filter {
 		logger.trace("===============");
 	}
 	
+	@SuppressWarnings("unchecked")
 	public static void logRequestParameter(HttpServletRequest request) {
 		Map<String, String[]> parameters = request.getParameterMap();
 		logger.trace("=== Request parameters ===");

@@ -10,7 +10,7 @@
     <!-- build the war file and deploy it -->
     <target name="deploy">
         <war destfile="${uapprove.deployment}/${war.name}.war" webxml="webapp/WEB-INF/web.xml">
-            <fileset dir="webapp" />
+            <fileset dir="webapp" excludes="**/web.xml" />
         </war>
      </target>
 </project>

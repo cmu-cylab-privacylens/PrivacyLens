@@ -18,6 +18,7 @@ import ch.SWITCH.aai.uApprove.components.Attribute;
 import edu.internet2.middleware.shibboleth.common.attribute.AttributeRequestException;
 import edu.internet2.middleware.shibboleth.common.attribute.BaseAttribute;
 import edu.internet2.middleware.shibboleth.common.attribute.provider.SAML2AttributeAuthority;
+import edu.internet2.middleware.shibboleth.common.attribute.provider.ScopedAttributeValue;
 import edu.internet2.middleware.shibboleth.common.profile.provider.BaseSAMLProfileRequestContext;
 import edu.internet2.middleware.shibboleth.common.relyingparty.RelyingPartyConfiguration;
 import edu.internet2.middleware.shibboleth.common.relyingparty.provider.SAMLMDRelyingPartyConfigurationManager;
@@ -42,6 +43,7 @@ public class AttributeDumper {
     LOG.debug("AttributeDumper initialized");
   }
 
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public static Collection<Attribute> getAttributes(String username,
       String spEntityId) throws UApproveException {
     if (dumper == null)
@@ -73,7 +75,7 @@ public class AttributeDumper {
     }
     requestCtx.setMetadataProvider(metadataProvider);
     
-    Map<String, BaseAttribute> attributes;
+	Map<String, BaseAttribute> attributes;
     try {
       attributes = saml2AA.getAttributes(requestCtx);
     } catch (AttributeRequestException e) {
@@ -84,7 +86,7 @@ public class AttributeDumper {
 
     Collection<Attribute> result = new ArrayList<Attribute>();
     LOG.trace("DIRECT OUTPUT FROM RESOLVING");
-    for (BaseAttribute attr : attributes.values()) {
+    for (BaseAttribute<?> attr : attributes.values()) {
      
       Collection<String> attributeValues = new ArrayList<String>();
       for (Iterator<?> iter = attr.getValues().iterator(); iter.hasNext();) {
@@ -92,7 +94,11 @@ public class AttributeDumper {
         //String value =  valueObj instanceof String ? (String)valueObj : "Non-string attribute value";
         if (valueObj != null && !valueObj.toString().trim().equals("")) {
           LOG.trace(valueObj.toString());
-          attributeValues.add(valueObj.toString());
+          if (valueObj instanceof ScopedAttributeValue) {
+          	attributeValues.add(valueObj.toString() + "@" + ((ScopedAttributeValue)valueObj).getScope());
+         } else {
+         	attributeValues.add(valueObj.toString());
+         }
         }
       }
       

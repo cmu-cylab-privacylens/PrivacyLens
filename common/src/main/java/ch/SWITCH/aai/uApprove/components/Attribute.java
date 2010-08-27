@@ -65,6 +65,7 @@ public class Attribute implements Serializable {
 
 
 
+@SuppressWarnings("unchecked")
 public static String serializeAttributes(Collection<Attribute> attributes) {
 
   JSONArray result = new JSONArray();
@@ -100,6 +101,7 @@ public static String serializeAttributes(Collection<Attribute> attributes) {
   return result.toString();
 }
 
+@SuppressWarnings("unchecked")
 public static Collection<Attribute> unserializeAttributes(String serializedAttributes) {
 
   Collection<Attribute> result = new ArrayList<Attribute>();

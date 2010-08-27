@@ -50,6 +50,7 @@ public class RelyingParty implements Serializable {
 		
 	}
 	
+	@SuppressWarnings("unchecked")
 	public String serialize() {
 		JSONObject result = new JSONObject();
 		

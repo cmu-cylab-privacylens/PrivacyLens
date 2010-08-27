@@ -5,7 +5,6 @@ import java.util.Collection;
 import javax.servlet.http.HttpServletRequest;
 
 import ch.SWITCH.aai.uApprove.components.Attribute;
-import ch.SWITCH.aai.uApprove.components.ConfigurationManager;
 import ch.SWITCH.aai.uApprove.components.RelyingParty;
 import ch.SWITCH.aai.uApprove.components.UApproveException;
 import edu.internet2.middleware.shibboleth.common.attribute.provider.SAML2AttributeAuthority;
@@ -20,7 +19,8 @@ public class UApproveContextBuilder {
 	private static final String SAML2_AA_ID = "shibboleth.SAML2AttributeAuthority";
 	private static final String RP_CM_ID = "shibboleth.RelyingPartyConfigurationManager";
 	
-	
+	public final static String RESET_CONSENT_PARAMETER = "_resetconsent";
+
 	UApproveContextBuilder(Dispatcher dispatcher) throws UApproveException {
 		
 		this.dispatcher = dispatcher;
@@ -53,7 +53,8 @@ public class UApproveContextBuilder {
 	      // get the attributes released for user and relying party;
 	      Collection<Attribute> attributesReleased = AttributeDumper.getAttributes(principal, relyingParty.getEntityId());
 		  
-	      boolean resetConsent = request.getParameter(ConfigurationManager.HTTP_PARAM_RESET) != null;
+	      boolean resetConsent =  loginContext.getProperty(RESET_CONSENT_PARAMETER) != null
+	      	&& (Boolean) loginContext.getProperty(RESET_CONSENT_PARAMETER);
 
 	      return new UApproveContext(principal, relyingParty, attributesReleased, resetConsent);
 	}

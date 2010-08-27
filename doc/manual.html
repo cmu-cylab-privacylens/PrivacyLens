@@ -165,7 +165,7 @@ dt {
       <code>/opt/shibboleth-identityprovider</code>
     </dt>
     <dd>
-      The Shibboleth IdP installation directory
+      The Shibboleth IdP installation directory (where install.sh lives)
     </dd>
     <dt>
       <code>/opt/tomcat</code>
@@ -413,9 +413,7 @@ The IdP plugin has to be enabled within Shibboleth IdP web application
 
   &lt;filter-mapping&gt;
     &lt;filter-name&gt;uApprove IdP plugin&lt;/filter-name&gt;
-    &lt;url-pattern&gt;/profile/*&lt;/url-pattern&gt;
-    &lt;dispatcher&gt;REQUEST&lt;/dispatcher&gt;
-    &lt;dispatcher&gt;FORWARD&lt;/dispatcher&gt;
+    &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
   &lt;/filter-mapping&gt;
 </tt>
 &lt;/web-app&gt;
@@ -783,7 +781,12 @@ Please send bugs, improvements and feature requests to
   </fieldset>
  
   <fieldset class="warn"><legend>Warning</legend>
-    If you are updating uApprove, be aware of overwrite the configuration files
+    If you are updating uApprove, be aware of overwrite the configuration files.
+  </fieldset>
+  
+  <fieldset class="warn"><legend>Warning</legend>
+    If you are updating uApprove from 2.1.x to 2.2.x please be aware of the url-pattern
+    change of the IdP plugin filter! See 4.2.
   </fieldset>
     
   <ol>
@@ -800,7 +803,7 @@ unzip idp-plugin-2.1.4-bin.zip</pre>
     <li> Copy the plugin libaries into the IdP install directory and <strong>remove the old ones
     (common-2.1.x.jar and idp-plugin-2.1.x.jar) as well as the dependencies
     (vt-crypt-2.x.jar,
-    bcprov-jdk15-140.jar,
+    bcprov-jdk15-x.jar,
     commons-cli-1.x.jar,
     commons-logging-1.x.jar,
     mysql-connector-java-5.x.jar and

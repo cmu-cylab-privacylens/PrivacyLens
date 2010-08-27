@@ -1,13 +1,8 @@
 package ch.SWITCH.aai.uApprove.storage;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -33,10 +28,6 @@ public class UserLogInfo {
   private String termsVersion; // terms of use version accepted
   private String global; // whether the user wants to have a global approval
   private Map<String, String> mapProviderIds;
-
-  private static Logger LOG = LoggerFactory.getLogger(UserLogInfo.class);
-
-
   
   /**
    * 

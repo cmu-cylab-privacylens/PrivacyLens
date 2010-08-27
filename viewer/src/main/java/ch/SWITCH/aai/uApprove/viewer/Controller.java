@@ -158,7 +158,7 @@ public class Controller extends HttpServlet {
       LOG.debug("returnURL=" + returnURL);
       session.setAttribute(SESKEY_RETURNURL, returnURL);
 
-      // get relying
+      // get relying party
       String relyingPartySerialized = crypt.decrypt(request.getParameter(ConfigurationManager.HTTP_PARAM_RELYINGPARTY));
       LOG.debug("RP decrypted, serialized: {}", relyingPartySerialized);
       RelyingParty relyingParty = new RelyingParty(relyingPartySerialized);
@@ -251,7 +251,8 @@ public class Controller extends HttpServlet {
       
       LOG.debug("userInfo is {}", userInfo);
 
-      Collection<Attribute> attributesReleased = (Collection<Attribute>) session.getAttribute(SESKEY_ATTRIBUTES);
+      @SuppressWarnings("unchecked")
+	  Collection<Attribute> attributesReleased = (Collection<Attribute>) session.getAttribute(SESKEY_ATTRIBUTES);
       LOG.debug("attributesReleased are {}", attributesReleased);
       
       String returnURL = (String) session.getAttribute(SESKEY_RETURNURL);

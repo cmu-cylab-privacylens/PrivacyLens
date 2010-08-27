@@ -547,8 +547,8 @@ public class LogInfoJdbc extends LogInfo {
       theSqlCmds.load(new FileInputStream(theFile));
 
       if (bDebug) {
-        Enumeration theEnums = theSqlCmds.propertyNames();
-        for (Enumeration e =  theSqlCmds.propertyNames(); e.hasMoreElements();) {
+        Enumeration<?> theEnums = theSqlCmds.propertyNames();
+        for (Enumeration<?> e =  theSqlCmds.propertyNames(); e.hasMoreElements();) {
           String theKey = (String) e.nextElement();
         }
       }
@@ -648,7 +648,7 @@ public class LogInfoJdbc extends LogInfo {
 
       // if the map of providers is completely empty, delete the entries in the
       // db
-      Map mapShibProviders = theUserData.getProviderIds();
+      Map<String, String> mapShibProviders = theUserData.getProviderIds();
       if (mapShibProviders.isEmpty() == true)
         clearUserArpEntries(theUserData.getUsername());
 
