@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<schema targetNamespace="urn:mace:shibboleth:2.0:afp:mf:saml-metadata" xmlns="http://www.w3.org/2001/XMLSchema"
+    xmlns:afp="urn:mace:shibboleth:2.0:afp"
+    elementFormDefault="qualified">
+
+    <import namespace="urn:mace:shibboleth:2.0:afp" schemaLocation="classpath:/schema/shibboleth-2.0-afp.xsd" />
+   
+    <complexType name="AttributeInMetadata">
+        <annotation>
+            <documentation>
+                A match function that evaluates to true if an attribute (or specific values) is specified by the requesting entity's
+                AttributeConsumingService SP metadata.
+            </documentation>
+        </annotation>
+        <complexContent>
+            <extension base="afp:MatchFunctorType">
+                <attribute name="requiredOnly" type="boolean">
+                    <annotation>
+                        <documentation>
+                            A boolean flag indicating whether attributes noted as optional should match.
+                        </documentation>
+                    </annotation>
+                </attribute>
+            </extension>
+        </complexContent>
+    </complexType>    
+</schema>
