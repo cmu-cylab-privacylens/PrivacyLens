@@ -24,7 +24,7 @@ import edu.internet2.middleware.shibboleth.common.config.BaseSpringNamespaceHand
 public class SAMLMetadataMatchFunctorNamespaceHandler extends BaseSpringNamespaceHandler {
 
     /** Basic match function namespace. */
-    public static final String NAMESPACE = "urn:mace:shibboleth:2.0:afp:mf:saml-metadata";
+    public static final String NAMESPACE = "http://www.switch.ch/aai/idp/uApprove/mf";
 
     /** {@inheritDoc} */
     public void init() {

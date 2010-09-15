@@ -130,8 +130,7 @@ dt {
 <p>
  uApprove is an application which allows an end user to view the attribute set which will be sent
  to the visiting resource.
-
- </p>
+</p>
 
 <p>
   This guide describes the installation &amp; configuration of a the <a href="http://www.switch.ch/aai/uApprove">uApprove</a>
@@ -181,7 +180,7 @@ dt {
   Before start install and configure uApprove, assure that the following prerequisites are met:
   <dl>
     <dt>
-      Shibboleth Identity Provider <strong>2.1.4 or greater</strong>.
+      Shibboleth Identity Provider <strong>2.2.0 or greater</strong>.
     </dt>
     <dd>
       Shibboleth Identity Provider has to be deployed properly.
@@ -204,9 +203,9 @@ dt {
 
 <div>
   Download and unzip the uApprove package: <pre class="console">
-wget http://www.switch.ch/aai/downloads/uApprove-2.1.4-bin.zip
-unzip uApprove-2.1.4-bin.zip -d /opt/
-ln -s /opt/uApprove-2.1.4 /opt/uApprove
+wget http://www.switch.ch/aai/downloads/uApprove-2.2.0-bin.zip
+unzip uApprove-2.2.0-bin.zip -d /opt/
+ln -s /opt/uApprove-2.2.0 /opt/uApprove
 </pre>
 </div>
 
@@ -221,9 +220,9 @@ ln -s /opt/uApprove-2.1.4 /opt/uApprove
   Copy libraries and configuration: <pre class="console">
 cd /opt/uApprove
 mkdir conf logs war
-unzip idp-plugin-2.1.4-bin.zip
-cp idp-plugin-2.1.4/conf-template/* conf/
-cp idp-plugin-2.1.4/lib/* /opt/shibboleth-identityprovider/lib/
+unzip idp-plugin-2.2.0-bin.zip
+cp idp-plugin-2.2.0/conf-template/* conf/
+cp idp-plugin-2.2.0/lib/* /opt/shibboleth-identityprovider/lib/
 </pre>
 </div>
 
@@ -231,8 +230,8 @@ cp idp-plugin-2.1.4/lib/* /opt/shibboleth-identityprovider/lib/
 <div>
   Copy libraries and configuration: <pre class="console">
 cd /opt/uApprove
-unzip viewer-2.1.4-bin.zip
-cp viewer-2.1.4/conf-template/* conf/
+unzip viewer-2.2.0-bin.zip
+cp viewer-2.2.0/conf-template/* conf/
 </pre>
 </div>
 
@@ -480,7 +479,7 @@ isPassiveSupport=<tt class="customval">false</tt>
 
 <p>
 Adjust the viewer application according you configuration directory in
-<tt>/opt/uApprove/viewer-2.1.4/webapp/WEB-INF/web.xml</tt>:
+<tt>/opt/uApprove/viewer-2.2.0/webapp/WEB-INF/web.xml</tt>:
 </p>
 <pre class="file">
 &lt;web-app&gt;
@@ -499,7 +498,7 @@ Adjust the viewer application according you configuration directory in
 <h5> Deployment of the uApprove webapp</h5>
 <div>
 
-<pre class="console">cd /opt/uApprove/viewer-2.1.4/
+<pre class="console">cd /opt/uApprove/viewer-2.2.0/
 ant deploy -Duapprove.deployment=<tt class="customval">/opt/uApprove/war</tt>
 </pre>
 </div>
@@ -765,7 +764,7 @@ Please send bugs, improvements and feature requests to
 
 <h2> <a name="update"> </a> 9. Update </h2>
 <p>
-  This section explains, how to update uApprove 2.1.x to 2.1.4.
+  This section explains, how to update uApprove 2.1.x to 2.2.0.
   The prerequisite is that uApprove is already deployed sucessfully.
 </p>
  
@@ -792,13 +791,13 @@ Please send bugs, improvements and feature requests to
   <ol>
     <li>Download the <a href="http://www.switch.ch/aai/uApprove/#versions">latest</a> release</li>
     <li> Unzip uApprove:
-      <pre class="console">unzip uApprove-2.1.4-bin.zip -d /opt/
+      <pre class="console">unzip uApprove-2.2.0-bin.zip -d /opt/
 rm /opt/uApprove
-ln -s /opt/uApprove-2.1.4 /opt/uApprove
+ln -s /opt/uApprove-2.2.0 /opt/uApprove
 cd /opt/uApprove
 mkdir conf logs war
-unzip viewer-2.1.4-bin.zip
-unzip idp-plugin-2.1.4-bin.zip</pre>
+unzip viewer-2.2.0-bin.zip
+unzip idp-plugin-2.2.0-bin.zip</pre>
     </li>
     <li> Copy the plugin libaries into the IdP install directory and <strong>remove the old ones
     (common-2.1.x.jar and idp-plugin-2.1.x.jar) as well as the dependencies
@@ -808,11 +807,11 @@ unzip idp-plugin-2.1.4-bin.zip</pre>
     commons-logging-1.x.jar,
     mysql-connector-java-5.x.jar and
     json-simple-1.x.jar) if they have changed:</strong>
-    <pre class="console">cp /opt/uApprove/idp-plugin-2.1.4/lib/* /opt/shibboleth-identityprovider/lib/</pre>
+    <pre class="console">cp /opt/uApprove/idp-plugin-2.2.0/lib/* /opt/shibboleth-identityprovider/lib/</pre>
     </li>
     <li>
       Reuse the old <code>web.xml</code>:
-      <pre class="console">cp /opt/uApprove-2.1.x/viewer-2.1.x/webapp/WEB-INF/web.xml /opt/uApprove/viewer-2.1.4/webapp/WEB-INF/</pre>    
+      <pre class="console">cp /opt/uApprove-2.1.x/viewer-2.1.x/webapp/WEB-INF/web.xml /opt/uApprove/viewer-2.2.0/webapp/WEB-INF/</pre>    
     </li>
     <li>
       Copy your working configuration:
@@ -829,11 +828,49 @@ sh install.sh</pre>
     <li>
       Redeploy the uApprove webapp:
       <pre class="console">/opt/tomcat/bin/shutdown.sh
-cd /opt/uApprove/viewer-2.1.4/
+cd /opt/uApprove/viewer-2.2.0/
 ant deploy -Duapprove.deployment=<tt class="customval">/opt/uApprove/war</tt>
 /opt/tomcat/bin/startup.sh</pre>
     </li>
   </ol>
+
+<!--  Attribute In Attribute Requester's Metadata -->
+<h1><a name="mf"></a>Attribute In Attribute Requester's Metadata Plugin</h1>
+
+<h2>Installation</h2>
+
+The plugin is installed by default with uApprove (<code>idpplugin.jar</code>).
+
+<h2>Configuration Attribute In Attribute Requester's Metadata Matching Rule</h2>
+
+This matching rule checks to see if the attribute to be released is
+in the attribute requester's metadata. <br/>
+This allows the release of those attribute listed as requested by
+the SP and consented to via the uApprove user interface.
+
+<fieldset class="note"><legend>Note</legend>
+Please be aware of the following:
+<ul>
+    <li>This filter requires the attribute requester's metadata be loaded and available.</li>
+    <li>The requester's metadata must have an <code>&lt;SPSSODescriptor</code> role since that is the role that contains the listed attributes.</li>
+    <li>This matching function only operates as a value rule and only really makes sense as a permit value rule.</li>
+</ul>
+</fieldset>
+
+<h3>Define the Rule</h3>
+This rule is defined by the element <code>&lt;PermitValueRule xsi:type="http://www.switch.ch/aai/idp/uApprove/mf:AttributeInMetadata"&gt</code> with the following attribute:
+<dl>
+<dt>requiredOnly</dt>
+<dd>
+Boolean flag indicated that only those attributes which are marked as required should be released,
+those marked as optional will not be. Default value: true
+</dd>
+</dl>
+
+Example Policy Requirement Rule using the AttributeInMetadata Match Function:
+<pre class="file">
+&lt;PermitValueRule xsi:type="http://www.switch.ch/aai/idp/uApprove/mf:AttributeInMetadata" requiredOnly="false"&gt;
+</pre> 
 
 </body>
 </html>
