@@ -38,11 +38,11 @@ BaseFilterBeanDefinitionParser {
     protected void doParse(Element configElement, BeanDefinitionBuilder builder) {
         super.doParse(configElement, builder);
 
-        boolean requiredOnly = true;
-        if (configElement.hasAttributeNS(null, "requiredOnly")) {
-            requiredOnly = XMLHelper.getAttributeValueAsBoolean(configElement.getAttributeNodeNS(null, "requiredOnly"));
+        boolean onlyIfRequired = true;
+        if (configElement.hasAttributeNS(null, "onlyIfRequired")) {
+        	onlyIfRequired = XMLHelper.getAttributeValueAsBoolean(configElement.getAttributeNodeNS(null, "onlyIfRequired"));
         }
-        builder.addPropertyValue("requiredOnly", requiredOnly);
+        builder.addPropertyValue("onlyIfRequired", onlyIfRequired);
     }
     
     /** {@inheritDoc} */

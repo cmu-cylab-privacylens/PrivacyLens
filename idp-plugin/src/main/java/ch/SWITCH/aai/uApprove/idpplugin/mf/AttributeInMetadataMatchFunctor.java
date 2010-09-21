@@ -55,24 +55,24 @@ public class AttributeInMetadataMatchFunctor extends AbstractMatchFunctor {
     private final Logger log = LoggerFactory.getLogger(AttributeInMetadataMatchFunctor.class);
 
     /** Whether optionally requested attributes should be matched. */
-    private boolean requiredOnly;
+    private boolean onlyIfRequired;
     
     /**
      * Gets whether optionally requested attributes should be matched.
      * 
      * @return Whether optionally requested attributes should be matched.
      */
-    public boolean isRequiredOnly() {
-        return requiredOnly;
+    public boolean isOnlyIfRequired() {
+        return onlyIfRequired;
     }
 
     /**
      * Sets whether optionally requested attributes should be matched.
      * 
-     * @param requiredOnly Whether optionally requested attributes should be matched.
+     * @param onlyIfRequired Whether optionally requested attributes should be matched.
      */
-    public void setRequiredOnly(boolean requiredOnly) {
-        this.requiredOnly = requiredOnly;
+    public void setOnlyIfRequired(boolean onlyIfRequired) {
+        this.onlyIfRequired = onlyIfRequired;
     }
 
     /** {@inheritDoc} */
@@ -137,7 +137,7 @@ public class AttributeInMetadataMatchFunctor extends AbstractMatchFunctor {
                 AttributeEncoder encoder = (AttributeEncoder) i.next();
                 RequestedAttribute requested = findInMetadata(service, encoder);
                 if (requested != null) {
-                    if (requiredOnly && !requested.isRequired()) {
+                    if (onlyIfRequired && !requested.isRequired()) {
                         log.debug("attribute {} requested in metadata, but was not required", attributeId);
                         return false;
                     }

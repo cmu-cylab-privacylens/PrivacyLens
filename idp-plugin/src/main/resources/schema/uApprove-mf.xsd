@@ -15,7 +15,7 @@
         </annotation>
         <complexContent>
             <extension base="afp:MatchFunctorType">
-                <attribute name="requiredOnly" type="boolean">
+                <attribute name="onlyIfRequired" type="boolean">
                     <annotation>
                         <documentation>
                             A boolean flag indicating whether attributes noted as optional should match.

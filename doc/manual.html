@@ -839,14 +839,16 @@ ant deploy -Duapprove.deployment=<tt class="customval">/opt/uApprove/war</tt>
 
 <h2>Installation</h2>
 
-The plugin is installed by default with uApprove (<code>idpplugin.jar</code>).
+The plugin is installed by default with uApprove (<code>idp-plugin-2.2.0.jar</code>).
 
-<h2>Configuration Attribute In Attribute Requester's Metadata Matching Rule</h2>
+<h2>Configuration Attribute In Requester's Metadata Matching Rule</h2>
 
-This matching rule checks to see if the attribute to be released is
-in the attribute requester's metadata. <br/>
-This allows the release of those attribute listed as requested by
-the SP and consented to via the uApprove user interface.
+This rule allows the release of an attribute if, via its metadata, the SP indicates a need/desire for the attribute.
+The attributes are indicated by means of <code>%lt;AttributeConsumingService%gt;</code> elements within the 
+<code>&lt;SPSSODescriptor&gt;</code> element.  See SAML metadata for more information.
+
+While this rule does have some minor support for dealing with attribute values within the metadata it is limited 
+and should be considered experimental.
 
 <fieldset class="note"><legend>Note</legend>
 Please be aware of the following:
@@ -857,20 +859,29 @@ Please be aware of the following:
 </ul>
 </fieldset>
 
+<h3>Define the Namespace</h3>
+In you attribute filter policy file you'll need to add the namespace declaration for this plugin.  To do this:
+<ol>
+    <li>Add the attribute <code>xmlns:ua="http://www.switch.ch/aai/idp/uApprove/mf"</code> before the <code>xmlns:xsi</code> 
+        attribute on the root <code>&lt;AttributeFilterPolicy&gt;</code> element.</li>
+    <li>Add the following at the end of the whitespace delimited list of values for the <code>xsi:schemaLocation</code> 
+        attribute: <code>http://www.switch.ch/aai/idp/uApprove/mf classpath:/schema/uApprove-mf.xsd</code></li>
+</ol>
+
 <h3>Define the Rule</h3>
-This rule is defined by the element <code>&lt;PermitValueRule xsi:type="http://www.switch.ch/aai/idp/uApprove/mf:AttributeInMetadata"&gt</code> with the following attribute:
+This rule is defined by the element <code>&lt;PermitValueRule xsi:type="ua:AttributeInMetadata"&gt</code> with the following attribute:
 <dl>
-<dt>requiredOnly</dt>
+<dt><strong>onlyIfRequired</strong></dt>
 <dd>
 Boolean flag indicated that only those attributes which are marked as required should be released,
 those marked as optional will not be. Default value: true
 </dd>
 </dl>
 
-Example Policy Requirement Rule using the AttributeInMetadata Match Function:
+Example Permit Value Rule using the AttributeInMetadata Match Function:
 <pre class="file">
-&lt;PermitValueRule xsi:type="http://www.switch.ch/aai/idp/uApprove/mf:AttributeInMetadata" requiredOnly="false"&gt;
-</pre> 
+&lt;PermitValueRule xsi:type="ua:AttributeInMetadata" onlyIfRequired="false"&gt;
+</pre>
 
 </body>
 </html>
