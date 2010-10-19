@@ -124,6 +124,9 @@ dt {
   <li>
     <a href="#update"> Update </a>
   </li>
+  <li>
+    <a href="#mf"> Attribute In Attribute Requester's Metadata Plugin </a>
+  </li>
 </ol>
 <h2> <a name="introduction"> </a> 1. Introduction </h2>
 
@@ -844,7 +847,7 @@ The plugin is installed by default with uApprove (<code>idp-plugin-2.2.0.jar</co
 <h2>Configuration Attribute In Requester's Metadata Matching Rule</h2>
 
 This rule allows the release of an attribute if, via its metadata, the SP indicates a need/desire for the attribute.
-The attributes are indicated by means of <code>%lt;AttributeConsumingService%gt;</code> elements within the 
+The attributes are indicated by means of <code>&lt;AttributeConsumingService&gt;</code> elements within the 
 <code>&lt;SPSSODescriptor&gt;</code> element.  See SAML metadata for more information.
 
 While this rule does have some minor support for dealing with attribute values within the metadata it is limited 
@@ -863,13 +866,14 @@ Please be aware of the following:
 In you attribute filter policy file you'll need to add the namespace declaration for this plugin.  To do this:
 <ol>
     <li>Add the attribute <code>xmlns:ua="http://www.switch.ch/aai/idp/uApprove/mf"</code> before the <code>xmlns:xsi</code> 
-        attribute on the root <code>&lt;AttributeFilterPolicy&gt;</code> element.</li>
+        attribute on the root <code>&lt;AttributeFilterPolicyGroup&gt;</code> element.</li>
     <li>Add the following at the end of the whitespace delimited list of values for the <code>xsi:schemaLocation</code> 
         attribute: <code>http://www.switch.ch/aai/idp/uApprove/mf classpath:/schema/uApprove-mf.xsd</code></li>
 </ol>
 
 <h3>Define the Rule</h3>
-This rule is defined by the element <code>&lt;PermitValueRule xsi:type="ua:AttributeInMetadata"&gt</code> with the following attribute:
+This rule is defined by the element <code>&lt;PermitValueRule xsi:type="ua:AttributeInMetadata"&gt</code>
+with the following optional attribute:
 <dl>
 <dt><strong>onlyIfRequired</strong></dt>
 <dd>

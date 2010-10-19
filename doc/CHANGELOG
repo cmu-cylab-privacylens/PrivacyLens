@@ -1,7 +1,10 @@
-2.2         xx.xx.2010        HR
+2.2         24.09.2010        HR
 ================================
  - ScopedAttribute values are displayed
    as value@scope
+ - Adaption of new redirect mechanism of IdP 2.2.0
+ - Attribute In Attribute Requester's Metadata Plugin
+   Contributed by Scott Cantor
 
 2.1.4       12.08.2010        HR
 ================================
