@@ -8,6 +8,8 @@ import java.util.Map;
 
 import java.util.Locale;
 
+import org.opensaml.common.xml.SAMLConstants;
+import org.opensaml.saml2.metadata.EntityDescriptor;
 import org.opensaml.saml2.metadata.provider.MetadataProvider;
 import org.opensaml.saml2.metadata.provider.MetadataProviderException;
 import org.slf4j.Logger;
@@ -24,113 +26,114 @@ import edu.internet2.middleware.shibboleth.common.relyingparty.RelyingPartyConfi
 import edu.internet2.middleware.shibboleth.common.relyingparty.provider.SAMLMDRelyingPartyConfigurationManager;
 
 public class AttributeDumper {
-  private static Logger LOG = LoggerFactory.getLogger(AttributeDumper.class);
+	private static Logger LOG = LoggerFactory.getLogger(AttributeDumper.class);
 
-  private static AttributeDumper dumper;
+	private static AttributeDumper dumper;
 
-  private static SAML2AttributeAuthority saml2AA;
-  private static SAMLMDRelyingPartyConfigurationManager relyingPartyConfigurationManager;
+	private static SAML2AttributeAuthority saml2AA;
+	private static SAMLMDRelyingPartyConfigurationManager relyingPartyConfigurationManager;
 
-  // create the dumper instance and initialize it
-  private AttributeDumper(SAML2AttributeAuthority saml2AA, SAMLMDRelyingPartyConfigurationManager relyingPartyConfigurationManager){
-    AttributeDumper.saml2AA = saml2AA;
-    AttributeDumper.relyingPartyConfigurationManager = relyingPartyConfigurationManager;
-  }
+	// create the dumper instance and initialize it
+	private AttributeDumper(SAML2AttributeAuthority saml2AA, SAMLMDRelyingPartyConfigurationManager relyingPartyConfigurationManager) {
+		AttributeDumper.saml2AA = saml2AA;
+		AttributeDumper.relyingPartyConfigurationManager = relyingPartyConfigurationManager;
+	}
 
-  public synchronized static void initialize(SAML2AttributeAuthority saml2AA, SAMLMDRelyingPartyConfigurationManager relyingPartyConfigurationManager) {
-    if (dumper == null) 
-        dumper = new AttributeDumper(saml2AA, relyingPartyConfigurationManager);
-    LOG.debug("AttributeDumper initialized");
-  }
+	public static void initialize(SAML2AttributeAuthority saml2AA,SAMLMDRelyingPartyConfigurationManager relyingPartyConfigurationManager) {
+		if (dumper == null) {
+			dumper = new AttributeDumper(saml2AA, relyingPartyConfigurationManager);
+		}
+		LOG.debug("AttributeDumper initialized");
+	}
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
-  public static Collection<Attribute> getAttributes(String username,
-      String spEntityId) throws UApproveException {
-    if (dumper == null)
-      throw new UApproveException("AttributeDumper is not initializied");
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static Collection<Attribute> getAttributes(String username, String spEntityId) throws UApproveException {
+		if (dumper == null) {
+			throw new UApproveException("AttributeDumper is not initializied");
+		}
 
-    // build request context
-    BaseSAMLProfileRequestContext requestCtx = new BaseSAMLProfileRequestContext();
-    RelyingPartyConfiguration relyingPartyConfiguration= relyingPartyConfigurationManager.getRelyingPartyConfiguration(spEntityId);
-    MetadataProvider metadataProvider = relyingPartyConfigurationManager.getMetadataProvider();
-    
-    String idpEntityId = relyingPartyConfiguration.getProviderId();
-    
-    LOG.debug("metadataProvider={}",metadataProvider);
-    LOG.debug("spEntityId={}",spEntityId);
-    LOG.debug("idpEntityId={}",idpEntityId);
-    
-    requestCtx.setRelyingPartyConfiguration(relyingPartyConfiguration);
-    requestCtx.setInboundMessageIssuer(spEntityId);
-    requestCtx.setOutboundMessageIssuer(idpEntityId);
-    requestCtx.setPrincipalName(username);
-    requestCtx.setLocalEntityId(idpEntityId);
-    requestCtx.setPeerEntityId(spEntityId);
+		// build request context
+		BaseSAMLProfileRequestContext requestCtx = new BaseSAMLProfileRequestContext();
+		RelyingPartyConfiguration relyingPartyConfiguration = relyingPartyConfigurationManager.getRelyingPartyConfiguration(spEntityId);
+		MetadataProvider metadataProvider = relyingPartyConfigurationManager.getMetadataProvider();
 
-    try {
-      requestCtx.setLocalEntityMetadata(metadataProvider.getEntityDescriptor(idpEntityId));
-      requestCtx.setPeerEntityMetadata(metadataProvider.getEntityDescriptor(spEntityId));
-    } catch (MetadataProviderException e) {
-      throw new UApproveException(e);
-    }
-    requestCtx.setMetadataProvider(metadataProvider);
-    
-	Map<String, BaseAttribute> attributes;
-    try {
-      attributes = saml2AA.getAttributes(requestCtx);
-    } catch (AttributeRequestException e) {
-      LOG.error("Unable to retrieve attributes Message: " + e.getMessage());
-      throw new UApproveException("Unable to retrieve attributes Message: "
-          + e.getMessage());
-    }
+		String idpEntityId = relyingPartyConfiguration.getProviderId();
 
-    Collection<Attribute> result = new ArrayList<Attribute>();
-    LOG.trace("DIRECT OUTPUT FROM RESOLVING");
-    for (BaseAttribute<?> attr : attributes.values()) {
-     
-      Collection<String> attributeValues = new ArrayList<String>();
-      for (Iterator<?> iter = attr.getValues().iterator(); iter.hasNext();) {
-        Object valueObj = iter.next();
-        //String value =  valueObj instanceof String ? (String)valueObj : "Non-string attribute value";
-        if (valueObj != null && !valueObj.toString().trim().equals("")) {
-          LOG.trace(valueObj.toString());
-          if (valueObj instanceof ScopedAttributeValue) {
-          	attributeValues.add(valueObj.toString() + "@" + ((ScopedAttributeValue)valueObj).getScope());
-         } else {
-         	attributeValues.add(valueObj.toString());
-         }
-        }
-      }
-      
-      LOG.debug("Attribute '{}' has {} value(s)", attr.getId(), attributeValues.size());
-      
-      if (attributeValues.size() == 0)
-        continue;
-      
-      Map<String, String> attributeNames = new HashMap<String, String>();
-      for (Iterator<Locale> iter = attr.getDisplayNames().keySet().iterator(); iter.hasNext();) {
-        Locale key = iter.next();
-        LOG.trace((String)attr.getDisplayNames().get(key));
-        attributeNames.put(key.getLanguage(), (String) attr.getDisplayNames().get(key));
-      }
-      
-      Map<String, String> attributeDescriptions = new HashMap<String, String>();
-      for (Iterator<Locale> iter = attr.getDisplayDescriptions().keySet().iterator(); iter.hasNext();) {
-        Locale key = iter.next();
-        LOG.trace((String) attr.getDisplayDescriptions().get(key));
-        attributeDescriptions.put(key.getLanguage(), (String) attr.getDisplayDescriptions().get(key));
-      }
-      
-      Attribute a = new Attribute();
-      a.attributeID = attr.getId();
-      a.attributeNames = attributeNames;
-      a.attributeDescriptions = attributeDescriptions;
-      a.attributeValues = attributeValues;
-      
-      result.add(a);
-    }
+		requestCtx.setRelyingPartyConfiguration(relyingPartyConfiguration);
+		requestCtx.setInboundMessageIssuer(spEntityId);
+		requestCtx.setOutboundMessageIssuer(idpEntityId);
+		requestCtx.setPrincipalName(username);
+		requestCtx.setLocalEntityId(idpEntityId);
+		requestCtx.setPeerEntityId(spEntityId);
+		requestCtx.setMetadataProvider(metadataProvider);
+		
+		try {
+			  EntityDescriptor localMetadata = metadataProvider.getEntityDescriptor(idpEntityId);
+		      requestCtx.setLocalEntityMetadata(localMetadata);
+		      requestCtx.setLocalEntityRoleMetadata(localMetadata.getIDPSSODescriptor(SAMLConstants.SAML20P_NS));
 
-    return result;
-  }
+		      EntityDescriptor peerMetadata = metadataProvider.getEntityDescriptor(spEntityId);
+		      requestCtx.setPeerEntityMetadata(peerMetadata);
+		      requestCtx.setPeerEntityRoleMetadata(peerMetadata.getSPSSODescriptor(SAMLConstants.SAML20P_NS));
+		} catch (MetadataProviderException e) {
+			throw new UApproveException(e);
+		}
+
+		Map<String, BaseAttribute> attributes;
+		try {
+			attributes = saml2AA.getAttributes(requestCtx);
+		} catch (AttributeRequestException e) {
+			LOG.error("Unable to retrieve attributes Message", e);
+			throw new UApproveException("Unable to retrieve attributes Message", e);
+		}
+
+		Collection<Attribute> result = new ArrayList<Attribute>();
+		LOG.trace("DIRECT OUTPUT FROM RESOLVING");
+		for (BaseAttribute<?> attr : attributes.values()) {
+
+			Collection<String> attributeValues = new ArrayList<String>();
+			for (Iterator<?> iter = attr.getValues().iterator(); iter.hasNext();) {
+				Object valueObj = iter.next();
+				if (valueObj != null && !valueObj.toString().trim().equals("")) {
+					LOG.trace(valueObj.toString());
+					if (valueObj instanceof ScopedAttributeValue) {
+						attributeValues.add(valueObj.toString() + "@" + ((ScopedAttributeValue) valueObj).getScope());
+					} else {
+						attributeValues.add(valueObj.toString());
+					}
+				}
+			}
+
+			LOG.debug("Attribute '{}' has {} value(s)", attr.getId(),attributeValues.size());
+
+			if (attributeValues.size() == 0) {
+				continue;
+			}
+
+			Map<String, String> attributeNames = new HashMap<String, String>();
+			for (Iterator<Locale> iter = attr.getDisplayNames().keySet().iterator(); iter.hasNext();) {
+				Locale key = iter.next();
+				LOG.trace(attr.getDisplayNames().get(key));
+				attributeNames.put(key.getLanguage(), attr.getDisplayNames().get(key));
+			}
+
+			Map<String, String> attributeDescriptions = new HashMap<String, String>();
+			for (Iterator<Locale> iter = attr.getDisplayDescriptions().keySet().iterator(); iter.hasNext();) {
+				Locale key = iter.next();
+				LOG.trace(attr.getDisplayDescriptions().get(key));
+				attributeDescriptions.put(key.getLanguage(), attr.getDisplayDescriptions().get(key));
+			}
+
+			Attribute a = new Attribute();
+			a.attributeID = attr.getId();
+			a.attributeNames = attributeNames;
+			a.attributeDescriptions = attributeDescriptions;
+			a.attributeValues = attributeValues;
+
+			result.add(a);
+		}
+
+		return result;
+	}
 
 }
