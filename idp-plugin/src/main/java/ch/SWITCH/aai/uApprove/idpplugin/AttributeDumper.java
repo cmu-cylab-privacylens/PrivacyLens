@@ -10,7 +10,6 @@ import java.util.Locale;
 
 import org.opensaml.common.xml.SAMLConstants;
 import org.opensaml.saml2.core.NameID;
-import org.opensaml.saml2.core.impl.NameIDImpl;
 import org.opensaml.saml2.metadata.EntityDescriptor;
 import org.opensaml.saml2.metadata.provider.MetadataProvider;
 import org.opensaml.saml2.metadata.provider.MetadataProviderException;

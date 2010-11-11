@@ -18,12 +18,15 @@
 				<enabled>true</enabled>
 			</snapshots>
 		</repository>
-
 		<repository>
 			<id>vt-middleware.repo</id>
 			<url>http://vt-middleware.googlecode.com/svn/maven2</url>
 		</repository>
-
+        <repository>
+	        <id>bonecp-repo</id>
+	        <name>BoneCP Repository</name>
+	        <url>http://jolbox.com/bonecp/downloads/maven</url>
+        </repository>
 	</repositories>
 
 	<dependencies>
@@ -35,7 +38,11 @@
 			<!-- <exclusions> <exclusion> <groupId>commons-logging</groupId> <artifactId>commons-logging</artifactId> 
 				</exclusion> </exclusions> -->
 		</dependency>
-
+        <dependency>
+            <groupId>com.jolbox</groupId>
+            <artifactId>bonecp</artifactId>
+            <version>0.7.0</version>
+        </dependency>
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>

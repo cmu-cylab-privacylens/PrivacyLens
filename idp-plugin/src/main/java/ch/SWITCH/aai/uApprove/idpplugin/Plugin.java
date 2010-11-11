@@ -61,6 +61,7 @@ public class Plugin implements Filter {
       if (terms != null && !terms.equals("")) {
         try {
           TermsOfUseManager.initalize(terms);
+          getStorage();
         } catch (Exception e) {
           throw new UApproveException(e);
         }
