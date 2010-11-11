@@ -9,11 +9,16 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.opensaml.saml2.metadata.ServiceDescription;
 import org.opensaml.saml2.metadata.ServiceName;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RelyingParty implements Serializable {
 
 	private static final long serialVersionUID = 4022033377848736850L;
 
+	private final Logger logger = LoggerFactory.getLogger(RelyingParty.class);
+
+	
 	private String entityId;
 	private Map<String, String> rpNames;
 	private Map<String, String> rpDescriptions;
@@ -68,6 +73,7 @@ public class RelyingParty implements Serializable {
 		result.put("rpNames", rpNamesSerialized);
 		result.put("rpDescriptions", rpDescriptionsSerialized);
 		
+		logger.trace("Serialized RelyingParty: {}", result);
 		return result.toString();
 	}
 

@@ -67,9 +67,12 @@ public class Dispatcher {
 	 	logger.debug("Builded returnURL is {}", returnURL);
 	 	
 	 	String postForm = buildPostForm(context.resetConsent(), returnURL, context.getPrincipal(), context.getRelyingParty(), context.getAttributesReleased());
-	    response.setContentType("text/html");
+	    logger.trace("Builded postForm is {}", postForm);
+	    
+	 	response.setContentType("text/html");
 	    
 	    if (context.resetConsent()) {
+	    	logger.trace("Setting reset consent flag to the login context");
 	    	getLoginContext(request).setProperty(UApproveContextBuilder.RESET_CONSENT_PARAMETER, false);
 	    }
 	    
@@ -98,7 +101,8 @@ public class Dispatcher {
 			throw new UApproveException(e);
 		}
 		action += resetConsent ? "&" + ConfigurationManager.HTTP_PARAM_RESET + "=true" : "";
-
+		logger.trace("Builded action URL for posting the data: {}", action);
+		
 		String postForm = "<html>"
 				+ "   <body onload=\"document.forms[0].submit()\">"
 				+ "     <noscript>"

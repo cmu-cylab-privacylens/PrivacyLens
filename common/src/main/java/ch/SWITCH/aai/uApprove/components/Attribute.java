@@ -11,11 +11,15 @@ import java.util.StringTokenizer;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
 public class Attribute implements Serializable {
 
+  private final static Logger logger = LoggerFactory.getLogger(Attribute.class);
+  
   private static final long serialVersionUID = -7555070485991286595L;
   private static final String ATTR_DELIMITER = ":";
 
@@ -98,6 +102,7 @@ public static String serializeAttributes(Collection<Attribute> attributes) {
     result.add(attribute);
   }
   // return JSONObject.escape(result.toString());
+  logger.trace("Serialized RelyingParty: {}", result);
   return result.toString();
 }
 

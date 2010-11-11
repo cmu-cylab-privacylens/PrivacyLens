@@ -114,7 +114,7 @@ public class Controller extends HttpServlet {
           throw new UApproveException(e);
         }
         useTerms = true;
-        LOG.debug("Terms of use loaded, version=" + TermsOfUseManager.getVersion());
+        LOG.debug("Terms of use loaded, version {}", TermsOfUseManager.getVersion());
       } else {
         LOG.debug("No Terms of use are used");
       }
@@ -126,8 +126,7 @@ public class Controller extends HttpServlet {
         LOG.trace("{}", key);
       }
       // storage init
-      String storeType = ConfigurationManager
-          .getParam(ConfigurationManager.COMMON_STORE_TYPE);
+      String storeType = ConfigurationManager.getParam(ConfigurationManager.COMMON_STORE_TYPE);
       LogInfo.initialize(storeType);
       LOG.debug("LogInfo (storage) initialized with mode=" + storeType);
 
@@ -197,10 +196,10 @@ public class Controller extends HttpServlet {
         if (userInfo == null) {
           if (useTerms) {
             LOG.debug("first visit of the user, redirect to terms page");
-            getServletContext().getRequestDispatcher(PAGE_TERMS).forward(request,response);
+            getServletContext().getRequestDispatcher(PAGE_TERMS).forward(request, response);
           } else {
             LOG.debug("first visit of the user, redirect to attributes page");
-            getServletContext().getRequestDispatcher(PAGE_ATTRIBUTES).forward(request,response);
+            getServletContext().getRequestDispatcher(PAGE_ATTRIBUTES).forward(request, response);
           }
           return;
         }
@@ -208,12 +207,12 @@ public class Controller extends HttpServlet {
         // has user agreed to the current terms version
         if (useTerms && !userInfo.getTermsVersion().equals(TermsOfUseManager.getVersion())) {
           LOG.info("current terms version are not agreed by user, redirect to the terms page");
-          getServletContext().getRequestDispatcher(PAGE_TERMS).forward(request,response);
+          getServletContext().getRequestDispatcher(PAGE_TERMS).forward(request, response);
           return;
         }
         
         LOG.info("Terms are not used or current terms version are agreed by user, redirect to the attributes page");
-        getServletContext().getRequestDispatcher(PAGE_ATTRIBUTES).forward(request,response);
+        getServletContext().getRequestDispatcher(PAGE_ATTRIBUTES).forward(request, response);
         return;
       }
     } catch (UApproveException e) {

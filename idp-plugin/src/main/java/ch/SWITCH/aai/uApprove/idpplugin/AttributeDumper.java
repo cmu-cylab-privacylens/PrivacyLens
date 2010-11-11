@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Locale;
 
 import org.opensaml.common.xml.SAMLConstants;
+import org.opensaml.saml2.core.NameID;
+import org.opensaml.saml2.core.impl.NameIDImpl;
 import org.opensaml.saml2.metadata.EntityDescriptor;
 import org.opensaml.saml2.metadata.provider.MetadataProvider;
 import org.opensaml.saml2.metadata.provider.MetadataProviderException;
@@ -96,8 +98,12 @@ public class AttributeDumper {
 				Object valueObj = iter.next();
 				if (valueObj != null && !valueObj.toString().trim().equals("")) {
 					LOG.trace(valueObj.toString());
-					if (valueObj instanceof ScopedAttributeValue) {
-						attributeValues.add(valueObj.toString() + "@" + ((ScopedAttributeValue) valueObj).getScope());
+					if (valueObj instanceof NameID) {        	  
+						NameID nameIdObject = (NameID)valueObj;
+						attributeValues.add(nameIdObject.getValue());         
+					} else if (valueObj instanceof ScopedAttributeValue) {
+						ScopedAttributeValue scopedAttr = (ScopedAttributeValue)valueObj;
+						attributeValues.add(scopedAttr.getValue() + "@" + scopedAttr.getScope());
 					} else {
 						attributeValues.add(valueObj.toString());
 					}

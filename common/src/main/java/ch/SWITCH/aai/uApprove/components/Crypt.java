@@ -24,7 +24,9 @@ public class Crypt {
 	public String encrypt(String plaintext) throws UApproveException {
 		try {
 			alg.initEncrypt();
-			return alg.encrypt(plaintext.getBytes(), new Base64Converter());
+			String cipher = alg.encrypt(plaintext.getBytes(), new Base64Converter());
+			logger.trace("Encrypt '{}' to '{}'", plaintext, cipher);
+			return cipher;
 		} catch (CryptException e) {
 			logger.error("Encryption failed", e);
 		    throw new UApproveException(e);
@@ -34,7 +36,9 @@ public class Crypt {
 	public String decrypt(String cipher) throws UApproveException {
 		try {
 			alg.initDecrypt();
-			return new String(alg.decrypt(cipher, new Base64Converter()));
+			String plaintext = new String(alg.decrypt(cipher, new Base64Converter()));
+			logger.trace("Decrypt '{}' to '{}'", cipher, plaintext);
+			return plaintext;
 		} catch (CryptException e) {
 			logger.error("Decryption failed", e);
 		    throw new UApproveException(e);
