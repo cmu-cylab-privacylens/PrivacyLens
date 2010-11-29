@@ -126,11 +126,15 @@ public class JdbcConnectionFactory {
                         //and try to validate it
                         validated = conn.isValid(VALIDATE_TIMEOUT);
                         if (!validated) {
+                        	LOG.debug("Connection is invalid, dropping it");
                             closeConnection(conn);
                         }
+                    } catch (AbstractMethodError e) {
+                    	LOG.debug("Underlying database don't support Connection.isValid()");
+                    	break;
                     } catch (SQLException ignored) {
-                        LOG.debug("Unable to test connection, dropping it", ignored);
-                        closeConnection(conn);
+                    	LOG.warn("Caught Connection.isValid() exception, but will continue");
+                    	break;                    	
                     }
                 } while (!validated);
                 return conn;

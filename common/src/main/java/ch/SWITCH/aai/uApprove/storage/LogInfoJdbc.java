@@ -801,6 +801,7 @@ public class LogInfoJdbc extends LogInfo {
             theSQL = theSQL.replaceFirst("\\?", sAttributes);
             theSQL = theSQL.replaceFirst("\\?", (new Integer(idxApproval)).toString());
 
+            LOG.trace("Execute SQL: {}", theSQL);
             stmt.executeUpdate(theSQL);
             conn.commit();
         } catch (SQLException ex) {
@@ -828,6 +829,7 @@ public class LogInfoJdbc extends LogInfo {
             int idxUser = getUserIndex(theUsername);
 
             int idxProvider = getProviderIndex(theProvider);
+            
             if (idxProvider < 0) {
                 addProvider(theProvider);
                 idxProvider = getProviderIndex(theProvider);
@@ -841,6 +843,7 @@ public class LogInfoJdbc extends LogInfo {
             theSQL = theSQL.replaceFirst("\\?", "NULL");
 
             stmt = conn.createStatement();
+            LOG.trace("Execute SQL: {}", theSQL);
             stmt.executeUpdate(theSQL);
         } catch (SQLException ex) {
             LOG.error("SQLException", ex);
