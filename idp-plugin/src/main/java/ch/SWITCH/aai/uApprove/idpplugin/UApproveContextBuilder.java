@@ -51,12 +51,16 @@ public class UApproveContextBuilder {
 	      RelyingParty relyingParty = metadataAccess.getRelyingPartyInfo(loginContext.getRelyingPartyId());
 
 	      // get the attributes released for user and relying party;
-	      Collection<Attribute> attributesReleased = AttributeDumper.getAttributes(principal, relyingParty.getEntityId());
-		  
+	      final Collection<Attribute> attributesReleased = AttributeDumper.getAttributes(principal, relyingParty.getEntityId());
+	      
+	      // remove blacklisted attributes and sort it
+	      Collection<Attribute> attributes = AttributeList.removeBlacklistedAttributes(attributesReleased);
+	      attributes = AttributeList.sortAttributes(attributes);
+	      
 	      boolean resetConsent =  loginContext.getProperty(RESET_CONSENT_PARAMETER) != null
 	      	&& (Boolean) loginContext.getProperty(RESET_CONSENT_PARAMETER);
 
-	      return new UApproveContext(principal, relyingParty, attributesReleased, resetConsent);
+	      return new UApproveContext(principal, relyingParty, attributes, resetConsent);
 	}
 	
 	public class UApproveContext {

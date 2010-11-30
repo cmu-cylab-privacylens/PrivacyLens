@@ -30,9 +30,8 @@ public class Attribute implements Serializable {
 
 
 // This function extracts all the attribute names, is the the storage format.
-// Keep this function for backwards compatibility and all use it for all
-// interaction
-// with the storage: store, load, comparing
+// Keep this function for backwards compatibility and use it for all
+// interaction with the storage: store, load, comparing
 // Format: ":attr1:attr2:attr3:" || ""
   public static String serializeAttributeIDs(Collection<Attribute> attributes) {
 	  String result = "";

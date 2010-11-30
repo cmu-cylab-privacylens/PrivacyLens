@@ -154,6 +154,7 @@ public class Plugin implements Filter {
  		return;
     }
 
+    
     logger.trace("check if the user wants to reset the settings");
     if (context.resetConsent()) {
 	  logger.info("user wants to reset the settings");
@@ -181,17 +182,13 @@ public class Plugin implements Filter {
 	}
 
     Collection<Attribute> attributes = context.getAttributesReleased();
-    attributes = AttributeList.removeBlacklistedAttributes(attributes);
-
     if (attributes.isEmpty()) {
   	  logger.info("No attributes will be released");
       logAccess(context, globalConsentGiven, false);
       dispatcher.dispatchToIdP(request, response, filterChain);
     }
     
-    attributes = AttributeList.sortAttributes(attributes);
-    String attributeIDs = Attribute.serializeAttributeIDs(attributes);
-    
+    String attributeIDs = Attribute.serializeAttributeIDs(attributes);    
     logger.trace("check if the there are any attributes, which not are already approved for release to relying party");
     if (!Attribute.compareAttributeRelease(userInfo.getAttributesForProviderId(context.getRelyingParty().getEntityId()), attributeIDs)) {
       logger.info("attributes, which not are already approved for release to relying party {}", context.getRelyingParty().getEntityId());

@@ -40,15 +40,18 @@ public class AttributeList {
           whiteList.add(line);
       }
     } catch (Exception e) {
-      LOG.warn("Unable to load AttributeList file={}. AttributeList is initialized empty", filename);
-      LOG.warn("Reason: ",e);
+      LOG.warn("Unable to load AttributeList file={}. AttributeList is initialized empty, Reason: {}", filename, e.getMessage());
     }
   }
 
 
   public static synchronized void initialize(String filename) {
-    if (attributeList == null)
-      attributeList = new AttributeList(filename);
+    if (attributeList == null) {
+    	attributeList = new AttributeList(filename);
+    }
+    
+    LOG.debug("Attribute blacklist: {}", blackList);
+    LOG.debug("Attribute sorted whitelist: {}", whiteList);
   }
 
   public static List <String> getWhiteList() {
@@ -60,8 +63,8 @@ public class AttributeList {
   }
   
   public static List<Attribute> sortAttributes(Collection<Attribute> unsortedAttributes) {
+	  LOG.trace("Unsorted attributes: {}", getAttributeIds(unsortedAttributes));
 	  List<Attribute> attributes = new ArrayList<Attribute>();
-	  
 	  for (String id : getWhiteList()) {
 		  for (Attribute attribute: unsortedAttributes) {
 			  if (attribute.attributeID.equals(id)) {
@@ -76,16 +79,27 @@ public class AttributeList {
 		  }
 	  }
 	  
+	  LOG.trace("Sorted attributes: {}", getAttributeIds(attributes));
 	  return attributes;
   }
   
+  public static Collection<String> getAttributeIds(Collection<Attribute> attributes) {
+	  Collection<String> ids = new ArrayList<String>();
+	  for (Attribute attribute: attributes) {
+		  ids.add(attribute.attributeID);
+	  }
+	  return ids;
+  }
+  
   public static Collection<Attribute> removeBlacklistedAttributes(Collection<Attribute> allAttributes) {
+	  LOG.trace("Attributes before blacklist removal: {}", getAttributeIds(allAttributes));
 	  Collection<Attribute> attributes = new HashSet<Attribute>();
 	  for (Attribute attribute: allAttributes) {
 		  if (!isBlackListed(attribute.attributeID)) {
 			  attributes.add(attribute);
 		  }
 	  }
+	  LOG.trace("Attributes after blacklist removal: {}", getAttributeIds(attributes));
 	  return attributes;
   }
 }
