@@ -43,7 +43,7 @@ public class UApproveContextBuilder {
 	public UApproveContext buildContext(HttpServletRequest request) throws UApproveException {
 		  LoginContext loginContext = dispatcher.getLoginContext(request);
 
-		  String principal = loginContext.getPrincipalName();
+		  String principal = dispatcher.getPrincipalName(request);
 		  
 		  if (principal == null || "".equals(principal))
 			  throw new UApproveException("No principal found, assure authentication");

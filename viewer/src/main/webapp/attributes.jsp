@@ -2,7 +2,6 @@
 	import="
   ch.SWITCH.aai.uApprove.viewer.Controller,
   ch.SWITCH.aai.uApprove.components.Attribute,
-  ch.SWITCH.aai.uApprove.viewer.AttributeList,
   ch.SWITCH.aai.uApprove.components.RelyingParty,
   java.util.Map,
   java.util.List,
@@ -56,19 +55,21 @@
  */
 %>
 
-
-<%
+<%!
   public String safeTip(String input) {
     return input.replace("\"","&quot;").replace("'","&#39;").replace("\n"," ");
   }
+%>
 
+
+<%
   RelyingParty relyingParty = (RelyingParty) session.getAttribute(Controller.SESKEY_RELYINGPARTY);
   boolean globalConsentPosibble = (Boolean) session.getAttribute(Controller.SESKEY_GLOBAL_CONSENT_POSSIBLE);
-  Collection<Attribute> attributes = (Collection<Attribute>) session.getAttribute(Controller.SESKEY_ATTRIBUTES);
+  List<Attribute> attributes = (List<Attribute>) session.getAttribute(Controller.SESKEY_ATTRIBUTES);
   Locale locale = (Locale) session.getAttribute(Controller.SESKEY_LOCALE);
 
-	ResourceBundle rb = ResourceBundle.getBundle( Controller.RB_ATTRIBUTES, locale);
-	out.println( "<p><strong>" + (String) rb.getString("title") + "</strong></p>" );
+  ResourceBundle rb = ResourceBundle.getBundle( Controller.RB_ATTRIBUTES, locale);
+  out.println( "<p><strong>" + (String) rb.getString("title") + "</strong></p>" );
 
 
 
@@ -101,49 +102,25 @@
 
 			<%
 	// iterate over the attributes
-int i = 0;
-List<String> drawed = new ArrayList<String>();
-for (String attrId : AttributeList.getWhiteList()) {
-  for (Attribute attribute: attributes) {
-    if (attribute.attributeID.equals(attrId)) {
+	int i = 0;
+    for (Attribute attribute: attributes) {
       Collection<String> values = attribute.attributeValues;  
-      if ( values == null || values.isEmpty() )
+      if ( values == null || values.isEmpty() ) {
         continue;
+      }
       String valuesHtml = "";
-      for (String value : values) 
+      for (String value : values) {
         valuesHtml += value + "<br />";
-    %>
+      }
+      %>
 			<tr bgcolor='<%= i++ % 2 == 0 ? "white" : "#eeeeee" %>'>
 				<td class="attr-name"
 					onmouseover="Tip('<%=safeTip(Controller.resolveDisplayDesc(attribute, locale))%>')"
 					onmouseout="UnTip()"><%=Controller.resolveDisplayName(attribute, locale)%></td>
 				<td class="attr-value"><%= valuesHtml.replace("$","<br />") %></td>
 			</tr>
-			<%
-      drawed.add(attribute.attributeID);
+	  <%
     }
-  }
-}
-for (Attribute attribute: attributes) {
-  if (AttributeList.isBlackListed(attribute.attributeID) || drawed.contains(attribute.attributeID))
-    continue;
- 
-  Collection<String> values = attribute.attributeValues;  
-  if ( values == null || values.isEmpty() )
-    continue;
-  String valuesHtml = "";
-  for (String value : values) 
-    valuesHtml += value + "<br />";
-%>
-			<tr bgcolor='<%= i++ % 2 == 0 ? "white" : "#eeeeee" %>'>
-				<td class="attr-name"
-					onmouseover="Tip('<%=safeTip(Controller.resolveDisplayDesc(attribute, locale))%>')"
-					onmouseout="UnTip()"><%=Controller.resolveDisplayName(attribute, locale)%></td>
-				<td class="attr-value"><%= valuesHtml.replace("$","<br />") %></td>
-			</tr>
-			<%
-}
-
 %>
 		</table>
 		</td>

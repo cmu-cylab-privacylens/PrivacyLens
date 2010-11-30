@@ -49,7 +49,7 @@ public class LogInfoJdbc extends LogInfo {
                 conn.close();
             }
         } catch (SQLException e) {
-            LOG.warn("Caught SQLException while closing Connection", e);
+            LOG.warn("Caught SQLException while closing Connection: {}", e.getMessage());
         } finally {
             connection.remove();
         }
@@ -600,19 +600,17 @@ public class LogInfoJdbc extends LogInfo {
         try {
             conn = connectionFactory.createConnection();
             connection.set(conn);
-            conn.setAutoCommit(false);
             idx = getUserIndex(username);
 
             if (idx <= 0) {
+            	closeConnection();
                 return null;
             }
 
             theUserInfo = getUserArpInfoByName(username);
-            conn.commit();
         } catch (SQLException ex) {
             LOG.error("Exception ", ex);
             theUserInfo = null;
-            tryRollbackTransaction();
         } finally {
             closeConnection();
         }
@@ -671,6 +669,7 @@ public class LogInfoJdbc extends LogInfo {
             if (theUserData.getGlobal().equalsIgnoreCase("yes")
                     && bUserHasGlobalArp == false) {
                 setUserArpGlobal(theUserData, idxUser, true);
+                conn.commit();
                 return;
             }
 
@@ -845,6 +844,7 @@ public class LogInfoJdbc extends LogInfo {
             stmt = conn.createStatement();
             LOG.trace("Execute SQL: {}", theSQL);
             stmt.executeUpdate(theSQL);
+            conn.commit();
         } catch (SQLException ex) {
             LOG.error("SQLException", ex);
             tryRollbackTransaction();

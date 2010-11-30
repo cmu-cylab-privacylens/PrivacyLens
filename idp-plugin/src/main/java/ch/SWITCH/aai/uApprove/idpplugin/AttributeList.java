@@ -1,6 +1,8 @@
-package ch.SWITCH.aai.uApprove.viewer;
+package ch.SWITCH.aai.uApprove.idpplugin;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import java.io.FileReader;
@@ -9,6 +11,7 @@ import java.io.BufferedReader;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
+import ch.SWITCH.aai.uApprove.components.Attribute;
 import ch.SWITCH.aai.uApprove.components.UApproveException;
 
 public class AttributeList {
@@ -54,5 +57,35 @@ public class AttributeList {
   
   public static boolean isBlackListed(String attr) {
     return blackList.contains(attr);
+  }
+  
+  public static List<Attribute> sortAttributes(Collection<Attribute> unsortedAttributes) {
+	  List<Attribute> attributes = new ArrayList<Attribute>();
+	  
+	  for (String id : getWhiteList()) {
+		  for (Attribute attribute: unsortedAttributes) {
+			  if (attribute.attributeID.equals(id)) {
+				  attributes.add(attribute);		  
+			  }
+		  }
+	  }
+	  
+	  for (Attribute attribute: unsortedAttributes) {
+		  if (!getWhiteList().contains(attribute.attributeID)) {
+			  attributes.add(attribute);		  
+		  }
+	  }
+	  
+	  return attributes;
+  }
+  
+  public static Collection<Attribute> removeBlacklistedAttributes(Collection<Attribute> allAttributes) {
+	  Collection<Attribute> attributes = new HashSet<Attribute>();
+	  for (Attribute attribute: allAttributes) {
+		  if (!isBlackListed(attribute.attributeID)) {
+			  attributes.add(attribute);
+		  }
+	  }
+	  return attributes;
   }
 }

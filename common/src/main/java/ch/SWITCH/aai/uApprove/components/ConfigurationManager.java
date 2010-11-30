@@ -33,7 +33,7 @@ public class ConfigurationManager {
   public static final String PLUGIN_ISPASSIVE_SUPPORT = "isPassiveSupport";
   
   public static final String VIEWER_USELOCALE = "useLocale";
-  public static final String VIEWER_ATTRIBUTELIST = "attributeList";
+  public static final String PLUGIN_ATTRIBUTELIST = "attributeList";
   public static final String VIEWER_GLOBAL_CONSENT = "globalConsentPossible";
   public static final String VIEWER_LOGBACK_CONFIG = "loggingConfig";
   
@@ -100,8 +100,7 @@ public class ConfigurationManager {
       if (value == null || value.trim().equals(""))
         return "/uApprove/Controller";
     }
-    
-    //LOG.debug("{} => {}", new Object[] {configKey, value});
+
     return (value != null) ? value.trim() : null;
   }
   

@@ -20,6 +20,7 @@ import ch.SWITCH.aai.uApprove.components.RelyingParty;
 import ch.SWITCH.aai.uApprove.components.UApproveException;
 import ch.SWITCH.aai.uApprove.idpplugin.UApproveContextBuilder.UApproveContext;
 import edu.internet2.middleware.shibboleth.idp.authn.LoginContext;
+import edu.internet2.middleware.shibboleth.idp.session.Session;
 import edu.internet2.middleware.shibboleth.idp.util.HttpServletHelper;
 
 public class Dispatcher {
@@ -46,13 +47,23 @@ public class Dispatcher {
 		return loginContext;
 	}
 	
+	public String getPrincipalName(HttpServletRequest request) {
+		//return getLoginContext(request).getPrincipalName();
+		return getSession(request).getPrincipalName();
+	}
+	
+	public Session getSession(HttpServletRequest request) {
+		Session session = HttpServletHelper.getUserSession(request);
+		logger.trace("Retrieve Session {} ", session);
+		return session;
+	}
+	
 	public void dispatchToIdP(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws UApproveException {
 		try {
 			logger.debug("Dispatch to IdP");
 			filterChain.doFilter(request, response);
 		} catch (Exception e) {
-			logger.error("Error dispatching to IdP", e);
-			throw new UApproveException(e);
+			throw new UApproveException("Error dispatching to IdP: " + e.getMessage());
 		}
 	}
 	

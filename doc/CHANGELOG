@@ -1,3 +1,18 @@
+2.2.1         tbd        HR
+================================
+ - Bugfix ScopedAttributes
+ - Bugfix Tip Javascript
+ - Bugfix RoleDescriptor
+   Ack to Chad la Joie
+ - BoneCP Connection Pooling
+   Ack to Adam Lantos
+ - Maven enhancements
+ - JSON.simple 1.1
+ - Transfer back plugin errors to IdP
+ - Refactor of blacklist/sort attribute
+   Do not show attribute release if attributes are empty
+ - Manual updated
+
 2.2         24.09.2010        HR
 ================================
  - ScopedAttribute values are displayed

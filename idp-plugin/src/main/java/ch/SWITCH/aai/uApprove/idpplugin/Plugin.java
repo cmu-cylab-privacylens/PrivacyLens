@@ -1,6 +1,7 @@
 package ch.SWITCH.aai.uApprove.idpplugin;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Date;
 
 import javax.servlet.Filter;
@@ -23,6 +24,7 @@ import ch.SWITCH.aai.uApprove.idpplugin.StateAndActionEvaluator.Action;
 import ch.SWITCH.aai.uApprove.idpplugin.UApproveContextBuilder.UApproveContext;
 import ch.SWITCH.aai.uApprove.storage.LogInfo;
 import ch.SWITCH.aai.uApprove.storage.UserLogInfo;
+import edu.internet2.middleware.shibboleth.common.profile.AbstractErrorHandler;
 
 /**
  * Class Plugin:
@@ -74,6 +76,8 @@ public class Plugin implements Filter {
       // initialize sp blacklist
       SPBlacklistManager.initialize(ConfigurationManager.getParam(ConfigurationManager.PLUGIN_SP_BLACKLIST));
 
+      // initialize attribute list
+      AttributeList.initialize(ConfigurationManager.getParam(ConfigurationManager.PLUGIN_ATTRIBUTELIST));
     
       // check if the filter only should work on a specified authnContextClassRef
       String accr = filterConfig.getInitParameter("authnContextClassRef");
@@ -117,8 +121,8 @@ public class Plugin implements Filter {
 	  		
 	  }
     } catch (UApproveException e) {
-      logger.error("uApprove error", e);
-      throw new ServletException(e);
+      logger.error("uApprove error: {}", e.getMessage());
+      request.setAttribute(AbstractErrorHandler.ERROR_KEY, e);
     }
   }
   
@@ -175,20 +179,21 @@ public class Plugin implements Filter {
       dispatcher.dispatchToIdP(request, response, filterChain);
 	  return;
 	}
-    
-    // not necessary needed
-    logger.trace("check if it is users first visit to relying party");
-    if (!userInfo.containsProviderId(context.getRelyingParty().getEntityId())) {
-      logger.info("users first visit to relying party {}", context.getRelyingParty().getEntityId());
-      dispatcher.dispatchToViewer(request, response, context);
-      return;
-    }
 
-    String attributes = Attribute.serializeAttributeIDs(context.getAttributesReleased());
-    logger.trace("Attributes which will be released {}", attributes);
+    Collection<Attribute> attributes = context.getAttributesReleased();
+    attributes = AttributeList.removeBlacklistedAttributes(attributes);
+
+    if (attributes.isEmpty()) {
+  	  logger.info("No attributes will be released");
+      logAccess(context, globalConsentGiven, false);
+      dispatcher.dispatchToIdP(request, response, filterChain);
+    }
     
-    logger.trace("check if the there are ant attributes, which not are already approved for release to relying party");
-    if (!Attribute.compareAttributeRelease(userInfo.getAttributesForProviderId(context.getRelyingParty().getEntityId()), attributes)) {
+    attributes = AttributeList.sortAttributes(attributes);
+    String attributeIDs = Attribute.serializeAttributeIDs(attributes);
+    
+    logger.trace("check if the there are any attributes, which not are already approved for release to relying party");
+    if (!Attribute.compareAttributeRelease(userInfo.getAttributesForProviderId(context.getRelyingParty().getEntityId()), attributeIDs)) {
       logger.info("attributes, which not are already approved for release to relying party {}", context.getRelyingParty().getEntityId());
       dispatcher.dispatchToViewer(request, response, context);
       return;
@@ -231,8 +236,10 @@ public class Plugin implements Filter {
     	logger.debug("log provider access {}", context);
     	LogInfo storage = getStorage();
     	if (approvalGiven) {
+    		logger.trace("log provider access with approval");
             storage.updateProviderAccess(context.getPrincipal(), context.getRelyingParty().getEntityId(), globalARA);
     	} else {
+    		logger.trace("log provider access without approval");
             storage.updateProviderAccessWithNoARA(context.getPrincipal(), context.getRelyingParty().getEntityId());
     	}
     }

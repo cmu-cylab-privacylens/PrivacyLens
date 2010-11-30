@@ -119,12 +119,6 @@ public class Controller extends HttpServlet {
         LOG.debug("No Terms of use are used");
       }
 
-      // init attributeList
-      AttributeList.initialize(ConfigurationManager.getParam(ConfigurationManager.VIEWER_ATTRIBUTELIST));
-      LOG.trace("Content of attribute list:");
-      for (String key : AttributeList.getWhiteList()) {
-        LOG.trace("{}", key);
-      }
       // storage init
       String storeType = ConfigurationManager.getParam(ConfigurationManager.COMMON_STORE_TYPE);
       LogInfo.initialize(storeType);
@@ -175,7 +169,7 @@ public class Controller extends HttpServlet {
         // get released attributes
         String serializedAttributesReleased = crypt.decrypt(request.getParameter(ConfigurationManager.HTTP_PARAM_ATTRIBUTES));
         LOG.debug("serializedAttributesReleased are {}", serializedAttributesReleased);
-        Collection<Attribute> attributesReleased = Attribute.unserializeAttributes(serializedAttributesReleased);
+        Collection<Attribute> attributesReleased = Attribute.unserializeAttributes(serializedAttributesReleased);        
         session.setAttribute(SESKEY_ATTRIBUTES, attributesReleased);
 
         // get globalConsentPossible

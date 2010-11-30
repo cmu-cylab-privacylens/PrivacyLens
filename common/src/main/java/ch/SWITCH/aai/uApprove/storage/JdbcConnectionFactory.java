@@ -237,14 +237,14 @@ public class JdbcConnectionFactory {
             try {
                 rs.close();
             } catch (SQLException e) {
-                LOG.warn("Exception caught while trying to close resultset", e);
+                LOG.warn("Exception caught while trying to close resultset: {}", e.getMessage());
             }
         }
         if (stmt != null) {
             try {
                 stmt.close();
             } catch (SQLException e) {
-                LOG.warn("Exception caught while trying to close statement", e);
+                LOG.warn("Exception caught while trying to close statement: {}", e.getMessage());
             }
         }
     }
@@ -254,7 +254,7 @@ public class JdbcConnectionFactory {
             try {
                 conn.close();
             } catch (SQLException e) {
-                LOG.warn("Exception caught while trying to close connection", e);
+                LOG.warn("Exception caught while trying to close connection: {}", e.getMessage());
             }
         }
 

@@ -57,23 +57,28 @@ public class RelyingParty implements Serializable {
 	
 	@SuppressWarnings("unchecked")
 	public String serialize() {
+		logger.trace("Attempt to serialize data for {}", entityId);
 		JSONObject result = new JSONObject();
 		
+		logger.trace("Attempt to serialize names {}", rpNames);
 	    JSONObject rpNamesSerialized = new JSONObject();
 	    for (String key : rpNames.keySet()) {
 	    	rpNamesSerialized.put(key, rpNames.get(key));
-	    }
+	    }	    
+		logger.trace("Serialized names {}", rpNamesSerialized);
 	    
+		logger.trace("Attempt to serialize description {}", rpDescriptions);
 	    JSONObject rpDescriptionsSerialized = new JSONObject();
 	    for (String key : rpDescriptions.keySet()) {
 	    	rpDescriptionsSerialized.put(key, rpDescriptions.get(key));
-	    }
+	    }    
+		logger.trace("Serialized descriptions {}", rpDescriptionsSerialized);
 		
 		result.put("entityId", entityId);
 		result.put("rpNames", rpNamesSerialized);
 		result.put("rpDescriptions", rpDescriptionsSerialized);
 		
-		logger.trace("Serialized RelyingParty: {}", result);
+		logger.trace("Serialized data '{}'", result);
 		return result.toString();
 	}
 
