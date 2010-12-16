@@ -9,6 +9,7 @@ import ch.SWITCH.aai.uApprove.components.RelyingParty;
 import ch.SWITCH.aai.uApprove.components.UApproveException;
 import edu.internet2.middleware.shibboleth.common.attribute.provider.SAML2AttributeAuthority;
 import edu.internet2.middleware.shibboleth.common.relyingparty.provider.SAMLMDRelyingPartyConfigurationManager;
+import edu.internet2.middleware.shibboleth.common.session.Session;
 import edu.internet2.middleware.shibboleth.idp.authn.LoginContext;
 
 public class UApproveContextBuilder {
@@ -51,7 +52,8 @@ public class UApproveContextBuilder {
 	      RelyingParty relyingParty = metadataAccess.getRelyingPartyInfo(loginContext.getRelyingPartyId());
 
 	      // get the attributes released for user and relying party;
-	      final Collection<Attribute> attributesReleased = AttributeDumper.getAttributes(principal, relyingParty.getEntityId());
+	      final Session session = dispatcher.getSession(request);
+	      final Collection<Attribute> attributesReleased = AttributeDumper.getAttributes(principal, relyingParty.getEntityId(), session);
 	      
 	      // remove blacklisted attributes and sort it
 	      Collection<Attribute> attributes = AttributeList.removeBlacklistedAttributes(attributesReleased);

@@ -25,6 +25,7 @@ import edu.internet2.middleware.shibboleth.common.attribute.provider.ScopedAttri
 import edu.internet2.middleware.shibboleth.common.profile.provider.BaseSAMLProfileRequestContext;
 import edu.internet2.middleware.shibboleth.common.relyingparty.RelyingPartyConfiguration;
 import edu.internet2.middleware.shibboleth.common.relyingparty.provider.SAMLMDRelyingPartyConfigurationManager;
+import edu.internet2.middleware.shibboleth.common.session.Session;
 
 public class AttributeDumper {
 	private static Logger LOG = LoggerFactory.getLogger(AttributeDumper.class);
@@ -48,7 +49,7 @@ public class AttributeDumper {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static Collection<Attribute> getAttributes(String username, String spEntityId) throws UApproveException {
+	public static Collection<Attribute> getAttributes(String username, String spEntityId, Session session) throws UApproveException {
 		if (dumper == null) {
 			throw new UApproveException("AttributeDumper is not initializied");
 		}
@@ -64,6 +65,7 @@ public class AttributeDumper {
 		requestCtx.setInboundMessageIssuer(spEntityId);
 		requestCtx.setOutboundMessageIssuer(idpEntityId);
 		requestCtx.setPrincipalName(username);
+		requestCtx.setUserSession(session);
 		requestCtx.setLocalEntityId(idpEntityId);
 		requestCtx.setPeerEntityId(spEntityId);
 		requestCtx.setMetadataProvider(metadataProvider);

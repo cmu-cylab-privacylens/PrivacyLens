@@ -11,6 +11,7 @@
  - Transfer back plugin errors to IdP
  - Refactor of blacklist/sort attribute
    Do not show attribute release if attributes are empty
+ - Provide user session in profile request context 
  - Manual updated
 
 2.2         24.09.2010        HR
