@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <style type="text/css" media="screen">
 <!--
 
@@ -183,7 +183,7 @@ dt {
   Before start install and configure uApprove, assure that the following prerequisites are met:
   <dl>
     <dt>
-      Shibboleth Identity Provider <strong>2.2.0 or later</strong>.
+      Shibboleth Identity Provider <strong>2.2</strong>.
     </dt>
     <dd>
       Shibboleth Identity Provider has to be deployed properly.
@@ -206,9 +206,9 @@ dt {
 
 <div>
   Download and unzip the uApprove package: <pre class="console">
-wget http://www.switch.ch/aai/downloads/uApprove-2.2.0-bin.zip
-unzip uApprove-2.2.0-bin.zip -d /opt/
-ln -s /opt/uApprove-2.2.0 /opt/uApprove
+wget http://www.switch.ch/aai/downloads/uApprove-2.2.1-bin.zip
+unzip uApprove-2.2.1-bin.zip -d /opt/
+ln -s /opt/uApprove-2.2.1 /opt/uApprove
 </pre>
 </div>
 
@@ -223,9 +223,9 @@ ln -s /opt/uApprove-2.2.0 /opt/uApprove
   Copy libraries and configuration: <pre class="console">
 cd /opt/uApprove
 mkdir conf logs war
-unzip idp-plugin-2.2.0-bin.zip
-cp idp-plugin-2.2.0/conf-template/* conf/
-cp idp-plugin-2.2.0/lib/* /opt/shibboleth-identityprovider/lib/
+unzip idp-plugin-2.2.1-bin.zip
+cp idp-plugin-2.2.1/conf-template/* conf/
+cp idp-plugin-2.2.1/lib/* /opt/shibboleth-identityprovider/lib/
 </pre>
 </div>
 
@@ -233,8 +233,8 @@ cp idp-plugin-2.2.0/lib/* /opt/shibboleth-identityprovider/lib/
 <div>
   Copy libraries and configuration: <pre class="console">
 cd /opt/uApprove
-unzip viewer-2.2.0-bin.zip
-cp viewer-2.2.0/conf-template/* conf/
+unzip viewer-2.2.1-bin.zip
+cp viewer-2.2.1/conf-template/* conf/
 </pre>
 </div>
 
@@ -342,13 +342,32 @@ databaseConfig=/opt/uApprove/conf/database.properties
 #flatFile=/opt/uApprove/data/uApprove-log.xml
 </pre>
 
+<fieldset class="note"><legend>Note</legend>
+uApprove supports JDBC connection pooling provided by the BoneCP library. <br />
+It is possible to configure container managed connections as well as application managed connection pooling.
+</fieldset>
+
 All database specific configuration is done in <tt>/opt/uApprove/conf/database.properties</tt>:
 <pre class="file">
+sqlCommands=<tt class="customval">/opt/uApprove/conf/mysql.commands</tt>
+
+# first option to use jndi and container managed connections
+# resourceName=jdbc/mypool
+
+# second option to use application managed connection pooling
+# this is provided by the bonecp library http://jolbox.com/
+# these are the required parameters
 driver=com.mysql.jdbc.Driver
-url=jdbc:mysql://localhost:3306/uApprove?autoReconnect=true
+url=jdbc:mysql://localhost:3306/uApprove
 user=uApprove
 password=<tt class="customval">uApprove</tt>
-sqlCommands=<tt class="customval">/opt/uApprove/conf/mysql.commands</tt>
+
+# optional parameters for bonecp
+#
+# connectionTestStatement=SELECT 1
+# minConnectionsPerPartition=1
+# maxConnectionsPerPartition=5
+# partitionCount=2
 </pre>
 
 <fieldset class="note"><legend>Note</legend>If another SQL server than MySQL is used, the values above has to be adjusted.
@@ -466,56 +485,15 @@ uApproveViewer=<tt class="customval">https://idp.example.org/uApprove/Controller
 isPassiveSupport=<tt class="customval">false</tt>
 </pre>
 
-<h3> 4.3 Viewer configuration </h3>
-
-<p>
-  Define a tomcat deployment descriptor for the uApprove webapp in
-  <tt>/opt/tomcat/conf/Catalina/localhost/uApprove.xml</tt>:
-</p>
-<pre class="file">
-&lt;Context docBase="<tt class="customval">/opt/uApprove/war/uApprove.war</tt>"
-         privileged="true"
-         antiResourceLocking="false"
-         antiJARLocking="false"
-         unpackWAR="false" /&gt;                             
-</pre>
-
-<p>
-Adjust the viewer application according you configuration directory in
-<tt>/opt/uApprove/viewer-2.2.0/webapp/WEB-INF/web.xml</tt>:
-</p>
-<pre class="file">
-&lt;web-app&gt;
-  ...
-  &lt;context-param&gt;
-    &lt;param-name&gt;Config&lt;/param-name&gt;
-    &lt;param-value&gt;
-        <tt class="customval">/opt/uApprove/conf/viewer.properties;</tt>
-        <tt class="customval">/opt/uApprove/conf/common.properties;</tt>
-    &lt;/param-value&gt;
-  &lt;/context-param&gt;
-  ...
-&lt;web-app&gt;
-</pre>
-
-<h5> Deployment of the uApprove webapp</h5>
-<div>
-
-<pre class="console">cd /opt/uApprove/viewer-2.2.0/
-ant deploy -Duapprove.deployment=<tt class="customval">/opt/uApprove/war</tt>
-</pre>
-</div>
-
-
-<h4> Attributes and localization </h4>
+<h4> Attributes ordering and blacklisting </h4>
 
 <div>
-The viewer web application shows all attributes which will be released for the current user to the
+uApprove shows all attributes which will be released for the current user to the
 target resource.
 
 <p>
 It is possible to define a order of the attribute listing and if necessary, attributes can also be hidden.
-The configuration of the attribute list is optional done by <tt> /opt/uApprove/conf/viewer.properties</tt>:
+The configuration of the attribute list is optional done by <tt> /opt/uApprove/conf/idp-plugin.properties</tt>:
 </p>
 
 <pre class="file">
@@ -539,6 +517,52 @@ postalAddress
 The attribute name in <code>attribute-list</code> has to comply with the attribute id in
 <code> /opt/shibboleth-idp/conf/attribute-resolver.xml</code>
 </fieldset>
+</div>
+
+<h3> 4.3 Viewer configuration </h3>
+
+<p>
+  Define a tomcat deployment descriptor for the uApprove webapp in
+  <tt>/opt/tomcat/conf/Catalina/localhost/uApprove.xml</tt>:
+</p>
+<pre class="file">
+&lt;Context docBase="<tt class="customval">/opt/uApprove/war/uApprove.war</tt>"
+         privileged="true"
+         antiResourceLocking="false"
+         antiJARLocking="false"
+         unpackWAR="false" /&gt;                             
+</pre>
+
+<p>
+Adjust the viewer application according you configuration directory in
+<tt>/opt/uApprove/viewer-2.2.1/webapp/WEB-INF/web.xml</tt>:
+</p>
+<pre class="file">
+&lt;web-app&gt;
+  ...
+  &lt;context-param&gt;
+    &lt;param-name&gt;Config&lt;/param-name&gt;
+    &lt;param-value&gt;
+        <tt class="customval">/opt/uApprove/conf/viewer.properties;</tt>
+        <tt class="customval">/opt/uApprove/conf/common.properties;</tt>
+    &lt;/param-value&gt;
+  &lt;/context-param&gt;
+  ...
+&lt;web-app&gt;
+</pre>
+
+<h5> Deployment of the uApprove webapp</h5>
+<div>
+
+<pre class="console">cd /opt/uApprove/viewer-2.2.1/
+ant deploy -Duapprove.deployment=<tt class="customval">/opt/uApprove/war</tt>
+</pre>
+</div>
+
+
+<h4> Localization </h4>
+
+<div>
 
 <p>
 The viewer web application ist multi lingual for the static text and dynamic text, like attribute names and descrptions.
@@ -751,7 +775,7 @@ The logging of uApprove viewer application is <a href="#vlog">configured as desc
 <div>
   <ul>
     <li>
-      <a href="http://www.switch.ch/aai/docs/shibboleth/SWITCH/2.1/idp/install-idp-2.1-debian.html"> Shibboleth Identity Provider 2.1 deployment guide</a>
+      <a href="http://www.switch.ch/aai/docs/shibboleth/SWITCH/2.2/idp/install-idp-2.2-debian.html"> Shibboleth Identity Provider 2.2 deployment guide</a>
     </li>
     <li>
       <a href="http://logback.qos.ch/manual/"> LogBack manual</a>
@@ -759,15 +783,31 @@ The logging of uApprove viewer application is <a href="#vlog">configured as desc
   </ul>
 </div>
 
-<h2> <a name="bugsandfeatures"> </a> 8. Bugs &amp; features </h2>
+<h2> <a name="further"> </a> 8. Further information </h2>
+<div>
+  <ul>
+    <li>
+      <a href="https://www.gakunin.jp/docs/fed/uapprove-jp"> uApprove.jp: uApprove
+        including selection of optional attributes to be released (Japanese federation GakuNin)
+      </a>
+    </li>
+  </ul>
+</div>
+
+<h2> <a name="bugsandfeatures"> </a> 9. Bugs &amp; features </h2>
 <p>
-Please send bugs, improvements and feature requests to
-<a href=mailto:aai@switch.ch?Subject=uApprove>aai@switch.ch</a>.
+Please use our <a href="https://forge.switch.ch/redmine/projects/uapprove">issue tracking system</a>
+for bugs, improvements and questions.
 </p>
 
-<h2> <a name="update"> </a> 9. Update </h2>
 <p>
-  This section explains, how to update uApprove 2.1.x to 2.2.0.
+In case of general contact,
+please write us at <a href="mailto:aai@switch.ch?Subject=uApprove">aai@switch.ch</a>.
+</p>
+
+<h2> <a name="update"> </a> 10. Update </h2>
+<p>
+  This section explains, how to update uApprove 2.x to 2.2.1.
   The prerequisite is that uApprove is already deployed sucessfully.
 </p>
  
@@ -787,38 +827,47 @@ Please send bugs, improvements and feature requests to
   </fieldset>
   
   <fieldset class="warn"><legend>Warning</legend>
-    If you are updating uApprove from 2.1.x to 2.2.x please be aware of the url-pattern
+    If you are updating uApprove from 2.x to 2.2.1 please be aware of the url-pattern
     change of the IdP plugin filter! See 4.2.
+  </fieldset>
+  
+  <fieldset class="warn"><legend>Warning</legend>
+    If you are updating uApprove from 2.x to 2.2.1 please be aware , that the attribute-list configuration
+    moved from <tt>viewer.properties</tt> to <tt>idp-plugin.properties</tt>! See 4.2.
+  </fieldset>
+  
+  <fieldset class="warn"><legend>Warning</legend>
+    If you are updating uApprove from 2.x to 2.2.1 please be aware, that the code of <tt>attributes.jsp</tt> has changed,
+    in case you have customized this page.
   </fieldset>
     
   <ol>
     <li>Download the <a href="http://www.switch.ch/aai/uApprove/#versions">latest</a> release</li>
     <li> Unzip uApprove:
-      <pre class="console">unzip uApprove-2.2.0-bin.zip -d /opt/
+      <pre class="console">unzip uApprove-2.2.1-bin.zip -d /opt/
 rm /opt/uApprove
-ln -s /opt/uApprove-2.2.0 /opt/uApprove
+ln -s /opt/uApprove-2.2.1 /opt/uApprove
 cd /opt/uApprove
 mkdir conf logs war
-unzip viewer-2.2.0-bin.zip
-unzip idp-plugin-2.2.0-bin.zip</pre>
+unzip viewer-2.2.1-bin.zip
+unzip idp-plugin-2.2.1-bin.zip</pre>
     </li>
     <li> Copy the plugin libaries into the IdP install directory and <strong>remove the old ones
-    (common-2.1.x.jar and idp-plugin-2.1.x.jar) as well as the dependencies
-    (vt-crypt-2.x.jar,
-    bcprov-jdk15-x.jar,
-    commons-cli-1.x.jar,
-    commons-logging-1.x.jar,
-    mysql-connector-java-5.x.jar and
-    json-simple-1.x.jar) if they have changed:</strong>
-    <pre class="console">cp /opt/uApprove/idp-plugin-2.2.0/lib/* /opt/shibboleth-identityprovider/lib/</pre>
+    (common-*.jar and idp-plugin-*.jar) as well as the dependencies
+    (bonecp-*.jar,
+    guava-*.jar,
+    vt-crypt-*.jar,
+    mysql-connector-*.jar and
+    json-simple-*.jar) if they have changed:</strong>
+    <pre class="console">cp /opt/uApprove/idp-plugin-2.2.1/lib/* /opt/shibboleth-identityprovider/lib/</pre>
     </li>
     <li>
       Reuse the old <code>web.xml</code>:
-      <pre class="console">cp /opt/uApprove-2.1.x/viewer-2.1.x/webapp/WEB-INF/web.xml /opt/uApprove/viewer-2.2.0/webapp/WEB-INF/</pre>    
+      <pre class="console">cp /opt/uApprove-2.x/viewer-2.x/webapp/WEB-INF/web.xml /opt/uApprove/viewer-2.2.1/webapp/WEB-INF/</pre>    
     </li>
     <li>
       Copy your working configuration:
-      <pre class="console">cp /opt/uApprove-2.1.x/conf/* /opt/uApprove/conf/</pre>
+      <pre class="console">cp /opt/uApprove-2.x/conf/* /opt/uApprove/conf/</pre>
     </li>
     <li>
       If you have customized JSPs, stylesheets or logo copy them over as well.
@@ -831,7 +880,7 @@ sh install.sh</pre>
     <li>
       Redeploy the uApprove webapp:
       <pre class="console">/opt/tomcat/bin/shutdown.sh
-cd /opt/uApprove/viewer-2.2.0/
+cd /opt/uApprove/viewer-2.2.1/
 ant deploy -Duapprove.deployment=<tt class="customval">/opt/uApprove/war</tt>
 /opt/tomcat/bin/startup.sh</pre>
     </li>
@@ -841,17 +890,22 @@ ant deploy -Duapprove.deployment=<tt class="customval">/opt/uApprove/war</tt>
 <h1><a name="mf"></a>Attribute In Attribute Requester's Metadata Plugin</h1>
 
 <h2>Installation</h2>
-
-The plugin is installed by default with uApprove (<code>idp-plugin-2.2.0.jar</code>).
+<p>
+The plugin is installed by default with uApprove (<code>idp-plugin-2.2.1.jar</code>).
+</p>
 
 <h2>Configuration Attribute In Requester's Metadata Matching Rule</h2>
 
+<p>
 This rule allows the release of an attribute if, via its metadata, the SP indicates a need/desire for the attribute.
 The attributes are indicated by means of <code>&lt;AttributeConsumingService&gt;</code> elements within the 
 <code>&lt;SPSSODescriptor&gt;</code> element.  See SAML metadata for more information.
+</p>
 
+<p>
 While this rule does have some minor support for dealing with attribute values within the metadata it is limited 
 and should be considered experimental.
+</p>
 
 <fieldset class="note"><legend>Note</legend>
 Please be aware of the following:
@@ -863,7 +917,9 @@ Please be aware of the following:
 </fieldset>
 
 <h3>Define the Namespace</h3>
-In you attribute filter policy file you'll need to add the namespace declaration for this plugin.  To do this:
+<p>
+In you attribute filter policy file you'll need to add the namespace declaration for this plugin. To do this:
+</p>
 <ol>
     <li>Add the attribute <code>xmlns:ua="http://www.switch.ch/aai/idp/uApprove/mf"</code> before the <code>xmlns:xsi</code> 
         attribute on the root <code>&lt;AttributeFilterPolicyGroup&gt;</code> element.</li>
@@ -872,8 +928,10 @@ In you attribute filter policy file you'll need to add the namespace declaration
 </ol>
 
 <h3>Define the Rule</h3>
-This rule is defined by the element <code>&lt;PermitValueRule xsi:type="ua:AttributeInMetadata"&gt</code>
+<p>
+This rule is defined by the element <code>&lt;PermitValueRule xsi:type="ua:AttributeInMetadata"&gt;</code>
 with the following optional attribute:
+</p>
 <dl>
 <dt><strong>onlyIfRequired</strong></dt>
 <dd>
@@ -881,8 +939,9 @@ Boolean flag indicated that only those attributes which are marked as required s
 those marked as optional will not be. Default value: true
 </dd>
 </dl>
-
+<p>
 Example Permit Value Rule using the AttributeInMetadata Match Function:
+</p>
 <pre class="file">
 &lt;PermitValueRule xsi:type="ua:AttributeInMetadata" onlyIfRequired="false"&gt;
 </pre>

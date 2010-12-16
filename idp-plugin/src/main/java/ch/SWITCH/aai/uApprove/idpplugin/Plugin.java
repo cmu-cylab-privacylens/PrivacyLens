@@ -186,6 +186,7 @@ public class Plugin implements Filter {
   	  logger.info("No attributes will be released");
       logAccess(context, globalConsentGiven, false);
       dispatcher.dispatchToIdP(request, response, filterChain);
+      return;
     }
     
     String attributeIDs = Attribute.serializeAttributeIDs(attributes);    

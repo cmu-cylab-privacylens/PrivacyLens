@@ -1,36 +1,20 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<configuration>
-
-<appender name="RootConsoleAppender"
-    class="ch.qos.logback.core.ConsoleAppender">
-    <layout class="ch.qos.logback.classic.PatternLayout">
-      <pattern>%d{yyyy-MM-dd HH:mm:ss},%p,%c,%M %m%n</pattern>
-    </layout>
+<configuration> 
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%date %-5level %logger{35} - %message %n</pattern>
+    </encoder>
   </appender>
-
-  <appender class="ch.qos.logback.core.FileAppender" name="RootFileAppender">
-   <file>/opt/uApprove/logs/uApprove.log</file>
-   <append>true</append>
-   <layout class="ch.qos.logback.classic.PatternLayout">
-     <pattern>%d{yyyy-MM-dd HH:mm:ss},%p,%c,%M %m%n</pattern>
-   </layout>
+  
+  <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+    <file>/opt/uApprove/logs/uApprove.log</file>
+    <encoder>
+      <pattern>%date %-5level %logger{35} - %message %n</pattern>
+    </encoder>
   </appender>
- 
-  <logger name="ch.SWITCH.aai.uApprove.viewer">
-    <level value="INFO" />
-  </logger>
- 
-  <logger name="ch.SWITCH.aai.uApprove.components">
-    <level value="WARN" />
-  </logger>
- 
-  <logger name="ch.SWITCH.aai.uApprove.storage">
-    <level value="WARN" />
-  </logger>
- 
- <root>
-   <level value="INFO"/>
-   <appender-ref ref="RootFileAppender"/>
- </root>
- 
+  
+  <logger name="ch.SWITCH.aai.uApprove" level="info" />
+
+  <root level="warn">
+    <appender-ref ref="FILE" />
+  </root>
 </configuration>
