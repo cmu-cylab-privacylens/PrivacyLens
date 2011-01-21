@@ -555,7 +555,7 @@ Adjust the viewer application according you configuration directory in
 <div>
 
 <pre class="console">cd /opt/uApprove/viewer-2.2.1/
-ant deploy -Duapprove.deployment=<tt class="customval">/opt/uApprove/war</tt>
+ant deploy -DuApprove.deployment=<tt class="customval">/opt/uApprove/war</tt>
 </pre>
 </div>
 
@@ -709,7 +709,7 @@ For the standalone mode, the JSP has to be protected either by container managed
 that the <code>REMOTE_USER</code> is provided.
 
 <p>
-The standalone JSP can be called like <code> https://idp.example.org/uApprove/reset-approvals.jsp?standalone_next_url=http://go.here.org/after/reset</code>. The parameter <code>standalone_next_url</code> has to be set.
+The standalone JSP can be called like <code> https://idp.example.org/uApprove/reset-approvals.jsp?standalone-next-url=http://go.here.org/after/reset</code>. The parameter <code>standalone-next-url</code> has to be set.
 </p>
 </div>
 

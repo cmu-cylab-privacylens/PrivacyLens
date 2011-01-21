@@ -4,12 +4,12 @@
         ant build file for uApprove
     </description>
     <!-- global properties for this build -->
-    <property name="uapprove.deployment" location="/opt/uapprove/webapp"/>
+    <property name="uApprove.deployment" location="/opt/uApprove/war"/>
     <property name="war.name" value="uApprove"/>
 
     <!-- build the war file and deploy it -->
     <target name="deploy">
-        <war destfile="${uapprove.deployment}/${war.name}.war" webxml="webapp/WEB-INF/web.xml">
+        <war destfile="${uApprove.deployment}/${war.name}.war" webxml="webapp/WEB-INF/web.xml">
             <fileset dir="webapp" excludes="**/web.xml" />
         </war>
      </target>
