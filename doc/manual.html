@@ -164,7 +164,7 @@ dt {
       The directory, where the uApprove config is located
     </dd>
     <dt>
-      <code>/opt/shibboleth-identityprovider</code>
+      <code>/opt/shibboleth-identityprovider-2.2.x</code>
     </dt>
     <dd>
       The Shibboleth IdP installation directory (where install.sh lives)
@@ -225,7 +225,7 @@ cd /opt/uApprove
 mkdir conf logs war
 unzip idp-plugin-2.2.1-bin.zip
 cp idp-plugin-2.2.1/conf-template/* conf/
-cp idp-plugin-2.2.1/lib/* /opt/shibboleth-identityprovider/lib/
+cp idp-plugin-2.2.1/lib/* /opt/shibboleth-identityprovider-2.2.x/lib/
 </pre>
 </div>
 
@@ -413,7 +413,7 @@ openssl rand -base64 16 2&gt;/dev/null
 <h4> Shibboleth IdP adjustments </h4>
 <p>
 The IdP plugin has to be enabled within Shibboleth IdP web application
-<tt>/opt/shibboleth-identityprovider/src/main/webapp/WEB-INF/web.xml</tt>:
+<tt>/opt/shibboleth-identityprovider-2.2.x/src/main/webapp/WEB-INF/web.xml</tt>:
 </p>
 
 <pre class="file">
@@ -442,7 +442,7 @@ The IdP plugin has to be enabled within Shibboleth IdP web application
 
 <h5> Redeployment of Shibboleth IdP</h5>
 <pre class="console">
-cd /opt/shibboleth-identityprovider/
+cd /opt/shibboleth-identityprovider-2.2.x/
 sh install.sh
 </pre>
 
@@ -859,7 +859,7 @@ unzip idp-plugin-2.2.1-bin.zip</pre>
     vt-crypt-*.jar,
     mysql-connector-*.jar and
     json-simple-*.jar) if they have changed:</strong>
-    <pre class="console">cp /opt/uApprove/idp-plugin-2.2.1/lib/* /opt/shibboleth-identityprovider/lib/</pre>
+    <pre class="console">cp /opt/uApprove/idp-plugin-2.2.1/lib/* /opt/shibboleth-identityprovider-2.2.x/lib/</pre>
     </li>
     <li>
       Reuse the old <code>web.xml</code>:
@@ -874,14 +874,14 @@ unzip idp-plugin-2.2.1-bin.zip</pre>
     </li>
     <li>
       Redeploy the IdP:
-      <pre class="console">cd /opt/shibboleth-identityprovider/
+      <pre class="console">cd /opt/shibboleth-identityprovider-2.2.x/
 sh install.sh</pre>
     </li>
     <li>
       Redeploy the uApprove webapp:
       <pre class="console">/opt/tomcat/bin/shutdown.sh
 cd /opt/uApprove/viewer-2.2.1/
-ant deploy -Duapprove.deployment=<tt class="customval">/opt/uApprove/war</tt>
+ant deploy -DuApprove.deployment=<tt class="customval">/opt/uApprove/war</tt>
 /opt/tomcat/bin/startup.sh</pre>
     </li>
   </ol>
