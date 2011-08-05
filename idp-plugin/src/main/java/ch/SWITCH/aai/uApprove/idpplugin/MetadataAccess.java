@@ -1,7 +1,9 @@
 package ch.SWITCH.aai.uApprove.idpplugin;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.opensaml.common.xml.SAMLConstants;
 import org.opensaml.saml2.metadata.AttributeConsumingService;
@@ -41,9 +43,9 @@ public class MetadataAccess {
 		AttributeConsumingService attrService = getAttributeConsumingService(entityDescriptor);
 		
 		if (attrService != null)
-			return new RelyingParty(entityId, attrService.getNames(), attrService.getDescriptions());
+			return createRelyingParty(entityId, attrService.getNames(), attrService.getDescriptions());
 		else
-			return new RelyingParty(entityId, new ArrayList<ServiceName>(), new ArrayList<ServiceDescription>());
+			return createRelyingParty(entityId, new ArrayList<ServiceName>(), new ArrayList<ServiceDescription>());
 	}
 	
 	private AttributeConsumingService getAttributeConsumingService(EntityDescriptor entityDescriptor) {
@@ -75,5 +77,18 @@ public class MetadataAccess {
 		}
 		
 		return result;
+	}
+	
+	private RelyingParty createRelyingParty(String entityId, List<ServiceName> names, List<ServiceDescription> descriptions) {
+		Map<String, String> rpNames = new HashMap<String, String>();
+		for (ServiceName element : names) {
+			rpNames.put(element.getName().getLanguage(), element.getName().getLocalString());
+		}
+
+		Map<String, String> rpDescriptions = new HashMap<String, String>();
+		for (ServiceDescription element : descriptions) {
+			rpDescriptions.put(element.getDescription().getLanguage(), element.getDescription().getLocalString());
+		}
+		return new RelyingParty(entityId, rpNames, rpDescriptions);
 	}
 }

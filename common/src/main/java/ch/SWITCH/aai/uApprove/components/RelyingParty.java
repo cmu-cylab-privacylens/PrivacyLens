@@ -2,13 +2,10 @@ package ch.SWITCH.aai.uApprove.components;
 
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.opensaml.saml2.metadata.ServiceDescription;
-import org.opensaml.saml2.metadata.ServiceName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,18 +20,11 @@ public class RelyingParty implements Serializable {
 	private Map<String, String> rpNames;
 	private Map<String, String> rpDescriptions;
 	
-	public RelyingParty(String entityId, List<ServiceName> names, List<ServiceDescription> descriptions) {
+	public RelyingParty(String entityId, Map<String, String> rpNames,
+			Map<String, String> rpDescriptions) {
 		this.entityId = entityId;
-		
-		rpNames = new HashMap<String, String>();
-		for (ServiceName element : names) {
-			rpNames.put(element.getName().getLanguage(), element.getName().getLocalString());
-		}
-
-		rpDescriptions = new HashMap<String, String>();
-		for (ServiceDescription element : descriptions) {
-			rpDescriptions.put(element.getDescription().getLanguage(), element.getDescription().getLocalString());
-		}	
+		this.rpNames = rpNames;
+		this.rpDescriptions = rpDescriptions;
 	}
 	
 	public RelyingParty(String serialized) {
