@@ -3,21 +3,12 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ch.SWITCH.aai.uApprove</groupId>
-	<artifactId>common</artifactId>
+	<artifactId>uApprove-common</artifactId>
 	<packaging>jar</packaging>
-	<version>2.2.1</version>
+	<version>2.2.2</version>
 	<name>uApprove-common</name>
 
 	<repositories>
-		<repository>
-			<id>shibboleth.internet2.edu</id>
-			<name>Internet2</name>
-			<layout>default</layout>
-			<url>http://shibboleth.internet2.edu/downloads/maven2</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
 		<repository>
 			<id>vt-middleware.repo</id>
 			<url>http://vt-middleware.googlecode.com/svn/maven2</url>
@@ -75,16 +66,15 @@
 
 		<!-- Provided dependencies -->
 		<dependency>
-			<groupId>edu.internet2.middleware</groupId>
-			<artifactId>shibboleth-identityprovider</artifactId>
-			<version>2.2.0</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
 			<version>2.4</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.6.1</version>
 			<scope>provided</scope>
 		</dependency>
 

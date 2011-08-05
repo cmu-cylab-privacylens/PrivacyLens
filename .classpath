@@ -1,19 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" output="target/classes" path="src/main/java"/>
-	<classpathentry kind="src" output="target/test-classes" path="src/test/java"/>
-	<classpathentry kind="src" output="common/target/classes" path="common/src/main/java"/>
-	<classpathentry excluding="**" kind="src" output="common/target/classes" path="common/src/main/resources"/>
-	<classpathentry kind="src" output="common/target/test-classes" path="common/src/test/java"/>
-	<classpathentry excluding="**" kind="src" output="common/target/test-classes" path="common/src/test/resources"/>
-	<classpathentry kind="src" output="idp-plugin/target/classes" path="idp-plugin/src/main/java"/>
-	<classpathentry excluding="**" kind="src" output="idp-plugin/target/classes" path="idp-plugin/src/main/resources"/>
-	<classpathentry kind="src" output="idp-plugin/target/test-classes" path="idp-plugin/src/test/java"/>
-	<classpathentry excluding="**" kind="src" output="idp-plugin/target/test-classes" path="idp-plugin/src/test/resources"/>
-	<classpathentry kind="src" output="viewer/target/classes" path="viewer/src/main/java"/>
-	<classpathentry excluding="**" kind="src" output="viewer/target/classes" path="viewer/src/main/resources"/>
-	<classpathentry kind="src" output="viewer/target/test-classes" path="viewer/src/test/java"/>
-	<classpathentry excluding="**" kind="src" output="viewer/target/test-classes" path="viewer/src/test/resources"/>
 	<classpathentry kind="con" path="org.maven.ide.eclipse.MAVEN2_CLASSPATH_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="target/classes"/>
