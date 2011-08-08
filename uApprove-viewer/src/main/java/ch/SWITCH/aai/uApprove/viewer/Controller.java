@@ -390,6 +390,7 @@ public class Controller extends HttpServlet {
 
 	// parse resource (sp) host
 	public static String getResourceHost(String entityId) {
+		assert entityId != null : "entityId is null";
 		int i1 = entityId.indexOf("//");
 		int i2 = entityId.indexOf("/", i1 + 2);
 		LOG.debug("entityId received = \"" + entityId + "\"");

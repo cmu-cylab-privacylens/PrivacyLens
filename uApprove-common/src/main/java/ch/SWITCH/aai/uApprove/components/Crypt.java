@@ -35,6 +35,7 @@ public class Crypt {
 	
 	public String decrypt(String cipher) throws UApproveException {
 		try {
+			assert cipher != null : "Null argument";
 			alg.initDecrypt();
 			String plaintext = new String(alg.decrypt(cipher, new Base64Converter()));
 			logger.trace("Decrypt '{}' to '{}'", cipher, plaintext);

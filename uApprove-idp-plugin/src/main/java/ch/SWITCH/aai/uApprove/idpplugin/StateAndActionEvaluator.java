@@ -9,11 +9,10 @@ import ch.SWITCH.aai.uApprove.components.ConfigurationManager;
 
 import edu.internet2.middleware.shibboleth.idp.authn.AuthenticationException;
 import edu.internet2.middleware.shibboleth.idp.authn.LoginContext;
-import edu.internet2.middleware.shibboleth.idp.session.Session;
 
 public class StateAndActionEvaluator {
 	
-	private static enum State {NO_LOGIN_CONTEXT, AUTH_FAILURE, NOT_SPECIFIC_AUTH_CTX, PRINCIPAL_AUTHENTICATED, PRINCIPAL_NOT_AUTHENTICATED, NO_SESSION};
+	private static enum State {NO_LOGIN_CONTEXT, AUTH_FAILURE, NOT_SPECIFIC_AUTH_CTX, PRINCIPAL_AUTHENTICATED, PRINCIPAL_NOT_AUTHENTICATED};
 	public static enum Action {PASS_TO_IDP, CHECK_ACCESS};
 	private final Logger logger = LoggerFactory.getLogger(StateAndActionEvaluator.class);
 	private final Dispatcher dispatcher;
@@ -43,11 +42,6 @@ public class StateAndActionEvaluator {
 			loginContext.setProperty(UApproveContextBuilder.RESET_CONSENT_PARAMETER, true);
 		}
 		
-		Session session = dispatcher.getSession(request);
-		if (session == null) {
-			return State.NO_SESSION;
-		}
-				
 		if (loginContext.isPrincipalAuthenticated()) {
 			return State.PRINCIPAL_AUTHENTICATED;
 		}

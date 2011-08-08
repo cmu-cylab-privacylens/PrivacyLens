@@ -72,6 +72,7 @@ public class AttributeDumper {
 		
 		try {
 			  EntityDescriptor localMetadata = metadataProvider.getEntityDescriptor(idpEntityId);
+			  assert localMetadata != null : "Assure metadata loaded by your IdP contain the entity descriptor of the IdP itself.";
 		      requestCtx.setLocalEntityMetadata(localMetadata);
 		      requestCtx.setLocalEntityRoleMetadata(localMetadata.getIDPSSODescriptor(SAMLConstants.SAML20P_NS));
 

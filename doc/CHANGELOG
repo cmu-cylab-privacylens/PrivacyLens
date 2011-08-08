@@ -1,3 +1,9 @@
+2.2.2       TBD               HR
+================================
+- Latest versions of dependencies
+- Defend some NPEs / assert and message
+- Improved manual
+
 2.2.1       16.12.2010        HR
 ================================
  - Bugfix ScopedAttributes
