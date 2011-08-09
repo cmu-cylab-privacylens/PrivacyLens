@@ -87,9 +87,8 @@ dt {
 }
 
 -->
-
-
-    </style> <title> Installation and configuration of uApprove for Shibboleth Identity Provider</title>
+    </style>
+    <title> Installation and configuration of uApprove for Shibboleth Identity Provider</title>
 </head>
 <body>
 
@@ -137,10 +136,10 @@ dt {
 
 <p>
   This guide describes the installation &amp; configuration of a the <a href="http://www.switch.ch/aai/uApprove">uApprove</a>
-  for <a href="http://shibboleth.internet2.edu/"> Shibboleth Identity Provider (IdP)</a>.
+  for <a href="http://shibboleth.net/"> Shibboleth Identity Provider (IdP)</a>.
   <br />
   It covers the installation the IdP plugin as well as uApprove viewer application and their configuration with
-  a flat file based or SQL based (Database) storage.
+  a SQL based (Database) storage.
 </p>
 <div>
   The example values used in this guide are:
@@ -164,7 +163,7 @@ dt {
       The directory, where the uApprove config is located
     </dd>
     <dt>
-      <code>/opt/shibboleth-identityprovider-2.2.x</code>
+      <code>/opt/shibboleth-identityprovider-2.3.x</code>
     </dt>
     <dd>
       The Shibboleth IdP installation directory (where install.sh lives)
@@ -183,21 +182,22 @@ dt {
   Before start install and configure uApprove, assure that the following prerequisites are met:
   <dl>
     <dt>
-      Shibboleth Identity Provider <strong>2.2</strong>.
+      Shibboleth Identity Provider <strong>2.3</strong>.
     </dt>
     <dd>
       Shibboleth Identity Provider has to be deployed properly.
-      <br /> That implied that Java and Tomcat are working.
+      <br /> That implies that Java and Tomcat are working.
     </dd>
     <dt>
       SQL Database
     </dt>
     <dd>
-      If a SQL Database as storage is used. A SQL Server has to be prepared.
+      A SQL Server has to be prepared.
       <br /> Shipped uApprove is already configured for MySQL, but another SQL Server can be adapted.
       Brook Schofield documented how to use 
       <a href="http://wiki.unisa.edu.au/display/AAI/uApprove">
       uApprove with an Oracle database</a>.
+      Deployments using MSSQL or HSQLDB (also file mode) are known.
     </dd>
   </dl>
 
@@ -206,9 +206,9 @@ dt {
 
 <div>
   Download and unzip the uApprove package: <pre class="console">
-wget http://www.switch.ch/aai/downloads/uApprove-2.2.1-bin.zip
-unzip uApprove-2.2.1-bin.zip -d /opt/
-ln -s /opt/uApprove-2.2.1 /opt/uApprove
+wget http://www.switch.ch/aai/downloads/uApprove-2.2.2-bin.zip
+unzip uApprove-2.2.2-bin.zip -d /opt/
+ln -s /opt/uApprove-2.2.2 /opt/uApprove
 </pre>
 </div>
 
@@ -223,9 +223,9 @@ ln -s /opt/uApprove-2.2.1 /opt/uApprove
   Copy libraries and configuration: <pre class="console">
 cd /opt/uApprove
 mkdir conf logs war
-unzip idp-plugin-2.2.1-bin.zip
-cp idp-plugin-2.2.1/conf-template/* conf/
-cp idp-plugin-2.2.1/lib/* /opt/shibboleth-identityprovider-2.2.x/lib/
+cp 
+unzip uApprove-idp-plugin-2.2.2-bin.zip
+cp uApprove/idp-plugin-2.2.2/lib/* /opt/shibboleth-identityprovider-2.3.x/lib/
 </pre>
 </div>
 
@@ -233,8 +233,8 @@ cp idp-plugin-2.2.1/lib/* /opt/shibboleth-identityprovider-2.2.x/lib/
 <div>
   Copy libraries and configuration: <pre class="console">
 cd /opt/uApprove
-unzip viewer-2.2.1-bin.zip
-cp viewer-2.2.1/conf-template/* conf/
+unzip viewer-2.2.2-bin.zip
+cp viewer-2.2.2/conf-template/* conf/
 </pre>
 </div>
 
@@ -413,7 +413,7 @@ openssl rand -base64 16 2&gt;/dev/null
 <h4> Shibboleth IdP adjustments </h4>
 <p>
 The IdP plugin has to be enabled within Shibboleth IdP web application
-<tt>/opt/shibboleth-identityprovider-2.2.x/src/main/webapp/WEB-INF/web.xml</tt>:
+<tt>/opt/shibboleth-identityprovider-2.3.x/src/main/webapp/WEB-INF/web.xml</tt>:
 </p>
 
 <pre class="file">
@@ -442,7 +442,7 @@ The IdP plugin has to be enabled within Shibboleth IdP web application
 
 <h5> Redeployment of Shibboleth IdP</h5>
 <pre class="console">
-cd /opt/shibboleth-identityprovider-2.2.x/
+cd /opt/shibboleth-identityprovider-2.3.x/
 sh install.sh
 </pre>
 
@@ -535,7 +535,7 @@ The attribute name in <code>attribute-list</code> has to comply with the attribu
 
 <p>
 Adjust the viewer application according you configuration directory in
-<tt>/opt/uApprove/viewer-2.2.1/webapp/WEB-INF/web.xml</tt>:
+<tt>/opt/uApprove/viewer-2.2.2/webapp/WEB-INF/web.xml</tt>:
 </p>
 <pre class="file">
 &lt;web-app&gt;
@@ -554,7 +554,7 @@ Adjust the viewer application according you configuration directory in
 <h5> Deployment of the uApprove webapp</h5>
 <div>
 
-<pre class="console">cd /opt/uApprove/viewer-2.2.1/
+<pre class="console">cd /opt/uApprove/viewer-2.2.2/
 ant deploy -DuApprove.deployment=<tt class="customval">/opt/uApprove/war</tt>
 </pre>
 </div>
@@ -807,7 +807,7 @@ please write us at <a href="mailto:aai@switch.ch?Subject=uApprove">aai@switch.ch
 
 <h2> <a name="update"> </a> 10. Update </h2>
 <p>
-  This section explains, how to update uApprove 2.x to 2.2.1.
+  This section explains, how to update uApprove 2.x to 2.2.2.
   The prerequisite is that uApprove is already deployed sucessfully.
 </p>
  
@@ -827,30 +827,30 @@ please write us at <a href="mailto:aai@switch.ch?Subject=uApprove">aai@switch.ch
   </fieldset>
   
   <fieldset class="warn"><legend>Warning</legend>
-    If you are updating uApprove from 2.x to 2.2.1 please be aware of the url-pattern
+    If you are updating uApprove from 2.x to 2.2.2 please be aware of the url-pattern
     change of the IdP plugin filter! See 4.2.
   </fieldset>
   
   <fieldset class="warn"><legend>Warning</legend>
-    If you are updating uApprove from 2.x to 2.2.1 please be aware , that the attribute-list configuration
+    If you are updating uApprove from 2.x to 2.2.2 please be aware , that the attribute-list configuration
     moved from <tt>viewer.properties</tt> to <tt>idp-plugin.properties</tt>! See 4.2.
   </fieldset>
   
   <fieldset class="warn"><legend>Warning</legend>
-    If you are updating uApprove from 2.x to 2.2.1 please be aware, that the code of <tt>attributes.jsp</tt> has changed,
+    If you are updating uApprove from 2.x to 2.2.2 please be aware, that the code of <tt>attributes.jsp</tt> has changed,
     in case you have customized this page.
   </fieldset>
     
   <ol>
     <li>Download the <a href="http://www.switch.ch/aai/uApprove/#versions">latest</a> release</li>
     <li> Unzip uApprove:
-      <pre class="console">unzip uApprove-2.2.1-bin.zip -d /opt/
+      <pre class="console">unzip uApprove-2.2.2-bin.zip -d /opt/
 rm /opt/uApprove
-ln -s /opt/uApprove-2.2.1 /opt/uApprove
+ln -s /opt/uApprove-2.2.2 /opt/uApprove
 cd /opt/uApprove
 mkdir conf logs war
-unzip viewer-2.2.1-bin.zip
-unzip idp-plugin-2.2.1-bin.zip</pre>
+unzip viewer-2.2.2-bin.zip
+unzip idp-plugin-2.2.2-bin.zip</pre>
     </li>
     <li> Copy the plugin libaries into the IdP install directory and <strong>remove the old ones
     (common-*.jar and idp-plugin-*.jar) as well as the dependencies
@@ -859,11 +859,11 @@ unzip idp-plugin-2.2.1-bin.zip</pre>
     vt-crypt-*.jar,
     mysql-connector-*.jar and
     json-simple-*.jar) if they have changed:</strong>
-    <pre class="console">cp /opt/uApprove/idp-plugin-2.2.1/lib/* /opt/shibboleth-identityprovider-2.2.x/lib/</pre>
+    <pre class="console">cp /opt/uApprove/idp-plugin-2.2.2/lib/* /opt/shibboleth-identityprovider-2.3.x/lib/</pre>
     </li>
     <li>
       Reuse the old <code>web.xml</code>:
-      <pre class="console">cp /opt/uApprove-2.x/viewer-2.x/webapp/WEB-INF/web.xml /opt/uApprove/viewer-2.2.1/webapp/WEB-INF/</pre>    
+      <pre class="console">cp /opt/uApprove-2.x/viewer-2.x/webapp/WEB-INF/web.xml /opt/uApprove/viewer-2.2.2/webapp/WEB-INF/</pre>    
     </li>
     <li>
       Copy your working configuration:
@@ -874,13 +874,13 @@ unzip idp-plugin-2.2.1-bin.zip</pre>
     </li>
     <li>
       Redeploy the IdP:
-      <pre class="console">cd /opt/shibboleth-identityprovider-2.2.x/
+      <pre class="console">cd /opt/shibboleth-identityprovider-2.3.x/
 sh install.sh</pre>
     </li>
     <li>
       Redeploy the uApprove webapp:
       <pre class="console">/opt/tomcat/bin/shutdown.sh
-cd /opt/uApprove/viewer-2.2.1/
+cd /opt/uApprove/viewer-2.2.2/
 ant deploy -DuApprove.deployment=<tt class="customval">/opt/uApprove/war</tt>
 /opt/tomcat/bin/startup.sh</pre>
     </li>
@@ -891,7 +891,7 @@ ant deploy -DuApprove.deployment=<tt class="customval">/opt/uApprove/war</tt>
 
 <h2>Installation</h2>
 <p>
-The plugin is installed by default with uApprove (<code>idp-plugin-2.2.1.jar</code>).
+The plugin is installed by default with uApprove (<code>idp-plugin-2.2.2.jar</code>).
 </p>
 
 <h2>Configuration Attribute In Requester's Metadata Matching Rule</h2>

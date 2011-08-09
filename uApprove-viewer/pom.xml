@@ -22,14 +22,14 @@
 			<version>1.6.1</version>
 			<scope>compile</scope>
 		</dependency>
-
-        <!-- Runtime dependencies -->
-        <dependency>
+		<dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>0.9.29</version>
-            <scope>runtme</scope>
+            <scope>compile</scope>
         </dependency>
+
+        <!-- Runtime dependencies -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
@@ -70,7 +70,6 @@
 				<configuration>
 					<descriptors>
 						<descriptor>src/main/assembly/bin.xml</descriptor>
-						<descriptor>src/main/assembly/src.xml</descriptor>
 					</descriptors>
 				</configuration>
 				<executions>

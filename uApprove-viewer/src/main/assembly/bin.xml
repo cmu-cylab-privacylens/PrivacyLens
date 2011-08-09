@@ -1,10 +1,10 @@
 <!-- Binary distribution, along with dependency jar files -->
 <assembly>
-    <id>bin</id>
+    <id></id>
     <formats>
-        <format>zip</format>
+        <format>dir</format>
     </formats>
-    
+    <includeBaseDirectory>false</includeBaseDirectory>
     <dependencySets>
         <dependencySet>
             <outputDirectory>/webapp/WEB-INF/lib</outputDirectory>
@@ -24,11 +24,6 @@
         <fileSet>
             <directory>src/main/resources/int</directory>
             <outputDirectory>/webapp/WEB-INF/classes</outputDirectory>
-        </fileSet>
-        <!-- Configuration template -->
-        <fileSet>
-            <directory>src/main/resources/conf</directory>
-            <outputDirectory>/conf-template</outputDirectory>
         </fileSet>
          <!-- Installscript -->
         <fileSet>

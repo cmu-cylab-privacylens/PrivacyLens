@@ -1,25 +1,16 @@
 <!-- Binary distribution, along with dependency jar files -->
 <assembly>
-    <id>bin</id>
+    <id></id>
     <formats>
-        <format>zip</format>
+        <format>dir</format>
     </formats>
-    
+    <includeBaseDirectory>false</includeBaseDirectory>
     <dependencySets>
         <dependencySet>
-            <outputDirectory>/lib</outputDirectory>
+            <outputDirectory>/</outputDirectory>
             <includes>
                 <include>*:jar:*</include>
             </includes>
         </dependencySet>
-    </dependencySets>
-    
-    <fileSets>
-        <!-- Configuration template -->
-        <fileSet>
-            <directory>src/main/resources/conf</directory>
-            <outputDirectory>/conf-template</outputDirectory>
-        </fileSet>
-    </fileSets>
-    
+    </dependencySets>    
 </assembly>

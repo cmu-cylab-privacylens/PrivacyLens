@@ -1,8 +1,7 @@
 <!-- Binary distribution, along with dependency jar files -->
 <assembly>
-    <id>bin</id>
+    <id></id>
     <formats>
-        <!--<format>tar.gz</format>-->
         <format>zip</format>
     </formats>
         
@@ -12,20 +11,30 @@
             <directory>doc/</directory>
             <outputDirectory>/doc</outputDirectory>
         </fileSet>
-     </fileSets>
-     
-     <files>       
+        
+        <!-- Configuration -->
+        <fileSet>
+            <directory>conf/</directory>
+            <outputDirectory>/conf.dist</outputDirectory>
+        </fileSet>
+        
+        <!-- Examples -->
+        <fileSet>
+            <directory>examples/</directory>
+            <outputDirectory>/examples</outputDirectory>
+        </fileSet>
+        
         <!--  IdP Plugin -->
-        <file>
-            <source>uApprove-idp-plugin/target/uApprove-idp-plugin-${project.version}-bin.zip</source>
-            <outputDirectory>/</outputDirectory>
-        </file>
+        <fileSet>
+            <directory>uApprove-idp-plugin/target/uApprove-idp-plugin-${project.version}.dir</directory>
+            <outputDirectory>/uApprove-idp-plugin/</outputDirectory>
+        </fileSet>
         
         <!--  Viewer -->
-        <file>
-            <source>uApprove-viewer/target/uApprove-viewer-${project.version}-bin.zip</source>
-            <outputDirectory>/</outputDirectory>
-        </file>
-      </files>
+        <fileSet>
+            <directory>uApprove-viewer/target/uApprove-viewer-${project.version}.dir</directory>
+            <outputDirectory>/uApprove-viewer/</outputDirectory>
+        </fileSet>
+     </fileSets>
             
 </assembly>
