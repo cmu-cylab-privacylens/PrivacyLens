@@ -145,7 +145,7 @@
 %>
 
 <div class="login-field">
-<form name="question" action="Controller">
+<form name="question" action="Controller" method="get">
 <% if ( globalConsentPosibble ) { %>
 <p><input type="checkbox"
 	name="<%=Controller.GETPAR_ATTRIBUTES_GLOBAL_CONSENT%>" value="on">
