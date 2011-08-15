@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>ch.SWITCH.aai</groupId>
+    <artifactId>uApprove</artifactId>
+    <version>2.3.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>uApprove</name>
+    <description>
+        Terms of Use and User Consent Module
+        for the Shibboleth Identity Provider.
+    </description>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>shib-release</id>
+            <url>https://shibboleth.net/nexus/content/groups/public</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <!-- Compile dependencies -->
+        <dependency>
+            <groupId>edu.internet2.middleware</groupId>
+            <artifactId>shibboleth-identityprovider</artifactId>
+            <version>2.3.3</version>
+            <scope>compile</scope>
+        </dependency>
+        
+        <!-- Provided dependencies -->
+
+
+        <!-- Runtime dependencies -->
+
+        <!-- Test dependencies -->
+    </dependencies>
+
+    <!-- Project Metadata -->
+    <url>http://www.switch.ch/aai/uApprove</url>
+
+    <inceptionYear>2011</inceptionYear>
+
+    <licenses>
+        <license>
+            <name>Apache 2</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <issueManagement>
+        <system>Redmine</system>
+        <url>https://forge.switch.ch/redmine/projects/uapprove/issues</url>
+    </issueManagement>
+
+    <scm>
+        <url>https://subversion.switch.ch/svn/general/aai/uApprove/</url>
+    </scm>
+
+    <developers>
+        <developer>
+            <id>reusser</id>
+            <name>Halm Ruesser</name>
+            <organization>SWITCH</organization>
+            <organizationUrl>http://switch.ch</organizationUrl>
+            <timezone>+1</timezone>
+        </developer>
+    </developers>
+
+</project>
