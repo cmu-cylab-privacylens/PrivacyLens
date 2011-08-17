@@ -19,18 +19,14 @@ package ch.SWITCH.aai.uApprove.tou;
 
 import java.io.IOException;
 
-import net.jcip.annotations.ThreadSafe;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
 import ch.SWITCH.aai.uApprove.Util;
-import ch.SWITCH.aai.uApprove.UApproveException;
 
 /** Represents the terms of use. */
-@ThreadSafe
 public class ToU {
 
     // TODO: Needs probably an ID too (persisted, compared). For disjunction between different ToUs of relying parties.
@@ -39,38 +35,32 @@ public class ToU {
     private final Logger logger = LoggerFactory.getLogger(ToU.class);
 
     /** The version of the terms of use. */
-    private final String version;
+    private String version;
 
-    /** The text of the terms of use. */
-    private final String text;
+    /** The content of the terms of use. */
+    private String content;
 
     /**
-     * Constructs terms of use.
+     * Sets the terms of use version.
      * 
-     * @param touVersion The version of the terms of use.
-     * @param resource The resource from where the terms of use text is loaded.
-     * @throws UApproveException In case of an initialization error.
+     * @param version The version of the terms of use to set.
      */
-    public ToU(final String touVersion, final Resource resource) throws UApproveException {
-        Assert.hasText(touVersion, touVersion + " is an invalid ToU version");
-        version = touVersion;
-
-        Assert.notNull(resource, "ToU resource is not set.");
-        try {
-            text = Util.readResource(resource);
-            logger.info("ToU version {} initialized from file {}", version, resource);
-        } catch (final IOException exception) {
-            throw new UApproveException("Error while reading ToU resource " + resource.getDescription(), exception);
-        }
+    public void setVersion(final String version) {
+        this.version = version;
     }
 
     /**
-     * Gets the text of the terms of use.
+     * Sets the content of use text.
      * 
-     * @return Returns the text.
+     * @param resource The resource from where the ToU content is loaded.
      */
-    public final String getText() {
-        return text;
+    public void setResource(final Resource resource) {
+        try {
+            logger.debug("Initialized ToU from {}.", resource.getDescription());
+            content = Util.readResource(resource);
+        } catch (final IOException exception) {
+            logger.error("Error while reading ToU resource {}.", resource.getDescription(), exception);
+        }
     }
 
     /**
@@ -81,4 +71,20 @@ public class ToU {
     public final String getVersion() {
         return version;
     }
+
+    /**
+     * Gets the content of the terms of use.
+     * 
+     * @return Returns the content.
+     */
+    public final String getContent() {
+        return content;
+    }
+
+    public void initialize() {
+        Assert.hasText(version, version + " is an invalid ToU version.");
+        Assert.hasText(content, "ToU Text is not set.");
+        logger.debug("ToU {} initialized [{}].", version, Util.fingerprint(content));
+    }
+
 }

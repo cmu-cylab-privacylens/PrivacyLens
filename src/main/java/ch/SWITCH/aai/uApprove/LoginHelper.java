@@ -36,10 +36,12 @@ import edu.internet2.middleware.shibboleth.idp.util.HttpServletHelper;
  */
 public class LoginHelper {
 
+    /** Class logger. */
+    private static final Logger logger = LoggerFactory.getLogger(LoginHelper.class);
+
+    /** Default constructor for utility classes is private. */
     private LoginHelper() {
     }
-
-    private final static Logger logger = LoggerFactory.getLogger(LoginHelper.class);
 
     private static LoginContext getLoginContext(final ServletContext servletContext, final HttpServletRequest request) {
         final LoginContext loginContext =

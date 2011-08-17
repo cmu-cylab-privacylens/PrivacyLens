@@ -8,16 +8,27 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ViewHelper {
 
+    /** Class logger. */
+    private final Logger logger = LoggerFactory.getLogger(Util.class);
+
+    /** Velocity engine. */
     private final VelocityEngine velocityEngine;
 
-    public ViewHelper(final Properties velocityProperties) {
+    /** Default constructor. */
+    public ViewHelper() {
+        velocityEngine = new VelocityEngine();
+    }
+
+    public void setVelocityProperties(final Properties velocityProperties) {
         try {
-            velocityEngine = new VelocityEngine(velocityProperties);
+            velocityEngine.init(velocityProperties);
         } catch (final Exception e) {
-            throw new UApproveException(e);
+            logger.error("Error while initializing the velocity engine.", e);
         }
     }
 

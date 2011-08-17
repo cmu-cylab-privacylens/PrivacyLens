@@ -57,7 +57,7 @@ public class ToUAcceptance {
      */
     private ToUAcceptance(final ToU tou, final DateTime acceptanceDate) {
         this.version = tou.getVersion();
-        this.fingerprint = Util.fingerprint(tou.getText());
+        this.fingerprint = Util.fingerprint(tou.getContent());
         this.acceptanceDate = acceptanceDate;
     }
 
@@ -115,6 +115,6 @@ public class ToUAcceptance {
      * @return Returns true if version and fingerprint equals, false otherwise.
      */
     public boolean contains(final ToU tou) {
-        return version.equals(tou.getVersion()) && fingerprint.equals(Util.fingerprint(tou.getText()));
+        return version.equals(tou.getVersion()) && fingerprint.equals(Util.fingerprint(tou.getContent()));
     }
 }

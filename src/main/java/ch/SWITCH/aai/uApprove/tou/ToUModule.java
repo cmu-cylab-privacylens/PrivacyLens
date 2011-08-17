@@ -20,6 +20,7 @@ package ch.SWITCH.aai.uApprove.tou;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
 
 import ch.SWITCH.aai.uApprove.tou.storage.Storage;
 
@@ -31,23 +32,35 @@ public class ToUModule {
     /** Class logger. */
     private final Logger logger = LoggerFactory.getLogger(ToUModule.class);
 
-    private final boolean enabled;
+    private boolean enabled;
 
-    private final ToU tou;
+    private ToU tou;
 
-    private final Storage storage;
+    private Storage storage;
+
+    /** Default constructor. */
+    public ToUModule() {
+        enabled = false;
+    }
 
     /**
-     * Constructor.
-     * 
-     * @param enabled
-     * @param tou
-     * @param storage
+     * @param enabled The enabled to set.
      */
-    public ToUModule(final boolean enabled, final ToU tou, final Storage storage) {
-        super();
+    public void setEnabled(final boolean enabled) {
         this.enabled = enabled;
+    }
+
+    /**
+     * @param tou The tou to set.
+     */
+    public void setTou(final ToU tou) {
         this.tou = tou;
+    }
+
+    /**
+     * @param storage The storage to set.
+     */
+    public void setStorage(final Storage storage) {
         this.storage = storage;
     }
 
@@ -56,6 +69,11 @@ public class ToUModule {
      */
     public ToU getTou() {
         return tou;
+    }
+
+    public void initialize() {
+        Assert.notNull(tou, "ToU is not set.");
+        Assert.notNull(storage, "Storage is not set.");
     }
 
     /**
@@ -68,7 +86,6 @@ public class ToUModule {
             logger.debug("Terms of use are disabled.");
             return true;
         }
-        logger.debug("Using ToU {}.", tou);
 
         final ToUAcceptance touAcceptance;
         if (storage.containsToUAcceptance(principalName, tou.getVersion())) {
@@ -78,11 +95,11 @@ public class ToUModule {
         }
 
         if (touAcceptance.contains(tou)) {
-            logger.info("User {} has already accepted ToU {}", principalName, tou);
+            logger.info("User {} has already accepted ToU {}.", principalName, tou.getVersion());
             return true;
         }
 
-        logger.info("User {} needs to accept ToU", principalName, tou);
+        logger.info("User {} needs to accept ToU {}.", principalName, tou.getVersion());
         return false;
     }
 

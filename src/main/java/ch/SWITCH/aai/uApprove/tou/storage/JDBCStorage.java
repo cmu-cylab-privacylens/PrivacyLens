@@ -25,6 +25,8 @@ import java.util.Properties;
 import javax.sql.DataSource;
 
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
@@ -36,6 +38,9 @@ import ch.SWITCH.aai.uApprove.tou.ToUAcceptance;
 
 /** JDBC implementation. */
 public class JDBCStorage implements Storage {
+
+    /** Class logger. */
+    private final Logger logger = LoggerFactory.getLogger(JDBCStorage.class);
 
     /** The JDBC template. */
     private SimpleJdbcTemplate jdbcTemplate;
@@ -54,21 +59,29 @@ public class JDBCStorage implements Storage {
     }
 
     /** The terms of use acceptance mapper. */
-    private final ToUAcceptanceMapper touAcceptanceMapper = new ToUAcceptanceMapper();
+    private final ToUAcceptanceMapper touAcceptanceMapper;
+
+    /** Default constructor. */
+    public JDBCStorage() {
+        touAcceptanceMapper = new ToUAcceptanceMapper();
+    }
 
     public void setDataSource(final DataSource dataSource) {
         jdbcTemplate = new SimpleJdbcTemplate(dataSource);
     }
 
     public void setSqlStatements(final Resource sqlStamentsResource) throws UApproveException {
-        Assert.notNull(sqlStamentsResource, "SQL statements are not set.");
-        this.sqlStatements = new Properties();
+        sqlStatements = new Properties();
         try {
-            this.sqlStatements.load(sqlStamentsResource.getInputStream());
+            sqlStatements.load(sqlStamentsResource.getInputStream());
         } catch (final IOException e) {
-            throw new UApproveException("Error reading SQL statements from resource "
-                    + sqlStamentsResource.getDescription(), e);
+            logger.error("Error reading SQL statements from resource {}", sqlStamentsResource.getDescription(), e);
         }
+    }
+
+    public void initialize() {
+        Assert.notNull(jdbcTemplate, "Datasource is not set.");
+        Assert.notEmpty(sqlStatements, "SQL statements are not set.");
     }
 
     /** {@inheritDoc} */

@@ -6,7 +6,7 @@ pre..
 
     <context-param>
         <param-name>contextConfigLocation</param-name>
-        <param-value>classpath:/uApprove.xml;</param-value>
+        <param-value>classpath:/conf/uApprove.xml;</param-value>
     </context-param>
     
     ...
@@ -49,7 +49,7 @@ h3. ToU Schema:
 pre.. 
 CREATE TABLE ToUAcceptance (
     userId              VARCHAR(256)                                NOT NULL,
-    version             VARCHAR(256)                                NOT NULL,
+    version             VARCHAR(64)                                 NOT NULL,
     fingerprint         VARCHAR(256)                                NOT NULL,
     acceptanceDate      TIMESTAMP       DEFAULT CURRENT_TIMESTAMP   NOT NULL,
     

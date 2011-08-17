@@ -7,10 +7,15 @@ import java.io.InputStreamReader;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import org.bouncycastle.util.encoders.Hex;
+import org.apache.commons.codec.binary.Hex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
 public class Util {
+
+    /** Class logger. */
+    private static final Logger logger = LoggerFactory.getLogger(Util.class);
 
     private static MessageDigest sha256;
 
@@ -18,7 +23,7 @@ public class Util {
         try {
             sha256 = MessageDigest.getInstance("SHA-256");
         } catch (final NoSuchAlgorithmException e) {
-            throw new UApproveException(e);
+            logger.error("Error getting message digest instance.", e);
         }
     }
 
@@ -51,6 +56,7 @@ public class Util {
      * @return Returns a fingerprint.
      */
     public static String fingerprint(final String input) {
-        return new String(Hex.encode(sha256.digest(input.getBytes())));
+        final byte[] digest = sha256.digest(input.getBytes());
+        return Hex.encodeHexString(digest);
     }
 }

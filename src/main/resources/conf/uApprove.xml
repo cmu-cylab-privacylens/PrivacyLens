@@ -10,7 +10,23 @@
         
     <context:property-placeholder location="classpath:/conf/uApprove.properties" />
 
-    <bean id="dataSource" class="com.jolbox.bonecp.BoneCPDataSource" destroy-method="close">
+    <bean id="uApprove.touModule" class="ch.SWITCH.aai.uApprove.tou.ToUModule" init-method="initialize">
+        <property name="enabled" value="${tou.enabled}" />
+        <property name="tou" ref="uApprove.tou" />
+        <property name="storage" ref="uApprove.jdbcStorage" />
+    </bean>
+    
+    <bean id="uApprove.tou" class="ch.SWITCH.aai.uApprove.tou.ToU" init-method="initialize">
+        <property name="version" value="${tou.version}" />
+        <property name="resource" value="${tou.resource}" />
+    </bean>
+
+    <bean id="uApprove.jdbcStorage" class="ch.SWITCH.aai.uApprove.tou.storage.JDBCStorage" init-method="initialize">
+        <property name="dataSource" ref="uApprove.dataSource" />
+        <property name="sqlStatements" value="${database.sqlStatements}"/>
+    </bean>
+
+    <bean id="uApprove.dataSource" class="com.jolbox.bonecp.BoneCPDataSource" destroy-method="close">
         <property name="driverClass" value="${database.driver}" />
         <property name="jdbcUrl" value="${database.url}" />
         <property name="username" value="${database.username}" />
@@ -18,19 +34,18 @@
         <property name="minConnectionsPerPartition" value="1" />
         <property name="maxConnectionsPerPartition" value="5" />
     </bean>
-    
-    
+        
     <!-- 
         Velocity resource loader configuration:
         http://velocity.apache.org/engine/devel/developer-guide.html#Configuring_Resource_Loaders
     -->
-    <bean id="viewHelper" class="ch.SWITCH.aai.uApprove.ViewHelper">
-        <constructor-arg>
+    <bean id="uApprove.viewHelper" class="ch.SWITCH.aai.uApprove.ViewHelper">
+        <property name="velocityProperties">
             <value>
                 resource.loader = class
                 class.resource.loader.class = org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader
                 class.resource.loader.path = /views
             </value>
-        </constructor-arg>
+        </property>
     </bean>
 </beans>
