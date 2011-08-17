@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" type="text/css" href="uApprove.css"/> 
+	<title>${resources.getString("tou.title")}</title>
+</head>
+
+<body>
+
+    <div>
+        <strong>${resources.getString("tou.title")}</strong>
+    </div>
+
+	<div id="tou.text">
+	   ${tou.text}
+	</div>
+
+    <div id="tou.form">
+        <form action="." method="post" >
+            <label for="tou.accept">${resources.getString("tou.accept")}</label>
+            <input type="checkbox" name="tou.accept" value="yes"/>
+            <button type="submit">${resources.getString("tou.confirm")}</button>
+        </form>
+    </div>
+    
+</body>
+</html>

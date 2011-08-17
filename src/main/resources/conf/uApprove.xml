@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd
+                           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+        
+    <context:property-placeholder location="classpath:/conf/uApprove.properties" />
+
+    <bean id="dataSource" class="com.jolbox.bonecp.BoneCPDataSource" destroy-method="close">
+        <property name="driverClass" value="${database.driver}" />
+        <property name="jdbcUrl" value="${database.url}" />
+        <property name="username" value="${database.username}" />
+        <property name="password" value="${database.password}" />
+        <property name="minConnectionsPerPartition" value="1" />
+        <property name="maxConnectionsPerPartition" value="5" />
+    </bean>
+    
+    
+    <!-- 
+        Velocity resource loader configuration:
+        http://velocity.apache.org/engine/devel/developer-guide.html#Configuring_Resource_Loaders
+    -->
+    <bean id="viewHelper" class="ch.SWITCH.aai.uApprove.ViewHelper">
+        <constructor-arg>
+            <value>
+                resource.loader = class
+                class.resource.loader.class = org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader
+                class.resource.loader.path = /views
+            </value>
+        </constructor-arg>
+    </bean>
+</beans>
