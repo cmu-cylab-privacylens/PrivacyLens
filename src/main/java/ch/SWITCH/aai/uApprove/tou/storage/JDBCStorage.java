@@ -33,7 +33,6 @@ import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.util.Assert;
 
-import ch.SWITCH.aai.uApprove.UApproveException;
 import ch.SWITCH.aai.uApprove.tou.ToUAcceptance;
 
 /** JDBC implementation. */
@@ -70,7 +69,7 @@ public class JDBCStorage implements Storage {
         jdbcTemplate = new SimpleJdbcTemplate(dataSource);
     }
 
-    public void setSqlStatements(final Resource sqlStamentsResource) throws UApproveException {
+    public void setSqlStatements(final Resource sqlStamentsResource) {
         sqlStatements = new Properties();
         try {
             sqlStatements.load(sqlStamentsResource.getInputStream());

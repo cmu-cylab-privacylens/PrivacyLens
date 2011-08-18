@@ -15,21 +15,21 @@
  * limitations under the License.
  */
 
-package ch.SWITCH.aai.uApprove.mf;
+package ch.SWITCH.aai.uApprove;
 
-import edu.internet2.middleware.shibboleth.common.config.BaseSpringNamespaceHandler;
+import static org.testng.AssertJUnit.assertEquals;
 
-/**
- * Namespace handler for the attribute filter engine SAML match functions.
- */
-public class SAMLMetadataMatchFunctorNamespaceHandler extends BaseSpringNamespaceHandler {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.testng.annotations.Test;
 
-    /** Basic match function namespace. */
-    public static final String NAMESPACE = "http://www.switch.ch/aai/idp/uApprove/mf";
+@Test
+public class UtilTest {
 
-    /** {@inheritDoc} */
-    public void init() {
-        registerBeanDefinitionParser(AttributeInMetadataMatchFunctorBeanDefinitionParser.SCHEMA_TYPE,
-                new AttributeInMetadataMatchFunctorBeanDefinitionParser());
+    private final Logger logger = LoggerFactory.getLogger("test");
+
+    @Test
+    public void testFingerprint() {
+        assertEquals("9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08", Util.fingerprint("test"));
     }
 }

@@ -1,11 +1,11 @@
 
 package ch.SWITCH.aai.uApprove;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.velocity.VelocityContext;
@@ -36,9 +36,22 @@ public class ViewHelper {
     /** Velocity engine. */
     private final VelocityEngine velocityEngine;
 
+    /** Default locale. */
+    private Locale defaultLocale;
+
+    /** Whether the default locale should forced. */
+    private boolean forceDefaultLocale;
+
     /** Default constructor. */
     public ViewHelper() {
         velocityEngine = new VelocityEngine();
+        defaultLocale = Locale.getDefault();
+        forceDefaultLocale = false;
+    }
+
+    public void initialize() {
+        logger.debug("ViewHelper initialized with{}default locale {}.", forceDefaultLocale ? " forced " : " ",
+                defaultLocale);
     }
 
     public void setVelocityProperties(final Properties velocityProperties) {
@@ -46,6 +59,28 @@ public class ViewHelper {
             velocityEngine.init(velocityProperties);
         } catch (final Exception e) {
             logger.error("Error while initializing the velocity engine.", e);
+        }
+    }
+
+    /**
+     * @param defaultLocale The defaultLocale to set.
+     */
+    public void setDefaultLocale(final Locale defaultLocale) {
+        this.defaultLocale = defaultLocale;
+    }
+
+    /**
+     * @param forceDefaultLocale The forceDefaultLocale to set.
+     */
+    public void setForceDefaultLocale(final boolean forceDefaultLocale) {
+        this.forceDefaultLocale = forceDefaultLocale;
+    }
+
+    public Locale selectLocale(final Locale userLocale) {
+        if (forceDefaultLocale) {
+            return defaultLocale;
+        } else {
+            return userLocale;
         }
     }
 
@@ -61,9 +96,9 @@ public class ViewHelper {
         }
     }
 
-    public LocalizedStrings getLocalizedStrings(final HttpServletRequest req, final String resource) {
+    public LocalizedStrings getLocalizedStrings(final String resource, final Locale userLocale) {
         final ResourceBundle resourceBundle =
-                ResourceBundle.getBundle(String.format("messages.%s", resource), req.getLocale());
+                ResourceBundle.getBundle(String.format("messages.%s", resource), selectLocale(userLocale));
         return new LocalizedStrings(resourceBundle);
     }
 }

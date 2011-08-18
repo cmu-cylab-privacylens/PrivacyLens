@@ -42,6 +42,7 @@ public class ToUServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
+    @SuppressWarnings("unused")
     private final Logger logger = LoggerFactory.getLogger(ToUServlet.class);
 
     private ToUModule touModule;
@@ -61,7 +62,7 @@ public class ToUServlet extends HttpServlet {
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException,
             IOException {
         final Map<String, Object> context = new HashMap<String, Object>();
-        context.put("localized", viewHelper.getLocalizedStrings(req, "terms-of-use"));
+        context.put("localized", viewHelper.getLocalizedStrings("terms-of-use", req.getLocale()));
         context.put("tou", touModule.getTou());
         viewHelper.showView(resp, "terms-of-use", context);
     }

@@ -27,14 +27,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
-import edu.internet2.middleware.shibboleth.common.profile.AbstractErrorHandler;
 import edu.internet2.middleware.shibboleth.idp.authn.LoginContext;
 import edu.internet2.middleware.shibboleth.idp.util.HttpServletHelper;
 
 /**
  * Provides helper functions to retrieve information about the login from the IdP.
  */
-public class LoginHelper {
+public final class LoginHelper {
 
     /** Class logger. */
     private static final Logger logger = LoggerFactory.getLogger(LoginHelper.class);
@@ -71,24 +70,17 @@ public class LoginHelper {
     public static String getPrincipalName(final ServletContext servletContext, final HttpServletRequest request) {
         final LoginContext loginContext = getLoginContext(servletContext, request);
         Assert.notNull(loginContext, "LoginContext is null.");
-        return loginContext.getPrincipalName();
+        final String principalName = loginContext.getPrincipalName();
+        logger.trace("Principal name is {}.", principalName);
+        return principalName;
     }
 
     public static String getRelyingPartyId(final ServletContext servletContext, final HttpServletRequest request) {
         final LoginContext loginContext = getLoginContext(servletContext, request);
         Assert.notNull(loginContext, "LoginContext is null.");
-        return loginContext.getRelyingPartyId();
-    }
-
-    // TODO just throw Exception
-    public static void forwardError(final HttpServletRequest request, final HttpServletResponse response,
-            final UApproveException exception) {
-        request.setAttribute(AbstractErrorHandler.ERROR_KEY, exception);
-        try {
-            request.getRequestDispatcher("/error.jsp").forward(request, response);
-        } catch (final Exception e) {
-            logger.error("Error forwarding to error page", e);
-        }
+        final String relyingPartyId = loginContext.getRelyingPartyId();
+        logger.trace("Relying party id is {}.", relyingPartyId);
+        return relyingPartyId;
     }
 
     public static void returnToIdP(final ServletContext servletContext, final HttpServletRequest request,
@@ -97,6 +89,7 @@ public class LoginHelper {
         final String profileUrl =
                 HttpServletHelper.getContextRelativeUrl(request, loginContext.getProfileHandlerURL()).buildURL();
         try {
+            logger.trace("Redirect to {}.", profileUrl);
             response.sendRedirect(profileUrl);
         } catch (final IOException e) {
             logger.error("Error sending user back to profile handler at {}", profileUrl, e);
@@ -107,6 +100,7 @@ public class LoginHelper {
             final String servletPath) {
         final String servletUrl = HttpServletHelper.getContextRelativeUrl(request, servletPath).buildURL();
         try {
+            logger.trace("Redirect to {}.", servletUrl);
             response.sendRedirect(servletUrl);
         } catch (final IOException e) {
             logger.error("Error sending user to servlet {} ", servletUrl, e);

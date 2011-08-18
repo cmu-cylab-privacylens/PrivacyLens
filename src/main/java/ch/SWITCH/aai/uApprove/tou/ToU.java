@@ -29,8 +29,6 @@ import ch.SWITCH.aai.uApprove.Util;
 /** Represents the terms of use. */
 public class ToU {
 
-    // TODO: Needs probably an ID too (persisted, compared). For disjunction between different ToUs of relying parties.
-
     /** Class logger. */
     private final Logger logger = LoggerFactory.getLogger(ToU.class);
 

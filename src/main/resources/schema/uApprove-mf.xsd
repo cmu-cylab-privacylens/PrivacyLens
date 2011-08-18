@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<schema targetNamespace="http://www.switch.ch/aai/idp/uApprove/mf" xmlns="http://www.w3.org/2001/XMLSchema"
+<schema targetNamespace="http://www.switch.ch/aai/uApprove/mf" xmlns="http://www.w3.org/2001/XMLSchema"
     xmlns:afp="urn:mace:shibboleth:2.0:afp"
     elementFormDefault="qualified">
 

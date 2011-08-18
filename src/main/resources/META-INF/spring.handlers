@@ -1,1 +1,1 @@
-http\://www.switch.ch/aai/idp/uApprove/mf = ch.SWITCH.aai.uApprove.idpplugin.mf.SAMLMetadataMatchFunctorNamespaceHandler
+http\://www.switch.ch/aai/idp/uApprove/mf = ch.SWITCH.aai.uApprove.mf.SAMLMetadataMatchFunctorNamespaceHandler
