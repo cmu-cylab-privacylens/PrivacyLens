@@ -3,24 +3,23 @@
 <head>
 	<meta charset="UTF-8">
 	<link rel="stylesheet" type="text/css" href="uApprove.css"/> 
-	<title>${resources.getString("tou.title")}</title>
+	<title>${localized.tou-title}</title>
 </head>
 
 <body>
-
     <div>
-        <strong>${resources.getString("tou.title")}</strong>
+        <strong>${localized.tou-title}</strong>
     </div>
 
-	<div id="tou.text">
-	   ${tou.text}
+	<div id="tou.content">
+	   ${tou.content}
 	</div>
 
     <div id="tou.form">
-        <form action="." method="post" >
-            <label for="tou.accept">${resources.getString("tou.accept")}</label>
+        <form action="" method="post" >
+            <label for="tou.accept">${localized.tou-accept}</label>
             <input type="checkbox" name="tou.accept" value="yes"/>
-            <button type="submit">${resources.getString("tou.confirm")}</button>
+            <button type="submit">${localized.tou-confirm}</button>
         </form>
     </div>
     

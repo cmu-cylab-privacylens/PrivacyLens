@@ -81,7 +81,7 @@ public class Intercepter implements Filter {
         logger.debug("uApprove access from {} to {}.", principalName, relyingPartyId);
 
         if (!touModule.isToUAccepted(principalName)) {
-            request.getRequestDispatcher("/uApprove/terms-of-use.html").forward(request, response);
+            LoginHelper.redirectToServlet(request, response, "/uApprove/TermsOfUse");
             return;
         } else {
             chain.doFilter(request, response);

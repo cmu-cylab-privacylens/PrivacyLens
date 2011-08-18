@@ -17,8 +17,10 @@
 
 package ch.SWITCH.aai.uApprove;
 
+import javax.servlet.ServletException;
+
 /** Exception thrown to indicate a problem with uApprove. */
-public class UApproveException extends RuntimeException {
+public class UApproveException extends ServletException {
 
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;

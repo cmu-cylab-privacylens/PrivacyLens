@@ -80,6 +80,7 @@ public class LoginHelper {
         return loginContext.getRelyingPartyId();
     }
 
+    // TODO just throw Exception
     public static void forwardError(final HttpServletRequest request, final HttpServletResponse response,
             final UApproveException exception) {
         request.setAttribute(AbstractErrorHandler.ERROR_KEY, exception);
@@ -98,7 +99,17 @@ public class LoginHelper {
         try {
             response.sendRedirect(profileUrl);
         } catch (final IOException e) {
-            logger.error("Error sending user back to profile handler at " + profileUrl, e);
+            logger.error("Error sending user back to profile handler at {}", profileUrl, e);
+        }
+    }
+
+    public static void redirectToServlet(final HttpServletRequest request, final HttpServletResponse response,
+            final String servletPath) {
+        final String servletUrl = HttpServletHelper.getContextRelativeUrl(request, servletPath).buildURL();
+        try {
+            response.sendRedirect(servletUrl);
+        } catch (final IOException e) {
+            logger.error("Error sending user to servlet {} ", servletUrl, e);
         }
     }
 }
