@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd
+                           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+    <bean id="jdbcStorage" class="ch.SWITCH.aai.uApprove.tou.storage.JDBCStorage" init-method="initialize">
+        <property name="dataSource" ref="dataSource" />
+        <property name="sqlStatements" value="classpath:/conf/sql-statements.properties"/>
+    </bean>
+    
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>    
+
+    <bean id="dataSource" class="com.jolbox.bonecp.BoneCPDataSource" destroy-method="close">
+        <property name="driverClass" value="org.hsqldb.jdbcDriver" />
+        <property name="jdbcUrl" value="jdbc:hsqldb:mem:uApprove" />
+        <property name="username" value="SA" />
+        <property name="password" value="" />
+        <property name="minConnectionsPerPartition" value="1" />
+        <property name="maxConnectionsPerPartition" value="20" />
+    </bean>
+    
+</beans>
