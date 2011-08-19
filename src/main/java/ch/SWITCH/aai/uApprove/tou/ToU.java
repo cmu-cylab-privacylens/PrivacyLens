@@ -82,7 +82,7 @@ public class ToU {
     public void initialize() {
         Assert.hasText(version, version + " is an invalid ToU version.");
         Assert.hasText(content, "ToU Text is not set.");
-        logger.debug("ToU {} initialized [{}].", version, Util.fingerprint(content));
+        logger.debug("ToU {} initialized [{}].", version, Util.hash(content));
     }
 
 }

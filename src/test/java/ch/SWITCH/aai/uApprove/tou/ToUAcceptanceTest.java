@@ -45,22 +45,15 @@ public class ToUAcceptanceTest {
 
     public void createToUAcceptance() {
         final DateTime date = new DateTime();
-        final ToUAcceptance touAcceptance = ToUAcceptance.createToUAcceptance(tou, date);
+        final ToUAcceptance touAcceptance = new ToUAcceptance(tou, date);
         Assert.assertEquals(tou.getVersion(), touAcceptance.getVersion());
-        final String fingerprint = Util.fingerprint(tou.getContent());
+        final String fingerprint = Util.hash(tou.getContent());
         Assert.assertEquals(fingerprint, touAcceptance.getFingerprint());
         Assert.assertEquals(date, touAcceptance.getAcceptanceDate());
     }
 
-    public void emptyToUAcceptance() {
-        final ToUAcceptance touAcceptance = ToUAcceptance.emptyToUAcceptance();
-        Assert.assertEquals("", touAcceptance.getVersion());
-        Assert.assertEquals("", touAcceptance.getFingerprint());
-        Assert.assertNull(touAcceptance.getAcceptanceDate());
-    }
-
     public void contains() {
-        final ToUAcceptance touAcceptance = ToUAcceptance.createToUAcceptance(tou, new DateTime());
+        final ToUAcceptance touAcceptance = new ToUAcceptance(tou, new DateTime());
         Assert.assertTrue(touAcceptance.contains(tou));
 
         final ToUAcceptance emptyToUAcceptance = ToUAcceptance.emptyToUAcceptance();
@@ -70,15 +63,14 @@ public class ToUAcceptanceTest {
         otherToU.setVersion("2.0");
         otherToU.setResource(new ClassPathResource("examples/terms-of-use.html"));
         otherToU.initialize();
-        ToUAcceptance otherToUAcceptance = ToUAcceptance.createToUAcceptance(otherToU, new DateTime());
+        ToUAcceptance otherToUAcceptance = new ToUAcceptance(otherToU, new DateTime());
         Assert.assertFalse(otherToUAcceptance.contains(tou));
 
         otherToU.setVersion("1.0");
         otherToU.setResource(new ByteArrayResource("some other text".getBytes()));
         otherToU.initialize();
-        otherToUAcceptance = ToUAcceptance.createToUAcceptance(otherToU, new DateTime());
+        otherToUAcceptance = new ToUAcceptance(otherToU, new DateTime());
         Assert.assertFalse(otherToUAcceptance.contains(tou));
 
     }
-
 }

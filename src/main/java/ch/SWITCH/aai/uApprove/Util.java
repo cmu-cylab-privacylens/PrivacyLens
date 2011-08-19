@@ -55,7 +55,7 @@ public final class Util {
      * @param input The input String.
      * @return Returns a fingerprint.
      */
-    public static String fingerprint(final String input) {
+    public static String hash(final String input) {
         final byte[] digest = sha256.digest(input.getBytes());
         return Hex.encodeHexString(digest);
     }

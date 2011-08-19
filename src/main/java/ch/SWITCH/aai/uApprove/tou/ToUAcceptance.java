@@ -17,14 +17,12 @@
 
 package ch.SWITCH.aai.uApprove.tou;
 
-import net.jcip.annotations.ThreadSafe;
-
 import org.joda.time.DateTime;
 
 import ch.SWITCH.aai.uApprove.Util;
 
 /** Represents a terms of use acceptance. */
-@ThreadSafe
+
 public class ToUAcceptance {
 
     /** The terms of use version. */
@@ -50,15 +48,13 @@ public class ToUAcceptance {
     }
 
     /**
-     * Constructs a terms of use acceptance using a terms of use and an acceptance date.
+     * Constructs a terms of use acceptance using a ToU and an acceptance date.
      * 
      * @param tou The {@see Tou}.
      * @param acceptanceDate The acceptance date.
      */
-    private ToUAcceptance(final ToU tou, final DateTime acceptanceDate) {
-        this.version = tou.getVersion();
-        this.fingerprint = Util.fingerprint(tou.getContent());
-        this.acceptanceDate = acceptanceDate;
+    public ToUAcceptance(final ToU tou, final DateTime acceptanceDate) {
+        this(tou.getVersion(), Util.hash(tou.getContent()), acceptanceDate);
     }
 
     /**
@@ -89,17 +85,6 @@ public class ToUAcceptance {
     }
 
     /**
-     * Creates a terms of use acceptance.
-     * 
-     * @param tou The {@see Tou}.
-     * @param acceptanceDate The acceptance date.
-     * @return Returns a terms of use acceptance.
-     */
-    public static ToUAcceptance createToUAcceptance(final ToU tou, final DateTime acceptanceDate) {
-        return new ToUAcceptance(tou, acceptanceDate);
-    }
-
-    /**
      * Creates an empty terms of use acceptance.
      * 
      * @return Returns an empty terms of use acceptance.
@@ -115,6 +100,6 @@ public class ToUAcceptance {
      * @return Returns true if version and fingerprint equals, false otherwise.
      */
     public boolean contains(final ToU tou) {
-        return version.equals(tou.getVersion()) && fingerprint.equals(Util.fingerprint(tou.getContent()));
+        return version.equals(tou.getVersion()) && fingerprint.equals(Util.hash(tou.getContent()));
     }
 }

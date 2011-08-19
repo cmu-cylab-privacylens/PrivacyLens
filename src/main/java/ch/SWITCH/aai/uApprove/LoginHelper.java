@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
+import edu.internet2.middleware.shibboleth.common.session.Session;
 import edu.internet2.middleware.shibboleth.idp.authn.LoginContext;
 import edu.internet2.middleware.shibboleth.idp.util.HttpServletHelper;
 
@@ -47,6 +48,10 @@ public final class LoginHelper {
                 HttpServletHelper.getLoginContext(HttpServletHelper.getStorageService(servletContext), servletContext,
                         request);
         return loginContext;
+    }
+
+    public static Session getSession(final HttpServletRequest request) {
+        return HttpServletHelper.getUserSession(request);
     }
 
     public static boolean isAuthenticated(final ServletContext servletContext, final HttpServletRequest request) {
