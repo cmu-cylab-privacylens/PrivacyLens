@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<suite name="uApprove" verbose="2" junit="false" parallel="false" configfailurepolicy="skip" thread-count="5" skipfailedinvocationcounts="false" data-provider-thread-count="10">
+<suite name="uApprove" verbose="2">
     
-    <test name="uApprove" enabled="true" junit="false" skipfailedinvocationcounts="false" preserve-order="false">  
+    <test name="uApprove" enabled="true">  
         <packages>       
             <package name="ch.SWITCH.aai.uApprove" />
         </packages>
     </test>
     
-    <test name="uApprove.tou" enabled="true" junit="false" skipfailedinvocationcounts="false" preserve-order="false">  
+    <test name="uApprove.tou" enabled="true">  
         <packages>       
             <package name="ch.SWITCH.aai.uApprove.tou"></package>
             <package name="ch.SWITCH.aai.uApprove.tou.storage"></package>

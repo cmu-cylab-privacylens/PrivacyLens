@@ -25,7 +25,7 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTransactionalTestNGSpringContextTests;
 import org.springframework.test.context.transaction.TransactionConfiguration;
-import org.testng.AssertJUnit;
+import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -58,25 +58,25 @@ public class JDBCStorageTest extends AbstractTransactionalTestNGSpringContextTes
         final String fingerprint = "5b2ee897c08c79a09cd57e8602d605bf8c52db17de9793677c36b5c78644b2b2";
         final DateTime acceptanceDate = new DateTime("2011-11-11T11:11:11");
 
-        AssertJUnit.assertFalse(storage.containsToUAcceptance(userId, version));
-        AssertJUnit.assertNull(storage.readToUAcceptance(userId, version));
+        Assert.assertFalse(storage.containsToUAcceptance(userId, version));
+        Assert.assertNull(storage.readToUAcceptance(userId, version));
 
         ToUAcceptance touAcceptance = new ToUAcceptance(version, fingerprint, acceptanceDate);
         storage.createToUAcceptance(userId, touAcceptance);
-        AssertJUnit.assertTrue(storage.containsToUAcceptance(userId, version));
+        Assert.assertTrue(storage.containsToUAcceptance(userId, version));
 
         touAcceptance = storage.readToUAcceptance(userId, version);
 
-        AssertJUnit.assertEquals(version, touAcceptance.getVersion());
-        AssertJUnit.assertEquals(fingerprint, touAcceptance.getFingerprint());
-        AssertJUnit.assertEquals(acceptanceDate, touAcceptance.getAcceptanceDate());
+        Assert.assertEquals(version, touAcceptance.getVersion());
+        Assert.assertEquals(fingerprint, touAcceptance.getFingerprint());
+        Assert.assertEquals(acceptanceDate, touAcceptance.getAcceptanceDate());
 
         touAcceptance = new ToUAcceptance(version, fingerprint.substring(1), acceptanceDate.plusMonths(1));
         storage.updateToUAcceptance(userId, touAcceptance);
 
         touAcceptance = storage.readToUAcceptance(userId, version);
-        AssertJUnit.assertEquals(version, touAcceptance.getVersion());
-        AssertJUnit.assertEquals(fingerprint.substring(1), touAcceptance.getFingerprint());
-        AssertJUnit.assertEquals(acceptanceDate.plusMonths(1), touAcceptance.getAcceptanceDate());
+        Assert.assertEquals(version, touAcceptance.getVersion());
+        Assert.assertEquals(fingerprint.substring(1), touAcceptance.getFingerprint());
+        Assert.assertEquals(acceptanceDate.plusMonths(1), touAcceptance.getAcceptanceDate());
     }
 }
