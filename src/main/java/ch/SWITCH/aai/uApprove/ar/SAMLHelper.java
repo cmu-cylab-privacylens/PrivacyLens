@@ -82,8 +82,8 @@ public class SAMLHelper {
         Assert.notNull(metadataProvider, "Metadata Provider not set.");
     }
 
-    public Collection<Attribute> getAttributes(final String principalName, final String relyingPartyId,
-            final Session session) {
+    public List<Attribute>
+            getAttributes(final String principalName, final String relyingPartyId, final Session session) {
         final BaseSAMLProfileRequestContext requestCtx = buildRequestContext(principalName, relyingPartyId, session);
 
         Map<String, BaseAttribute> baseAttributes = null;
@@ -93,7 +93,7 @@ public class SAMLHelper {
             logger.error("Error while retrieving attributes for {}.", principalName, e);
         }
 
-        final Collection<Attribute> attributes = new ArrayList<Attribute>();
+        final List<Attribute> attributes = new ArrayList<Attribute>();
         for (final BaseAttribute<?> baseAttribute : baseAttributes.values()) {
             final Collection<String> attributeValues = new ArrayList<String>();
             for (final Object valueObj : baseAttribute.getValues()) {

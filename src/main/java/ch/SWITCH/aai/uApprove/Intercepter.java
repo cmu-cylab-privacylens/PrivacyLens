@@ -18,6 +18,7 @@
 package ch.SWITCH.aai.uApprove;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -35,6 +36,9 @@ import org.springframework.util.Assert;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import ch.SWITCH.aai.uApprove.ar.Attribute;
+import ch.SWITCH.aai.uApprove.ar.AttributeReleaseModule;
+import ch.SWITCH.aai.uApprove.ar.SAMLHelper;
 import ch.SWITCH.aai.uApprove.tou.ToUModule;
 
 /**
@@ -49,12 +53,19 @@ public class Intercepter implements Filter {
 
     private ToUModule touModule;
 
+    private AttributeReleaseModule attributeReleaseModule;
+
+    private SAMLHelper samlHelper;
+
     /** {@inheritDoc} */
     public void init(final FilterConfig filterConfig) throws ServletException {
         servletContext = filterConfig.getServletContext();
         final WebApplicationContext appContext =
                 WebApplicationContextUtils.getRequiredWebApplicationContext(filterConfig.getServletContext());
         touModule = (ToUModule) appContext.getBean("uApprove.touModule", ToUModule.class);
+        attributeReleaseModule =
+                (AttributeReleaseModule) appContext.getBean("uApprove.attributeReleaseModule",
+                        AttributeReleaseModule.class);
         logger.debug("uApprove initialized.");
     }
 
@@ -84,8 +95,22 @@ public class Intercepter implements Filter {
             LoginHelper.redirectToServlet(request, response, "/uApprove/TermsOfUse");
             return;
         } else {
-            chain.doFilter(request, response);
-            return;
+
+            final List<Attribute> attributes =
+                    samlHelper.getAttributes(principalName, relyingPartyId, LoginHelper.getSession(request));
+
+            if (LoginHelper.consentRevocationRequested(request)) {
+                logger.debug("Consent revovation requested.");
+                attributeReleaseModule.clearConsent(principalName, relyingPartyId);
+            }
+
+            if (attributeReleaseModule.consentRequired(principalName, relyingPartyId, attributes)) {
+                LoginHelper.redirectToServlet(request, response, "/uApprove/AttributeRelease");
+                return;
+            } else {
+                chain.doFilter(request, response);
+                return;
+            }
         }
 
     }

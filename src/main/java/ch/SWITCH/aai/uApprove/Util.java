@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.codec.binary.Hex;
 import org.slf4j.Logger;
@@ -58,5 +60,9 @@ public final class Util {
     public static String hash(final String input) {
         final byte[] digest = sha256.digest(input.getBytes());
         return Hex.encodeHexString(digest);
+    }
+
+    public static List<String> stringToList(final String string) {
+        return Arrays.asList(string.split("\\s+"));
     }
 }

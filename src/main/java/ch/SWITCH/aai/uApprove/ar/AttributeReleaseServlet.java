@@ -64,6 +64,7 @@ public class AttributeReleaseServlet extends HttpServlet {
             IOException {
         final Map<String, Object> context = new HashMap<String, Object>();
         context.put("localized", viewHelper.getLocalizedStrings("attribute-release", req.getLocale()));
+        // context need relying party and attributes (both localized);
         viewHelper.showView(resp, "attribute-release", context);
     }
 

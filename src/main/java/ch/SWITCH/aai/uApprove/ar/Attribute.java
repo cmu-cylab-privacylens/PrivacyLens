@@ -74,18 +74,27 @@ public class Attribute {
 
     /**
      * @param locale
-     * @return Returns the localized name.
+     * @return Returns the localized name or the attribute id.
      */
     public String getLocalizedName(final Locale locale) {
-        return localizedNames.get(locale);
+        if (localizedNames.containsKey(locale)) {
+            return localizedNames.get(locale);
+        } else {
+            return getId();
+        }
+
     }
 
     /**
      * @param locale
-     * @return Returns the localized description.
+     * @return Returns the localized description or an empty string.
      */
     public String getLocalizedDescription(final Locale locale) {
-        return localizedDescriptions.get(locale);
+        if (localizedDescriptions.containsKey(locale)) {
+            return localizedDescriptions.get(locale);
+        } else {
+            return "";
+        }
     }
 
     /**

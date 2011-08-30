@@ -64,17 +64,42 @@ public class RelyingParty {
 
     /**
      * @param locale
-     * @return Returns the localized name.
+     * @return Returns the localized name, FQDN or the entityId (in this order).
      */
     public String getLocalizedName(final Locale locale) {
-        return localizedNames.get(locale);
+        if (localizedNames.containsKey(locale)) {
+            return localizedNames.get(locale);
+        } else {
+            return getFqdn(id);
+        }
     }
 
     /**
      * @param locale
-     * @return Returns the localized description.
+     * @return Returns the localized description or an empty string.
      */
     public String getLocalizedDescription(final Locale locale) {
-        return localizedDescriptions.get(locale);
+        if (localizedDescriptions.containsKey(locale)) {
+            return localizedDescriptions.get(locale);
+        } else {
+            return "";
+        }
+    }
+
+    /**
+     * Tries to parse out the FDQN from the relying party id.
+     * 
+     * @param entityId The relying party id.
+     * @return Returns the sp.example.org component out of https://sp.example.org/shibboleth or the sp.example.org
+     *         component out of urn:mace:federation.org:sp.example.org or the entityId.
+     */
+    private String getFqdn(final String entityId) {
+
+        // TODO
+        // pattern = http(s)?://(.)+(/)?(.)?
+
+        // pattern = (.)+:(.)+
+
+        return entityId;
     }
 }

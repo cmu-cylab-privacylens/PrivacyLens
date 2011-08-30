@@ -13,4 +13,11 @@
             <package name="ch.SWITCH.aai.uApprove.tou.storage"></package>
         </packages>
     </test>
+    
+    <test name="uApprove.ar" enabled="true">  
+        <packages>       
+            <package name="ch.SWITCH.aai.uApprove.ar"></package>
+            <package name="ch.SWITCH.aai.uApprove.ar.storage"></package>
+        </packages>
+    </test>
 </suite>

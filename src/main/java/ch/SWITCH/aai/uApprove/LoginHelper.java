@@ -18,15 +18,19 @@
 package ch.SWITCH.aai.uApprove;
 
 import java.io.IOException;
+import java.io.Serializable;
+import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
+import ch.SWITCH.aai.uApprove.ar.Attribute;
 import edu.internet2.middleware.shibboleth.common.session.Session;
 import edu.internet2.middleware.shibboleth.idp.authn.LoginContext;
 import edu.internet2.middleware.shibboleth.idp.util.HttpServletHelper;
@@ -110,5 +114,26 @@ public final class LoginHelper {
         } catch (final IOException e) {
             logger.error("Error sending user to servlet {} ", servletUrl, e);
         }
+    }
+
+    /**
+     * @param request
+     * @return
+     */
+    public static boolean consentRevocationRequested(final HttpServletRequest request) {
+        return StringUtils.equals(request.getParameter("reset-consent"), "yes");
+    }
+
+    public void setAttributes(final ServletContext servletContext, final HttpServletRequest request,
+            final List<Attribute> attributes) {
+        final LoginContext loginContext = getLoginContext(servletContext, request);
+        Assert.notNull(loginContext, "Login context is required for this operation.");
+        loginContext.setProperty("uApprove-attributes", (Serializable) attributes);
+    }
+
+    public static List<Attribute> getAttributes(final ServletContext servletContext, final HttpServletRequest request) {
+        final LoginContext loginContext = getLoginContext(servletContext, request);
+        Assert.notNull(loginContext, "Login context is required for this operation.");
+        return (List<Attribute>) loginContext.getProperty("uApprove-attributes");
     }
 }

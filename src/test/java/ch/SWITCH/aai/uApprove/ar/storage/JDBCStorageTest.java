@@ -15,7 +15,9 @@
  * limitations under the License.
  */
 
-package ch.SWITCH.aai.uApprove.tou.storage;
+package ch.SWITCH.aai.uApprove.ar.storage;
+
+import java.util.List;
 
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -29,7 +31,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import ch.SWITCH.aai.uApprove.tou.ToUAcceptance;
+import ch.SWITCH.aai.uApprove.ar.AttributeRelease;
 
 /**
  * Tests JDBC storage using the Spring JDBC framework.
@@ -47,36 +49,35 @@ public class JDBCStorageTest extends AbstractTransactionalTestNGSpringContextTes
     @BeforeClass
     @Rollback(false)
     public void initialize() {
-        super.executeSqlScript("classpath:/terms-of-use-schema.sql", false);
+        super.executeSqlScript("classpath:/attribute-release-schema.sql", false);
     }
 
     @Test
-    public void crudToUAcceptance() {
+    public void crudAttributeRelease() {
+        final String userId = "userId";
+        final String relyingPartyId = "relyingPartyId";
+        final AttributeRelease attributeRelease1 = new AttributeRelease("id", "hash", new DateTime());
 
-        final String userId = "student1";
-        final String version = "1.0";
-        final String fingerprint = "5b2ee897c08c79a09cd57e8602d605bf8c52db17de9793677c36b5c78644b2b2";
-        final DateTime acceptanceDate = new DateTime("2011-11-11T11:11:11");
+        Assert.assertFalse(storage.containsAttributeReleases(userId, relyingPartyId));
 
-        Assert.assertFalse(storage.containsToUAcceptance(userId, version));
-        Assert.assertNull(storage.readToUAcceptance(userId, version));
+        storage.createAttributeRelease(userId, relyingPartyId, attributeRelease1);
+        Assert.assertTrue(storage.containsAttributeReleases(userId, relyingPartyId));
 
-        ToUAcceptance touAcceptance = new ToUAcceptance(version, fingerprint, acceptanceDate);
-        storage.createToUAcceptance(userId, touAcceptance);
-        Assert.assertTrue(storage.containsToUAcceptance(userId, version));
+        List<AttributeRelease> attributeReleases = storage.readAttributeReleases(userId, relyingPartyId);
+        Assert.assertEquals(attributeReleases.size(), 1);
+        Assert.assertEquals(attributeReleases.get(0).getAttributeId(), attributeRelease1.getAttributeId());
+        Assert.assertEquals(attributeReleases.get(0).getValuesHash(), attributeRelease1.getValuesHash());
+        Assert.assertEquals(attributeReleases.get(0).getDate(), attributeRelease1.getDate());
 
-        touAcceptance = storage.readToUAcceptance(userId, version);
+        final AttributeRelease attributeRelease2 = new AttributeRelease("id", "otherhash", new DateTime());
+        storage.updateAttributeRelease(userId, relyingPartyId, attributeRelease2);
 
-        Assert.assertEquals(version, touAcceptance.getVersion());
-        Assert.assertEquals(fingerprint, touAcceptance.getFingerprint());
-        Assert.assertEquals(acceptanceDate, touAcceptance.getAcceptanceDate());
+        attributeReleases = storage.readAttributeReleases(userId, relyingPartyId);
+        Assert.assertEquals(attributeReleases.size(), 1);
+        Assert.assertEquals(attributeReleases.get(0).getValuesHash(), attributeRelease2.getValuesHash());
 
-        touAcceptance = new ToUAcceptance(version, fingerprint.substring(1), acceptanceDate.plusMonths(1));
-        storage.updateToUAcceptance(userId, touAcceptance);
-
-        touAcceptance = storage.readToUAcceptance(userId, version);
-        Assert.assertEquals(version, touAcceptance.getVersion());
-        Assert.assertEquals(fingerprint.substring(1), touAcceptance.getFingerprint());
-        Assert.assertEquals(acceptanceDate.plusMonths(1), touAcceptance.getAcceptanceDate());
+        storage.deleteAttributeReleases(userId, relyingPartyId);
+        Assert.assertFalse(storage.containsAttributeReleases(userId, relyingPartyId));
+        Assert.assertTrue(storage.readAttributeReleases(userId, relyingPartyId).isEmpty());
     }
 }

@@ -1,6 +1,7 @@
 
 package ch.SWITCH.aai.uApprove;
 
+import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -76,7 +77,7 @@ public class ViewHelper {
         this.forceDefaultLocale = forceDefaultLocale;
     }
 
-    public Locale selectLocale(final Locale userLocale) {
+    public Locale selectLocale(final Locale userLocale, final Collection<Locale> availableLocales) {
         if (forceDefaultLocale) {
             return defaultLocale;
         } else {
@@ -96,9 +97,8 @@ public class ViewHelper {
         }
     }
 
-    public LocalizedStrings getLocalizedStrings(final String resource, final Locale userLocale) {
-        final ResourceBundle resourceBundle =
-                ResourceBundle.getBundle(String.format("messages.%s", resource), selectLocale(userLocale));
+    public LocalizedStrings getLocalizedStrings(final String resource, final Locale locale) {
+        final ResourceBundle resourceBundle = ResourceBundle.getBundle(String.format("messages.%s", resource), locale);
         return new LocalizedStrings(resourceBundle);
     }
 }

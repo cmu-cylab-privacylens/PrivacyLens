@@ -17,35 +17,23 @@
 
 package ch.SWITCH.aai.uApprove.tou.storage;
 
-import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Properties;
-
-import javax.sql.DataSource;
 
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
-import org.springframework.util.Assert;
 
+import ch.SWITCH.aai.uApprove.AbstractJDBCStorage;
 import ch.SWITCH.aai.uApprove.tou.ToUAcceptance;
 
 /** JDBC implementation. */
-public class JDBCStorage implements Storage {
+public class JDBCStorage extends AbstractJDBCStorage implements Storage {
 
     /** Class logger. */
     private final Logger logger = LoggerFactory.getLogger(JDBCStorage.class);
-
-    /** The JDBC template. */
-    private SimpleJdbcTemplate jdbcTemplate;
-
-    /** The SQL Statements. */
-    private Properties sqlStatements;
 
     /** {@see ToUAcceptance} row mapper. */
     private static final class ToUAcceptanceMapper implements ParameterizedRowMapper<ToUAcceptance> {
@@ -62,25 +50,8 @@ public class JDBCStorage implements Storage {
 
     /** Default constructor. */
     public JDBCStorage() {
+        super();
         touAcceptanceMapper = new ToUAcceptanceMapper();
-    }
-
-    public void setDataSource(final DataSource dataSource) {
-        jdbcTemplate = new SimpleJdbcTemplate(dataSource);
-    }
-
-    public void setSqlStatements(final Resource sqlStamentsResource) {
-        sqlStatements = new Properties();
-        try {
-            sqlStatements.load(sqlStamentsResource.getInputStream());
-        } catch (final IOException e) {
-            logger.error("Error reading SQL statements from resource {}", sqlStamentsResource.getDescription(), e);
-        }
-    }
-
-    public void initialize() {
-        Assert.notNull(jdbcTemplate, "Datasource is not set.");
-        Assert.notEmpty(sqlStatements, "SQL statements are not set.");
     }
 
     /** {@inheritDoc} */

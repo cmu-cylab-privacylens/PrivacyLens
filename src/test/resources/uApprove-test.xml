@@ -7,7 +7,12 @@
                            http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd
                            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
 
-    <bean id="jdbcStorage" class="ch.SWITCH.aai.uApprove.tou.storage.JDBCStorage" init-method="initialize">
+    <bean id="touJdbcStorage" class="ch.SWITCH.aai.uApprove.tou.storage.JDBCStorage" init-method="initialize">
+        <property name="dataSource" ref="dataSource" />
+        <property name="sqlStatements" value="classpath:/conf/sql-statements.properties"/>
+    </bean>
+    
+    <bean id="arJdbcStorage" class="ch.SWITCH.aai.uApprove.ar.storage.JDBCStorage" init-method="initialize">
         <property name="dataSource" ref="dataSource" />
         <property name="sqlStatements" value="classpath:/conf/sql-statements.properties"/>
     </bean>

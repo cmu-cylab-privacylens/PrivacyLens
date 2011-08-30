@@ -17,7 +17,7 @@
 
 package ch.SWITCH.aai.uApprove.ar.storage;
 
-import java.util.Collection;
+import java.util.List;
 
 import ch.SWITCH.aai.uApprove.ar.AttributeRelease;
 
@@ -31,7 +31,7 @@ public interface Storage {
      * @param relyingPartyId The relying party id.
      * @return Returns a collection of attribute releases, might be empty but never null.
      */
-    Collection<AttributeRelease> readAttributeReleases(final String userId, final String relyingPartyId);
+    List<AttributeRelease> readAttributeReleases(final String userId, final String relyingPartyId);
 
     /**
      * Deletes the attribute releases from the storage for a specific user and relying party.
@@ -42,14 +42,13 @@ public interface Storage {
     void deleteAttributeReleases(final String userId, final String relyingPartyId);
 
     /**
-     * Checks if the storage contains a attribute release for a specific user, relying party and attribute.
+     * Checks if the storage contains attribute releases for a specific user andrelying party
      * 
      * @param userId The user id.
      * @param relyingPartyId The relying party id.
-     * @param attributeId attribute id.
-     * @return Returns true if the storage contains the attribute release, false otherwise.
+     * @return Returns true if the storage contains attribute releases, false otherwise.
      */
-    boolean containsAttributeRelease(final String userId, final String relyingPartyId, final String attributeId);
+    boolean containsAttributeReleases(final String userId, final String relyingPartyId);
 
     /**
      * Updates the attribute releases for a specific user and relying party.

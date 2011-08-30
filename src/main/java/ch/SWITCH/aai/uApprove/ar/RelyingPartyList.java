@@ -17,30 +17,33 @@
 
 package ch.SWITCH.aai.uApprove.ar;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.ArrayList;
 import java.util.regex.Pattern;
+
+import ch.SWITCH.aai.uApprove.Util;
 
 /**
  *
  */
-public class ServiceList {
+public class RelyingPartyList extends ArrayList<String> {
 
-    private List<String> services;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
 
     private boolean isBlacklist;
 
-    public ServiceList() {
-        services = Collections.emptyList();
+    public RelyingPartyList() {
+        super();
         isBlacklist = true;
     }
 
     /**
-     * @param services The services to set.
+     * @param expressions
      */
-    public void setServices(final String list) {
-        services = Arrays.asList(list.split("\\s+"));
+    public void setRegularExpressions(final String expressions) {
+        super.addAll(Util.stringToList(expressions));
     }
 
     /**
@@ -50,16 +53,17 @@ public class ServiceList {
         this.isBlacklist = isBlacklist;
     }
 
-    public boolean skipRelyingParty(final String relyingPartyId) {
+    /** {@inheritDoc} */
+    public boolean contains(final Object o) {
         boolean found = false;
-        for (final String serviceRegEx : services) {
+        for (final String serviceRegEx : this) {
             final Pattern pattern = Pattern.compile(serviceRegEx);
-            if (pattern.matcher(relyingPartyId).find()) {
+            if (pattern.matcher(String.valueOf(o)).find()) {
                 found = true;
                 break;
             }
         }
-        return isBlacklist ? found : !found;
+        return isBlacklist ? !found : found;
     }
 
 }

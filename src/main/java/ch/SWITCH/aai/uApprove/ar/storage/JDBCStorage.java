@@ -17,29 +17,25 @@
 
 package ch.SWITCH.aai.uApprove.ar.storage;
 
-import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Properties;
-
-import javax.sql.DataSource;
+import java.util.List;
 
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 
+import ch.SWITCH.aai.uApprove.AbstractJDBCStorage;
 import ch.SWITCH.aai.uApprove.ar.AttributeRelease;
 
 /** JDBC implementation. */
-public class JDBCStorage implements Storage {
+public class JDBCStorage extends AbstractJDBCStorage implements Storage {
 
     /** Class logger. */
+    @SuppressWarnings("unused")
     private final Logger logger = LoggerFactory.getLogger(JDBCStorage.class);
 
     /** {@see AttributeRelease} row mapper. */
@@ -51,64 +47,37 @@ public class JDBCStorage implements Storage {
         }
     }
 
-    /** The SQL Statements. */
-    private Properties sqlStatements;
-
-    /** The JDBC template. */
-    private SimpleJdbcTemplate jdbcTemplate;
-
     /** The attribute release mapper. */
     private final AttributeReleaseMapper attributeReleaseMapper;
 
     /** Default constructor. */
     public JDBCStorage() {
+        super();
         attributeReleaseMapper = new AttributeReleaseMapper();
     }
 
-    /**
-     * Sets the data source.
-     * 
-     * @param dataSource The datasource.
-     */
-    public void setDataSource(final DataSource dataSource) {
-        jdbcTemplate = new SimpleJdbcTemplate(dataSource);
-    }
-
-    public void setSqlStatements(final Resource sqlStamentsResource) {
-        sqlStatements = new Properties();
-        try {
-            sqlStatements.load(sqlStamentsResource.getInputStream());
-        } catch (final IOException e) {
-            logger.error("Error reading SQL statements from resource {}", sqlStamentsResource.getDescription(), e);
-        }
-    }
-
     /** {@inheritDoc} */
-    @Override
-    public Collection<AttributeRelease> readAttributeReleases(final String userId, final String relyingPartyId) {
+    public List<AttributeRelease> readAttributeReleases(final String userId, final String relyingPartyId) {
         try {
             return jdbcTemplate.query(sqlStatements.getProperty("ar.readAttributeReleases"), attributeReleaseMapper,
                     userId, relyingPartyId);
         } catch (final EmptyResultDataAccessException e) {
-            return Collections.emptySet();
+            return Collections.emptyList();
         }
     }
 
     /** {@inheritDoc} */
-    @Override
     public void deleteAttributeReleases(final String userId, final String relyingPartyId) {
         jdbcTemplate.update(sqlStatements.getProperty("ar.deleteAttributeReleases"), userId, relyingPartyId);
     }
 
     /** {@inheritDoc} */
-    @Override
-    public boolean containsAttributeRelease(final String userId, final String relyingPartyId, final String attributeId) {
-        return jdbcTemplate.queryForInt(sqlStatements.getProperty("ar.containsAttributeRelease"), userId,
-                relyingPartyId, attributeId) > 0;
+    public boolean containsAttributeReleases(final String userId, final String relyingPartyId) {
+        return jdbcTemplate.queryForInt(sqlStatements.getProperty("ar.containsAttributeReleases"), userId,
+                relyingPartyId) > 0;
     }
 
     /** {@inheritDoc} */
-    @Override
     public void updateAttributeRelease(final String userId, final String relyingPartyId,
             final AttributeRelease attributeRelease) {
         jdbcTemplate.update(sqlStatements.getProperty("ar.updateAttributeRelease"), attributeRelease.getValuesHash(),
@@ -116,7 +85,6 @@ public class JDBCStorage implements Storage {
     }
 
     /** {@inheritDoc} */
-    @Override
     public void createAttributeRelease(final String userId, final String relyingPartyId,
             final AttributeRelease attributeRelease) {
         jdbcTemplate.update(sqlStatements.getProperty("ar.createAttributeRelease"), userId, relyingPartyId,
