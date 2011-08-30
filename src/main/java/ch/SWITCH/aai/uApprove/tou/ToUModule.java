@@ -51,6 +51,13 @@ public class ToUModule {
     }
 
     /**
+     * @return Returns the enabled.
+     */
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    /**
      * @param tou The tou to set.
      */
     public void setTou(final ToU tou) {
@@ -82,11 +89,6 @@ public class ToUModule {
      * @return
      */
     public boolean isToUAccepted(final String principalName) {
-        if (!enabled) {
-            logger.debug("Terms of use are disabled.");
-            return true;
-        }
-
         final ToUAcceptance touAcceptance;
         if (storage.containsToUAcceptance(principalName, tou.getVersion())) {
             touAcceptance = storage.readToUAcceptance(principalName, tou.getVersion());

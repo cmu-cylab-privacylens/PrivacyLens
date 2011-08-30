@@ -109,7 +109,6 @@ public class SAMLHelper {
             }
             logger.trace("Attribute: {} {}", baseAttribute.getId(), attributeValues);
 
-            final Map<String, String> attributeNames = new HashMap<String, String>();
             attributes.add(new Attribute(baseAttribute.getId(), baseAttribute.getDisplayNames(), baseAttribute
                     .getDisplayDescriptions(), attributeValues));
         }
@@ -117,8 +116,8 @@ public class SAMLHelper {
         return attributes;
     }
 
-    private BaseSAMLProfileRequestContext buildRequestContext(final String principalName, final String relyingPartyId,
-            final Session session) {
+    private BaseSAMLProfileRequestContext<?, ?, ?, ?> buildRequestContext(final String principalName,
+            final String relyingPartyId, final Session session) {
 
         final RelyingPartyConfiguration relyingPartyConfiguration =
                 relyingPartyConfigurationManager.getRelyingPartyConfiguration(relyingPartyId);
@@ -138,7 +137,7 @@ public class SAMLHelper {
             logger.error("Error while retrieving metadata descriptor for {}.", relyingPartyId, e);
         }
 
-        final BaseSAMLProfileRequestContext requestCtx = new BaseSAMLProfileRequestContext();
+        final BaseSAMLProfileRequestContext<?, ?, ?, ?> requestCtx = new BaseSAMLProfileRequestContext();
         requestCtx.setRelyingPartyConfiguration(relyingPartyConfiguration);
         requestCtx.setInboundMessageIssuer(relyingPartyId);
         requestCtx.setOutboundMessageIssuer(providerId);

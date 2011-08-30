@@ -36,34 +36,44 @@ public class AttributeReleaseModule {
     /** Class logger. */
     private final Logger logger = LoggerFactory.getLogger(AttributeReleaseModule.class);
 
-    private final boolean enabled;
+    private boolean enabled;
 
-    private final boolean allowGeneralConsent;
+    private boolean allowGeneralConsent;
 
     private List<String> enabledRelyingParties;
 
-    private List<String> attributeBlacklist;
-
-    private List<String> attributeOrdering;
-
     private Storage storage;
+
+    /**
+     * @param enabled The enabled to set.
+     */
+    public void setEnabled(final boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    /**
+     * @return Returns the enabled.
+     */
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    /**
+     * @param allowGeneralConsent The allowGeneralConsent to set.
+     */
+    public void setAllowGeneralConsent(final boolean allowGeneralConsent) {
+        this.allowGeneralConsent = allowGeneralConsent;
+    }
+
+    /**
+     * @return Returns the allowGeneralConsent.
+     */
+    public boolean isAllowGeneralConsent() {
+        return allowGeneralConsent;
+    }
 
     public void setRelyingParties(final List<String> relyingParties) {
         this.enabledRelyingParties = relyingParties;
-    }
-
-    /**
-     * @param attributeBlacklist The attributeBlacklist to set.
-     */
-    public void setAttributeBlacklist(final List<String> attributeBlacklist) {
-        this.attributeBlacklist = attributeBlacklist;
-    }
-
-    /**
-     * @param attributeOrdering The attributeOrdering to set.
-     */
-    public void setAttributeOrdering(final List<String> attributeOrdering) {
-        this.attributeOrdering = attributeOrdering;
     }
 
     /**
@@ -77,8 +87,6 @@ public class AttributeReleaseModule {
         enabled = false;
         allowGeneralConsent = false;
         enabledRelyingParties = Collections.emptyList();
-        attributeBlacklist = Collections.emptyList();
-        attributeOrdering = Collections.emptyList();
     }
 
     public void initialize() {
@@ -92,10 +100,7 @@ public class AttributeReleaseModule {
      * @return
      */
     public boolean consentRequired(final String principalName, final String relyingPartyId,
-            final List<Attribute> releasedAttributes) {
-
-        final List<Attribute> attributes =
-                AttributeReleaseHelper.removeBlacklistedAttributes(releasedAttributes, attributeBlacklist);
+            final List<Attribute> attributes) {
 
         if (storage.containsAttributeReleases(principalName, "*")) {
             logger.debug("User {} has given gerneral consent.");

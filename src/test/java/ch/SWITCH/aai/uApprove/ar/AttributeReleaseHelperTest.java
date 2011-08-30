@@ -17,9 +17,6 @@
 
 package ch.SWITCH.aai.uApprove.ar;
 
-import static org.testng.AssertJUnit.fail;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -42,46 +39,6 @@ public class AttributeReleaseHelperTest {
         final List<String> unsortedValues = Arrays.asList(new String[] {"bbb", "ccc", "aaa"});
         final String hash = AttributeReleaseHelper.hashValues(unsortedValues);
         Assert.assertEquals(hash, Util.hash("aaa;bbb;ccc;"));
-    }
-
-    @Test
-    public void testRemoveBlacklistedAttributes() {
-
-        final List<Attribute> attributes = new ArrayList<Attribute>();
-        attributes.add(new Attribute("id1", null, null, null));
-        attributes.add(new Attribute("id2", null, null, null));
-        attributes.add(new Attribute("id3", null, null, null));
-        attributes.add(new Attribute("id4", null, null, null));
-
-        final List<String> blacklist = Arrays.asList(new String[] {"id2", "id4"});
-        final List<Attribute> filteredAttributes =
-                AttributeReleaseHelper.removeBlacklistedAttributes(attributes, blacklist);
-
-        for (final Attribute filteredAttribute : filteredAttributes) {
-            if (blacklist.contains(filteredAttribute.getId())) {
-                fail("Blacklisted attribute found");
-            }
-        }
-        Assert.assertTrue(true);
-    }
-
-    @Test
-    public void testSortAttributes() {
-
-        final List<Attribute> attributes = new ArrayList<Attribute>();
-        attributes.add(new Attribute("id2", null, null, null));
-        attributes.add(new Attribute("id3", null, null, null));
-        attributes.add(new Attribute("id4", null, null, null));
-        attributes.add(new Attribute("id1", null, null, null));
-
-        final List<String> ordering = Arrays.asList(new String[] {"id1", "id2"});
-
-        AttributeReleaseHelper.sortAttributes(attributes, ordering);
-
-        for (int i = 0; i < ordering.size(); i++) {
-            Assert.assertEquals(attributes.get(i).getId(), ordering.get(i));
-        }
-
     }
 
 }

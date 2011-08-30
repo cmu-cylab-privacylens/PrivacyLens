@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="uApprove.css"/> 
+    <title>${localized.ar_title}</title>
+</head>
+
+<body>
+    <div>
+        ${localized.ar_relyingParty}
+    </div>
+    
+    <div>
+	    <table>
+	    #foreach( ${attribute} in ${attributes} )
+	        <tr>
+	            <td>${attribute.localizedName(locale)}</td>
+	            <td>
+	                ${attribute.values}
+	            </td>
+	        </tr>
+	    #end
+	    </table>
+    </div>
+    
+    <div>
+        <form action="#" method="post" >
+            <label for="ar.general_consent">${localized.general_consent_text}</label>
+            <input type="checkbox" name="ar.general_consent" value="true"/>
+            <button type="submit">${localized.ar_confirm}</button>
+        </form>
+    </div>    
+</body>
+
+</html>

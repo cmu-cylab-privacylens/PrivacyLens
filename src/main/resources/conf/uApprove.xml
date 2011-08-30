@@ -26,13 +26,15 @@
         <property name="sqlStatements" value="${database.sqlStatements}"/>
     </bean>
     
-    <bean id="uApprove.arModule" class="ch.SWITCH.aai.uApprove.tou.ToUModule" init-method="initialize">
+    <bean id="uApprove.arModule" class="ch.SWITCH.aai.uApprove.ar.AttributeReleaseModule" init-method="initialize">
         <property name="enabled" value="${ar.enabled}" />
         <property name="allowGeneralConsent" value="${ar.allowGeneralConsent}" />
-        <property name="services" value="${ar.services" />
+        <property name="services" value="${ar.services}" />
         <property name="servicesIsBlacklist" value="${ar.services.blacklist}" />
         <property name="storage" ref="uApprove.ar.storage" />
     </bean>
+    
+    <
     
     <bean id="uApprove.ar.storage" class="ch.SWITCH.aai.uApprove.ar.storage.JDBCStorage" init-method="initialize">
         <property name="dataSource" ref="uApprove.dataSource" />
@@ -61,5 +63,10 @@
         </property>
         <property name="defaultLocale" value="${view.defaultLocale}" />
         <property name="forceDefaultLocale" value="${view.forceDefaultLocale}" />
+    </bean>
+    
+    <bean id="uApprove.samlHelper" class="ch.SWITCH.aai.uApprove.ar.SAMLHelper" init-method="initialize">
+        <property name="attributeAuthority" ref="shibboleth.AttributeResolver" />
+        <property name="relyingPartyConfigurationManager" ref="shibboleth.RelyingPartyConfigurationManager" />
     </bean>
 </beans>

@@ -20,7 +20,6 @@ package ch.SWITCH.aai.uApprove.ar;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 
@@ -64,37 +63,6 @@ public class AttributeReleaseHelper {
             stringBuilder.append(value).append(";");
         }
         return Util.hash(stringBuilder.toString());
-    }
-
-    public static List<Attribute> removeBlacklistedAttributes(final List<Attribute> attributes,
-            final List<String> blacklist) {
-        final List<Attribute> notBlacklisted = new ArrayList<Attribute>();
-        for (final Attribute attribute : attributes) {
-            if (!blacklist.contains(attribute.getId())) {
-                notBlacklisted.add(attribute);
-            }
-        }
-        return notBlacklisted;
-    }
-
-    public static void sortAttributes(final List<Attribute> attributes, final List<String> ordering) {
-        Collections.sort(attributes, new Comparator<Attribute>() {
-            public int compare(final Attribute attribute1, final Attribute attribute2) {
-                int last = ordering.size();
-                int rank1 = ordering.indexOf(attribute1.getId());
-                int rank2 = ordering.indexOf(attribute2.getId());
-
-                if (rank2 < 0) {
-                    rank2 = last;
-                    last++;
-                }
-
-                if (rank1 < 0) {
-                    rank1 = last;
-                }
-                return rank1 - rank2;
-            }
-        });
     }
 
     public static boolean approvedAttributes(final List<Attribute> attributes,

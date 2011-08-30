@@ -19,6 +19,7 @@ package ch.SWITCH.aai.uApprove.ar;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -26,6 +27,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.context.WebApplicationContext;
@@ -71,9 +73,18 @@ public class AttributeReleaseServlet extends HttpServlet {
     /** {@inheritDoc} */
     protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException,
             IOException {
-        // StringUtils.equals(req.getParameter("???"), "???");
+
+        final boolean generalConsent = StringUtils.equals(req.getParameter("ar.general_consent"), "true");
+        final String principalName = LoginHelper.getPrincipalName(getServletContext(), req);
+        final String relyingPartyId = LoginHelper.getRelyingPartyId(getServletContext(), req);
+        final List<Attribute> attributes = LoginHelper.getAttributes(getServletContext(), req);
+
+        if (attributeReleaseModule.isAllowGeneralConsent() && generalConsent) {
+            attributeReleaseModule.createConsent(principalName);
+        } else {
+            attributeReleaseModule.createConsent(principalName, relyingPartyId, attributes);
+        }
 
         LoginHelper.returnToIdP(getServletContext(), req, resp);
     }
-
 }
