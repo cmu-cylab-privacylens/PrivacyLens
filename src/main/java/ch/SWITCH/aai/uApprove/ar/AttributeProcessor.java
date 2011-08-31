@@ -27,19 +27,19 @@ import ch.SWITCH.aai.uApprove.Util;
 /**
  *
  */
-public class AttributeHelper {
+public class AttributeProcessor {
 
     private List<String> blacklist;
 
-    private List<String> ordering;
+    private List<String> order;
 
     /**
      * Constructor.
      * 
      */
-    public AttributeHelper() {
+    public AttributeProcessor() {
         blacklist = Collections.emptyList();
-        ordering = Collections.emptyList();
+        order = Collections.emptyList();
     }
 
     /**
@@ -50,10 +50,10 @@ public class AttributeHelper {
     }
 
     /**
-     * @param ordering The ordering to set.
+     * @param order The order to set.
      */
-    public void setOrdering(final String ordering) {
-        this.ordering = Util.stringToList(ordering);;
+    public void setOrder(final String order) {
+        this.order = Util.stringToList(order);;
     }
 
     public void removeBlacklistedAttributes(final List<Attribute> attributes) {
@@ -68,9 +68,9 @@ public class AttributeHelper {
     public void sortAttributes(final List<Attribute> attributes) {
         Collections.sort(attributes, new Comparator<Attribute>() {
             public int compare(final Attribute attribute1, final Attribute attribute2) {
-                int last = ordering.size();
-                int rank1 = ordering.indexOf(attribute1.getId());
-                int rank2 = ordering.indexOf(attribute2.getId());
+                int last = order.size();
+                int rank1 = order.indexOf(attribute1.getId());
+                int rank2 = order.indexOf(attribute2.getId());
 
                 if (rank2 < 0) {
                     rank2 = last;

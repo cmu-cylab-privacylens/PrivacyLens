@@ -33,15 +33,15 @@ import ch.SWITCH.aai.uApprove.Util;
 /**
  * Tests AttributeReleaseHelper.
  */
-public class AttributeHelperTest {
+public class AttributeProcessorTest {
 
-    private final Logger logger = LoggerFactory.getLogger(AttributeHelperTest.class);
+    private final Logger logger = LoggerFactory.getLogger(AttributeProcessorTest.class);
 
-    private AttributeHelper attributeHelper;
+    private AttributeProcessor attributeHelper;
 
     @BeforeClass
     public void initialize() {
-        attributeHelper = new AttributeHelper();
+        attributeHelper = new AttributeProcessor();
     }
 
     @Test
@@ -68,7 +68,7 @@ public class AttributeHelperTest {
     @Test
     public void testSortAttributes() {
 
-        attributeHelper.setOrdering("id1 id2");
+        attributeHelper.setOrder("id1 id2");
 
         final List<Attribute> attributes = new ArrayList<Attribute>();
         attributes.add(new Attribute("id2", null, null, null));

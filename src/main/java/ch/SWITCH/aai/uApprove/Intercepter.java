@@ -37,7 +37,6 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import ch.SWITCH.aai.uApprove.ar.Attribute;
-import ch.SWITCH.aai.uApprove.ar.AttributeHelper;
 import ch.SWITCH.aai.uApprove.ar.AttributeReleaseModule;
 import ch.SWITCH.aai.uApprove.ar.SAMLHelper;
 import ch.SWITCH.aai.uApprove.tou.ToUModule;
@@ -58,8 +57,6 @@ public class Intercepter implements Filter {
 
     private SAMLHelper samlHelper;
 
-    private AttributeHelper attributeHelper;
-
     /** {@inheritDoc} */
     public void init(final FilterConfig filterConfig) throws ServletException {
         servletContext = filterConfig.getServletContext();
@@ -70,7 +67,11 @@ public class Intercepter implements Filter {
                 (AttributeReleaseModule) appContext.getBean("uApprove.attributeReleaseModule",
                         AttributeReleaseModule.class);
         samlHelper = (SAMLHelper) appContext.getBean("uApprove.samlHelper", SAMLHelper.class);
-        attributeHelper = (AttributeHelper) appContext.getBean("uApprove.attributeHelper", AttributeHelper.class);
+
+        Assert.notNull(touModule, "ToU module isn't properly configured.");
+        Assert.notNull(attributeReleaseModule, "Attribute Release module isn't properly configured.");
+        Assert.notNull(samlHelper, "SAML Helper isn't properly configured.");
+
         logger.debug("uApprove initialized.");
     }
 
@@ -88,6 +89,7 @@ public class Intercepter implements Filter {
 
         if (!LoginHelper.isAuthenticated(servletContext, request)) {
             logger.trace("Request is not authenticated.");
+            LoginHelper.testAndSetConsentRevocation(servletContext, request);
             chain.doFilter(request, response);
             return;
         }
@@ -104,15 +106,15 @@ public class Intercepter implements Filter {
             final List<Attribute> attributes =
                     samlHelper.getAttributes(principalName, relyingPartyId, LoginHelper.getSession(request));
 
-            attributeHelper.removeBlacklistedAttributes(attributes);
-
-            if (LoginHelper.consentRevocationRequested(request)) {
+            if (LoginHelper.isConsentRevocation(servletContext, request)) {
                 logger.debug("Consent revovation requested.");
                 attributeReleaseModule.clearConsent(principalName, relyingPartyId);
+                LoginHelper.clearConsentRevocation(servletContext, request);
             }
 
             if (attributeReleaseModule.isEnabled()
                     && attributeReleaseModule.consentRequired(principalName, relyingPartyId, attributes)) {
+                LoginHelper.setAttributes(servletContext, request, attributes);
                 LoginHelper.redirectToServlet(request, response, "/uApprove/AttributeRelease");
                 return;
             } else {

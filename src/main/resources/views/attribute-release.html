@@ -14,20 +14,22 @@
     <div>
 	    <table>
 	    #foreach( ${attribute} in ${attributes} )
+	    
 	        <tr>
-	            <td>${attribute.localizedName(locale)}</td>
+	            <td>${attribute.getLocalizedName($locale)}</td>
 	            <td>
 	                ${attribute.values}
 	            </td>
 	        </tr>
 	    #end
+	    
 	    </table>
     </div>
     
     <div>
-        <form action="#" method="post" >
-            <label for="ar.general_consent">${localized.general_consent_text}</label>
-            <input type="checkbox" name="ar.general_consent" value="true"/>
+        <form action="" method="post">
+            <input type="checkbox" id="ar.general_consent" name="ar.general_consent" value="true"/>
+            <label for="ar.general_consent">${localized.ar_general_consent}</label>
             <button type="submit">${localized.ar_confirm}</button>
         </form>
     </div>    

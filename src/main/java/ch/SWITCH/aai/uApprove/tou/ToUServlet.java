@@ -70,7 +70,7 @@ public class ToUServlet extends HttpServlet {
     /** {@inheritDoc} */
     protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException,
             IOException {
-        final boolean accepted = StringUtils.equals(req.getParameter("tou.accept"), "yes");
+        final boolean accepted = StringUtils.equals(req.getParameter("tou.accept"), "true");
 
         if (accepted) {
             final String principalName = LoginHelper.getPrincipalName(getServletContext(), req);

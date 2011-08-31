@@ -60,6 +60,8 @@ public class SAMLHelper {
 
     private MetadataProvider metadataProvider;
 
+    private AttributeProcessor attributeProcessor;
+
     /**
      * @param attributeAuthority The attributeAuthority to set.
      */
@@ -68,11 +70,18 @@ public class SAMLHelper {
     }
 
     /**
-     * @param rpConfigurationManager The relyingPartyConfigurationManager to set.
+     * @param relyingPartyConfigurationManager The relyingPartyConfigurationManager to set.
      */
-    public void
-            setRpConfigurationManager(final SAMLMDRelyingPartyConfigurationManager relyingPartyConfigurationManager) {
+    public void setRelyingPartyConfigurationManager(
+            final SAMLMDRelyingPartyConfigurationManager relyingPartyConfigurationManager) {
         this.relyingPartyConfigurationManager = relyingPartyConfigurationManager;
+    }
+
+    /**
+     * @param attributeProcessor The attributeProcessor to set.
+     */
+    public void setAttributeProcessor(final AttributeProcessor attributeProcessor) {
+        this.attributeProcessor = attributeProcessor;
     }
 
     public void initialize() {
@@ -80,6 +89,7 @@ public class SAMLHelper {
         Assert.notNull(relyingPartyConfigurationManager, "Relying Party Configuration Manager not set.");
         metadataProvider = relyingPartyConfigurationManager.getMetadataProvider();
         Assert.notNull(metadataProvider, "Metadata Provider not set.");
+        Assert.notNull(attributeProcessor, "Attribute Processor not set.");
     }
 
     public List<Attribute>
@@ -113,6 +123,8 @@ public class SAMLHelper {
                     .getDisplayDescriptions(), attributeValues));
         }
 
+        attributeProcessor.removeBlacklistedAttributes(attributes);
+        attributeProcessor.sortAttributes(attributes);
         return attributes;
     }
 

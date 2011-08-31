@@ -20,6 +20,7 @@ package ch.SWITCH.aai.uApprove.ar;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -48,6 +49,8 @@ public class AttributeReleaseServlet extends HttpServlet {
 
     private AttributeReleaseModule attributeReleaseModule;
 
+    private SAMLHelper samlHelper;
+
     private ViewHelper viewHelper;
 
     /** {@inheritDoc} */
@@ -58,15 +61,21 @@ public class AttributeReleaseServlet extends HttpServlet {
         attributeReleaseModule =
                 (AttributeReleaseModule) appContext.getBean("uApprove.attributeReleaseModule",
                         AttributeReleaseModule.class);
+        samlHelper = (SAMLHelper) appContext.getBean("uApprove.samlHelper", SAMLHelper.class);
         viewHelper = (ViewHelper) appContext.getBean("uApprove.viewHelper", ViewHelper.class);
     }
 
     /** {@inheritDoc} */
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException,
             IOException {
+        final String relyingPartyId = LoginHelper.getRelyingPartyId(getServletContext(), req);
+        final List<Attribute> attributes = LoginHelper.getAttributes(getServletContext(), req);
         final Map<String, Object> context = new HashMap<String, Object>();
+        context.put("relyingParty", samlHelper.getRelyingParty(relyingPartyId));
+        context.put("attributes", attributes);
+        context.put("locale", Locale.ENGLISH);
         context.put("localized", viewHelper.getLocalizedStrings("attribute-release", req.getLocale()));
-        // context need relying party and attributes (both localized);
+
         viewHelper.showView(resp, "attribute-release", context);
     }
 
@@ -80,8 +89,10 @@ public class AttributeReleaseServlet extends HttpServlet {
         final List<Attribute> attributes = LoginHelper.getAttributes(getServletContext(), req);
 
         if (attributeReleaseModule.isAllowGeneralConsent() && generalConsent) {
+            logger.debug("Create general consent for {}", principalName);
             attributeReleaseModule.createConsent(principalName);
         } else {
+            logger.debug("Create consent for {} to {}.", principalName, relyingPartyId);
             attributeReleaseModule.createConsent(principalName, relyingPartyId, attributes);
         }
 

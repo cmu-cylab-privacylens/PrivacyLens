@@ -86,7 +86,7 @@ public final class LoginHelper {
 
     public static String getRelyingPartyId(final ServletContext servletContext, final HttpServletRequest request) {
         final LoginContext loginContext = getLoginContext(servletContext, request);
-        Assert.notNull(loginContext, "LoginContext is null.");
+        Assert.notNull(loginContext, "Login context is required for this operation.");
         final String relyingPartyId = loginContext.getRelyingPartyId();
         logger.trace("Relying party id is {}.", relyingPartyId);
         return relyingPartyId;
@@ -116,24 +116,39 @@ public final class LoginHelper {
         }
     }
 
-    /**
-     * @param request
-     * @return
-     */
-    public static boolean consentRevocationRequested(final HttpServletRequest request) {
-        return StringUtils.equals(request.getParameter("reset-consent"), "yes");
+    public static void
+            testAndSetConsentRevocation(final ServletContext servletContext, final HttpServletRequest request) {
+        if (StringUtils.equals(request.getParameter("uApprove.consent-revocation"), "true")) {
+            final LoginContext loginContext = getLoginContext(servletContext, request);
+            Assert.notNull(loginContext, "Login context is required for this operation.");
+            loginContext.setProperty("uApprove.consentRevocationRequested", "true");
+            logger.trace("Set uApprove.consent-revocation.");
+        }
     }
 
-    public void setAttributes(final ServletContext servletContext, final HttpServletRequest request,
+    public static boolean isConsentRevocation(final ServletContext servletContext, final HttpServletRequest request) {
+        final LoginContext loginContext = getLoginContext(servletContext, request);
+        Assert.notNull(loginContext, "Login context is required for this operation.");
+        return StringUtils.equals(String.valueOf(loginContext.getProperty("uApprove.consentRevocationRequested")),
+                "true");
+    }
+
+    public static void clearConsentRevocation(final ServletContext servletContext, final HttpServletRequest request) {
+        final LoginContext loginContext = getLoginContext(servletContext, request);
+        Assert.notNull(loginContext, "Login context is required for this operation.");
+        loginContext.setProperty("uApprove.consentRevocationRequested", null);
+    }
+
+    public static void setAttributes(final ServletContext servletContext, final HttpServletRequest request,
             final List<Attribute> attributes) {
         final LoginContext loginContext = getLoginContext(servletContext, request);
         Assert.notNull(loginContext, "Login context is required for this operation.");
-        loginContext.setProperty("uApprove-attributes", (Serializable) attributes);
+        loginContext.setProperty("uApprove.attributes", (Serializable) attributes);
     }
 
     public static List<Attribute> getAttributes(final ServletContext servletContext, final HttpServletRequest request) {
         final LoginContext loginContext = getLoginContext(servletContext, request);
         Assert.notNull(loginContext, "Login context is required for this operation.");
-        return (List<Attribute>) loginContext.getProperty("uApprove-attributes");
+        return (List<Attribute>) loginContext.getProperty("uApprove.attributes");
     }
 }

@@ -19,8 +19,9 @@ pre..
     <filter-mapping>
         <filter-name>uApprove</filter-name>
         <url-pattern>/profile/*</url-pattern>
+        <url-pattern>/Authn/UserPassword</url-pattern>
     </filter-mapping>
-    
+
     <servlet>
         <servlet-name>uApprove - Terms Of Use</servlet-name>
         <servlet-class>ch.SWITCH.aai.uApprove.tou.ToUServlet</servlet-class>
@@ -28,20 +29,34 @@ pre..
 
     <servlet-mapping>
         <servlet-name>uApprove - Terms Of Use</servlet-name>
-        <url-pattern>/uApprove/terms-of-use.html</url-pattern>
+        <url-pattern>/uApprove/TermsOfUse</url-pattern>
     </servlet-mapping>
-    
+
     <servlet>
-        <servlet-name>uApprove - Attribute Release Consent</servlet-name>
-        <servlet-class>ch.SWITCH.aai.uApprove.consent.ConsentServlet</servlet-class>
+        <servlet-name>uApprove - Attribute Release</servlet-name>
+        <servlet-class>ch.SWITCH.aai.uApprove.ar.AttributeReleaseServlet</servlet-class>
     </servlet>
-    
+
     <servlet-mapping>
-        <servlet-name>uApprove - Attribute Release Consent</servlet-name>
-        <url-pattern>/uApprove/attribute-release-consent.html</url-pattern>
+        <servlet-name>uApprove - Attribute Release</servlet-name>
+        <url-pattern>/uApprove/AttributeRelease</url-pattern>
     </servlet-mapping>
 
 </web-app>
+
+h3. Consent revocation on the login page
+
+@src/main/webapp/login.jsp@
+
+pre.. 
+
+             <tr>
+               <td>&nbsp;</td>
+               <td>
+                    <input id="uApprove.consent-revocation" type="checkbox" name="uApprove.consent-revocation" value="true"/>
+                    <label for="uApprove.consent-revocation">Reset consent</label>
+               </td>
+             </tr>
 
 
 h3. ToU Schema:
@@ -55,5 +70,6 @@ CREATE TABLE ToUAcceptance (
     
     PRIMARY KEY (userId, version)
 );
+
 
 
