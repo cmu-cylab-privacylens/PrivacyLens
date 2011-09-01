@@ -62,9 +62,8 @@ public class ToUServlet extends HttpServlet {
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException,
             IOException {
         final Map<String, Object> context = new HashMap<String, Object>();
-        context.put("localized", viewHelper.getLocalizedStrings("terms-of-use", req.getLocale()));
         context.put("tou", touModule.getTou());
-        viewHelper.showView(resp, "terms-of-use", context);
+        viewHelper.showView(req, resp, "terms-of-use", context);
     }
 
     /** {@inheritDoc} */

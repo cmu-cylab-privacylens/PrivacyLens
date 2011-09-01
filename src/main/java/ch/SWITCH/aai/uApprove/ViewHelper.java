@@ -1,12 +1,12 @@
 
 package ch.SWITCH.aai.uApprove;
 
-import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.velocity.VelocityContext;
@@ -77,27 +77,36 @@ public class ViewHelper {
         this.forceDefaultLocale = forceDefaultLocale;
     }
 
-    public Locale selectLocale(final Locale userLocale, final Collection<Locale> availableLocales) {
+    private Locale selectLocale(final HttpServletRequest request) {
         if (forceDefaultLocale) {
             return defaultLocale;
         } else {
-            return userLocale;
+            return request.getLocale();
         }
     }
 
-    public void showView(final HttpServletResponse response, final String viewName, final Map<String, ?> context) {
+    public void showView(final HttpServletRequest request, final HttpServletResponse response, final String viewName,
+            final Map<String, ?> viewContext) {
         response.setContentType("text/html");
         response.setCharacterEncoding("UTF-8");
 
+        final Locale locale = selectLocale(request);
+
+        final VelocityContext velocityContext = new VelocityContext();
+        velocityContext.put("String", String.class);
+        velocityContext.put("locale", locale);
+        velocityContext.put("localized", getLocalizedStrings(viewName, locale));
+
         final String templateName = String.format("views/%s.html", viewName);
         try {
-            velocityEngine.mergeTemplate(templateName, "UTF-8", new VelocityContext(context), response.getWriter());
+            velocityEngine.mergeTemplate(templateName, "UTF-8", new VelocityContext(viewContext, velocityContext),
+                    response.getWriter());
         } catch (final Exception e) {
             logger.error("Error while merge and writing view.", e);
         }
     }
 
-    public LocalizedStrings getLocalizedStrings(final String resource, final Locale locale) {
+    private LocalizedStrings getLocalizedStrings(final String resource, final Locale locale) {
         final ResourceBundle resourceBundle = ResourceBundle.getBundle(String.format("messages.%s", resource), locale);
         return new LocalizedStrings(resourceBundle);
     }

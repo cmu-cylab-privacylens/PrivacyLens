@@ -20,7 +20,6 @@ package ch.SWITCH.aai.uApprove.ar;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -73,10 +72,7 @@ public class AttributeReleaseServlet extends HttpServlet {
         final Map<String, Object> context = new HashMap<String, Object>();
         context.put("relyingParty", samlHelper.getRelyingParty(relyingPartyId));
         context.put("attributes", attributes);
-        context.put("locale", Locale.ENGLISH);
-        context.put("localized", viewHelper.getLocalizedStrings("attribute-release", req.getLocale()));
-
-        viewHelper.showView(resp, "attribute-release", context);
+        viewHelper.showView(req, resp, "attribute-release", context);
     }
 
     /** {@inheritDoc} */

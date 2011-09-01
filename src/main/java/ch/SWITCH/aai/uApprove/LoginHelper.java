@@ -136,7 +136,7 @@ public final class LoginHelper {
     public static void clearConsentRevocation(final ServletContext servletContext, final HttpServletRequest request) {
         final LoginContext loginContext = getLoginContext(servletContext, request);
         Assert.notNull(loginContext, "Login context is required for this operation.");
-        loginContext.setProperty("uApprove.consentRevocationRequested", null);
+        loginContext.setProperty("uApprove.consentRevocationRequested", "");
     }
 
     public static void setAttributes(final ServletContext servletContext, final HttpServletRequest request,

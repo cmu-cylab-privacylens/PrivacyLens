@@ -8,7 +8,7 @@
 
 <body>
     <div>
-        ${localized.ar_relyingParty}
+        ${String}.format(${localized.ar_relyingParty}, relyingParty.getLocalizedName(${locale})}}
     </div>
     
     <div>
@@ -16,20 +16,21 @@
 	    #foreach( ${attribute} in ${attributes} )
 	    
 	        <tr>
-	            <td>${attribute.getLocalizedName($locale)}</td>
+	            <td>${attribute.getLocalizedName(${locale})}</td>
 	            <td>
 	                ${attribute.values}
 	            </td>
 	        </tr>
 	    #end
-	    
 	    </table>
     </div>
     
     <div>
         <form action="" method="post">
+            #if (true)
             <input type="checkbox" id="ar.general_consent" name="ar.general_consent" value="true"/>
             <label for="ar.general_consent">${localized.ar_general_consent}</label>
+            #end
             <button type="submit">${localized.ar_confirm}</button>
         </form>
     </div>    
