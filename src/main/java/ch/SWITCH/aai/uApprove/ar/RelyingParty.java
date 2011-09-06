@@ -17,10 +17,6 @@
 
 package ch.SWITCH.aai.uApprove.ar;
 
-import java.util.Collections;
-import java.util.Locale;
-import java.util.Map;
-
 /**
  *
  */
@@ -28,31 +24,34 @@ public class RelyingParty {
 
     private final String id;
 
-    private final Map<Locale, String> localizedNames;
+    private final String localizedName;
 
-    private final Map<Locale, String> localizedDescriptions;
+    private final String localizedDescription;
 
     /**
      * Constructor.
      * 
      * @param id
-     * @param localizedNames
-     * @param localizedDescriptions
      */
-    public RelyingParty(final String id, final Map<Locale, String> localizedNames,
-            final Map<Locale, String> localizedDescriptions) {
-        this.id = id;
-        if (localizedNames != null) {
-            this.localizedNames = localizedNames;
-        } else {
-            this.localizedNames = Collections.emptyMap();
-        }
+    public RelyingParty(final String id) {
+        this(id, null, null);
+    }
 
-        if (localizedDescriptions != null) {
-            this.localizedDescriptions = localizedDescriptions;
+    /**
+     * Constructor.
+     * 
+     * @param id
+     * @param localizedName
+     * @param localizedDescription
+     */
+    public RelyingParty(final String id, final String localizedName, final String localizedDescription) {
+        this.id = id;
+        if (localizedName != null) {
+            this.localizedName = localizedName;
         } else {
-            this.localizedDescriptions = Collections.emptyMap();
+            this.localizedName = AttributeReleaseHelper.resolveFqdn(id);
         }
+        this.localizedDescription = localizedDescription;
     }
 
     /**
@@ -63,43 +62,17 @@ public class RelyingParty {
     }
 
     /**
-     * @param locale
-     * @return Returns the localized name, FQDN or the entityId (in this order).
+     * @return Returns the localizedName.
      */
-    public String getLocalizedName(final Locale locale) {
-        if (localizedNames.containsKey(locale)) {
-            return localizedNames.get(locale);
-        } else {
-            return getFqdn(id);
-        }
+    public String getLocalizedName() {
+        return localizedName;
     }
 
     /**
-     * @param locale
-     * @return Returns the localized description or an empty string.
+     * @return Returns the localizedDescription.
      */
-    public String getLocalizedDescription(final Locale locale) {
-        if (localizedDescriptions.containsKey(locale)) {
-            return localizedDescriptions.get(locale);
-        } else {
-            return "";
-        }
+    public String getLocalizedDescription() {
+        return localizedDescription;
     }
 
-    /**
-     * Tries to parse out the FDQN from the relying party id.
-     * 
-     * @param entityId The relying party id.
-     * @return Returns the sp.example.org component out of https://sp.example.org/shibboleth or the sp.example.org
-     *         component out of urn:mace:federation.org:sp.example.org or the entityId.
-     */
-    private String getFqdn(final String entityId) {
-
-        // TODO
-        // pattern = http(s)?://(.)+(/)?(.)?
-
-        // pattern = (.)+:(.)+
-
-        return entityId;
-    }
 }

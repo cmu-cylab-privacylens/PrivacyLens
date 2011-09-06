@@ -59,7 +59,7 @@ public class JDBCStorage extends AbstractJDBCStorage implements Storage {
     /** {@inheritDoc} */
     public List<AttributeRelease> readAttributeReleases(final String userId, final String relyingPartyId) {
         try {
-            return jdbcTemplate.query(sqlStatements.getProperty("ar.readAttributeReleases"), attributeReleaseMapper,
+            return jdbcTemplate.query(sqlStatements.getProperty("readAttributeReleases"), attributeReleaseMapper,
                     userId, relyingPartyId);
         } catch (final EmptyResultDataAccessException e) {
             return Collections.emptyList();
@@ -68,26 +68,25 @@ public class JDBCStorage extends AbstractJDBCStorage implements Storage {
 
     /** {@inheritDoc} */
     public void deleteAttributeReleases(final String userId, final String relyingPartyId) {
-        jdbcTemplate.update(sqlStatements.getProperty("ar.deleteAttributeReleases"), userId, relyingPartyId);
+        jdbcTemplate.update(sqlStatements.getProperty("deleteAttributeReleases"), userId, relyingPartyId);
     }
 
     /** {@inheritDoc} */
     public boolean containsAttributeReleases(final String userId, final String relyingPartyId) {
-        return jdbcTemplate.queryForInt(sqlStatements.getProperty("ar.containsAttributeReleases"), userId,
-                relyingPartyId) > 0;
+        return jdbcTemplate.queryForInt(sqlStatements.getProperty("containsAttributeReleases"), userId, relyingPartyId) > 0;
     }
 
     /** {@inheritDoc} */
     public void updateAttributeRelease(final String userId, final String relyingPartyId,
             final AttributeRelease attributeRelease) {
-        jdbcTemplate.update(sqlStatements.getProperty("ar.updateAttributeRelease"), attributeRelease.getValuesHash(),
+        jdbcTemplate.update(sqlStatements.getProperty("updateAttributeRelease"), attributeRelease.getValuesHash(),
                 attributeRelease.getDate().toDate(), userId, relyingPartyId, attributeRelease.getAttributeId());
     }
 
     /** {@inheritDoc} */
     public void createAttributeRelease(final String userId, final String relyingPartyId,
             final AttributeRelease attributeRelease) {
-        jdbcTemplate.update(sqlStatements.getProperty("ar.createAttributeRelease"), userId, relyingPartyId,
+        jdbcTemplate.update(sqlStatements.getProperty("createAttributeRelease"), userId, relyingPartyId,
                 attributeRelease.getAttributeId(), attributeRelease.getValuesHash(), attributeRelease.getDate()
                         .toDate());
     }

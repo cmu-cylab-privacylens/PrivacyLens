@@ -2,36 +2,62 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" type="text/css" href="uApprove.css"/> 
-    <title>${localized.ar_title}</title>
+    
+    <style type="text/css">
+    #include( 'views/uApprove.css' )
+    </style>
+
+    <title>${localizedMessages.title}</title>
 </head>
 
 <body>
+
     <div>
-        ${String}.format(${localized.ar_relyingParty}, relyingParty.getLocalizedName(${locale})}}
+        <a class="tooltip" href="">
+            ${MessageFormat.format($localizedMessages.releaseTo, $relyingParty.localizedName)}
+            #if ( ${relyingParty.localizedDescription} )
+            <span>${relyingParty.localizedDescription}</span>         
+            #end
+        </a>
     </div>
     
     <div>
 	    <table>
-	    #foreach( ${attribute} in ${attributes} )
-	    
-	        <tr>
-	            <td>${attribute.getLocalizedName(${locale})}</td>
-	            <td>
-	                ${attribute.values}
-	            </td>
-	        </tr>
-	    #end
+		    <thead>
+		       <tr>
+		          <td colspan="2">
+		              ${localizedMessages.attributesHeader}
+		          </td>
+		       </tr>
+		    </thead>
+		    <tbody>
+		    #foreach( ${attribute} in ${attributes} )
+		        <tr>
+		            <td>
+		               <a class="tooltip" href="">${attribute.localizedName}
+		                   #if ( ${attribute.localizedDescription} )
+		                   <span>${attribute.localizedDescription}</span>  
+		                   #end
+		               </a>
+		            </td>
+		            <td>
+		            #foreach( ${value} in ${attribute.values} )
+		                ${value} <br />
+		            #end
+		            </td>
+		        </tr>
+	       #end
+	       </tbody>
 	    </table>
     </div>
     
     <div>
         <form action="" method="post">
-            #if (true)
-            <input type="checkbox" id="ar.general_consent" name="ar.general_consent" value="true"/>
-            <label for="ar.general_consent">${localized.ar_general_consent}</label>
-            #end
-            <button type="submit">${localized.ar_confirm}</button>
+        #if (${allowGeneralConsent})
+            <input type="checkbox" id="generalConsent" name="generalConsent" value="true"/>
+            <label for="generalConsent">${localizedMessages.generalConsent}</label>
+        #end
+            <button type="submit">${localizedMessages.confirm}</button>
         </form>
     </div>    
 </body>

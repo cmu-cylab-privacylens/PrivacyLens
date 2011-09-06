@@ -56,20 +56,20 @@ public class JDBCStorage extends AbstractJDBCStorage implements Storage {
 
     /** {@inheritDoc} */
     public void createToUAcceptance(final String userId, final ToUAcceptance touAcceptance) {
-        jdbcTemplate.update(sqlStatements.getProperty("tou.createToUAcceptance"), userId, touAcceptance.getVersion(),
+        jdbcTemplate.update(sqlStatements.getProperty("createToUAcceptance"), userId, touAcceptance.getVersion(),
                 touAcceptance.getFingerprint(), touAcceptance.getAcceptanceDate().toDate());
     }
 
     /** {@inheritDoc} */
     public void updateToUAcceptance(final String userId, final ToUAcceptance touAcceptance) {
-        jdbcTemplate.update(sqlStatements.getProperty("tou.updateToUAcceptance"), touAcceptance.getFingerprint(),
+        jdbcTemplate.update(sqlStatements.getProperty("updateToUAcceptance"), touAcceptance.getFingerprint(),
                 touAcceptance.getAcceptanceDate().toDate(), userId, touAcceptance.getVersion());
     }
 
     /** {@inheritDoc} */
     public ToUAcceptance readToUAcceptance(final String userId, final String version) {
         try {
-            return jdbcTemplate.queryForObject(sqlStatements.getProperty("tou.readToUAcceptance"), touAcceptanceMapper,
+            return jdbcTemplate.queryForObject(sqlStatements.getProperty("readToUAcceptance"), touAcceptanceMapper,
                     userId, version);
         } catch (final EmptyResultDataAccessException e) {
             return null;
@@ -78,6 +78,6 @@ public class JDBCStorage extends AbstractJDBCStorage implements Storage {
 
     /** {@inheritDoc} */
     public boolean containsToUAcceptance(final String userId, final String version) {
-        return jdbcTemplate.queryForInt(sqlStatements.getProperty("tou.containsToUAcceptance"), userId, version) > 0;
+        return jdbcTemplate.queryForInt(sqlStatements.getProperty("containsToUAcceptance"), userId, version) > 0;
     }
 }

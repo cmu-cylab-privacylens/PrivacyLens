@@ -17,10 +17,9 @@
 
 package ch.SWITCH.aai.uApprove;
 
-import static org.testng.AssertJUnit.assertEquals;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 @Test
@@ -30,6 +29,13 @@ public class UtilTest {
 
     @Test
     public void testFingerprint() {
-        assertEquals("9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08", Util.hash("test"));
+        Assert.assertEquals("9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08", Util.hash("test"));
+    }
+
+    @Test
+    public void testStringToList() {
+        Assert.assertEquals(Util.stringToList("1 2 3").size(), 3);
+        Assert.assertEquals(Util.stringToList("1  2  3").size(), 3);
+        Assert.assertEquals(Util.stringToList("1\n2\n3").size(), 3);
     }
 }

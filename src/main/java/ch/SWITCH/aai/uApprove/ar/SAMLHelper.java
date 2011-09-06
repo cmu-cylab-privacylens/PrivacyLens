@@ -18,12 +18,11 @@
 package ch.SWITCH.aai.uApprove.ar;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.opensaml.common.xml.SAMLConstants;
 import org.opensaml.saml2.core.NameID;
 import org.opensaml.saml2.metadata.AttributeConsumingService;
@@ -92,8 +91,8 @@ public class SAMLHelper {
         Assert.notNull(attributeProcessor, "Attribute Processor not set.");
     }
 
-    public List<Attribute>
-            getAttributes(final String principalName, final String relyingPartyId, final Session session) {
+    public List<Attribute> getAttributes(final String principalName, final String relyingPartyId, final Locale locale,
+            final Session session) {
         final BaseSAMLProfileRequestContext requestCtx = buildRequestContext(principalName, relyingPartyId, session);
 
         Map<String, BaseAttribute> baseAttributes = null;
@@ -105,7 +104,7 @@ public class SAMLHelper {
 
         final List<Attribute> attributes = new ArrayList<Attribute>();
         for (final BaseAttribute<?> baseAttribute : baseAttributes.values()) {
-            final Collection<String> attributeValues = new ArrayList<String>();
+            final List<String> attributeValues = new ArrayList<String>();
             for (final Object valueObj : baseAttribute.getValues()) {
                 if (valueObj instanceof NameID) {
                     final NameID nameIdObject = (NameID) valueObj;
@@ -119,8 +118,8 @@ public class SAMLHelper {
             }
             logger.trace("Attribute: {} {}", baseAttribute.getId(), attributeValues);
 
-            attributes.add(new Attribute(baseAttribute.getId(), baseAttribute.getDisplayNames(), baseAttribute
-                    .getDisplayDescriptions(), attributeValues));
+            attributes.add(new Attribute(baseAttribute.getId(), baseAttribute.getDisplayNames().get(locale),
+                    baseAttribute.getDisplayDescriptions().get(locale), attributeValues));
         }
 
         attributeProcessor.removeBlacklistedAttributes(attributes);
@@ -166,7 +165,7 @@ public class SAMLHelper {
         return requestCtx;
     }
 
-    public RelyingParty getRelyingParty(final String relyingPartyId) {
+    public RelyingParty getRelyingParty(final String relyingPartyId, final Locale locale) {
         EntityDescriptor entityDescriptor = null;
         try {
             entityDescriptor = metadataProvider.getEntityDescriptor(relyingPartyId);
@@ -176,19 +175,24 @@ public class SAMLHelper {
         final AttributeConsumingService attrService = getAttributeConsumingService(entityDescriptor);
         if (attrService == null) {
             logger.debug("No attribute consuming service found for entityId {}.", relyingPartyId);
-            return new RelyingParty(relyingPartyId, null, null);
+            return new RelyingParty(relyingPartyId);
         } else {
-            final Map<Locale, String> rpNames = new HashMap<Locale, String>();
+            String localizedName = null;
             for (final ServiceName element : attrService.getNames()) {
-                rpNames.put(new Locale(element.getName().getLanguage()), element.getName().getLocalString());
+                if (StringUtils.equals(element.getName().getLanguage(), locale.getLanguage())) {
+                    localizedName = element.getName().getLocalString();
+                    break;
+                }
             }
 
-            final Map<Locale, String> rpDescriptions = new HashMap<Locale, String>();
+            String localizedDescription = null;
             for (final ServiceDescription element : attrService.getDescriptions()) {
-                rpDescriptions.put(new Locale(element.getDescription().getLanguage()), element.getDescription()
-                        .getLocalString());
+                if (StringUtils.equals(element.getDescription().getLanguage(), locale.getLanguage())) {
+                    localizedDescription = element.getDescription().getLocalString();
+                    break;
+                }
             }
-            return new RelyingParty(relyingPartyId, rpNames, rpDescriptions);
+            return new RelyingParty(relyingPartyId, localizedName, localizedDescription);
         }
 
     }

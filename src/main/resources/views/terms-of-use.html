@@ -3,23 +3,19 @@
 <head>
 	<meta charset="UTF-8">
 	<link rel="stylesheet" type="text/css" href="uApprove.css"/> 
-	<title>${localized.tou_title}</title>
+	<title>${localizedMessages.title}</title>
 </head>
 
 <body>
-    <div>
-        <strong>${localized.tou_title}</strong>
-    </div>
-
-	<div id="tou.content">
+	<div>
 	   ${tou.content}
 	</div>
 
-    <div id="tou.form">
+    <div>
         <form action="" method="post" >
-            <input type="checkbox" id="tou.accept" name="tou.accept" value="true"/>
-            <label for="tou.accept">${localized.tou_accept}</label>
-            <button type="submit">${localized.tou_confirm}</button>
+            <input type="checkbox" id="accept" name="accept" value="true"/>
+            <label for="accept">${localizedMessages.accept}</label>
+            <button type="submit">${localizedMessages.confirm}</button>
         </form>
     </div>
     

@@ -90,7 +90,13 @@ public class AttributeReleaseModule {
     }
 
     public void initialize() {
-        Assert.notNull(storage, "Storage is not set.");
+        if (enabled) {
+            Assert.notNull(storage, "Storage is not set.");
+            logger.debug("Attribute Release Module initialzed with genaral consent {}.", isAllowGeneralConsent()
+                    ? "enabled" : "disabled");
+        } else {
+            logger.debug("Attribute Release Module is not enabled.");
+        }
     }
 
     /**

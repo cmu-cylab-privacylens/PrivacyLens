@@ -70,8 +70,9 @@ public class AttributeReleaseServlet extends HttpServlet {
         final String relyingPartyId = LoginHelper.getRelyingPartyId(getServletContext(), req);
         final List<Attribute> attributes = LoginHelper.getAttributes(getServletContext(), req);
         final Map<String, Object> context = new HashMap<String, Object>();
-        context.put("relyingParty", samlHelper.getRelyingParty(relyingPartyId));
+        context.put("relyingParty", samlHelper.getRelyingParty(relyingPartyId, viewHelper.selectLocale(req)));
         context.put("attributes", attributes);
+        context.put("allowGeneralConsent", attributeReleaseModule.isAllowGeneralConsent());
         viewHelper.showView(req, resp, "attribute-release", context);
     }
 
@@ -79,12 +80,14 @@ public class AttributeReleaseServlet extends HttpServlet {
     protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException,
             IOException {
 
-        final boolean generalConsent = StringUtils.equals(req.getParameter("ar.general_consent"), "true");
+        final boolean generalConsent =
+                attributeReleaseModule.isAllowGeneralConsent()
+                        && StringUtils.equals(req.getParameter("generalConsent"), "true");
         final String principalName = LoginHelper.getPrincipalName(getServletContext(), req);
         final String relyingPartyId = LoginHelper.getRelyingPartyId(getServletContext(), req);
         final List<Attribute> attributes = LoginHelper.getAttributes(getServletContext(), req);
 
-        if (attributeReleaseModule.isAllowGeneralConsent() && generalConsent) {
+        if (generalConsent) {
             logger.debug("Create general consent for {}", principalName);
             attributeReleaseModule.createConsent(principalName);
         } else {

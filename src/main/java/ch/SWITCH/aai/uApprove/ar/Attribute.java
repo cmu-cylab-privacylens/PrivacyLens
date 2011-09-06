@@ -17,10 +17,8 @@
 
 package ch.SWITCH.aai.uApprove.ar;
 
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Locale;
-import java.util.Map;
+import java.util.List;
 
 /**
  *
@@ -29,35 +27,39 @@ public class Attribute {
 
     private final String id;
 
-    private final Map<Locale, String> localizedNames;
+    private final String localizedName;
 
-    private final Map<Locale, String> localizedDescriptions;
+    private final String localizedDescription;
 
-    private final Collection<String> values;
+    private final List<String> values;
 
     /**
      * Constructor.
      * 
      * @param id
-     * @param localizedNames
-     * @param localizedDescriptions
      * @param values
      */
-    public Attribute(final String id, final Map<Locale, String> localizedNames,
-            final Map<Locale, String> localizedDescriptions, final Collection<String> values) {
+    public Attribute(final String id, final List<String> values) {
+        this(id, null, null, values);
+    }
+
+    /**
+     * Constructor.
+     * 
+     * @param id
+     * @param localizedName
+     * @param localizedDescription
+     * @param values
+     */
+    public Attribute(final String id, final String localizedName, final String localizedDescription,
+            final List<String> values) {
         this.id = id;
-        if (localizedNames != null) {
-            this.localizedNames = localizedNames;
+        if (localizedName != null) {
+            this.localizedName = localizedName;
         } else {
-            this.localizedNames = Collections.emptyMap();
+            this.localizedName = id;
         }
-
-        if (localizedDescriptions != null) {
-            this.localizedDescriptions = localizedDescriptions;
-        } else {
-            this.localizedDescriptions = Collections.emptyMap();
-        }
-
+        this.localizedDescription = localizedDescription;
         if (values != null) {
             this.values = values;
         } else {
@@ -73,34 +75,24 @@ public class Attribute {
     }
 
     /**
-     * @param locale
-     * @return Returns the localized name or the attribute id.
+     * @return Returns the localizedName.
      */
-    public String getLocalizedName(final Locale locale) {
-        if (localizedNames.containsKey(locale)) {
-            return localizedNames.get(locale);
-        } else {
-            return getId();
-        }
-
+    public String getLocalizedName() {
+        return localizedName;
     }
 
     /**
-     * @param locale
-     * @return Returns the localized description or an empty string.
+     * @return Returns the localizedDescription.
      */
-    public String getLocalizedDescription(final Locale locale) {
-        if (localizedDescriptions.containsKey(locale)) {
-            return localizedDescriptions.get(locale);
-        } else {
-            return "";
-        }
+    public String getLocalizedDescription() {
+        return localizedDescription;
     }
 
     /**
      * @return Returns the values.
      */
-    public Collection<String> getValues() {
+    public List<String> getValues() {
         return values;
     }
+
 }

@@ -54,11 +54,17 @@ public class ToU {
      */
     public void setResource(final Resource resource) {
         try {
-            logger.debug("Initialized ToU from {}.", resource.getDescription());
             content = Util.readResource(resource);
+            logger.debug("Initialized ToU from {}.", resource.getDescription());
         } catch (final IOException exception) {
             logger.error("Error while reading ToU resource {}.", resource.getDescription(), exception);
         }
+    }
+
+    public void initialize() {
+        Assert.hasText(version, version + " is an invalid ToU version.");
+        Assert.hasText(content, "ToU Text is not set.");
+        logger.debug("ToU version {} [{}] initialized.", getVersion(), Util.hash(getContent()));
     }
 
     /**
@@ -77,12 +83,6 @@ public class ToU {
      */
     public final String getContent() {
         return content;
-    }
-
-    public void initialize() {
-        Assert.hasText(version, version + " is an invalid ToU version.");
-        Assert.hasText(content, "ToU Text is not set.");
-        logger.debug("ToU {} initialized [{}].", version, Util.hash(content));
     }
 
 }

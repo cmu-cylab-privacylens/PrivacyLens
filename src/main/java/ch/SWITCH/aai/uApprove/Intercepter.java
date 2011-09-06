@@ -57,6 +57,8 @@ public class Intercepter implements Filter {
 
     private SAMLHelper samlHelper;
 
+    private ViewHelper viewHelper;
+
     /** {@inheritDoc} */
     public void init(final FilterConfig filterConfig) throws ServletException {
         servletContext = filterConfig.getServletContext();
@@ -68,9 +70,12 @@ public class Intercepter implements Filter {
                         AttributeReleaseModule.class);
         samlHelper = (SAMLHelper) appContext.getBean("uApprove.samlHelper", SAMLHelper.class);
 
+        viewHelper = (ViewHelper) appContext.getBean("uApprove.viewHelper", ViewHelper.class);
+
         Assert.notNull(touModule, "ToU module isn't properly configured.");
         Assert.notNull(attributeReleaseModule, "Attribute Release module isn't properly configured.");
         Assert.notNull(samlHelper, "SAML Helper isn't properly configured.");
+        Assert.notNull(viewHelper, "View Helper isn't properly configured.");
 
         logger.debug("uApprove initialized.");
     }
@@ -95,28 +100,31 @@ public class Intercepter implements Filter {
         }
 
         final String principalName = LoginHelper.getPrincipalName(servletContext, request);
-        final String relyingPartyId = LoginHelper.getRelyingPartyId(servletContext, request);
-        logger.debug("uApprove access from {} to {}.", principalName, relyingPartyId);
 
         if (touModule.isEnabled() && !touModule.isToUAccepted(principalName)) {
             LoginHelper.redirectToServlet(request, response, "/uApprove/TermsOfUse");
             return;
         } else {
+            if (attributeReleaseModule.isEnabled()) {
+                final String relyingPartyId = LoginHelper.getRelyingPartyId(servletContext, request);
+                final List<Attribute> attributes =
+                        samlHelper.getAttributes(principalName, relyingPartyId, viewHelper.selectLocale(request),
+                                LoginHelper.getSession(request));
 
-            final List<Attribute> attributes =
-                    samlHelper.getAttributes(principalName, relyingPartyId, LoginHelper.getSession(request));
+                if (LoginHelper.isConsentRevocation(servletContext, request)) {
+                    logger.debug("Consent revovation requested.");
+                    attributeReleaseModule.clearConsent(principalName, relyingPartyId);
+                    LoginHelper.clearConsentRevocation(servletContext, request);
+                }
 
-            if (LoginHelper.isConsentRevocation(servletContext, request)) {
-                logger.debug("Consent revovation requested.");
-                attributeReleaseModule.clearConsent(principalName, relyingPartyId);
-                LoginHelper.clearConsentRevocation(servletContext, request);
-            }
-
-            if (attributeReleaseModule.isEnabled()
-                    && attributeReleaseModule.consentRequired(principalName, relyingPartyId, attributes)) {
-                LoginHelper.setAttributes(servletContext, request, attributes);
-                LoginHelper.redirectToServlet(request, response, "/uApprove/AttributeRelease");
-                return;
+                if (attributeReleaseModule.consentRequired(principalName, relyingPartyId, attributes)) {
+                    LoginHelper.setAttributes(servletContext, request, attributes);
+                    LoginHelper.redirectToServlet(request, response, "/uApprove/AttributeRelease");
+                    return;
+                } else {
+                    chain.doFilter(request, response);
+                    return;
+                }
             } else {
                 chain.doFilter(request, response);
                 return;

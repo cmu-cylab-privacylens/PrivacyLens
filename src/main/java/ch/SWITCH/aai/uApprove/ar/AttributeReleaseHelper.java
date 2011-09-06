@@ -22,6 +22,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.joda.time.DateTime;
 
@@ -80,5 +82,28 @@ public class AttributeReleaseHelper {
             }
         }
         return true;
+    }
+
+    /**
+     * Tries to resolve the FDQN from the relying party id.
+     * 
+     * @param entityId The relying party id.
+     * @return Returns the sp.example.org component out of https://sp.example.org/shibboleth or the sp.example.org
+     *         component out of urn:mace:federation.org:sp.example.org or the entityId.
+     */
+    public static String resolveFqdn(final String entityId) {
+
+        final Pattern urlPattern = Pattern.compile("^https://(.+)/shibboleth$");
+        final Matcher matcher = urlPattern.matcher(entityId);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+
+        if (entityId.matches("^urn:mace:.+")) {
+            final String[] temp = entityId.split(":");
+            return temp[temp.length - 1];
+        }
+
+        return entityId;
     }
 }

@@ -41,4 +41,15 @@ public class AttributeReleaseHelperTest {
         Assert.assertEquals(hash, Util.hash("aaa;bbb;ccc;"));
     }
 
+    @Test
+    public void testResolveFqdn() {
+        final String entityId1 = "https://sp.example.org/shibboleth";
+        Assert.assertEquals(AttributeReleaseHelper.resolveFqdn(entityId1), "sp.example.org");
+
+        final String entityId2 = "urn:mace:federation.org:sp.example.org";
+        Assert.assertEquals(AttributeReleaseHelper.resolveFqdn(entityId2), "sp.example.org");
+
+        final String entityId3 = "sp.example.org";
+        Assert.assertEquals(AttributeReleaseHelper.resolveFqdn(entityId3), "sp.example.org");
+    }
 }

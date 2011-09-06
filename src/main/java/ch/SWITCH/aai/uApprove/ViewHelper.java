@@ -1,6 +1,7 @@
 
 package ch.SWITCH.aai.uApprove;
 
+import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -77,7 +78,7 @@ public class ViewHelper {
         this.forceDefaultLocale = forceDefaultLocale;
     }
 
-    private Locale selectLocale(final HttpServletRequest request) {
+    public Locale selectLocale(final HttpServletRequest request) {
         if (forceDefaultLocale) {
             return defaultLocale;
         } else {
@@ -90,12 +91,9 @@ public class ViewHelper {
         response.setContentType("text/html");
         response.setCharacterEncoding("UTF-8");
 
-        final Locale locale = selectLocale(request);
-
         final VelocityContext velocityContext = new VelocityContext();
-        velocityContext.put("String", String.class);
-        velocityContext.put("locale", locale);
-        velocityContext.put("localized", getLocalizedStrings(viewName, locale));
+        velocityContext.put("MessageFormat", MessageFormat.class);
+        velocityContext.put("localizedMessages", getLocalizedMessages(viewName, selectLocale(request)));
 
         final String templateName = String.format("views/%s.html", viewName);
         try {
@@ -106,7 +104,7 @@ public class ViewHelper {
         }
     }
 
-    private LocalizedStrings getLocalizedStrings(final String resource, final Locale locale) {
+    private LocalizedStrings getLocalizedMessages(final String resource, final Locale locale) {
         final ResourceBundle resourceBundle = ResourceBundle.getBundle(String.format("messages.%s", resource), locale);
         return new LocalizedStrings(resourceBundle);
     }

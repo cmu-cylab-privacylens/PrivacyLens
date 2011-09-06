@@ -18,8 +18,6 @@
 package ch.SWITCH.aai.uApprove.ar;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Locale;
 
 import org.joda.time.DateTime;
 import org.testng.Assert;
@@ -38,14 +36,8 @@ public class AttributeReleaseTest {
 
     @BeforeClass
     public void initialize() {
-        attribute1 =
-                new Attribute("id1", Collections.<Locale, String> emptyMap(), Collections.<Locale, String> emptyMap(),
-                        Arrays.asList(new String[] {"value1", "value2"}));
-
-        attribute2 =
-                new Attribute("id2", Collections.<Locale, String> emptyMap(), Collections.<Locale, String> emptyMap(),
-                        Arrays.asList(new String[] {"value1", "value2"}));
-
+        attribute1 = new Attribute("id1", Arrays.asList(new String[] {"value1", "value2"}));
+        attribute2 = new Attribute("id2", Arrays.asList(new String[] {"value1", "value2"}));
         consentDate = new DateTime();
     }
 
@@ -63,10 +55,7 @@ public class AttributeReleaseTest {
         Assert.assertTrue(attributeRelease.contains(attribute1));
         Assert.assertFalse(attributeRelease.contains(attribute2));
 
-        final Attribute attribute3 =
-                new Attribute(attribute1.getId(), Collections.<Locale, String> emptyMap(),
-                        Collections.<Locale, String> emptyMap(), Arrays.asList(new String[] {"other value"}));
-
+        final Attribute attribute3 = new Attribute(attribute1.getId(), Arrays.asList(new String[] {"other value"}));
         Assert.assertFalse(attributeRelease.contains(attribute3));
     }
 }

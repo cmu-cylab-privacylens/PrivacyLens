@@ -79,8 +79,13 @@ public class ToUModule {
     }
 
     public void initialize() {
-        Assert.notNull(tou, "ToU is not set.");
-        Assert.notNull(storage, "Storage is not set.");
+        if (enabled) {
+            Assert.notNull(tou, "ToU is not set.");
+            Assert.notNull(storage, "Storage is not set.");
+            logger.debug("ToU Module using ToU version {} initialized.", getTou().getVersion());
+        } else {
+            logger.debug("ToU Module is not enabled.");
+        }
     }
 
     /**
