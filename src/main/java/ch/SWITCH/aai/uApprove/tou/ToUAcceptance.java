@@ -84,13 +84,4 @@ public class ToUAcceptance {
         return acceptanceDate;
     }
 
-    /**
-     * Creates an empty terms of use acceptance.
-     * 
-     * @return Returns an empty terms of use acceptance.
-     */
-    public static ToUAcceptance emptyToUAcceptance() {
-        return new ToUAcceptance("", "", null);
-    }
-
 }

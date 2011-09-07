@@ -18,20 +18,23 @@
 package ch.SWITCH.aai.uApprove.ar;
 
 /**
- *
+ * Relying Party.
  */
 public class RelyingParty {
 
+    /** The relying party id. */
     private final String id;
 
-    private final String localizedName;
+    /** The name of the relying party. */
+    private final String name;
 
-    private final String localizedDescription;
+    /** The description of the relying party. */
+    private final String description;
 
     /**
      * Constructor.
      * 
-     * @param id
+     * @param id The id.
      */
     public RelyingParty(final String id) {
         this(id, null, null);
@@ -40,21 +43,23 @@ public class RelyingParty {
     /**
      * Constructor.
      * 
-     * @param id
-     * @param localizedName
-     * @param localizedDescription
+     * @param id The id.
+     * @param name The name.
+     * @param description The description.
      */
-    public RelyingParty(final String id, final String localizedName, final String localizedDescription) {
+    public RelyingParty(final String id, final String name, final String description) {
         this.id = id;
-        if (localizedName != null) {
-            this.localizedName = localizedName;
+        if (name != null) {
+            this.name = name;
         } else {
-            this.localizedName = AttributeReleaseHelper.resolveFqdn(id);
+            this.name = AttributeReleaseHelper.resolveFqdn(id);
         }
-        this.localizedDescription = localizedDescription;
+        this.description = description;
     }
 
     /**
+     * Gets the id.
+     * 
      * @return Returns the id.
      */
     public String getId() {
@@ -62,17 +67,21 @@ public class RelyingParty {
     }
 
     /**
-     * @return Returns the localizedName.
+     * Gets the name.
+     * 
+     * @return Returns the name.
      */
-    public String getLocalizedName() {
-        return localizedName;
+    public String getName() {
+        return name;
     }
 
     /**
-     * @return Returns the localizedDescription.
+     * Gets the description.
+     * 
+     * @return Returns the description.
      */
-    public String getLocalizedDescription() {
-        return localizedDescription;
+    public String getDescription() {
+        return description;
     }
 
 }

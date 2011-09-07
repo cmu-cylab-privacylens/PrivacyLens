@@ -42,7 +42,7 @@ public interface Storage {
     void deleteAttributeReleases(final String userId, final String relyingPartyId);
 
     /**
-     * Checks if the storage contains attribute releases for a specific user andrelying party
+     * Checks if the storage contains attribute releases for a specific user and relying party.
      * 
      * @param userId The user id.
      * @param relyingPartyId The relying party id.

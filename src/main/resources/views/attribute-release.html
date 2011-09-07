@@ -7,16 +7,16 @@
     #include( 'views/uApprove.css' )
     </style>
 
-    <title>${localizedMessages.title}</title>
+    <title>${messages.title}</title>
 </head>
 
 <body>
 
     <div>
         <a class="tooltip" href="">
-            ${MessageFormat.format($localizedMessages.releaseTo, $relyingParty.localizedName)}
-            #if ( ${relyingParty.localizedDescription} )
-            <span>${relyingParty.localizedDescription}</span>         
+            ${MessageFormat.format($messages.releaseTo, $relyingParty.name)}
+            #if ( ${relyingParty.description} )
+            <span>${relyingParty.description}</span>         
             #end
         </a>
     </div>
@@ -26,7 +26,7 @@
 		    <thead>
 		       <tr>
 		          <td colspan="2">
-		              ${localizedMessages.attributesHeader}
+		              ${messages.attributesHeader}
 		          </td>
 		       </tr>
 		    </thead>
@@ -34,9 +34,9 @@
 		    #foreach( ${attribute} in ${attributes} )
 		        <tr>
 		            <td>
-		               <a class="tooltip" href="">${attribute.localizedName}
-		                   #if ( ${attribute.localizedDescription} )
-		                   <span>${attribute.localizedDescription}</span>  
+		               <a class="tooltip" href="">${attribute.name}
+		                   #if ( ${attribute.description} )
+		                   <span>${attribute.description}</span>  
 		                   #end
 		               </a>
 		            </td>
@@ -55,9 +55,9 @@
         <form action="" method="post">
         #if (${allowGeneralConsent})
             <input type="checkbox" id="generalConsent" name="generalConsent" value="true"/>
-            <label for="generalConsent">${localizedMessages.generalConsent}</label>
+            <label for="generalConsent">${messages.generalConsent}</label>
         #end
-            <button type="submit">${localizedMessages.confirm}</button>
+            <button type="submit">${messages.confirm}</button>
         </form>
     </div>    
 </body>

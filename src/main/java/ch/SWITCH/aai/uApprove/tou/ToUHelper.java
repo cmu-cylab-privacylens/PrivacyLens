@@ -31,6 +31,10 @@ public final class ToUHelper {
     }
 
     public static boolean acceptedToU(final ToU tou, final ToUAcceptance touAcceptance, final boolean compareContent) {
+        if (touAcceptance == null) {
+            return false;
+        }
+
         if (StringUtils.equals(tou.getVersion(), touAcceptance.getVersion())) {
             if (compareContent) {
                 return StringUtils.equals(Util.hash(tou.getContent()), touAcceptance.getFingerprint());

@@ -51,6 +51,7 @@ public class ToUHelperTest {
 
     @Test
     public void testAcceptedToU() {
+        Assert.assertFalse(ToUHelper.acceptedToU(tou1a, null, false));
         final ToUAcceptance touAcceptance = new ToUAcceptance(tou1a, new DateTime());
 
         Assert.assertTrue(ToUHelper.acceptedToU(tou1a, touAcceptance, false));
@@ -61,8 +62,6 @@ public class ToUHelperTest {
 
         Assert.assertFalse(ToUHelper.acceptedToU(tou2, touAcceptance, false));
 
-        final ToUAcceptance emptyToUAcceptance = ToUAcceptance.emptyToUAcceptance();
-        Assert.assertFalse(ToUHelper.acceptedToU(tou2, emptyToUAcceptance, false));
     }
 
 }

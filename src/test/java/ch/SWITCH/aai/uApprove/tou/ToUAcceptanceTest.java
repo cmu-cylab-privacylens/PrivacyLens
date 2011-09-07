@@ -42,7 +42,7 @@ public class ToUAcceptanceTest {
         tou.initialize();
     }
 
-    public void createToUAcceptance() {
+    public void testCreateToUAcceptance() {
         final DateTime date = new DateTime();
         final ToUAcceptance touAcceptance = new ToUAcceptance(tou, date);
         Assert.assertEquals(tou.getVersion(), touAcceptance.getVersion());

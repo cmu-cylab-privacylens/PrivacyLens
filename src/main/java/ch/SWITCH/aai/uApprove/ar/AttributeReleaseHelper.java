@@ -88,10 +88,15 @@ public final class AttributeReleaseHelper {
     public static boolean approvedAttributes(final List<Attribute> attributes,
             final List<AttributeRelease> attributeReleases, final boolean compareAttributeValues) {
         for (final Attribute attribute : attributes) {
+            boolean approved = false;
             for (final AttributeRelease attributeRelease : attributeReleases) {
-                if (!approvedAttribute(attribute, attributeRelease, compareAttributeValues)) {
-                    return false;
+                if (approvedAttribute(attribute, attributeRelease, compareAttributeValues)) {
+                    approved = true;
+                    break;
                 }
+            }
+            if (!approved) {
+                return false;
             }
         }
         return true;

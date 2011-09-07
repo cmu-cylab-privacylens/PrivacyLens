@@ -17,7 +17,9 @@
 
 package ch.SWITCH.aai.uApprove.ar;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.joda.time.DateTime;
@@ -79,6 +81,24 @@ public class AttributeReleaseHelperTest {
 
     @Test
     public void testApprovedAttributes() {
+        Assert.assertTrue(AttributeReleaseHelper.approvedAttributes(Collections.<Attribute> emptyList(),
+                Collections.<AttributeRelease> emptyList(), true));
 
+        final List<Attribute> attributes = Arrays.asList(new Attribute[] {attribute1a, attribute1b, attribute2});
+
+        Assert.assertFalse(AttributeReleaseHelper.approvedAttributes(attributes,
+                Collections.<AttributeRelease> emptyList(), true));
+
+        final List<AttributeRelease> attributeReleases = new ArrayList<AttributeRelease>();
+        attributeReleases.add(new AttributeRelease(attribute1a, new DateTime()));
+        attributeReleases.add(new AttributeRelease(attribute1b, new DateTime()));
+
+        Assert.assertFalse(AttributeReleaseHelper.approvedAttributes(attributes, attributeReleases, true));
+
+        attributeReleases.add(new AttributeRelease(attribute2, new DateTime()));
+        Assert.assertTrue(AttributeReleaseHelper.approvedAttributes(attributes, attributeReleases, true));
+
+        Assert.assertTrue(AttributeReleaseHelper.approvedAttributes(Collections.<Attribute> emptyList(),
+                attributeReleases, true));
     }
 }

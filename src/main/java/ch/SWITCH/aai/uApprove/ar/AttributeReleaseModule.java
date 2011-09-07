@@ -29,23 +29,29 @@ import org.slf4j.LoggerFactory;
 import ch.SWITCH.aai.uApprove.ar.storage.Storage;
 
 /**
- *
+ * The Attribute Release Module.
  */
 public class AttributeReleaseModule {
 
     /** Class logger. */
     private final Logger logger = LoggerFactory.getLogger(AttributeReleaseModule.class);
 
+    /** Module enabled. */
     private boolean enabled;
 
+    /** General Consent allowed. */
     private boolean allowGeneralConsent;
 
+    /** List of enabled relying parties. */
     private List<String> enabledRelyingParties;
 
+    /** Compare attribute values. */
     private boolean compareAttributeValues;
 
+    /** Storage. */
     private Storage storage;
 
+    /** Default constructor. */
     public AttributeReleaseModule() {
         enabled = false;
         allowGeneralConsent = false;
@@ -54,6 +60,8 @@ public class AttributeReleaseModule {
     }
 
     /**
+     * Sets whether the module is enabled.
+     * 
      * @param enabled The enabled to set.
      */
     public void setEnabled(final boolean enabled) {
@@ -61,6 +69,8 @@ public class AttributeReleaseModule {
     }
 
     /**
+     * Gets if the module is enabled.
+     * 
      * @return Returns the enabled.
      */
     public boolean isEnabled() {
@@ -68,6 +78,8 @@ public class AttributeReleaseModule {
     }
 
     /**
+     * Sets whether general consent is allowed.
+     * 
      * @param allowGeneralConsent The allowGeneralConsent to set.
      */
     public void setAllowGeneralConsent(final boolean allowGeneralConsent) {
@@ -75,6 +87,8 @@ public class AttributeReleaseModule {
     }
 
     /**
+     * Sets whether attribute values are compared.
+     * 
      * @param compareAttributeValues The compareAttributeValues to set.
      */
     public void setCompareAttributeValues(final boolean compareAttributeValues) {
@@ -82,28 +96,40 @@ public class AttributeReleaseModule {
     }
 
     /**
+     * Gets if general consent is allowed.
+     * 
      * @return Returns the allowGeneralConsent.
      */
     public boolean isAllowGeneralConsent() {
         return allowGeneralConsent;
     }
 
+    /**
+     * Sets the relying parties.
+     * 
+     * @param relyingParties The relyingParties to set.
+     */
     public void setRelyingParties(final List<String> relyingParties) {
         this.enabledRelyingParties = relyingParties;
     }
 
     /**
+     * Sets the storage.
+     * 
      * @param storage The storage to set.
      */
     public void setStorage(final Storage storage) {
         this.storage = storage;
     }
 
+    /**
+     * Initializes the module.
+     */
     public void initialize() {
         if (enabled) {
             Validate.notNull(storage, "Storage is not set.");
             logger.debug(
-                    "Attribute Release Module initialzed with genaral consent {}. Attribute values are {}compared.",
+                    "Attribute Release Module initialzed with {} general consent. Attribute values are {}compared.",
                     isAllowGeneralConsent() ? "enabled" : "disabled", compareAttributeValues ? "" : "not ");
         } else {
             logger.debug("Attribute Release Module is not enabled.");
@@ -111,13 +137,20 @@ public class AttributeReleaseModule {
     }
 
     /**
-     * @param principalName
-     * @param relyingPartyId
-     * @param attributes
-     * @return
+     * Determine if consent is required.
+     * 
+     * @param principalName The principal name.
+     * @param relyingPartyId The relying party id.
+     * @param attributes The attributes.
+     * @return Returns true if consent is required.
      */
     public boolean requiresConsent(final String principalName, final String relyingPartyId,
             final List<Attribute> attributes) {
+
+        if (!enabledRelyingParties.contains(relyingPartyId)) {
+            logger.debug("Skip relying party {}.", relyingPartyId);
+            return false;
+        }
 
         if (storage.containsAttributeReleases(principalName, "*")) {
             logger.debug("User {} has given gerneral consent.");
@@ -126,7 +159,8 @@ public class AttributeReleaseModule {
 
         final List<AttributeRelease> attributeReleases = storage.readAttributeReleases(principalName, relyingPartyId);
         if (AttributeReleaseHelper.approvedAttributes(attributes, attributeReleases, compareAttributeValues)) {
-            logger.debug("Consent not required.");
+            logger.debug("User {} has already approved attributes {} for relying party {}.", new Object[] {
+                    principalName, relyingPartyId, attributes});
             return false;
         }
 
@@ -135,8 +169,10 @@ public class AttributeReleaseModule {
     }
 
     /**
-     * @param principalName
-     * @param relyingPartyId
+     * Clear consent.
+     * 
+     * @param principalName The principal Name.
+     * @param relyingPartyId The relying party id.
      */
     public void clearConsent(final String principalName, final String relyingPartyId) {
         logger.info("Clear user consent for {}.", principalName);

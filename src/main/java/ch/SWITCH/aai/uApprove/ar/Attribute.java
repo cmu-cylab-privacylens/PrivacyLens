@@ -21,23 +21,27 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- *
+ * Attribute.
  */
 public class Attribute {
 
+    /** The id. */
     private final String id;
 
-    private final String localizedName;
+    /** The name. */
+    private final String name;
 
-    private final String localizedDescription;
+    /** The description. */
+    private final String description;
 
+    /** The values. */
     private final List<String> values;
 
     /**
      * Constructor.
      * 
-     * @param id
-     * @param values
+     * @param id The id.
+     * @param values The values.
      */
     public Attribute(final String id, final List<String> values) {
         this(id, null, null, values);
@@ -46,20 +50,19 @@ public class Attribute {
     /**
      * Constructor.
      * 
-     * @param id
-     * @param localizedName
-     * @param localizedDescription
-     * @param values
+     * @param id The id.
+     * @param name The name.
+     * @param description The description.
+     * @param values The values.
      */
-    public Attribute(final String id, final String localizedName, final String localizedDescription,
-            final List<String> values) {
+    public Attribute(final String id, final String name, final String description, final List<String> values) {
         this.id = id;
-        if (localizedName != null) {
-            this.localizedName = localizedName;
+        if (name != null) {
+            this.name = name;
         } else {
-            this.localizedName = id;
+            this.name = id;
         }
-        this.localizedDescription = localizedDescription;
+        this.description = description;
         if (values != null) {
             this.values = values;
         } else {
@@ -68,6 +71,8 @@ public class Attribute {
     }
 
     /**
+     * Gets the id.
+     * 
      * @return Returns the id.
      */
     public String getId() {
@@ -75,20 +80,26 @@ public class Attribute {
     }
 
     /**
-     * @return Returns the localizedName.
+     * Gets the name.
+     * 
+     * @return Returns the name.
      */
-    public String getLocalizedName() {
-        return localizedName;
+    protected String getName() {
+        return name;
     }
 
     /**
-     * @return Returns the localizedDescription.
+     * Gets the description.
+     * 
+     * @return Returns the description.
      */
-    public String getLocalizedDescription() {
-        return localizedDescription;
+    protected String getDescription() {
+        return description;
     }
 
     /**
+     * Gets the values.
+     * 
      * @return Returns the values.
      */
     public List<String> getValues() {

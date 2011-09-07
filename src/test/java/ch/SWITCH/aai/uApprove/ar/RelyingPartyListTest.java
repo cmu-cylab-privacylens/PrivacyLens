@@ -39,7 +39,7 @@ public class RelyingPartyListTest {
     }
 
     @Test
-    public void contains() {
+    public void testContains() {
         for (final Boolean isBlacklist : new Boolean[] {true, false}) {
             relyingPartyList.setBlacklist(isBlacklist);
             Assert.assertTrue(relyingPartyList.contains("https://sp.example1.org/shibboleth") != isBlacklist);

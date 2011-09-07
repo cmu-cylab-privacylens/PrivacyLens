@@ -33,7 +33,7 @@
         </property>
     </bean>
     
-    <bean id="uApprove.attributeReleaseModule" class="ch.SWITCH.aai.uApprove.ar.AttributeReleaseModule">
+    <bean id="uApprove.attributeReleaseModule" class="ch.SWITCH.aai.uApprove.ar.AttributeReleaseModule" init-method="initialize">
         <property name="enabled" value="${ar.enabled}" />
         <property name="allowGeneralConsent" value="${ar.allowGeneralConsent}" />
         <property name="relyingParties">

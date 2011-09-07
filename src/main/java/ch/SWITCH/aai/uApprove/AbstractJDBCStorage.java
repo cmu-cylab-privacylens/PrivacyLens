@@ -29,18 +29,19 @@ import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 
 /**
- *
+ * Abstract JDBC Storage.
  */
 public abstract class AbstractJDBCStorage {
 
     /** Class logger. */
+    @SuppressWarnings("unused")
     private final Logger logger = LoggerFactory.getLogger(AbstractJDBCStorage.class);
 
     /** The SQL Statements. */
-    protected Properties sqlStatements;
+    private Properties sqlStatements;
 
     /** The JDBC template. */
-    protected SimpleJdbcTemplate jdbcTemplate;
+    private SimpleJdbcTemplate jdbcTemplate;
 
     /**
      * Sets the data source.
@@ -59,6 +60,20 @@ public abstract class AbstractJDBCStorage {
             throw new UApproveException("Error reading SQL statements from resource "
                     + sqlStamentsResource.getDescription(), e);
         }
+    }
+
+    /**
+     * @return Returns the sqlStatements.
+     */
+    protected Properties getSqlStatements() {
+        return sqlStatements;
+    }
+
+    /**
+     * @return Returns the jdbcTemplate.
+     */
+    protected SimpleJdbcTemplate getJdbcTemplate() {
+        return jdbcTemplate;
     }
 
     public void initialize() {

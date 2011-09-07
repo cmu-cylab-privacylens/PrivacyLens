@@ -41,7 +41,7 @@ import edu.internet2.middleware.shibboleth.idp.util.HttpServletHelper;
 public final class LoginHelper {
 
     /** Class logger. */
-    private static final Logger logger = LoggerFactory.getLogger(LoginHelper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LoginHelper.class);
 
     /** Default constructor for utility classes is private. */
     private LoginHelper() {
@@ -66,29 +66,29 @@ public final class LoginHelper {
         final LoginContext loginContext = getLoginContext(servletContext, request, false);
 
         if (loginContext == null) {
-            logger.trace("LoginContext is null.");
+            LOGGER.trace("LoginContext is null.");
             return false;
         }
 
         if (loginContext.getAuthenticationFailure() != null) {
-            logger.trace("LoginContext contains authentication failure.");
+            LOGGER.trace("LoginContext contains authentication failure.");
             return false;
         }
 
         final boolean isPrincipalAuthenticated = loginContext.isPrincipalAuthenticated();
-        logger.trace("Principal autenticated is {}.", isPrincipalAuthenticated);
+        LOGGER.trace("Principal is {}autenticated.", isPrincipalAuthenticated ? "" : "not ");
         return isPrincipalAuthenticated;
     }
 
     public static String getPrincipalName(final ServletContext servletContext, final HttpServletRequest request) {
         final String principalName = getLoginContext(servletContext, request, true).getPrincipalName();
-        logger.trace("Principal name is {}.", principalName);
+        LOGGER.trace("Principal name is {}.", principalName);
         return principalName;
     }
 
     public static String getRelyingPartyId(final ServletContext servletContext, final HttpServletRequest request) {
         final String relyingPartyId = getLoginContext(servletContext, request, true).getRelyingPartyId();
-        logger.trace("Relying party id is {}.", relyingPartyId);
+        LOGGER.trace("Relying party id is {}.", relyingPartyId);
         return relyingPartyId;
     }
 
@@ -98,7 +98,7 @@ public final class LoginHelper {
         final String profileUrl =
                 HttpServletHelper.getContextRelativeUrl(request, loginContext.getProfileHandlerURL()).buildURL();
         try {
-            logger.trace("Redirect to {}.", profileUrl);
+            LOGGER.trace("Redirect to {}.", profileUrl);
             response.sendRedirect(profileUrl);
         } catch (final IOException e) {
             throw new UApproveException("Error sending user back to profile handler at " + profileUrl, e);
@@ -109,7 +109,7 @@ public final class LoginHelper {
             final String servletPath) {
         final String servletUrl = HttpServletHelper.getContextRelativeUrl(request, servletPath).buildURL();
         try {
-            logger.trace("Redirect to {}.", servletUrl);
+            LOGGER.trace("Redirect to {}.", servletUrl);
             response.sendRedirect(servletUrl);
         } catch (final IOException e) {
             throw new UApproveException("Error sending user to servlet " + servletUrl, e);
@@ -118,21 +118,27 @@ public final class LoginHelper {
 
     public static void
             testAndSetConsentRevocation(final ServletContext servletContext, final HttpServletRequest request) {
-        if (BooleanUtils.toBoolean(request.getParameter("uApprove.consent-revocation"))) {
+        final boolean consentRevocation = BooleanUtils.toBoolean(request.getParameter("uApprove.consent-revocation"));
+        if (consentRevocation) {
+            LOGGER.trace("Consent revocation is set.");
             final LoginContext loginContext = getLoginContext(servletContext, request, true);
-            loginContext.setProperty("uApprove.consentRevocationRequested", "true");
-            logger.trace("Set uApprove.consent-revocation.");
+            loginContext.setProperty("uApprove.consent-revocation", consentRevocation);
         }
     }
 
     public static boolean isConsentRevocation(final ServletContext servletContext, final HttpServletRequest request) {
         final LoginContext loginContext = getLoginContext(servletContext, request, true);
-        return BooleanUtils.toBoolean((String) loginContext.getProperty("uApprove.consentRevocationRequested"));
+        final Object consentRevocation = loginContext.getProperty("uApprove.consent-revocation");
+        if (consentRevocation instanceof Boolean) {
+            return (Boolean) consentRevocation;
+        } else {
+            return false;
+        }
     }
 
     public static void clearConsentRevocation(final ServletContext servletContext, final HttpServletRequest request) {
         final LoginContext loginContext = getLoginContext(servletContext, request, true);
-        loginContext.setProperty("uApprove.consentRevocationRequested", "");
+        loginContext.setProperty("uApprove.consent-revocation", false);
     }
 
     public static void setAttributes(final ServletContext servletContext, final HttpServletRequest request,
@@ -141,6 +147,7 @@ public final class LoginHelper {
         loginContext.setProperty("uApprove.attributes", (Serializable) attributes);
     }
 
+    @SuppressWarnings("unchecked")
     public static List<Attribute> getAttributes(final ServletContext servletContext, final HttpServletRequest request) {
         final LoginContext loginContext = getLoginContext(servletContext, request, true);
         return (List<Attribute>) loginContext.getProperty("uApprove.attributes");

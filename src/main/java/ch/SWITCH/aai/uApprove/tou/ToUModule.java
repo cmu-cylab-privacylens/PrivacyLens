@@ -27,21 +27,25 @@ import org.slf4j.LoggerFactory;
 import ch.SWITCH.aai.uApprove.tou.storage.Storage;
 
 /**
- *
+ * The Terms of Use Module.
  */
 public class ToUModule {
 
     /** Class logger. */
     private final Logger logger = LoggerFactory.getLogger(ToUModule.class);
 
+    /** Module enabled. */
     private boolean enabled;
 
+    /** Terms Of Use. */
     private ToU tou;
 
     private boolean compareContent;
 
-    private List<String> relyingParties;
+    /** List of enabled relying parties. */
+    private List<String> enabledRelyingParties;
 
+    /** Storage. */
     private Storage storage;
 
     /** Default constructor. */
@@ -78,11 +82,8 @@ public class ToUModule {
         this.compareContent = compareContent;
     }
 
-    /**
-     * @param relyingParties The relyingParties to set.
-     */
     public void setRelyingParties(final List<String> relyingParties) {
-        this.relyingParties = relyingParties;
+        this.enabledRelyingParties = relyingParties;
     }
 
     /**
@@ -99,6 +100,9 @@ public class ToUModule {
         return tou;
     }
 
+    /**
+     * Initializes the module.
+     */
     public void initialize() {
         if (enabled) {
             Validate.notNull(tou, "ToU is not set.");
@@ -117,20 +121,14 @@ public class ToUModule {
      */
     public boolean requiresToUAcceptance(final String principalName, final String relyingPartyId) {
 
-        if (!relyingParties.contains(relyingPartyId)) {
+        if (!enabledRelyingParties.contains(relyingPartyId)) {
             logger.debug("Skip relying party {}.", relyingPartyId);
             return false;
         }
 
-        final ToUAcceptance touAcceptance;
-        if (storage.containsToUAcceptance(principalName, tou.getVersion())) {
-            touAcceptance = storage.readToUAcceptance(principalName, tou.getVersion());
-        } else {
-            touAcceptance = ToUAcceptance.emptyToUAcceptance();
-        }
-
+        final ToUAcceptance touAcceptance = storage.readToUAcceptance(principalName, tou.getVersion());
         if (ToUHelper.acceptedToU(tou, touAcceptance, compareContent)) {
-            logger.info("User {} has already accepted ToU {}.", principalName, tou.getVersion());
+            logger.debug("User {} has already accepted ToU {}.", principalName, tou.getVersion());
             return false;
         }
 
@@ -143,10 +141,10 @@ public class ToUModule {
 
         final ToUAcceptance touAcceptance = new ToUAcceptance(tou, new DateTime());
         if (storage.containsToUAcceptance(principalName, tou.getVersion())) {
-            logger.debug("Update ToU acceptance for ToU version {}.", tou.getVersion());
+            logger.debug("Update ToU acceptance for User {} and ToU version {}.", principalName, tou.getVersion());
             storage.updateToUAcceptance(principalName, touAcceptance);
         } else {
-            logger.debug("Create ToU acceptance for ToU version {}.", tou.getVersion());
+            logger.debug("Create ToU acceptance for User {} and ToU version {}.", principalName, tou.getVersion());
             storage.createToUAcceptance(principalName, touAcceptance);
         }
     }

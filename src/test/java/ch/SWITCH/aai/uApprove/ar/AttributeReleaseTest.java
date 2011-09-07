@@ -34,7 +34,7 @@ public class AttributeReleaseTest {
     private DateTime consentDate;
 
     @Test
-    public void createAttributeReleases() {
+    public void testCreateAttributeReleases() {
         final Attribute attribute = new Attribute("id", Arrays.asList(new String[] {"value1", "value2"}));
         final AttributeRelease attributeRelease = new AttributeRelease(attribute, consentDate);
         Assert.assertEquals(attributeRelease.getAttributeId(), attribute.getId());

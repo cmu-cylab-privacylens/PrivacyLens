@@ -33,6 +33,7 @@ import ch.SWITCH.aai.uApprove.tou.ToUAcceptance;
 public class JDBCStorage extends AbstractJDBCStorage implements Storage {
 
     /** Class logger. */
+    @SuppressWarnings("unused")
     private final Logger logger = LoggerFactory.getLogger(JDBCStorage.class);
 
     /** {@see ToUAcceptance} row mapper. */
@@ -56,21 +57,21 @@ public class JDBCStorage extends AbstractJDBCStorage implements Storage {
 
     /** {@inheritDoc} */
     public void createToUAcceptance(final String userId, final ToUAcceptance touAcceptance) {
-        jdbcTemplate.update(sqlStatements.getProperty("createToUAcceptance"), userId, touAcceptance.getVersion(),
-                touAcceptance.getFingerprint(), touAcceptance.getAcceptanceDate().toDate());
+        getJdbcTemplate().update(getSqlStatements().getProperty("createToUAcceptance"), userId,
+                touAcceptance.getVersion(), touAcceptance.getFingerprint(), touAcceptance.getAcceptanceDate().toDate());
     }
 
     /** {@inheritDoc} */
     public void updateToUAcceptance(final String userId, final ToUAcceptance touAcceptance) {
-        jdbcTemplate.update(sqlStatements.getProperty("updateToUAcceptance"), touAcceptance.getFingerprint(),
+        getJdbcTemplate().update(getSqlStatements().getProperty("updateToUAcceptance"), touAcceptance.getFingerprint(),
                 touAcceptance.getAcceptanceDate().toDate(), userId, touAcceptance.getVersion());
     }
 
     /** {@inheritDoc} */
     public ToUAcceptance readToUAcceptance(final String userId, final String version) {
         try {
-            return jdbcTemplate.queryForObject(sqlStatements.getProperty("readToUAcceptance"), touAcceptanceMapper,
-                    userId, version);
+            return getJdbcTemplate().queryForObject(getSqlStatements().getProperty("readToUAcceptance"),
+                    touAcceptanceMapper, userId, version);
         } catch (final EmptyResultDataAccessException e) {
             return null;
         }
@@ -78,6 +79,6 @@ public class JDBCStorage extends AbstractJDBCStorage implements Storage {
 
     /** {@inheritDoc} */
     public boolean containsToUAcceptance(final String userId, final String version) {
-        return jdbcTemplate.queryForInt(sqlStatements.getProperty("containsToUAcceptance"), userId, version) > 0;
+        return getJdbcTemplate().queryForInt(getSqlStatements().getProperty("containsToUAcceptance"), userId, version) > 0;
     }
 }

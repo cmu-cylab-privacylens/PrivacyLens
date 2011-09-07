@@ -23,10 +23,10 @@ import org.slf4j.LoggerFactory;
 /** Exception thrown to indicate a problem with uApprove. */
 public class UApproveException extends RuntimeException {
 
-    private final Logger logger = LoggerFactory.getLogger(UApproveException.class);
-
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
+
+    private final Logger logger = LoggerFactory.getLogger(UApproveException.class);
 
     /**
      * Constructor.

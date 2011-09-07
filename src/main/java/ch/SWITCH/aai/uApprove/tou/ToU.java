@@ -56,7 +56,7 @@ public class ToU {
     public void setResource(final Resource resource) {
         try {
             content = Util.readResource(resource);
-            logger.debug("Initialized ToU from {}.", resource.getDescription());
+            logger.trace("Initializing ToU from {}.", resource.getDescription());
         } catch (final IOException e) {
             throw new UApproveException("Error while reading ToU resource " + resource.getDescription(), e);
         }

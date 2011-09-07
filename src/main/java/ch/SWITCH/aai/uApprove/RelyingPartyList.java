@@ -20,9 +20,8 @@ package ch.SWITCH.aai.uApprove;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
-
 /**
- *
+ * Relying Party List.
  */
 public class RelyingPartyList extends ArrayList<String> {
 
