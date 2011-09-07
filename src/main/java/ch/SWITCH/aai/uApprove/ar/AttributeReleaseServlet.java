@@ -70,7 +70,7 @@ public class AttributeReleaseServlet extends HttpServlet {
         final String relyingPartyId = LoginHelper.getRelyingPartyId(getServletContext(), req);
         final List<Attribute> attributes = LoginHelper.getAttributes(getServletContext(), req);
         final Map<String, Object> context = new HashMap<String, Object>();
-        context.put("relyingParty", samlHelper.getRelyingParty(relyingPartyId, viewHelper.selectLocale(req)));
+        context.put("relyingParty", samlHelper.readRelyingParty(relyingPartyId, viewHelper.selectLocale(req)));
         context.put("attributes", attributes);
         context.put("allowGeneralConsent", attributeReleaseModule.isAllowGeneralConsent());
         viewHelper.showView(req, resp, "attribute-release", context);

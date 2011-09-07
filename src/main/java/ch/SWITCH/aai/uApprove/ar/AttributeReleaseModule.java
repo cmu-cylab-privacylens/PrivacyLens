@@ -164,7 +164,8 @@ public class AttributeReleaseModule {
             return false;
         }
 
-        logger.debug("Consent required.");
+        logger.debug("Consent is required from user {} for attributes {} releasing to relying party {}.", new Object[] {
+                principalName, relyingPartyId, attributes});
         return true;
     }
 

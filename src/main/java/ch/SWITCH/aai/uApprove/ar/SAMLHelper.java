@@ -47,7 +47,7 @@ import edu.internet2.middleware.shibboleth.common.relyingparty.provider.SAMLMDRe
 import edu.internet2.middleware.shibboleth.common.session.Session;
 
 /**
- *
+ * SAML Helper.
  */
 public class SAMLHelper {
 
@@ -92,8 +92,8 @@ public class SAMLHelper {
         Validate.notNull(attributeProcessor, "Attribute Processor not set.");
     }
 
-    public List<Attribute> getAttributes(final String principalName, final String relyingPartyId, final Locale locale,
-            final Session session) {
+    public List<Attribute> resolveAttributes(final String principalName, final String relyingPartyId,
+            final Locale locale, final Session session) {
         @SuppressWarnings("rawtypes") final BaseSAMLProfileRequestContext requestCtx =
                 buildRequestContext(principalName, relyingPartyId, session);
 
@@ -118,7 +118,9 @@ public class SAMLHelper {
                     attributeValues.add(String.valueOf(valueObj));
                 }
             }
-            logger.trace("Attribute: {} {}", baseAttribute.getId(), attributeValues);
+            logger.trace("Attribute: {} {}, localized names {}, localized descriptions {}.", new Object[] {
+                    baseAttribute.getId(), attributeValues, baseAttribute.getDisplayNames().keySet(),
+                    baseAttribute.getDisplayDescriptions().keySet(),});
 
             attributes.add(new Attribute(baseAttribute.getId(), baseAttribute.getDisplayNames().get(locale),
                     baseAttribute.getDisplayDescriptions().get(locale), attributeValues));
@@ -168,7 +170,7 @@ public class SAMLHelper {
         return requestCtx;
     }
 
-    public RelyingParty getRelyingParty(final String relyingPartyId, final Locale locale) {
+    public RelyingParty readRelyingParty(final String relyingPartyId, final Locale locale) {
         EntityDescriptor entityDescriptor = null;
         try {
             entityDescriptor = metadataProvider.getEntityDescriptor(relyingPartyId);
@@ -177,9 +179,12 @@ public class SAMLHelper {
         }
         final AttributeConsumingService attrService = getAttributeConsumingService(entityDescriptor);
         if (attrService == null) {
-            logger.debug("No attribute consuming service found for entityId {}.", relyingPartyId);
+            logger.trace("No attribute consuming service found for entityId {}.", relyingPartyId);
             return new RelyingParty(relyingPartyId);
         } else {
+            logger.trace("Relying party: {}, localized names {}, localized descriptions {}.", new Object[] {
+                    relyingPartyId, attrService.getNames().size(), attrService.getDescriptions().size(),});
+
             String localizedName = null;
             for (final ServiceName element : attrService.getNames()) {
                 if (StringUtils.equals(element.getName().getLanguage(), locale.getLanguage())) {

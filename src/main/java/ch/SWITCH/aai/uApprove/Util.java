@@ -39,6 +39,7 @@ public final class Util {
     @SuppressWarnings("unused")
     private static final Logger LOGGER = LoggerFactory.getLogger(Util.class);
 
+    /** The message digest. */
     private static MessageDigest sha256;
 
     static {
@@ -82,6 +83,12 @@ public final class Util {
         return Hex.encodeHexString(digest);
     }
 
+    /**
+     * Converts a whitespace separated list into a list of Strings.
+     * 
+     * @param string The list.
+     * @return Returns a list of Strings.
+     */
     public static List<String> stringToList(final String string) {
         return Arrays.asList(string.split("\\s+"));
     }

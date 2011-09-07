@@ -84,7 +84,7 @@ public class Attribute {
      * 
      * @return Returns the name.
      */
-    protected String getName() {
+    public String getName() {
         return name;
     }
 
@@ -93,7 +93,7 @@ public class Attribute {
      * 
      * @return Returns the description.
      */
-    protected String getDescription() {
+    public String getDescription() {
         return description;
     }
 
@@ -104,6 +104,11 @@ public class Attribute {
      */
     public List<String> getValues() {
         return values;
+    }
+
+    /** {@inheritDoc} */
+    public String toString() {
+        return getId();
     }
 
 }

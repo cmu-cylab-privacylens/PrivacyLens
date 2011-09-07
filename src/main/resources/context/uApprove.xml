@@ -9,7 +9,7 @@
 
         
     <context:property-placeholder location="classpath:/context/uApprove.properties" />
-
+    
     <bean id="uApprove.touModule" class="ch.SWITCH.aai.uApprove.tou.ToUModule" init-method="initialize">
         <property name="enabled" value="${tou.enabled}" />
         <property name="tou">

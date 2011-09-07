@@ -49,14 +49,19 @@ public class Intercepter implements Filter {
     /** Class logger. */
     private final Logger logger = LoggerFactory.getLogger(Intercepter.class);
 
+    /** The servlet context. */
     private ServletContext servletContext;
 
+    /** The Terms Of Use Module. */
     private ToUModule touModule;
 
+    /** The Attribute Release Module. */
     private AttributeReleaseModule attributeReleaseModule;
 
+    /** The SAML helper. */
     private SAMLHelper samlHelper;
 
+    /** The view helper. */
     private ViewHelper viewHelper;
 
     /** {@inheritDoc} */
@@ -88,6 +93,15 @@ public class Intercepter implements Filter {
         intercept((HttpServletRequest) request, (HttpServletResponse) response, chain);
     }
 
+    /**
+     * Intercepts requests to the IdP.
+     * 
+     * @param request The request.
+     * @param response The response.
+     * @param chain The filter chain.
+     * @throws IOException Throws IOException.
+     * @throws ServletException Throws ServletException.
+     */
     public void
             intercept(final HttpServletRequest request, final HttpServletResponse response, final FilterChain chain)
                     throws IOException, ServletException {
@@ -107,15 +121,17 @@ public class Intercepter implements Filter {
             return;
         } else {
             if (attributeReleaseModule.isEnabled()) {
-                final List<Attribute> attributes =
-                        samlHelper.getAttributes(principalName, relyingPartyId, viewHelper.selectLocale(request),
-                                LoginHelper.getSession(request));
 
                 if (LoginHelper.isConsentRevocation(servletContext, request)) {
-                    logger.debug("Consent revovation requested.");
+                    logger.debug("Consent revovation requested. Clear consent.");
                     attributeReleaseModule.clearConsent(principalName, relyingPartyId);
                     LoginHelper.clearConsentRevocation(servletContext, request);
                 }
+
+                logger.debug("Resolving attributes for user {} and relying party {}.", principalName, relyingPartyId);
+                final List<Attribute> attributes =
+                        samlHelper.resolveAttributes(principalName, relyingPartyId, viewHelper.selectLocale(request),
+                                LoginHelper.getSession(request));
 
                 if (attributeReleaseModule.requiresConsent(principalName, relyingPartyId, attributes)) {
                     LoginHelper.setAttributes(servletContext, request, attributes);

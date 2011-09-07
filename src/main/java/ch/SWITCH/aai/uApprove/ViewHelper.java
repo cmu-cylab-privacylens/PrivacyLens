@@ -119,9 +119,12 @@ public class ViewHelper {
 
     public Locale selectLocale(final HttpServletRequest request) {
         if (forceDefaultLocale) {
+            logger.trace("Using forced default locale {}.", defaultLocale);
             return defaultLocale;
         } else {
-            return request.getLocale();
+            final Locale requestLocale = new Locale(request.getLocale().getLanguage());
+            logger.trace("Using request locale {}.", requestLocale);
+            return requestLocale;
         }
     }
 
