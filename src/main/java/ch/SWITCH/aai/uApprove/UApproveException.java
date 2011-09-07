@@ -17,18 +17,16 @@
 
 package ch.SWITCH.aai.uApprove;
 
-import javax.servlet.ServletException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** Exception thrown to indicate a problem with uApprove. */
-public class UApproveException extends ServletException {
+public class UApproveException extends RuntimeException {
+
+    private final Logger logger = LoggerFactory.getLogger(UApproveException.class);
 
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
-
-    /** Constructor. */
-    public UApproveException() {
-        super();
-    }
 
     /**
      * Constructor.
@@ -37,15 +35,7 @@ public class UApproveException extends ServletException {
      */
     public UApproveException(final String message) {
         super(message);
-    }
-
-    /**
-     * Constructor.
-     * 
-     * @param wrappedException exception to be wrapped by this one
-     */
-    public UApproveException(final Exception wrappedException) {
-        super(wrappedException);
+        logger.error(message);
     }
 
     /**
@@ -56,6 +46,7 @@ public class UApproveException extends ServletException {
      */
     public UApproveException(final String message, final Exception wrappedException) {
         super(message, wrappedException);
+        logger.error(message, wrappedException);
     }
 
 }

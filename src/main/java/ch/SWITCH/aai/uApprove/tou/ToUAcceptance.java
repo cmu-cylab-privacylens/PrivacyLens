@@ -93,13 +93,4 @@ public class ToUAcceptance {
         return new ToUAcceptance("", "", null);
     }
 
-    /**
-     * Checks if this terms of acceptance contains a specific terms of use.
-     * 
-     * @param tou The {@see Tou}.
-     * @return Returns true if version and fingerprint equals, false otherwise.
-     */
-    public boolean contains(final ToU tou) {
-        return version.equals(tou.getVersion()) && fingerprint.equals(Util.hash(tou.getContent()));
-    }
 }

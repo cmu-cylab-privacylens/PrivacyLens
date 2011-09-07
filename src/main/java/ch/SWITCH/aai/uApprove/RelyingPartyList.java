@@ -15,12 +15,11 @@
  * limitations under the License.
  */
 
-package ch.SWITCH.aai.uApprove.ar;
+package ch.SWITCH.aai.uApprove;
 
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
-import ch.SWITCH.aai.uApprove.Util;
 
 /**
  *

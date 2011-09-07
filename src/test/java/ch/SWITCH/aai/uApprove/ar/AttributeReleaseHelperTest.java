@@ -20,9 +20,11 @@ package ch.SWITCH.aai.uApprove.ar;
 import java.util.Arrays;
 import java.util.List;
 
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import ch.SWITCH.aai.uApprove.Util;
@@ -32,7 +34,16 @@ import ch.SWITCH.aai.uApprove.Util;
  */
 public class AttributeReleaseHelperTest {
 
-    final Logger logger = LoggerFactory.getLogger(AttributeReleaseHelperTest.class);
+    private final Logger logger = LoggerFactory.getLogger(AttributeReleaseHelperTest.class);
+
+    private Attribute attribute1a, attribute1b, attribute2;
+
+    @BeforeClass
+    public void initialize() {
+        attribute1a = new Attribute("id1", Arrays.asList(new String[] {"value1a", "value2a"}));
+        attribute1b = new Attribute("id1", Arrays.asList(new String[] {"value1b", "value2b"}));
+        attribute2 = new Attribute("id2", Arrays.asList(new String[] {"value1", "value2"}));
+    }
 
     @Test
     public void testHashValues() {
@@ -51,5 +62,23 @@ public class AttributeReleaseHelperTest {
 
         final String entityId3 = "sp.example.org";
         Assert.assertEquals(AttributeReleaseHelper.resolveFqdn(entityId3), "sp.example.org");
+    }
+
+    @Test
+    public void testApprovedAttribute() {
+        final AttributeRelease attributeRelease = new AttributeRelease(attribute1a, new DateTime());
+
+        Assert.assertTrue(AttributeReleaseHelper.approvedAttribute(attribute1a, attributeRelease, false));
+        Assert.assertTrue(AttributeReleaseHelper.approvedAttribute(attribute1a, attributeRelease, true));
+
+        Assert.assertTrue(AttributeReleaseHelper.approvedAttribute(attribute1b, attributeRelease, false));
+        Assert.assertFalse(AttributeReleaseHelper.approvedAttribute(attribute1b, attributeRelease, true));
+
+        Assert.assertFalse(AttributeReleaseHelper.approvedAttribute(attribute2, attributeRelease, false));
+    }
+
+    @Test
+    public void testApprovedAttributes() {
+
     }
 }

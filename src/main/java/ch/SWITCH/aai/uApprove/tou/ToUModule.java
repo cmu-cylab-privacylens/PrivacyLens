@@ -17,10 +17,12 @@
 
 package ch.SWITCH.aai.uApprove.tou;
 
+import java.util.List;
+
+import org.apache.commons.lang.Validate;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.Assert;
 
 import ch.SWITCH.aai.uApprove.tou.storage.Storage;
 
@@ -36,11 +38,16 @@ public class ToUModule {
 
     private ToU tou;
 
+    private boolean compareContent;
+
+    private List<String> relyingParties;
+
     private Storage storage;
 
     /** Default constructor. */
     public ToUModule() {
         enabled = false;
+        compareContent = true;
     }
 
     /**
@@ -65,6 +72,20 @@ public class ToUModule {
     }
 
     /**
+     * @param compareContent The compareContent to set.
+     */
+    public void setCompareContent(final boolean compareContent) {
+        this.compareContent = compareContent;
+    }
+
+    /**
+     * @param relyingParties The relyingParties to set.
+     */
+    public void setRelyingParties(final List<String> relyingParties) {
+        this.relyingParties = relyingParties;
+    }
+
+    /**
      * @param storage The storage to set.
      */
     public void setStorage(final Storage storage) {
@@ -80,9 +101,10 @@ public class ToUModule {
 
     public void initialize() {
         if (enabled) {
-            Assert.notNull(tou, "ToU is not set.");
-            Assert.notNull(storage, "Storage is not set.");
-            logger.debug("ToU Module using ToU version {} initialized.", getTou().getVersion());
+            Validate.notNull(tou, "ToU is not set.");
+            Validate.notNull(storage, "Storage is not set.");
+            logger.debug("ToU Module initialized with ToU version {}. Content is {}compared.", getTou().getVersion(),
+                    compareContent ? "" : "not ");
         } else {
             logger.debug("ToU Module is not enabled.");
         }
@@ -93,7 +115,13 @@ public class ToUModule {
      * @param relyingPartyId
      * @return
      */
-    public boolean isToUAccepted(final String principalName) {
+    public boolean requiresToUAcceptance(final String principalName, final String relyingPartyId) {
+
+        if (!relyingParties.contains(relyingPartyId)) {
+            logger.debug("Skip relying party {}.", relyingPartyId);
+            return false;
+        }
+
         final ToUAcceptance touAcceptance;
         if (storage.containsToUAcceptance(principalName, tou.getVersion())) {
             touAcceptance = storage.readToUAcceptance(principalName, tou.getVersion());
@@ -101,13 +129,13 @@ public class ToUModule {
             touAcceptance = ToUAcceptance.emptyToUAcceptance();
         }
 
-        if (touAcceptance.contains(tou)) {
+        if (ToUHelper.acceptedToU(tou, touAcceptance, compareContent)) {
             logger.info("User {} has already accepted ToU {}.", principalName, tou.getVersion());
-            return true;
+            return false;
         }
 
         logger.info("User {} needs to accept ToU {}.", principalName, tou.getVersion());
-        return false;
+        return true;
     }
 
     public void acceptToU(final String principalName) {

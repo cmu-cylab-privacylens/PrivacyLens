@@ -21,6 +21,8 @@ import org.springframework.core.io.ClassPathResource;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import ch.SWITCH.aai.uApprove.UApproveException;
+
 /**
  * Tests ToU.
  */
@@ -44,11 +46,10 @@ public class ToUTest {
             Assert.assertTrue(true);
         }
 
-        tou.setResource(new ClassPathResource("not-existent.html"));
         try {
-            tou.initialize();
+            tou.setResource(new ClassPathResource("not-existent.html"));
             Assert.fail();
-        } catch (final IllegalArgumentException e) {
+        } catch (final UApproveException e) {
             Assert.assertTrue(true);
         }
 

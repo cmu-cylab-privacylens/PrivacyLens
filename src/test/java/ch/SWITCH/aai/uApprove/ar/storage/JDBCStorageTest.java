@@ -37,7 +37,7 @@ import ch.SWITCH.aai.uApprove.ar.AttributeRelease;
  * Tests JDBC storage using the Spring JDBC framework.
  */
 
-@ContextConfiguration(locations = {"/uApprove-test.xml"})
+@ContextConfiguration(locations = {"classpath:/context/uApprove-test.xml"})
 @TransactionConfiguration(defaultRollback = true)
 public class JDBCStorageTest extends AbstractTransactionalTestNGSpringContextTests {
 
@@ -49,7 +49,7 @@ public class JDBCStorageTest extends AbstractTransactionalTestNGSpringContextTes
     @BeforeClass
     @Rollback(false)
     public void initialize() {
-        super.executeSqlScript("classpath:/attribute-release-schema.sql", false);
+        super.executeSqlScript("classpath:/storage/attribute-release-schema.sql", false);
     }
 
     @Test

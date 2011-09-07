@@ -23,6 +23,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
 import org.opensaml.common.xml.SAMLConstants;
 import org.opensaml.saml2.core.NameID;
 import org.opensaml.saml2.metadata.AttributeConsumingService;
@@ -34,8 +35,8 @@ import org.opensaml.saml2.metadata.provider.MetadataProvider;
 import org.opensaml.saml2.metadata.provider.MetadataProviderException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.Assert;
 
+import ch.SWITCH.aai.uApprove.UApproveException;
 import edu.internet2.middleware.shibboleth.common.attribute.AttributeRequestException;
 import edu.internet2.middleware.shibboleth.common.attribute.BaseAttribute;
 import edu.internet2.middleware.shibboleth.common.attribute.provider.SAML2AttributeAuthority;
@@ -84,22 +85,23 @@ public class SAMLHelper {
     }
 
     public void initialize() {
-        Assert.notNull(attributeAuthority, "Attribute Authority not set.");
-        Assert.notNull(relyingPartyConfigurationManager, "Relying Party Configuration Manager not set.");
+        Validate.notNull(attributeAuthority, "Attribute Authority not set.");
+        Validate.notNull(relyingPartyConfigurationManager, "Relying Party Configuration Manager not set.");
         metadataProvider = relyingPartyConfigurationManager.getMetadataProvider();
-        Assert.notNull(metadataProvider, "Metadata Provider not set.");
-        Assert.notNull(attributeProcessor, "Attribute Processor not set.");
+        Validate.notNull(metadataProvider, "Metadata Provider not set.");
+        Validate.notNull(attributeProcessor, "Attribute Processor not set.");
     }
 
     public List<Attribute> getAttributes(final String principalName, final String relyingPartyId, final Locale locale,
             final Session session) {
-        final BaseSAMLProfileRequestContext requestCtx = buildRequestContext(principalName, relyingPartyId, session);
+        @SuppressWarnings("rawtypes") final BaseSAMLProfileRequestContext requestCtx =
+                buildRequestContext(principalName, relyingPartyId, session);
 
-        Map<String, BaseAttribute> baseAttributes = null;
+        @SuppressWarnings("rawtypes") Map<String, BaseAttribute> baseAttributes = null;
         try {
             baseAttributes = attributeAuthority.getAttributes(requestCtx);
         } catch (final AttributeRequestException e) {
-            logger.error("Error while retrieving attributes for {}.", principalName, e);
+            throw new UApproveException("Error while retrieving attributes for " + principalName, e);
         }
 
         final List<Attribute> attributes = new ArrayList<Attribute>();
@@ -138,17 +140,18 @@ public class SAMLHelper {
         try {
             localEntityMetadata = metadataProvider.getEntityDescriptor(providerId);
         } catch (final MetadataProviderException e) {
-            logger.error("Error while retrieving metadata descriptor for {}.", providerId, e);
+            throw new UApproveException("Error while retrieving metadata descriptor for " + providerId, e);
         }
 
         EntityDescriptor peerEntityMetadata = null;
         try {
             peerEntityMetadata = metadataProvider.getEntityDescriptor(relyingPartyId);
         } catch (final MetadataProviderException e) {
-            logger.error("Error while retrieving metadata descriptor for {}.", relyingPartyId, e);
+            throw new UApproveException("Error while retrieving metadata descriptor for " + relyingPartyId, e);
         }
 
-        final BaseSAMLProfileRequestContext<?, ?, ?, ?> requestCtx = new BaseSAMLProfileRequestContext();
+        @SuppressWarnings("rawtypes") final BaseSAMLProfileRequestContext<?, ?, ?, ?> requestCtx =
+                new BaseSAMLProfileRequestContext();
         requestCtx.setRelyingPartyConfiguration(relyingPartyConfiguration);
         requestCtx.setInboundMessageIssuer(relyingPartyId);
         requestCtx.setOutboundMessageIssuer(providerId);
@@ -170,7 +173,7 @@ public class SAMLHelper {
         try {
             entityDescriptor = metadataProvider.getEntityDescriptor(relyingPartyId);
         } catch (final MetadataProviderException e) {
-            logger.error("Error while retrieving metadata descriptor for {}.", relyingPartyId, e);
+            throw new UApproveException("Error while retrieving metadata descriptor for " + relyingPartyId, e);
         }
         final AttributeConsumingService attrService = getAttributeConsumingService(entityDescriptor);
         if (attrService == null) {

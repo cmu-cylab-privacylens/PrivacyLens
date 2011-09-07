@@ -27,7 +27,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.context.WebApplicationContext;
@@ -82,7 +82,7 @@ public class AttributeReleaseServlet extends HttpServlet {
 
         final boolean generalConsent =
                 attributeReleaseModule.isAllowGeneralConsent()
-                        && StringUtils.equals(req.getParameter("generalConsent"), "true");
+                        && BooleanUtils.toBoolean(req.getParameter("generalConsent"));
         final String principalName = LoginHelper.getPrincipalName(getServletContext(), req);
         final String relyingPartyId = LoginHelper.getRelyingPartyId(getServletContext(), req);
         final List<Attribute> attributes = LoginHelper.getAttributes(getServletContext(), req);

@@ -9,12 +9,12 @@
 
     <bean id="touJdbcStorage" class="ch.SWITCH.aai.uApprove.tou.storage.JDBCStorage" init-method="initialize">
         <property name="dataSource" ref="dataSource" />
-        <property name="sqlStatements" value="classpath:/conf/sql-statements.properties"/>
+        <property name="sqlStatements" value="classpath:/storage/sql-statements.properties"/>
     </bean>
     
     <bean id="arJdbcStorage" class="ch.SWITCH.aai.uApprove.ar.storage.JDBCStorage" init-method="initialize">
         <property name="dataSource" ref="dataSource" />
-        <property name="sqlStatements" value="classpath:/conf/sql-statements.properties"/>
+        <property name="sqlStatements" value="classpath:/storage/sql-statements.properties"/>
     </bean>
     
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">

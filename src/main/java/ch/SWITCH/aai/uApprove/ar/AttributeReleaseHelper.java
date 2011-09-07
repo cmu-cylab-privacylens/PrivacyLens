@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 
 import ch.SWITCH.aai.uApprove.Util;
@@ -32,7 +33,11 @@ import ch.SWITCH.aai.uApprove.Util;
 /**
  *
  */
-public class AttributeReleaseHelper {
+public final class AttributeReleaseHelper {
+
+    /** Default constructor for utility classes is private. */
+    private AttributeReleaseHelper() {
+    }
 
     /**
      * Creates a collection of @see AttributeRelease.
@@ -67,18 +72,26 @@ public class AttributeReleaseHelper {
         return Util.hash(stringBuilder.toString());
     }
 
-    public static boolean approvedAttributes(final List<Attribute> attributes,
-            final List<AttributeRelease> attributeReleases) {
-        for (final Attribute attribute : attributes) {
-            boolean approved = false;
-            for (final AttributeRelease attributeRelease : attributeReleases) {
-                if (attributeRelease.contains(attribute)) {
-                    approved = true;
-                    break;
-                }
+    public static boolean approvedAttribute(final Attribute attribute, final AttributeRelease attributeRelease,
+            final boolean compareAttributeValues) {
+        if (StringUtils.equals(attributeRelease.getAttributeId(), attribute.getId())) {
+            if (compareAttributeValues) {
+                return StringUtils.equals(attributeRelease.getValuesHash(), hashValues(attribute.getValues()));
+            } else {
+                return true;
             }
-            if (!approved) {
-                return false;
+        } else {
+            return false;
+        }
+    }
+
+    public static boolean approvedAttributes(final List<Attribute> attributes,
+            final List<AttributeRelease> attributeReleases, final boolean compareAttributeValues) {
+        for (final Attribute attribute : attributes) {
+            for (final AttributeRelease attributeRelease : attributeReleases) {
+                if (!approvedAttribute(attribute, attributeRelease, compareAttributeValues)) {
+                    return false;
+                }
             }
         }
         return true;

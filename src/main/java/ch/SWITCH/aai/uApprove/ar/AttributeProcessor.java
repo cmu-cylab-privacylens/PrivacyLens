@@ -53,7 +53,7 @@ public class AttributeProcessor {
      * @param order The order to set.
      */
     public void setOrder(final String order) {
-        this.order = Util.stringToList(order);;
+        this.order = Util.stringToList(order);
     }
 
     public void removeBlacklistedAttributes(final List<Attribute> attributes) {

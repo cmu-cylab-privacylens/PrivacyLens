@@ -30,9 +30,9 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.Assert;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -72,10 +72,10 @@ public class Intercepter implements Filter {
 
         viewHelper = (ViewHelper) appContext.getBean("uApprove.viewHelper", ViewHelper.class);
 
-        Assert.notNull(touModule, "ToU module isn't properly configured.");
-        Assert.notNull(attributeReleaseModule, "Attribute Release module isn't properly configured.");
-        Assert.notNull(samlHelper, "SAML Helper isn't properly configured.");
-        Assert.notNull(viewHelper, "View Helper isn't properly configured.");
+        Validate.notNull(touModule, "ToU module isn't properly configured.");
+        Validate.notNull(attributeReleaseModule, "Attribute Release module isn't properly configured.");
+        Validate.notNull(samlHelper, "SAML Helper isn't properly configured.");
+        Validate.notNull(viewHelper, "View Helper isn't properly configured.");
 
         logger.debug("uApprove initialized.");
     }
@@ -83,8 +83,8 @@ public class Intercepter implements Filter {
     /** {@inheritDoc} */
     public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
             throws IOException, ServletException {
-        Assert.isInstanceOf(HttpServletRequest.class, request, "Not an HttpServletRequest.");
-        Assert.isInstanceOf(HttpServletResponse.class, response, "Not an HttpServletResponse.");
+        Validate.isTrue(request instanceof HttpServletRequest, "Not an HttpServletRequest.");
+        Validate.isTrue(response instanceof HttpServletResponse, "Not an HttpServletResponse.");
         intercept((HttpServletRequest) request, (HttpServletResponse) response, chain);
     }
 
@@ -100,13 +100,13 @@ public class Intercepter implements Filter {
         }
 
         final String principalName = LoginHelper.getPrincipalName(servletContext, request);
+        final String relyingPartyId = LoginHelper.getRelyingPartyId(servletContext, request);
 
-        if (touModule.isEnabled() && !touModule.isToUAccepted(principalName)) {
+        if (touModule.isEnabled() && touModule.requiresToUAcceptance(principalName, relyingPartyId)) {
             LoginHelper.redirectToServlet(request, response, "/uApprove/TermsOfUse");
             return;
         } else {
             if (attributeReleaseModule.isEnabled()) {
-                final String relyingPartyId = LoginHelper.getRelyingPartyId(servletContext, request);
                 final List<Attribute> attributes =
                         samlHelper.getAttributes(principalName, relyingPartyId, viewHelper.selectLocale(request),
                                 LoginHelper.getSession(request));
@@ -117,7 +117,7 @@ public class Intercepter implements Filter {
                     LoginHelper.clearConsentRevocation(servletContext, request);
                 }
 
-                if (attributeReleaseModule.consentRequired(principalName, relyingPartyId, attributes)) {
+                if (attributeReleaseModule.requiresConsent(principalName, relyingPartyId, attributes)) {
                     LoginHelper.setAttributes(servletContext, request, attributes);
                     LoginHelper.redirectToServlet(request, response, "/uApprove/AttributeRelease");
                     return;

@@ -44,11 +44,17 @@ public class ViewHelper {
     /** Whether the default locale should forced. */
     private boolean forceDefaultLocale;
 
+    private String resourceBundleBase;
+
+    private String viewTemplateBase;
+
     /** Default constructor. */
     public ViewHelper() {
         velocityEngine = new VelocityEngine();
         defaultLocale = Locale.getDefault();
         forceDefaultLocale = false;
+        resourceBundleBase = "messages";
+        viewTemplateBase = "views";
     }
 
     public void initialize() {
@@ -60,7 +66,7 @@ public class ViewHelper {
         try {
             velocityEngine.init(velocityProperties);
         } catch (final Exception e) {
-            logger.error("Error while initializing the velocity engine.", e);
+            throw new UApproveException("Error while initializing the velocity engine.", e);
         }
     }
 
@@ -76,6 +82,20 @@ public class ViewHelper {
      */
     public void setForceDefaultLocale(final boolean forceDefaultLocale) {
         this.forceDefaultLocale = forceDefaultLocale;
+    }
+
+    /**
+     * @param resourceBundleBase The resourceBundleBase to set.
+     */
+    public void setResourceBundleBase(final String resourceBundleBase) {
+        this.resourceBundleBase = resourceBundleBase;
+    }
+
+    /**
+     * @param viewTemplateBase The viewTemplateBase to set.
+     */
+    public void setViewTemplateBase(final String viewTemplateBase) {
+        this.viewTemplateBase = viewTemplateBase;
     }
 
     public Locale selectLocale(final HttpServletRequest request) {
@@ -95,17 +115,18 @@ public class ViewHelper {
         velocityContext.put("MessageFormat", MessageFormat.class);
         velocityContext.put("localizedMessages", getLocalizedMessages(viewName, selectLocale(request)));
 
-        final String templateName = String.format("views/%s.html", viewName);
+        final String templateName = String.format("%s/%s.html", viewTemplateBase, viewName);
         try {
             velocityEngine.mergeTemplate(templateName, "UTF-8", new VelocityContext(viewContext, velocityContext),
                     response.getWriter());
         } catch (final Exception e) {
-            logger.error("Error while merge and writing view.", e);
+            throw new UApproveException("Error while merge and writing view.", e);
         }
     }
 
     private LocalizedStrings getLocalizedMessages(final String resource, final Locale locale) {
-        final ResourceBundle resourceBundle = ResourceBundle.getBundle(String.format("messages.%s", resource), locale);
+        final ResourceBundle resourceBundle =
+                ResourceBundle.getBundle(String.format("%s.%s", resourceBundleBase, resource), locale);
         return new LocalizedStrings(resourceBundle);
     }
 }

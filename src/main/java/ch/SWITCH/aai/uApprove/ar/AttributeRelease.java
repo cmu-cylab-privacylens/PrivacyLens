@@ -83,14 +83,4 @@ public class AttributeRelease {
         return consentDate;
     }
 
-    /**
-     * Checks if an @see AttributeRelease contains a given @see Attribute.
-     * 
-     * @param attribute The @see Attribute to check for.
-     * @return Returns true if this @see AttributeRelease contains the given attribute.
-     */
-    public boolean contains(final Attribute attribute) {
-        return attributeId.equals(attribute.getId())
-                && valuesHash.equals(AttributeReleaseHelper.hashValues(attribute.getValues()));
-    }
 }

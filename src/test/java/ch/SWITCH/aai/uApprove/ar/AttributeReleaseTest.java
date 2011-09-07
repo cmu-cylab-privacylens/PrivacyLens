@@ -21,7 +21,6 @@ import java.util.Arrays;
 
 import org.joda.time.DateTime;
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
@@ -34,28 +33,12 @@ public class AttributeReleaseTest {
 
     private DateTime consentDate;
 
-    @BeforeClass
-    public void initialize() {
-        attribute1 = new Attribute("id1", Arrays.asList(new String[] {"value1", "value2"}));
-        attribute2 = new Attribute("id2", Arrays.asList(new String[] {"value1", "value2"}));
-        consentDate = new DateTime();
-    }
-
     @Test
     public void createAttributeReleases() {
-        final AttributeRelease attributeRelease = new AttributeRelease(attribute1, consentDate);
-        Assert.assertEquals(attributeRelease.getAttributeId(), attribute1.getId());
-        Assert.assertEquals(attributeRelease.getValuesHash(), AttributeReleaseHelper.hashValues(attribute1.getValues()));
+        final Attribute attribute = new Attribute("id", Arrays.asList(new String[] {"value1", "value2"}));
+        final AttributeRelease attributeRelease = new AttributeRelease(attribute, consentDate);
+        Assert.assertEquals(attributeRelease.getAttributeId(), attribute.getId());
+        Assert.assertEquals(attributeRelease.getValuesHash(), AttributeReleaseHelper.hashValues(attribute.getValues()));
         Assert.assertEquals(attributeRelease.getDate(), consentDate);
-    }
-
-    @Test
-    public void contains() {
-        final AttributeRelease attributeRelease = new AttributeRelease(attribute1, consentDate);
-        Assert.assertTrue(attributeRelease.contains(attribute1));
-        Assert.assertFalse(attributeRelease.contains(attribute2));
-
-        final Attribute attribute3 = new Attribute(attribute1.getId(), Arrays.asList(new String[] {"other value"}));
-        Assert.assertFalse(attributeRelease.contains(attribute3));
     }
 }

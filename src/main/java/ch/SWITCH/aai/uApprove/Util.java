@@ -25,7 +25,7 @@ public final class Util {
         try {
             sha256 = MessageDigest.getInstance("SHA-256");
         } catch (final NoSuchAlgorithmException e) {
-            logger.error("Error getting message digest instance.", e);
+            throw new UApproveException("Error getting message digest instance.", e);
         }
     }
 

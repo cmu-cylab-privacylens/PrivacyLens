@@ -21,10 +21,10 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.Assert;
 
 import ch.SWITCH.aai.uApprove.ar.storage.Storage;
 
@@ -42,7 +42,16 @@ public class AttributeReleaseModule {
 
     private List<String> enabledRelyingParties;
 
+    private boolean compareAttributeValues;
+
     private Storage storage;
+
+    public AttributeReleaseModule() {
+        enabled = false;
+        allowGeneralConsent = false;
+        enabledRelyingParties = Collections.emptyList();
+        compareAttributeValues = true;
+    }
 
     /**
      * @param enabled The enabled to set.
@@ -66,6 +75,13 @@ public class AttributeReleaseModule {
     }
 
     /**
+     * @param compareAttributeValues The compareAttributeValues to set.
+     */
+    public void setCompareAttributeValues(final boolean compareAttributeValues) {
+        this.compareAttributeValues = compareAttributeValues;
+    }
+
+    /**
      * @return Returns the allowGeneralConsent.
      */
     public boolean isAllowGeneralConsent() {
@@ -83,17 +99,12 @@ public class AttributeReleaseModule {
         this.storage = storage;
     }
 
-    public AttributeReleaseModule() {
-        enabled = false;
-        allowGeneralConsent = false;
-        enabledRelyingParties = Collections.emptyList();
-    }
-
     public void initialize() {
         if (enabled) {
-            Assert.notNull(storage, "Storage is not set.");
-            logger.debug("Attribute Release Module initialzed with genaral consent {}.", isAllowGeneralConsent()
-                    ? "enabled" : "disabled");
+            Validate.notNull(storage, "Storage is not set.");
+            logger.debug(
+                    "Attribute Release Module initialzed with genaral consent {}. Attribute values are {}compared.",
+                    isAllowGeneralConsent() ? "enabled" : "disabled", compareAttributeValues ? "" : "not ");
         } else {
             logger.debug("Attribute Release Module is not enabled.");
         }
@@ -105,7 +116,7 @@ public class AttributeReleaseModule {
      * @param attributes
      * @return
      */
-    public boolean consentRequired(final String principalName, final String relyingPartyId,
+    public boolean requiresConsent(final String principalName, final String relyingPartyId,
             final List<Attribute> attributes) {
 
         if (storage.containsAttributeReleases(principalName, "*")) {
@@ -114,7 +125,7 @@ public class AttributeReleaseModule {
         }
 
         final List<AttributeRelease> attributeReleases = storage.readAttributeReleases(principalName, relyingPartyId);
-        if (AttributeReleaseHelper.approvedAttributes(attributes, attributeReleases)) {
+        if (AttributeReleaseHelper.approvedAttributes(attributes, attributeReleases, compareAttributeValues)) {
             logger.debug("Consent not required.");
             return false;
         }
@@ -140,7 +151,7 @@ public class AttributeReleaseModule {
     public void
             createConsent(final String principalName, final String relyingPartyId, final List<Attribute> attributes) {
         logger.info("Create user consent for {} attributes from {} to {}.", new Object[] {attributes.size(),
-                principalName, relyingPartyId});
+                principalName, relyingPartyId,});
         final DateTime consenDate = new DateTime();
         for (final Attribute attribute : attributes) {
             final AttributeRelease attributeRelease = new AttributeRelease(attribute, consenDate);

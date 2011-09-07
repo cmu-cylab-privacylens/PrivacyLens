@@ -25,10 +25,10 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.Assert;
 
 import ch.SWITCH.aai.uApprove.ar.Attribute;
 import edu.internet2.middleware.shibboleth.common.session.Session;
@@ -47,10 +47,14 @@ public final class LoginHelper {
     private LoginHelper() {
     }
 
-    private static LoginContext getLoginContext(final ServletContext servletContext, final HttpServletRequest request) {
+    private static LoginContext getLoginContext(final ServletContext servletContext, final HttpServletRequest request,
+            final boolean required) {
         final LoginContext loginContext =
                 HttpServletHelper.getLoginContext(HttpServletHelper.getStorageService(servletContext), servletContext,
                         request);
+        if (required) {
+            Validate.notNull(loginContext, "Login context is required for this operation.");
+        }
         return loginContext;
     }
 
@@ -59,7 +63,7 @@ public final class LoginHelper {
     }
 
     public static boolean isAuthenticated(final ServletContext servletContext, final HttpServletRequest request) {
-        final LoginContext loginContext = getLoginContext(servletContext, request);
+        final LoginContext loginContext = getLoginContext(servletContext, request, false);
 
         if (loginContext == null) {
             logger.trace("LoginContext is null.");
@@ -77,31 +81,27 @@ public final class LoginHelper {
     }
 
     public static String getPrincipalName(final ServletContext servletContext, final HttpServletRequest request) {
-        final LoginContext loginContext = getLoginContext(servletContext, request);
-        Assert.notNull(loginContext, "LoginContext is null.");
-        final String principalName = loginContext.getPrincipalName();
+        final String principalName = getLoginContext(servletContext, request, true).getPrincipalName();
         logger.trace("Principal name is {}.", principalName);
         return principalName;
     }
 
     public static String getRelyingPartyId(final ServletContext servletContext, final HttpServletRequest request) {
-        final LoginContext loginContext = getLoginContext(servletContext, request);
-        Assert.notNull(loginContext, "Login context is required for this operation.");
-        final String relyingPartyId = loginContext.getRelyingPartyId();
+        final String relyingPartyId = getLoginContext(servletContext, request, true).getRelyingPartyId();
         logger.trace("Relying party id is {}.", relyingPartyId);
         return relyingPartyId;
     }
 
     public static void returnToIdP(final ServletContext servletContext, final HttpServletRequest request,
             final HttpServletResponse response) {
-        final LoginContext loginContext = getLoginContext(servletContext, request);
+        final LoginContext loginContext = getLoginContext(servletContext, request, true);
         final String profileUrl =
                 HttpServletHelper.getContextRelativeUrl(request, loginContext.getProfileHandlerURL()).buildURL();
         try {
             logger.trace("Redirect to {}.", profileUrl);
             response.sendRedirect(profileUrl);
         } catch (final IOException e) {
-            logger.error("Error sending user back to profile handler at {}", profileUrl, e);
+            throw new UApproveException("Error sending user back to profile handler at " + profileUrl, e);
         }
     }
 
@@ -112,43 +112,37 @@ public final class LoginHelper {
             logger.trace("Redirect to {}.", servletUrl);
             response.sendRedirect(servletUrl);
         } catch (final IOException e) {
-            logger.error("Error sending user to servlet {} ", servletUrl, e);
+            throw new UApproveException("Error sending user to servlet " + servletUrl, e);
         }
     }
 
     public static void
             testAndSetConsentRevocation(final ServletContext servletContext, final HttpServletRequest request) {
-        if (StringUtils.equals(request.getParameter("uApprove.consent-revocation"), "true")) {
-            final LoginContext loginContext = getLoginContext(servletContext, request);
-            Assert.notNull(loginContext, "Login context is required for this operation.");
+        if (BooleanUtils.toBoolean(request.getParameter("uApprove.consent-revocation"))) {
+            final LoginContext loginContext = getLoginContext(servletContext, request, true);
             loginContext.setProperty("uApprove.consentRevocationRequested", "true");
             logger.trace("Set uApprove.consent-revocation.");
         }
     }
 
     public static boolean isConsentRevocation(final ServletContext servletContext, final HttpServletRequest request) {
-        final LoginContext loginContext = getLoginContext(servletContext, request);
-        Assert.notNull(loginContext, "Login context is required for this operation.");
-        return StringUtils.equals(String.valueOf(loginContext.getProperty("uApprove.consentRevocationRequested")),
-                "true");
+        final LoginContext loginContext = getLoginContext(servletContext, request, true);
+        return BooleanUtils.toBoolean((String) loginContext.getProperty("uApprove.consentRevocationRequested"));
     }
 
     public static void clearConsentRevocation(final ServletContext servletContext, final HttpServletRequest request) {
-        final LoginContext loginContext = getLoginContext(servletContext, request);
-        Assert.notNull(loginContext, "Login context is required for this operation.");
+        final LoginContext loginContext = getLoginContext(servletContext, request, true);
         loginContext.setProperty("uApprove.consentRevocationRequested", "");
     }
 
     public static void setAttributes(final ServletContext servletContext, final HttpServletRequest request,
             final List<Attribute> attributes) {
-        final LoginContext loginContext = getLoginContext(servletContext, request);
-        Assert.notNull(loginContext, "Login context is required for this operation.");
+        final LoginContext loginContext = getLoginContext(servletContext, request, true);
         loginContext.setProperty("uApprove.attributes", (Serializable) attributes);
     }
 
     public static List<Attribute> getAttributes(final ServletContext servletContext, final HttpServletRequest request) {
-        final LoginContext loginContext = getLoginContext(servletContext, request);
-        Assert.notNull(loginContext, "Login context is required for this operation.");
+        final LoginContext loginContext = getLoginContext(servletContext, request, true);
         return (List<Attribute>) loginContext.getProperty("uApprove.attributes");
     }
 }

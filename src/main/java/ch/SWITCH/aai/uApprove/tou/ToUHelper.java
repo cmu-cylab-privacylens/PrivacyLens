@@ -17,38 +17,28 @@
 
 package ch.SWITCH.aai.uApprove.tou;
 
-import org.joda.time.DateTime;
-import org.springframework.core.io.ClassPathResource;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.apache.commons.lang.StringUtils;
 
 import ch.SWITCH.aai.uApprove.Util;
 
 /**
- * Tests ToUAcceptance.
+ *
  */
+public final class ToUHelper {
 
-@Test
-public class ToUAcceptanceTest {
-
-    private ToU tou;
-
-    @BeforeClass
-    public void initialize() {
-        tou = new ToU();
-        tou.setVersion("1.0");
-        tou.setResource(new ClassPathResource("examples/terms-of-use.html"));
-        tou.initialize();
+    /** Default constructor for utility classes is private. */
+    private ToUHelper() {
     }
 
-    public void createToUAcceptance() {
-        final DateTime date = new DateTime();
-        final ToUAcceptance touAcceptance = new ToUAcceptance(tou, date);
-        Assert.assertEquals(tou.getVersion(), touAcceptance.getVersion());
-        final String fingerprint = Util.hash(tou.getContent());
-        Assert.assertEquals(fingerprint, touAcceptance.getFingerprint());
-        Assert.assertEquals(date, touAcceptance.getAcceptanceDate());
+    public static boolean acceptedToU(final ToU tou, final ToUAcceptance touAcceptance, final boolean compareContent) {
+        if (StringUtils.equals(tou.getVersion(), touAcceptance.getVersion())) {
+            if (compareContent) {
+                return StringUtils.equals(Util.hash(tou.getContent()), touAcceptance.getFingerprint());
+            } else {
+                return true;
+            }
+        } else {
+            return false;
+        }
     }
-
 }

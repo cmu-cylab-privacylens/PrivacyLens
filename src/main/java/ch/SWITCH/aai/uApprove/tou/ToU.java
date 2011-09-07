@@ -19,11 +19,12 @@ package ch.SWITCH.aai.uApprove.tou;
 
 import java.io.IOException;
 
+import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
-import org.springframework.util.Assert;
 
+import ch.SWITCH.aai.uApprove.UApproveException;
 import ch.SWITCH.aai.uApprove.Util;
 
 /** Represents the terms of use. */
@@ -56,14 +57,14 @@ public class ToU {
         try {
             content = Util.readResource(resource);
             logger.debug("Initialized ToU from {}.", resource.getDescription());
-        } catch (final IOException exception) {
-            logger.error("Error while reading ToU resource {}.", resource.getDescription(), exception);
+        } catch (final IOException e) {
+            throw new UApproveException("Error while reading ToU resource " + resource.getDescription(), e);
         }
     }
 
     public void initialize() {
-        Assert.hasText(version, version + " is an invalid ToU version.");
-        Assert.hasText(content, "ToU Text is not set.");
+        Validate.notEmpty(version, "ToU version is not set.");
+        Validate.notEmpty(content, "ToU text is not set.");
         logger.debug("ToU version {} [{}] initialized.", getVersion(), Util.hash(getContent()));
     }
 

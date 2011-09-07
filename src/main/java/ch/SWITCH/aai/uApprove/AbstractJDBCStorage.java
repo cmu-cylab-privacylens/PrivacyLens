@@ -22,11 +22,11 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
-import org.springframework.util.Assert;
 
 /**
  *
@@ -56,12 +56,13 @@ public abstract class AbstractJDBCStorage {
         try {
             sqlStatements.load(sqlStamentsResource.getInputStream());
         } catch (final IOException e) {
-            logger.error("Error reading SQL statements from resource {}", sqlStamentsResource.getDescription(), e);
+            throw new UApproveException("Error reading SQL statements from resource "
+                    + sqlStamentsResource.getDescription(), e);
         }
     }
 
     public void initialize() {
-        Assert.notNull(jdbcTemplate, "Datasource is not set.");
-        Assert.notEmpty(sqlStatements, "SQL statements are not set.");
+        Validate.notNull(jdbcTemplate, "Datasource is not set.");
+        Validate.notEmpty(sqlStatements, "SQL statements are not set.");
     }
 }
