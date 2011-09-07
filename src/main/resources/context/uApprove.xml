@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd
+                           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+        
+    <context:property-placeholder location="classpath:/context/uApprove.properties" />
+
+    <bean id="uApprove.touModule" class="ch.SWITCH.aai.uApprove.tou.ToUModule" init-method="initialize">
+        <property name="enabled" value="${tou.enabled}" />
+        <property name="tou">
+            <bean class="ch.SWITCH.aai.uApprove.tou.ToU" init-method="initialize">
+                <property name="version" value="${tou.version}" />
+                <property name="resource" value="${tou.resource}" />
+            </bean>        
+        </property>
+        <property name="relyingParties">
+            <bean class="ch.SWITCH.aai.uApprove.RelyingPartyList">
+                <property name="regularExpressions" value="${uApprove.services}"/>
+                <property name="blacklist" value="${uApprove.services.blacklist}"/>
+            </bean>
+        </property>
+        <property name="compareContent" value="false" />
+        <property name="storage">
+            <bean class="ch.SWITCH.aai.uApprove.tou.storage.JDBCStorage" init-method="initialize">
+                <property name="dataSource" ref="uApprove.dataSource" />
+                <property name="sqlStatements" value="classpath:/storage/sql-statements.properties"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <bean id="uApprove.attributeReleaseModule" class="ch.SWITCH.aai.uApprove.ar.AttributeReleaseModule">
+        <property name="enabled" value="${ar.enabled}" />
+        <property name="allowGeneralConsent" value="${ar.allowGeneralConsent}" />
+        <property name="relyingParties">
+            <bean class="ch.SWITCH.aai.uApprove.RelyingPartyList">
+                <property name="regularExpressions" value="${uApprove.services}"/>
+                <property name="blacklist" value="${uApprove.services.blacklist}"/>
+            </bean>
+        </property>
+        <property name="compareAttributeValues" value="false" />
+        <property name="storage">
+            <bean class="ch.SWITCH.aai.uApprove.ar.storage.JDBCStorage" init-method="initialize">
+                <property name="dataSource" ref="uApprove.dataSource" />
+                <property name="sqlStatements" value="classpath:/storage/sql-statements.properties"/>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="uApprove.dataSource" class="com.jolbox.bonecp.BoneCPDataSource" destroy-method="close" depends-on="shibboleth.LogbackLogging">
+        <property name="driverClass" value="${database.driver}" />
+        <property name="jdbcUrl" value="${database.url}" />
+        <property name="username" value="${database.username}" />
+        <property name="password" value="${database.password}" />
+        <property name="minConnectionsPerPartition" value="1" />
+        <property name="maxConnectionsPerPartition" value="20" />
+    </bean>
+     
+    <!-- 
+        Velocity resource loader configuration:
+        http://velocity.apache.org/engine/devel/developer-guide.html#Configuring_Resource_Loaders
+    -->
+    <bean id="uApprove.viewHelper" class="ch.SWITCH.aai.uApprove.ViewHelper" init-method="initialize">
+        <property name="defaultLocale" value="${view.defaultLocale}" />
+        <property name="forceDefaultLocale" value="${view.forceDefaultLocale}" />
+        <property name="velocityProperties">
+            <value>
+                resource.loader = class
+                class.resource.loader.class = org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader
+            </value>
+        </property>
+        <property name="resourceBundleBase" value="messages" />
+        <property name="viewTemplateBase" value="views" />
+    </bean>
+    
+    <bean id="uApprove.samlHelper" class="ch.SWITCH.aai.uApprove.ar.SAMLHelper" init-method="initialize">
+        <property name="attributeAuthority" ref="shibboleth.SAML2AttributeAuthority" />
+        <property name="relyingPartyConfigurationManager" ref="shibboleth.RelyingPartyConfigurationManager" />
+        <property name="attributeProcessor">
+            <bean class="ch.SWITCH.aai.uApprove.ar.AttributeProcessor">
+                <property name="blacklist" value="${ar.attributes.blacklist}" />
+                <property name="order" value="${ar.attributes.order}" />
+            </bean>
+        </property>
+    </bean>
+</beans>
