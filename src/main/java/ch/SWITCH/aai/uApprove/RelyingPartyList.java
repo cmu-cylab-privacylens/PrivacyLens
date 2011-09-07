@@ -25,26 +25,30 @@ import java.util.regex.Pattern;
  */
 public class RelyingPartyList extends ArrayList<String> {
 
-    /**
-     * 
-     */
+    /** Serial version UID. */
     private static final long serialVersionUID = 1L;
 
+    /** Indicates whether the list is a black- or whitelist. */
     private boolean isBlacklist;
 
+    /** Default constructor. */
     public RelyingPartyList() {
         super();
         isBlacklist = true;
     }
 
     /**
-     * @param expressions
+     * Sets the regular expressions.
+     * 
+     * @param expressions The regular expressions (whitespace delimited).
      */
     public void setRegularExpressions(final String expressions) {
         super.addAll(Util.stringToList(expressions));
     }
 
     /**
+     * Sets whether the list should be interpreted as blacklist or whitelist.
+     * 
      * @param isBlacklist The isBlacklist to set.
      */
     public void setBlacklist(final boolean isBlacklist) {

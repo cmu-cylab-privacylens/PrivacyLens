@@ -29,7 +29,11 @@ import org.testng.annotations.Test;
  */
 public class ToUHelperTest {
 
-    private ToU tou1a, tou1b, tou2;
+    private ToU tou1a;
+
+    private ToU tou1b;
+
+    private ToU tou2;
 
     @BeforeClass
     public void initialize() {

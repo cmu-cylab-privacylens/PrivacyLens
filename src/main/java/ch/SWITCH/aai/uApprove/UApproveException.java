@@ -26,6 +26,7 @@ public class UApproveException extends RuntimeException {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
 
+    /** Class logger. */
     private final Logger logger = LoggerFactory.getLogger(UApproveException.class);
 
     /**

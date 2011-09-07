@@ -40,12 +40,24 @@ public class ViewHelper {
      * Localized Strings.
      */
     public class LocalizedStrings {
+        /** Resource bundle. */
         private final ResourceBundle resourceBundle;
 
+        /**
+         * Constructor.
+         * 
+         * @param resourceBundle The resource bundle to use.
+         */
         public LocalizedStrings(final ResourceBundle resourceBundle) {
             this.resourceBundle = resourceBundle;
         }
 
+        /**
+         * Gets the string.
+         * 
+         * @param key The key.
+         * @return Returns the string.
+         */
         public String get(final String key) {
             return resourceBundle.getString(key);
         }
@@ -63,8 +75,10 @@ public class ViewHelper {
     /** Whether the default locale should forced. */
     private boolean forceDefaultLocale;
 
+    /** Base path for resource bundles. */
     private String resourceBundleBase;
 
+    /** Base path for view templates. */
     private String viewTemplateBase;
 
     /** Default constructor. */
@@ -76,11 +90,19 @@ public class ViewHelper {
         viewTemplateBase = "views";
     }
 
+    /**
+     * Initializes the view helper.
+     */
     public void initialize() {
         logger.debug("ViewHelper initialized with {}default locale {}.", forceDefaultLocale ? "forced " : "",
                 defaultLocale);
     }
 
+    /**
+     * Sets the velocity properties.
+     * 
+     * @param velocityProperties The velocity properties.
+     */
     public void setVelocityProperties(final Properties velocityProperties) {
         try {
             velocityEngine.init(velocityProperties);
@@ -90,6 +112,8 @@ public class ViewHelper {
     }
 
     /**
+     * Sets the default locale.
+     * 
      * @param defaultLocale The defaultLocale to set.
      */
     public void setDefaultLocale(final Locale defaultLocale) {
@@ -97,6 +121,8 @@ public class ViewHelper {
     }
 
     /**
+     * Sets whether the default locale is enforced or not.
+     * 
      * @param forceDefaultLocale The forceDefaultLocale to set.
      */
     public void setForceDefaultLocale(final boolean forceDefaultLocale) {
@@ -104,6 +130,8 @@ public class ViewHelper {
     }
 
     /**
+     * Sets the base path for resource bundles.
+     * 
      * @param resourceBundleBase The resourceBundleBase to set.
      */
     public void setResourceBundleBase(final String resourceBundleBase) {
@@ -111,12 +139,20 @@ public class ViewHelper {
     }
 
     /**
+     * Sets the base path for view templates.
+     * 
      * @param viewTemplateBase The viewTemplateBase to set.
      */
     public void setViewTemplateBase(final String viewTemplateBase) {
         this.viewTemplateBase = viewTemplateBase;
     }
 
+    /**
+     * Selects the locale, which should be used.
+     * 
+     * @param request The HTTP request.
+     * @return Returns the locale to use.
+     */
     public Locale selectLocale(final HttpServletRequest request) {
         if (forceDefaultLocale) {
             logger.trace("Using forced default locale {}.", defaultLocale);
@@ -128,6 +164,14 @@ public class ViewHelper {
         }
     }
 
+    /**
+     * Renders and shows the view.
+     * 
+     * @param request The HTTP request.
+     * @param response The HTTP response.
+     * @param viewName The view name.
+     * @param viewContext The view context.
+     */
     public void showView(final HttpServletRequest request, final HttpServletResponse response, final String viewName,
             final Map<String, ?> viewContext) {
         response.setContentType("text/html");
@@ -146,6 +190,13 @@ public class ViewHelper {
         }
     }
 
+    /**
+     * Get the localized messages.
+     * 
+     * @param resource The resource.
+     * @param locale The locale.
+     * @return Returns the localized strings.
+     */
     private LocalizedStrings getLocalizedMessages(final String resource, final Locale locale) {
         final ResourceBundle resourceBundle =
                 ResourceBundle.getBundle(String.format("%s.%s", resourceBundleBase, resource), locale);

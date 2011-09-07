@@ -52,6 +52,11 @@ public abstract class AbstractJDBCStorage {
         jdbcTemplate = new SimpleJdbcTemplate(dataSource);
     }
 
+    /**
+     * Sets the sql statements.
+     * 
+     * @param sqlStamentsResource the sql statements properties resource.
+     */
     public void setSqlStatements(final Resource sqlStamentsResource) {
         sqlStatements = new Properties();
         try {
@@ -63,6 +68,8 @@ public abstract class AbstractJDBCStorage {
     }
 
     /**
+     * Gets the sql statements.
+     * 
      * @return Returns the sqlStatements.
      */
     protected Properties getSqlStatements() {
@@ -70,12 +77,17 @@ public abstract class AbstractJDBCStorage {
     }
 
     /**
+     * Gets the JDBC template.
+     * 
      * @return Returns the jdbcTemplate.
      */
     protected SimpleJdbcTemplate getJdbcTemplate() {
         return jdbcTemplate;
     }
 
+    /**
+     * Initializes the JDBC storage.
+     */
     public void initialize() {
         Validate.notNull(jdbcTemplate, "Datasource is not set.");
         Validate.notEmpty(sqlStatements, "SQL statements are not set.");

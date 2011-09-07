@@ -24,12 +24,14 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
- *
+ * Attribute Release Test.
  */
 
 public class AttributeReleaseTest {
 
-    private Attribute attribute1, attribute2;
+    private Attribute attribute1;
+
+    private Attribute attribute2;
 
     private DateTime consentDate;
 

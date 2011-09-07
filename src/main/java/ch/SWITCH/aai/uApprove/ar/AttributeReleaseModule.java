@@ -160,12 +160,12 @@ public class AttributeReleaseModule {
         final List<AttributeRelease> attributeReleases = storage.readAttributeReleases(principalName, relyingPartyId);
         if (AttributeReleaseHelper.approvedAttributes(attributes, attributeReleases, compareAttributeValues)) {
             logger.debug("User {} has already approved attributes {} for relying party {}.", new Object[] {
-                    principalName, relyingPartyId, attributes});
+                    principalName, relyingPartyId, attributes,});
             return false;
         }
 
         logger.debug("Consent is required from user {} for attributes {} releasing to relying party {}.", new Object[] {
-                principalName, relyingPartyId, attributes});
+                principalName, relyingPartyId, attributes,});
         return true;
     }
 

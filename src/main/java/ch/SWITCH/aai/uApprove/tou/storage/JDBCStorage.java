@@ -38,6 +38,7 @@ public class JDBCStorage extends AbstractJDBCStorage implements Storage {
 
     /** {@see ToUAcceptance} row mapper. */
     private static final class ToUAcceptanceMapper implements ParameterizedRowMapper<ToUAcceptance> {
+        /** {@inheritDoc} */
         public ToUAcceptance mapRow(final ResultSet rs, final int rowNum) throws SQLException {
             final ToUAcceptance touAcceptance =
                     new ToUAcceptance(rs.getString("version"), rs.getString("fingerprint"), new DateTime(

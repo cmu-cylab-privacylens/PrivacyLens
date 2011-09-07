@@ -36,9 +36,14 @@ import ch.SWITCH.aai.uApprove.Util;
  */
 public class AttributeReleaseHelperTest {
 
+    /** Class logger. */
     private final Logger logger = LoggerFactory.getLogger(AttributeReleaseHelperTest.class);
 
-    private Attribute attribute1a, attribute1b, attribute2;
+    private Attribute attribute1a;
+
+    private Attribute attribute1b;
+
+    private Attribute attribute2;
 
     @BeforeClass
     public void initialize() {

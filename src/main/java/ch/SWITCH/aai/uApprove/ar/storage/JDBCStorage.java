@@ -40,7 +40,7 @@ public class JDBCStorage extends AbstractJDBCStorage implements Storage {
 
     /** {@see AttributeRelease} row mapper. */
     private static final class AttributeReleaseMapper implements ParameterizedRowMapper<AttributeRelease> {
-        @Override
+        /** {@inheritDoc} */
         public AttributeRelease mapRow(final ResultSet rs, final int rowNum) throws SQLException {
             return new AttributeRelease(rs.getString("attributeId"), rs.getString("valuesHash"), new DateTime(
                     rs.getTimestamp("consentDate")));
