@@ -41,17 +41,22 @@ import ch.SWITCH.aai.uApprove.ar.AttributeRelease;
 @TransactionConfiguration(defaultRollback = true)
 public class JDBCStorageTest extends AbstractTransactionalTestNGSpringContextTests {
 
+    /** Class logger. */
+    @SuppressWarnings("unused")
     private final Logger logger = LoggerFactory.getLogger(JDBCStorageTest.class);
 
+    /** The storage. */
     @Autowired
     private Storage storage;
 
+    /** Before class. */
     @BeforeClass
     @Rollback(false)
     public void initialize() {
         super.executeSqlScript("classpath:/storage/attribute-release-schema.sql", false);
     }
 
+    /** Test. */
     @Test
     public void crudAttributeRelease() {
         final String userId = "userId";

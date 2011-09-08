@@ -29,11 +29,12 @@ import ch.SWITCH.aai.uApprove.Util;
  * Tests ToUAcceptance.
  */
 
-@Test
 public class ToUAcceptanceTest {
 
+    /** Teh ToU. */
     private ToU tou;
 
+    /** Before class. */
     @BeforeClass
     public void initialize() {
         tou = new ToU();
@@ -42,6 +43,8 @@ public class ToUAcceptanceTest {
         tou.initialize();
     }
 
+    /** Test. */
+    @Test
     public void testCreateToUAcceptance() {
         final DateTime date = new DateTime();
         final ToUAcceptance touAcceptance = new ToUAcceptance(tou, date);

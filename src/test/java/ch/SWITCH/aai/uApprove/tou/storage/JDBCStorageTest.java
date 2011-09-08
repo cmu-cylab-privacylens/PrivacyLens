@@ -39,17 +39,22 @@ import ch.SWITCH.aai.uApprove.tou.ToUAcceptance;
 @TransactionConfiguration(defaultRollback = true)
 public class JDBCStorageTest extends AbstractTransactionalTestNGSpringContextTests {
 
+    /** Class logger. */
+    @SuppressWarnings("unused")
     private final Logger logger = LoggerFactory.getLogger(JDBCStorageTest.class);
 
+    /** The storage. */
     @Autowired
     private Storage storage;
 
+    /** Before class. */
     @BeforeClass
     @Rollback(false)
     public void initialize() {
         super.executeSqlScript("classpath:/storage/terms-of-use-schema.sql", false);
     }
 
+    /** Test. */
     @Test
     public void crudToUAcceptance() {
 

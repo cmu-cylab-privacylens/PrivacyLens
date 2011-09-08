@@ -25,16 +25,20 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
- *
+ * ToU Helper.
  */
 public class ToUHelperTest {
 
+    /** ToU. */
     private ToU tou1a;
 
+    /** ToU. */
     private ToU tou1b;
 
+    /** ToU. */
     private ToU tou2;
 
+    /** Before class. */
     @BeforeClass
     public void initialize() {
         tou1a = new ToU();
@@ -53,6 +57,7 @@ public class ToUHelperTest {
         tou2.initialize();
     }
 
+    /** Test. */
     @Test
     public void testAcceptedToU() {
         Assert.assertFalse(ToUHelper.acceptedToU(tou1a, null, false));

@@ -54,15 +54,21 @@ public class SAMLHelper {
     /** Class logger. */
     private final Logger logger = LoggerFactory.getLogger(SAMLHelper.class);
 
+    /** The attribute authority. */
     private SAML2AttributeAuthority attributeAuthority;
 
+    /** The relying party configuration manager. */
     private SAMLMDRelyingPartyConfigurationManager relyingPartyConfigurationManager;
 
+    /** The metadata provider. */
     private MetadataProvider metadataProvider;
 
+    /** The attribute processor. */
     private AttributeProcessor attributeProcessor;
 
     /**
+     * Sets the attribute authority.
+     * 
      * @param attributeAuthority The attributeAuthority to set.
      */
     public void setAttributeAuthority(final SAML2AttributeAuthority attributeAuthority) {
@@ -70,6 +76,8 @@ public class SAMLHelper {
     }
 
     /**
+     * Sets the relying party configuration manager.
+     * 
      * @param relyingPartyConfigurationManager The relyingPartyConfigurationManager to set.
      */
     public void setRelyingPartyConfigurationManager(
@@ -78,12 +86,17 @@ public class SAMLHelper {
     }
 
     /**
+     * Sets the attribute processor.
+     * 
      * @param attributeProcessor The attributeProcessor to set.
      */
     public void setAttributeProcessor(final AttributeProcessor attributeProcessor) {
         this.attributeProcessor = attributeProcessor;
     }
 
+    /**
+     * Initializes the SAML helper.
+     */
     public void initialize() {
         Validate.notNull(attributeAuthority, "Attribute Authority not set.");
         Validate.notNull(relyingPartyConfigurationManager, "Relying Party Configuration Manager not set.");
@@ -92,6 +105,15 @@ public class SAMLHelper {
         Validate.notNull(attributeProcessor, "Attribute Processor not set.");
     }
 
+    /**
+     * Resolves the attributes.
+     * 
+     * @param principalName The principal name.
+     * @param relyingPartyId The relying party id.
+     * @param locale The locale.
+     * @param session The session.
+     * @return Returns a list of attributes.
+     */
     public List<Attribute> resolveAttributes(final String principalName, final String relyingPartyId,
             final Locale locale, final Session session) {
         @SuppressWarnings("rawtypes") final BaseSAMLProfileRequestContext requestCtx =
@@ -122,6 +144,12 @@ public class SAMLHelper {
                     baseAttribute.getId(), attributeValues, baseAttribute.getDisplayNames().keySet(),
                     baseAttribute.getDisplayDescriptions().keySet(),});
 
+            logger.debug("{}", baseAttribute.getDisplayNames());
+            logger.debug("{}", locale);
+            logger.debug("{}", locale.getLanguage());
+            logger.debug("{}", baseAttribute.getDisplayNames().containsKey(locale));
+            logger.debug("{}", baseAttribute.getDisplayNames().containsKey(locale.getLanguage()));
+
             attributes.add(new Attribute(baseAttribute.getId(), baseAttribute.getDisplayNames().get(locale),
                     baseAttribute.getDisplayDescriptions().get(locale), attributeValues));
         }
@@ -131,6 +159,14 @@ public class SAMLHelper {
         return attributes;
     }
 
+    /**
+     * Builds a profile request context.
+     * 
+     * @param principalName The principal name.
+     * @param relyingPartyId The relying party id.
+     * @param session The session.
+     * @return Returns a profile request context.
+     */
     private BaseSAMLProfileRequestContext<?, ?, ?, ?> buildRequestContext(final String principalName,
             final String relyingPartyId, final Session session) {
 
@@ -170,6 +206,13 @@ public class SAMLHelper {
         return requestCtx;
     }
 
+    /**
+     * Reads the relying party.
+     * 
+     * @param relyingPartyId The relying party id.
+     * @param locale The locale.
+     * @return Returns a relying party.
+     */
     public RelyingParty readRelyingParty(final String relyingPartyId, final Locale locale) {
         EntityDescriptor entityDescriptor = null;
         try {
@@ -205,6 +248,12 @@ public class SAMLHelper {
 
     }
 
+    /**
+     * Gets the attribute consuming service.
+     * 
+     * @param entityDescriptor The entity descriptor.
+     * @return Returns the attribute consuming service
+     */
     private AttributeConsumingService getAttributeConsumingService(final EntityDescriptor entityDescriptor) {
         final String[] protocols = {SAMLConstants.SAML20P_NS, SAMLConstants.SAML11P_NS, SAMLConstants.SAML10P_NS};
         AttributeConsumingService result = null;

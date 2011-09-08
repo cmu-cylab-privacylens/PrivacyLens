@@ -22,7 +22,7 @@ import org.apache.commons.lang.StringUtils;
 import ch.SWITCH.aai.uApprove.Util;
 
 /**
- *
+ * ToU Helper.
  */
 public final class ToUHelper {
 
@@ -30,6 +30,14 @@ public final class ToUHelper {
     private ToUHelper() {
     }
 
+    /**
+     * Determines if the ToU are accepted.
+     * 
+     * @param tou The ToU.
+     * @param touAcceptance The ToU acceptance.
+     * @param compareContent Whether content is compared or not.
+     * @return Returns true if ToU are accepted.
+     */
     public static boolean acceptedToU(final ToU tou, final ToUAcceptance touAcceptance, final boolean compareContent) {
         if (touAcceptance == null) {
             return false;

@@ -35,27 +35,32 @@ import ch.SWITCH.aai.uApprove.Util;
  */
 public class AttributeProcessorTest {
 
+    /** Class logger. */
+    @SuppressWarnings("unused")
     private final Logger logger = LoggerFactory.getLogger(AttributeProcessorTest.class);
 
-    private AttributeProcessor attributeHelper;
+    /** The attribute processor. */
+    private AttributeProcessor attributeProcessor;
 
+    /** Before class. */
     @BeforeClass
     public void initialize() {
-        attributeHelper = new AttributeProcessor();
+        attributeProcessor = new AttributeProcessor();
     }
 
+    /** Test. */
     @Test
     public void testRemoveBlacklistedAttributes() {
 
         final String blacklist = "id2 id4";
-        attributeHelper.setBlacklist(blacklist);
+        attributeProcessor.setBlacklist(blacklist);
         final List<Attribute> attributes = new ArrayList<Attribute>();
         attributes.add(new Attribute("id1", null, null, null));
         attributes.add(new Attribute("id2", null, null, null));
         attributes.add(new Attribute("id3", null, null, null));
         attributes.add(new Attribute("id4", null, null, null));
 
-        attributeHelper.removeBlacklistedAttributes(attributes);
+        attributeProcessor.removeBlacklistedAttributes(attributes);
 
         for (final Attribute attribute : attributes) {
             if (Util.stringToList(blacklist).contains(attribute.getId())) {
@@ -65,10 +70,11 @@ public class AttributeProcessorTest {
         Assert.assertTrue(true);
     }
 
+    /** Test. */
     @Test
     public void testSortAttributes() {
 
-        attributeHelper.setOrder("id1 id2");
+        attributeProcessor.setOrder("id1 id2");
 
         final List<Attribute> attributes = new ArrayList<Attribute>();
         attributes.add(new Attribute("id2", null, null, null));
@@ -76,7 +82,7 @@ public class AttributeProcessorTest {
         attributes.add(new Attribute("id4", null, null, null));
         attributes.add(new Attribute("id1", null, null, null));
 
-        attributeHelper.sortAttributes(attributes);
+        attributeProcessor.sortAttributes(attributes);
 
         Assert.assertEquals(attributes.get(0).getId(), "id1");
         Assert.assertEquals(attributes.get(1).getId(), "id2");

@@ -37,14 +37,19 @@ import ch.SWITCH.aai.uApprove.Util;
 public class AttributeReleaseHelperTest {
 
     /** Class logger. */
+    @SuppressWarnings("unused")
     private final Logger logger = LoggerFactory.getLogger(AttributeReleaseHelperTest.class);
 
+    /** Attribute. */
     private Attribute attribute1a;
 
+    /** Attribute. */
     private Attribute attribute1b;
 
+    /** Attribute. */
     private Attribute attribute2;
 
+    /** Before class. */
     @BeforeClass
     public void initialize() {
         attribute1a = new Attribute("id1", Arrays.asList(new String[] {"value1a", "value2a"}));
@@ -52,6 +57,7 @@ public class AttributeReleaseHelperTest {
         attribute2 = new Attribute("id2", Arrays.asList(new String[] {"value1", "value2"}));
     }
 
+    /** Test. */
     @Test
     public void testHashValues() {
         final List<String> unsortedValues = Arrays.asList(new String[] {"bbb", "ccc", "aaa"});
@@ -59,6 +65,7 @@ public class AttributeReleaseHelperTest {
         Assert.assertEquals(hash, Util.hash("aaa;bbb;ccc;"));
     }
 
+    /** Test. */
     @Test
     public void testResolveFqdn() {
         final String entityId1 = "https://sp.example.org/shibboleth";
@@ -71,6 +78,7 @@ public class AttributeReleaseHelperTest {
         Assert.assertEquals(AttributeReleaseHelper.resolveFqdn(entityId3), "sp.example.org");
     }
 
+    /** Test. */
     @Test
     public void testApprovedAttribute() {
         final AttributeRelease attributeRelease = new AttributeRelease(attribute1a, new DateTime());
@@ -84,6 +92,7 @@ public class AttributeReleaseHelperTest {
         Assert.assertFalse(AttributeReleaseHelper.approvedAttribute(attribute2, attributeRelease, false));
     }
 
+    /** Test. */
     @Test
     public void testApprovedAttributes() {
         Assert.assertTrue(AttributeReleaseHelper.approvedAttributes(Collections.<Attribute> emptyList(),

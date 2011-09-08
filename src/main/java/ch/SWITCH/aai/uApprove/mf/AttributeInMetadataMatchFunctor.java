@@ -48,7 +48,7 @@ import edu.internet2.middleware.shibboleth.common.attribute.filtering.provider.S
 import edu.internet2.middleware.shibboleth.common.attribute.filtering.provider.match.basic.AbstractMatchFunctor;
 
 /**
- *
+ * TODO.
  */
 public class AttributeInMetadataMatchFunctor extends AbstractMatchFunctor {
 
@@ -83,7 +83,6 @@ public class AttributeInMetadataMatchFunctor extends AbstractMatchFunctor {
     }
 
     /** {@inheritDoc} */
-    @SuppressWarnings("rawtypes")
     protected boolean doEvaluateValue(final ShibbolethFilteringContext filterContext, final String attributeId,
             final Object attributeValue) throws FilterProcessingException {
 
@@ -132,12 +131,13 @@ public class AttributeInMetadataMatchFunctor extends AbstractMatchFunctor {
 
         log.debug("using AttributeConsumingService descriptor with index {}", service.getIndex());
 
-        final BaseAttribute attr = filterContext.getUnfilteredAttributes().get(attributeId);
+        @SuppressWarnings("rawtypes") final BaseAttribute attr =
+                filterContext.getUnfilteredAttributes().get(attributeId);
         if (attr != null && attr.getValues() != null) {
-            final List encoders = attr.getEncoders();
-            final Iterator i = encoders.iterator();
+            @SuppressWarnings("rawtypes") final List encoders = attr.getEncoders();
+            @SuppressWarnings("rawtypes") final Iterator i = encoders.iterator();
             while (i.hasNext()) {
-                final AttributeEncoder encoder = (AttributeEncoder) i.next();
+                @SuppressWarnings("rawtypes") final AttributeEncoder encoder = (AttributeEncoder) i.next();
                 final RequestedAttribute requested = findInMetadata(service, encoder);
                 if (requested != null) {
                     if (onlyIfRequired && !requested.isRequired()) {
@@ -165,8 +165,15 @@ public class AttributeInMetadataMatchFunctor extends AbstractMatchFunctor {
         return false;
     }
 
-    @SuppressWarnings("rawtypes")
-    private RequestedAttribute findInMetadata(final AttributeConsumingService service, final AttributeEncoder encoder) {
+    /**
+     * TODO.
+     * 
+     * @param service TODO.
+     * @param encoder TODO.
+     * @return TODO.
+     */
+    private RequestedAttribute findInMetadata(final AttributeConsumingService service,
+            @SuppressWarnings("rawtypes") final AttributeEncoder encoder) {
         // I think it would be cleaner to expose a "protocol" property on the
         // encoder interface to match up against the outbound protocol than to
         // do a switch here based on casting/detecting the encoder type based
@@ -194,6 +201,13 @@ public class AttributeInMetadataMatchFunctor extends AbstractMatchFunctor {
         return null;
     }
 
+    /**
+     * TODO.
+     * 
+     * @param xmlObj TODO.
+     * @param attributeValue TODO.
+     * @return TODO
+     */
     private boolean match(final XMLObject xmlObj, final String attributeValue) {
         // This is a substitute for a decoder layer that can generate
         // internal comparable value objects out of AttributeValue elements.

@@ -81,6 +81,7 @@ public final class LoginHelper {
      * 
      * @param servletContext The servlet context.
      * @param request The HTTP request.
+     * @param response The HTTP response.
      * @return Returns true if the user is authenticated.
      */
     public static boolean isAuthenticated(final ServletContext servletContext, final HttpServletRequest request,

@@ -25,24 +25,25 @@ import java.util.List;
 import ch.SWITCH.aai.uApprove.Util;
 
 /**
- *
+ * Attribute Processor.
  */
 public class AttributeProcessor {
 
+    /** The attribute blacklist. */
     private List<String> blacklist;
 
+    /** The ordering of the attributes. */
     private List<String> order;
 
-    /**
-     * Constructor.
-     * 
-     */
+    /** Default constructor. */
     public AttributeProcessor() {
         blacklist = Collections.emptyList();
         order = Collections.emptyList();
     }
 
     /**
+     * Sets the blacklist.
+     * 
      * @param blacklist The blacklist to set.
      */
     public void setBlacklist(final String blacklist) {
@@ -50,12 +51,19 @@ public class AttributeProcessor {
     }
 
     /**
+     * Sets the ordering.
+     * 
      * @param order The order to set.
      */
     public void setOrder(final String order) {
         this.order = Util.stringToList(order);
     }
 
+    /**
+     * Removes the blacklisted attributes from the list.
+     * 
+     * @param attributes The attributes.
+     */
     public void removeBlacklistedAttributes(final List<Attribute> attributes) {
         final Iterator<Attribute> iterator = attributes.iterator();
         while (iterator.hasNext()) {
@@ -65,6 +73,11 @@ public class AttributeProcessor {
         }
     }
 
+    /**
+     * Sorts the attributes.
+     * 
+     * @param attributes The attributes.
+     */
     public void sortAttributes(final List<Attribute> attributes) {
         Collections.sort(attributes, new Comparator<Attribute>() {
             public int compare(final Attribute attribute1, final Attribute attribute2) {

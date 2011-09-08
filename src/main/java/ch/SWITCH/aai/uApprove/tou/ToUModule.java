@@ -40,6 +40,7 @@ public class ToUModule {
     /** Terms Of Use. */
     private ToU tou;
 
+    /** Indicates whether the content of the ToU is compared. */
     private boolean compareContent;
 
     /** List of enabled relying parties. */
@@ -55,6 +56,8 @@ public class ToUModule {
     }
 
     /**
+     * Sets if the ToU module is enabled.
+     * 
      * @param enabled The enabled to set.
      */
     public void setEnabled(final boolean enabled) {
@@ -62,6 +65,8 @@ public class ToUModule {
     }
 
     /**
+     * Gets if the ToU module is enabled.
+     * 
      * @return Returns the enabled.
      */
     public boolean isEnabled() {
@@ -69,6 +74,8 @@ public class ToUModule {
     }
 
     /**
+     * Sets the ToU.
+     * 
      * @param tou The tou to set.
      */
     public void setTou(final ToU tou) {
@@ -76,17 +83,26 @@ public class ToUModule {
     }
 
     /**
+     * Sets if the content should be compared.
+     * 
      * @param compareContent The compareContent to set.
      */
     public void setCompareContent(final boolean compareContent) {
         this.compareContent = compareContent;
     }
 
+    /**
+     * Sets the relying parties.
+     * 
+     * @param relyingParties The relying parties.
+     */
     public void setRelyingParties(final List<String> relyingParties) {
         this.enabledRelyingParties = relyingParties;
     }
 
     /**
+     * Sets the storage.
+     * 
      * @param storage The storage to set.
      */
     public void setStorage(final Storage storage) {
@@ -94,6 +110,8 @@ public class ToUModule {
     }
 
     /**
+     * Gets the ToU.
+     * 
      * @return Returns the tou.
      */
     public ToU getTou() {
@@ -115,9 +133,11 @@ public class ToUModule {
     }
 
     /**
-     * @param principalName
-     * @param relyingPartyId
-     * @return
+     * Determines if ToU acceptance is required.
+     * 
+     * @param principalName The principal name.
+     * @param relyingPartyId The relying party id.
+     * @return Returns true if ToU acceptance is required.
      */
     public boolean requiresToUAcceptance(final String principalName, final String relyingPartyId) {
 
@@ -136,6 +156,11 @@ public class ToUModule {
         return true;
     }
 
+    /**
+     * Creates or updates ToU acceptance.
+     * 
+     * @param principalName The principal name.
+     */
     public void acceptToU(final String principalName) {
         logger.info("User {} has accepted ToU version {}", principalName, tou.getVersion());
 

@@ -41,15 +41,19 @@ import ch.SWITCH.aai.uApprove.ViewHelper;
  */
 public class AttributeReleaseServlet extends HttpServlet {
 
+    /** Serial version UID. */
     private static final long serialVersionUID = 1L;
 
-    @SuppressWarnings("unused")
+    /** Class logger. */
     private final Logger logger = LoggerFactory.getLogger(AttributeReleaseServlet.class);
 
+    /** The Attribute Release module. */
     private AttributeReleaseModule attributeReleaseModule;
 
+    /** The SAML helper. */
     private SAMLHelper samlHelper;
 
+    /** The view helper. */
     private ViewHelper viewHelper;
 
     /** {@inheritDoc} */

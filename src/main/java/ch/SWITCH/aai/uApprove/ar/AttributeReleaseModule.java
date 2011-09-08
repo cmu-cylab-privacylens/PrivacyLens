@@ -182,8 +182,11 @@ public class AttributeReleaseModule {
     }
 
     /**
-     * @param principalName
-     * @param relyingPartyId
+     * Creates attribute release consent.
+     * 
+     * @param principalName The principal name.
+     * @param relyingPartyId The relying party id.
+     * @param attributes The attributes.
      */
     public void
             createConsent(final String principalName, final String relyingPartyId, final List<Attribute> attributes) {
@@ -196,6 +199,11 @@ public class AttributeReleaseModule {
         }
     }
 
+    /**
+     * Creates general attribute release consent.
+     * 
+     * @param principalName The principal name.
+     */
     public void createConsent(final String principalName) {
         logger.info("Create general consent for {}.", principalName);
         final AttributeRelease attributeRelease = new AttributeRelease("*", StringUtils.EMPTY, new DateTime());

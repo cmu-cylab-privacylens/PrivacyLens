@@ -29,15 +29,11 @@ import org.testng.annotations.Test;
 
 public class AttributeReleaseTest {
 
-    private Attribute attribute1;
-
-    private Attribute attribute2;
-
-    private DateTime consentDate;
-
+    /** Test. */
     @Test
     public void testCreateAttributeReleases() {
         final Attribute attribute = new Attribute("id", Arrays.asList(new String[] {"value1", "value2"}));
+        final DateTime consentDate = new DateTime();
         final AttributeRelease attributeRelease = new AttributeRelease(attribute, consentDate);
         Assert.assertEquals(attributeRelease.getAttributeId(), attribute.getId());
         Assert.assertEquals(attributeRelease.getValuesHash(), AttributeReleaseHelper.hashValues(attribute.getValues()));

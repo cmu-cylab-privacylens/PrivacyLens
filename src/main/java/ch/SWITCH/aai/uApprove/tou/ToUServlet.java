@@ -40,13 +40,17 @@ import ch.SWITCH.aai.uApprove.ViewHelper;
  */
 public class ToUServlet extends HttpServlet {
 
+    /** Serial version UID. */
     private static final long serialVersionUID = 1L;
 
+    /** Class logger. */
     @SuppressWarnings("unused")
     private final Logger logger = LoggerFactory.getLogger(ToUServlet.class);
 
+    /** The Terms Of Use Module. */
     private ToUModule touModule;
 
+    /** The view helper. */
     private ViewHelper viewHelper;
 
     /** {@inheritDoc} */

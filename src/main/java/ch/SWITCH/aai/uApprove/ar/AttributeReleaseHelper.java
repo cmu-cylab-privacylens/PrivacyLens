@@ -31,7 +31,7 @@ import org.joda.time.DateTime;
 import ch.SWITCH.aai.uApprove.Util;
 
 /**
- *
+ * Attribute Release Helper.
  */
 public final class AttributeReleaseHelper {
 
@@ -72,6 +72,14 @@ public final class AttributeReleaseHelper {
         return Util.hash(stringBuilder.toString());
     }
 
+    /**
+     * Checks whether the attributeRelease contains the attribute. Optionally compares the attribute values.
+     * 
+     * @param attribute The attribute.
+     * @param attributeRelease The attribute release.
+     * @param compareAttributeValues Indicates whether to compare the attribute values.
+     * @return Returns true if the attribute release contains the attribute.
+     */
     public static boolean approvedAttribute(final Attribute attribute, final AttributeRelease attributeRelease,
             final boolean compareAttributeValues) {
         if (StringUtils.equals(attributeRelease.getAttributeId(), attribute.getId())) {
@@ -85,6 +93,14 @@ public final class AttributeReleaseHelper {
         }
     }
 
+    /**
+     * Calls for all attributes and attribute releases the approvedAttribute method.
+     * 
+     * @param attributes The attributes
+     * @param attributeReleases The attribute releases.
+     * @param compareAttributeValues Indicates whether to compare the attribute values.
+     * @return Returns true if all attributes are contained in of the attribute releases.
+     */
     public static boolean approvedAttributes(final List<Attribute> attributes,
             final List<AttributeRelease> attributeReleases, final boolean compareAttributeValues) {
         for (final Attribute attribute : attributes) {

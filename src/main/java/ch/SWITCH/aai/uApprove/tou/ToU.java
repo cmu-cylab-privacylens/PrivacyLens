@@ -62,6 +62,9 @@ public class ToU {
         }
     }
 
+    /**
+     * Initializes the Terms of Use.
+     */
     public void initialize() {
         Validate.notEmpty(version, "ToU version is not set.");
         Validate.notEmpty(content, "ToU text is not set.");

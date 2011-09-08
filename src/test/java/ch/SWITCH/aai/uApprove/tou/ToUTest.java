@@ -27,9 +27,10 @@ import ch.SWITCH.aai.uApprove.UApproveException;
  * Tests ToU.
  */
 
-@Test
 public class ToUTest {
 
+    /** Test. */
+    @Test
     public void testInitialize() {
         final ToU tou = new ToU();
         try {

@@ -22,16 +22,22 @@ import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-@Test
+/**
+ * Util test.
+ */
 public class UtilTest {
 
-    private final Logger logger = LoggerFactory.getLogger("test");
+    /** Class logger. */
+    @SuppressWarnings("unused")
+    private final Logger logger = LoggerFactory.getLogger(UtilTest.class);
 
+    /** Test. */
     @Test
     public void testFingerprint() {
         Assert.assertEquals("9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08", Util.hash("test"));
     }
 
+    /** Test. */
     @Test
     public void testStringToList() {
         Assert.assertEquals(Util.stringToList("1 2 3").size(), 3);

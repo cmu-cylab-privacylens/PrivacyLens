@@ -24,12 +24,14 @@ import org.testng.annotations.Test;
 import ch.SWITCH.aai.uApprove.RelyingPartyList;
 
 /**
- *
+ * Tests the relying party list.
  */
 public class RelyingPartyListTest {
 
+    /** The relying party list. */
     private RelyingPartyList relyingPartyList;
 
+    /** Before class. */
     @BeforeClass
     public void initialize() {
         relyingPartyList = new RelyingPartyList();
@@ -38,6 +40,7 @@ public class RelyingPartyListTest {
         relyingPartyList.setRegularExpressions(expressions);
     }
 
+    /** Test. */
     @Test
     public void testContains() {
         for (final Boolean isBlacklist : new Boolean[] {true, false}) {
