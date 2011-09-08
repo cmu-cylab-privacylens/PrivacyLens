@@ -83,7 +83,8 @@ public final class LoginHelper {
      * @param request The HTTP request.
      * @return Returns true if the user is authenticated.
      */
-    public static boolean isAuthenticated(final ServletContext servletContext, final HttpServletRequest request) {
+    public static boolean isAuthenticated(final ServletContext servletContext, final HttpServletRequest request,
+            final HttpServletResponse response) {
         final LoginContext loginContext = getLoginContext(servletContext, request, false);
 
         if (loginContext == null) {
@@ -96,8 +97,16 @@ public final class LoginHelper {
             return false;
         }
 
+        if (request.getParameterMap().containsKey("SAMLRequest")) {
+            LOGGER.trace("Unbind login context.");
+            HttpServletHelper.unbindLoginContext(HttpServletHelper.getStorageService(servletContext), servletContext,
+                    request, response);
+            return false;
+        }
+
         final boolean isPrincipalAuthenticated = loginContext.isPrincipalAuthenticated();
         LOGGER.trace("Principal is {}autenticated.", isPrincipalAuthenticated ? "" : "not ");
+
         return isPrincipalAuthenticated;
     }
 

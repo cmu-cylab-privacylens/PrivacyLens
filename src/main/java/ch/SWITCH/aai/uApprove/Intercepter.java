@@ -106,7 +106,7 @@ public class Intercepter implements Filter {
             intercept(final HttpServletRequest request, final HttpServletResponse response, final FilterChain chain)
                     throws IOException, ServletException {
 
-        if (!LoginHelper.isAuthenticated(servletContext, request)) {
+        if (!LoginHelper.isAuthenticated(servletContext, request, response)) {
             logger.trace("Request is not authenticated.");
             LoginHelper.testAndSetConsentRevocation(servletContext, request);
             chain.doFilter(request, response);
