@@ -1,0 +1,184 @@
+
+This document contains the uApprove deployment guide.
+
+h1. Installation
+
+h2. Prerequisites
+
+* Shibboleth Identity Provider 2.3.3.
+* Database which supports JDBC.
+
+h2. Assumptions
+
+* IDP_HOME
+* The Shibboleth Identity Provider is unpacked at @$IDP_INSTALL$@ (e.g., @/opt/shibboleth-identity-provider-${idp.version}@).
+* The Shibboleth Identity Provider is installed at @$IDP_HOME$@ (e.g., @/opt/shibboleth-idp@).
+* "uApprove":http://www.switch.ch/aai/uApprove is downloaded and unpacked at @$UAPPROVE_INSTALL$@ (e.g., @/tmp/uApprove-${uApprvove.version}@).
+
+h2. Library Installation
+
+* @cp $UAPPROVE_INSTALL$/lib/uApprove-${uApprvove.version}.jar $IDP_INSTALL$/lib@
+* @cp $UAPPROVE_INSTALL$/lib/jdbc/*.jar $IDP_INSTALL$/lib@
+bq(note). Provide the JDBC driver for your database to the classpath of the IdP. Assure that there is only one version present. You might use the provided MySQL JDBC driver.
+
+* @cp $UAPPROVE_INSTALL$/lib/jdbc/optional/mysql-connector-java-*.jar $IDP_INSTALL$/lib@
+
+h2. Configuration Template
+
+* @cp@ (file)"UAPPROVE_INSTALL$/manual/configuration/uApprove.properties":configuration/uApprove.properties @$IDP_HOME$/conf@
+* @cp@ (file)"UAPPROVE_INSTALL$/manual/configuration/uApprove.xml":configuration/uApprove.xml @$IDP_HOME$/conf@
+
+h2. Database Preparation
+
+bq(note). The following database parameters are examples.
+
+* Create a database with the name "uApprove".
+* Create a database user with the username "uApprove" and password "secret".
+* Grant @INSERT, SELECT, UPDATE, DELETE@ rights for the user.
+* Create the initial table structures using the schemas:
+** "(file)$UAPPROVE_INSTALL$/manual/storage/attribute-release-schema.sql":storage/attribute-release-schema.sql.
+** "(file)$UAPPROVE_INSTALL$/manual/storage/terms-of-use-schema.sql":storage/terms-of-use-schema.sql.
+
+
+h1. Basic Deployment
+
+h2. Web Application Deployment Descriptor
+
+Extend the IdP web application deployment descriptor (@$IDP_INSTALL$/src/main/webapp/WEB-INF/web.xml@):
+
+bc.. 
+
+<web-app ...>
+
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>$IDP_HOME$$/conf/internal.xml; $IDP_HOME$/conf/service.xml; $IDP_HOME$/conf/uApprove.xml</param-value>
+    </context-param>
+
+    <!-- IdP Listeners, Filters and Servlets -->
+    <!-- ...                                 -->
+    
+    
+    <!-- uApprove Filter and Servlets -->
+    
+    <filter>
+        <filter-name>uApprove</filter-name>
+        <filter-class>ch.SWITCH.aai.uApprove.Intercepter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>uApprove</filter-name>
+        <url-pattern>/profile/*</url-pattern>
+        <url-pattern>/Authn/UserPassword</url-pattern>
+    </filter-mapping>
+
+    <servlet>
+        <servlet-name>uApprove - Terms Of Use</servlet-name>
+        <servlet-class>ch.SWITCH.aai.uApprove.tou.ToUServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>uApprove - Terms Of Use</servlet-name>
+        <url-pattern>/uApprove/TermsOfUse</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>uApprove - Attribute Release</servlet-name>
+        <servlet-class>ch.SWITCH.aai.uApprove.ar.AttributeReleaseServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>uApprove - Attribute Release</servlet-name>
+        <url-pattern>/uApprove/AttributeRelease</url-pattern>
+    </servlet-mapping>
+
+</web-app>
+h2. Custom Configuration
+
+In @$IDP_HOME$/conf/uApprove.xml@ change:
+
+bc. 
+<context:property-placeholder location="classpath:/configuration/uApprove.properties" />
+
+to:
+
+bc. 
+<context:property-placeholder location="$IDP_HOME$/conf/uApprove.properties" />
+
+Customize @$IDP_HOME$/conf/uApprove.properties@ according your database environment and required features. See "inline documentation":configuration/uApprove.properties for configuration options.
+
+h1. Upgrade
+
+bq(warning). Verify that the IdP classpath at @$IDP_INSTALL$/lib@ doesn't contain multiple version of the same library.
+
+TODO
+
+h1. Advanced Deployment
+
+This sections contains advanced configuration topics.
+
+h2. Reset Attribute Release Consent
+
+Add a checkbox to @$IDP_INSTALL$/src/main/webapp/login.jsp@
+
+bc.. 
+<form action="<%=request.getAttribute("actionUrl")%>" method="post">
+  ...
+  <input id="uApprove.consent-revocation" type="checkbox" name="uApprove.consent-revocation" value="true"/>
+  <label for="uApprove.consent-revocation">Clear my attribute release consent</label>
+  ...
+</form>
+h2. Storage
+
+h3. File-only
+
+TODO
+
+h3. Custom SQL Statements
+
+TODO
+
+h3. JDBC Connection Pool Tuning
+
+TODO
+
+h2. Templates
+
+h3. Custom View Templates
+
+TODO
+
+h2. Localization
+
+h3. Custom Messages
+
+TODO
+
+h3. Attribute Names and Descriptions
+
+See "(file)attribute-descriptions.xml":attribute-descriptions.xml for an example 
+how to configure the localized attribute names and descriptions.
+
+h3. Relying Party Names and Descriptions
+
+TODO
+
+h2. Strict Comparison
+
+h3. Terms Of Use Content Comparison
+
+TODO
+
+h3. Attribute Value Comparison
+
+TODO
+
+h2. Service Provider Black/Whitelist
+
+h3. Different Lists for Terms Of Use and Attribute Release Module
+
+TODO
+
+
+bq(note). Other topics will be added on request.
+

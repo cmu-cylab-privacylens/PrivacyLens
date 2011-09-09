@@ -90,7 +90,8 @@
             <groupId>org.hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
             <version>${hsql.version}</version>
-            <scope>test</scope>
+            <scope>runtime</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>mysql</groupId>
@@ -151,7 +152,7 @@
                             <tasks>
                                 <taskdef classpathref="maven.plugin.classpath" resource="wikitexttasks.properties" />    
                                 <wikitext-to-html markupLanguage="Textile"
-                                    file="${basedir}/guide/index.textile" htmlFilenameFormat="$1.html"
+                                    file="${basedir}/manual/index.textile" htmlFilenameFormat="$1.html"
                                     formatOutput="true" emitDoctype="false" title="${project.name}-${project.version}">
                                     <stylesheet url="style.css" />
                                 </wikitext-to-html>
