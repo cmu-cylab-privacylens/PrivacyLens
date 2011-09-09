@@ -103,15 +103,37 @@ bc.
 to:
 
 bc. 
-<context:property-placeholder location="$IDP_HOME$/conf/uApprove.properties" />
+<context:property-placeholder location="file:$IDP_HOME$/conf/uApprove.properties" />
 
 Customize @$IDP_HOME$/conf/uApprove.properties@ according your database environment and required features. See "inline documentation":configuration/uApprove.properties for configuration options.
 
+
+h2. Deployment
+
+To activate uApprove the IdP must be re-deployed:
+
+bc. $IDP_INSTALL$/instal.sh
+
+
 h1. Upgrade
 
-bq(warning). Verify that the IdP classpath at @$IDP_INSTALL$/lib@ doesn't contain multiple version of the same library.
+* @rm $IDP_INSTALL$/lib/uApprove-#old-version#.jar@
+* @cp $UAPPROVE_INSTALL$/lib/uApprove-#new-version#.jar $IDP_INSTALL$/lib@
 
-TODO
+Optionally update your the JDBC dependencies:
+
+* @cp $UAPPROVE_INSTALL$/lib/jdbc/*.jar $IDP_INSTALL$/lib@
+
+Optionally update your JDBC driver. You might use the provided MySQL JDBC driver:
+
+* @cp $UAPPROVE_INSTALL$/lib/jdbc/optional/mysql-connector-java-#version#.jar $IDP_INSTALL$/lib@
+
+bq(warning). Verify that the IdP classpath at @$IDP_INSTALL$/lib@ doesn't contain multiple versions of the same library.
+
+
+To finish the upgrade of uApprove the IdP must be re-deployed:
+
+bc. $IDP_INSTALL$/instal.sh
 
 h1. Advanced Deployment
 

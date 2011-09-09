@@ -217,6 +217,10 @@ public class SAMLHelper {
         EntityDescriptor entityDescriptor = null;
         try {
             entityDescriptor = metadataProvider.getEntityDescriptor(relyingPartyId);
+            if (entityDescriptor == null) {
+                logger.trace("No entity descriptor found for entityId {}.", relyingPartyId);
+                return new RelyingParty(relyingPartyId);
+            }
         } catch (final MetadataProviderException e) {
             throw new UApproveException("Error while retrieving metadata descriptor for " + relyingPartyId, e);
         }
