@@ -6,12 +6,12 @@
 
     <groupId>ch.SWITCH.aai</groupId>
     <artifactId>uApprove</artifactId>
-    <version>2.3.0-SNAPSHOT</version>
+    <version>2.3.0-RC1</version>
     <packaging>jar</packaging>
 
     <name>uApprove</name>
     <description>
-        Terms of Use and User Consent Module
+        Terms of Use and Attribute Release Consent Module
         for the Shibboleth Identity Provider.
     </description>
 
@@ -150,11 +150,10 @@
                         <configuration>
                             <tasks>
                                 <taskdef classpathref="maven.plugin.classpath" resource="wikitexttasks.properties" />    
-                                <echo message="Hello, world"/>
                                 <wikitext-to-html markupLanguage="Textile"
-                                    file="${basedir}/doc/manual.textile" htmlFilenameFormat="${project.name}-${project.version}-$1.html"
+                                    file="${basedir}/guide/index.textile" htmlFilenameFormat="$1.html"
                                     formatOutput="true" emitDoctype="false" title="${project.name}-${project.version}">
-                                    <stylesheet url="manual.css" />
+                                    <stylesheet url="style.css" />
                                 </wikitext-to-html>
                             </tasks>
                         </configuration>
@@ -186,7 +185,24 @@
                         <suiteXmlFile>${basedir}/src/test/resources/testng.xml</suiteXmlFile>
                     </suiteXmlFiles>
                 </configuration>
-           </plugin>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/main/assembly/distribution.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
