@@ -11,17 +11,17 @@ h2. Prerequisites
 h2. Assumptions
 
 * IDP_HOME
-* The Shibboleth Identity Provider is unpacked at @$IDP_INSTALL$@ (e.g., @/opt/shibboleth-identity-provider-${idp.version}@).
+* The Shibboleth Identity Provider is unpacked at @$IDP_INSTALL$@ (e.g., @/opt/shibboleth-identity-provider-#version#@).
 * The Shibboleth Identity Provider is installed at @$IDP_HOME$@ (e.g., @/opt/shibboleth-idp@).
-* "uApprove":http://www.switch.ch/aai/uApprove is downloaded and unpacked at @$UAPPROVE_INSTALL$@ (e.g., @/tmp/uApprove-${uApprvove.version}@).
+* "uApprove":http://www.switch.ch/aai/uApprove is downloaded and unpacked at @$UAPPROVE_INSTALL$@ (e.g., @/tmp/uApprove-#version#@).
 
 h2. Library Installation
 
-* @cp $UAPPROVE_INSTALL$/lib/uApprove-${uApprvove.version}.jar $IDP_INSTALL$/lib@
+* @cp $UAPPROVE_INSTALL$/lib/uApprove-#version#.jar $IDP_INSTALL$/lib@
 * @cp $UAPPROVE_INSTALL$/lib/jdbc/*.jar $IDP_INSTALL$/lib@
 bq(note). Provide the JDBC driver for your database to the classpath of the IdP. Assure that there is only one version present. You might use the provided MySQL JDBC driver.
 
-* @cp $UAPPROVE_INSTALL$/lib/jdbc/optional/mysql-connector-java-*.jar $IDP_INSTALL$/lib@
+* @cp $UAPPROVE_INSTALL$/lib/jdbc/optional/mysql-connector-java-#version#.jar $IDP_INSTALL$/lib@
 
 h2. Configuration Template
 
@@ -33,7 +33,7 @@ h2. Database Preparation
 bq(note). The following database parameters are examples.
 
 * Create a database with the name "uApprove".
-* Create a database user with the username "uApprove" and password "secret".
+* Create a database user with the username "uApprove" and password "uApprove".
 * Grant @INSERT, SELECT, UPDATE, DELETE@ rights for the user.
 * Create the initial table structures using the schemas:
 ** "(file)$UAPPROVE_INSTALL$/manual/storage/attribute-release-schema.sql":storage/attribute-release-schema.sql.
@@ -179,6 +179,43 @@ h3. Different Lists for Terms Of Use and Attribute Release Module
 
 TODO
 
+
+h2. Attribute In Attribute Requester's Metadata Plugin
+
+h3. Installation
+
+The plugin is installed by default with uApprove (uApprove-#version#.jar). 
+
+h3. Configuration Attribute In Requester's Metadata Matching Rule
+
+This rule allows the release of an attribute if, via its metadata, the SP indicates a need/desire for the attribute. The attributes are indicated by means of @<AttributeConsumingService>@ elements within the @<SPSSODescriptor>@ element. See SAML metadata for more information.
+
+While this rule does have some minor support for dealing with attribute values within the metadata it is limited and should be considered experimental.
+<blockquote class="note">
+Please be aware of the following:
+* This filter requires the attribute requester's metadata be loaded and available.
+* The requester's metadata must have an @<SPSSODescriptor@ role since that is the role that contains the listed attributes.
+* This matching function only operates as a value rule and only really makes sense as a permit value rule.
+</blockquote>
+
+h4. Define the Namespace
+
+In you attribute filter policy file you'll need to add the namespace declaration for this plugin. To do this:
+
+* Add the attribute @xmlns:ua="http://www.switch.ch/aai/idp/uApprove/mf"@ before the @xmlns:xsi@ attribute on the root @<AttributeFilterPolicyGroup>@ element.
+* Add the following at the end of the whitespace delimited list of values for the @xsi:schemaLocation@ attribute: @http://www.switch.ch/aai/idp/uApprove/mf classpath:/schema/uApprove-mf.xsd@.
+
+h4. Define the Rule
+
+This rule is defined by the element @<PermitValueRule xsi:type="ua:AttributeInMetadata">@ with the following optional attribute: 
+
+[onlyIfRequired] Boolean flag indicated that only those attributes which are marked as required should be released, those marked as optional will not be. Default value: @true@.
+
+Example Permit Value Rule using the AttributeInMetadata Match Function: 
+
+bc. <PermitValueRule xsi:type="ua:AttributeInMetadata" onlyIfRequired="false">
+
+h2. Other
 
 bq(note). Other topics will be added on request.
 

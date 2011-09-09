@@ -29,6 +29,10 @@ h3 {
 	font-size: 13px;
 }
 
+h4 {
+    font-size: 12px;
+}
+
 .custom {
 	font-weight: bold;
     color: #FF004B;
