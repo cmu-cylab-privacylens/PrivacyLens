@@ -14,7 +14,11 @@
 
     <div>
         <a class="tooltip" href="">
-            ${MessageFormat.format($messages.releaseTo, $relyingParty.name)}
+            #* Needs velocity > 1.5
+            ${MessageFormat.format(${messages.releaseTo}, ${relyingParty.name})}
+            *#
+            ## Workaround
+            $messages.releaseTo.replace('{0}', $relyingParty.name)
             #if ( ${relyingParty.description} )
             <span>${relyingParty.description}</span>         
             #end
