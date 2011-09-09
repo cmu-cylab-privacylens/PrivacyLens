@@ -8,7 +8,7 @@
                            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
 
         
-    <context:property-placeholder location="classpath:/context/uApprove.properties" />
+    <context:property-placeholder location="classpath:/configuration/uApprove.properties" />
     
     <bean id="uApprove.touModule" class="ch.SWITCH.aai.uApprove.tou.ToUModule" init-method="initialize">
         <property name="enabled" value="${tou.enabled}" />
@@ -20,8 +20,8 @@
         </property>
         <property name="relyingParties">
             <bean class="ch.SWITCH.aai.uApprove.RelyingPartyList">
-                <property name="regularExpressions" value="${uApprove.services}"/>
-                <property name="blacklist" value="${uApprove.services.blacklist}"/>
+                <property name="regularExpressions" value="${services}"/>
+                <property name="blacklist" value="${services.blacklist}"/>
             </bean>
         </property>
         <property name="compareContent" value="false" />
@@ -38,8 +38,8 @@
         <property name="allowGeneralConsent" value="${ar.allowGeneralConsent}" />
         <property name="relyingParties">
             <bean class="ch.SWITCH.aai.uApprove.RelyingPartyList">
-                <property name="regularExpressions" value="${uApprove.services}"/>
-                <property name="blacklist" value="${uApprove.services.blacklist}"/>
+                <property name="regularExpressions" value="${services}"/>
+                <property name="blacklist" value="${services.blacklist}"/>
             </bean>
         </property>
         <property name="compareAttributeValues" value="false" />
