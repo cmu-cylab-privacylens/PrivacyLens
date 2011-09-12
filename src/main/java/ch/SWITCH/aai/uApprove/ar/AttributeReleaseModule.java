@@ -20,7 +20,6 @@ package ch.SWITCH.aai.uApprove.ar;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -32,6 +31,11 @@ import ch.SWITCH.aai.uApprove.ar.storage.Storage;
  * The Attribute Release Module.
  */
 public class AttributeReleaseModule {
+
+    /**
+     * Wildcard string used for relying party id, attribute id and attribute values hash, when general consent is used.
+     */
+    private static final String WILDCARD = "*";
 
     /** Class logger. */
     private final Logger logger = LoggerFactory.getLogger(AttributeReleaseModule.class);
@@ -152,7 +156,7 @@ public class AttributeReleaseModule {
             return false;
         }
 
-        if (storage.containsAttributeReleases(principalName, "*")) {
+        if (storage.containsAttributeReleases(principalName, WILDCARD)) {
             logger.debug("User {} has given gerneral consent.");
             return false;
         }
@@ -177,7 +181,7 @@ public class AttributeReleaseModule {
      */
     public void clearConsent(final String principalName, final String relyingPartyId) {
         logger.info("Clear user consent for {}.", principalName);
-        storage.deleteAttributeReleases(principalName, "*");
+        storage.deleteAttributeReleases(principalName, WILDCARD);
         storage.deleteAttributeReleases(principalName, relyingPartyId);
     }
 
@@ -206,7 +210,7 @@ public class AttributeReleaseModule {
      */
     public void createConsent(final String principalName) {
         logger.info("Create general consent for {}.", principalName);
-        final AttributeRelease attributeRelease = new AttributeRelease("*", StringUtils.EMPTY, new DateTime());
-        storage.createAttributeRelease(principalName, "*", attributeRelease);
+        final AttributeRelease attributeRelease = new AttributeRelease(WILDCARD, WILDCARD, new DateTime());
+        storage.createAttributeRelease(principalName, WILDCARD, attributeRelease);
     }
 }

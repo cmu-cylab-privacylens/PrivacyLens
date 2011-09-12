@@ -20,7 +20,6 @@
             <includes>
                 <include>org.springframework:spring-jdbc</include>
                 <include>com.jolbox:bonecp</include>
-                <include>com.jolbox:bonecp</include>
             </includes>
         </dependencySet>
         <dependencySet>
@@ -43,11 +42,7 @@
         </fileSet>
         <fileSet>
             <outputDirectory>/manual/storage</outputDirectory>
-            <directory>src/main/resources/storage</directory>        
-            <includes>
-                <include>guide/*</include>
-                <include>*-schema.sql</include>
-            </includes>
+            <directory>src/main/resources/storage</directory>
         </fileSet>
         <fileSet>
             <outputDirectory>/manual/configuration</outputDirectory>
