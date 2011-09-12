@@ -5,6 +5,7 @@
     <id></id>
     <formats>
         <format>zip</format>
+        <format>dir</format>
     </formats>
     
     <dependencySets>
@@ -29,6 +30,13 @@
                 <include>org.hsqldb:hsqldb</include>
             </includes>
         </dependencySet>
+        <dependencySet>
+            <outputDirectory>/scripts/lib</outputDirectory>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <includes>
+                <include>org.codehaus.groovy:groovy-all</include>
+            </includes>
+        </dependencySet>
     </dependencySets>
     
     
@@ -47,6 +55,11 @@
         <fileSet>
             <outputDirectory>/manual/configuration</outputDirectory>
             <directory>src/main/resources/configuration</directory>
+        </fileSet>
+        
+        <fileSet>
+            <outputDirectory>/scripts</outputDirectory>
+            <directory>src/main/groovy</directory>
         </fileSet>
     </fileSets>
   

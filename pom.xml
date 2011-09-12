@@ -86,6 +86,8 @@
             </exclusions>
             <scope>runtime</scope>
         </dependency>
+        
+        <!-- Optional JDBC Connectors -->
         <dependency>
             <groupId>org.hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
@@ -99,6 +101,14 @@
             <version>${mysql.version}</version>
             <scope>runtime</scope>
             <optional>true</optional>
+        </dependency>
+        
+        <!-- Migration -->
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>1.8.2</version>
+            <scope>runtime</scope>
         </dependency>
 
         <!-- Test dependencies -->
