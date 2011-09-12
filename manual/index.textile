@@ -164,6 +164,14 @@ h3. JDBC Connection Pool Tuning
 
 TODO
 
+h3. Custom Storage
+
+Custom storage implementations might be provided in future. Some ideas are:
+
+* NOP(No Operation) Storage: This basically will retrieve users ToU acceptance and/or attribute release consent without remembering. This implies _alwaysRequireToUAcceptance_ and/or _alwaysRequireConsent_.
+* Cookie based Storage: This will remember users consent within a cookie. It could stored for just the session or some defined period (e.g., 10 days).
+* In Memory Storage: Already possible with @mem@ HSQLDB. Will store consent as long as the IdP process is alive.
+
 h2. Templates
 
 h3. Custom View Templates
@@ -201,6 +209,10 @@ h3. Different Lists for Terms Of Use and Attribute Release Module
 
 TODO
 
+
+h3. Specific authContextClassRef required
+
+TODO
 
 h2. Attribute In Attribute Requester's Metadata Plugin
 
