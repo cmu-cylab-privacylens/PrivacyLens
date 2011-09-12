@@ -30,6 +30,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +65,9 @@ public class Intercepter implements Filter {
     /** The view helper. */
     private ViewHelper viewHelper;
 
+    /** If set, uApprove will be only enabled if authnContextClassRef equals to the requested one. */
+    private String authnContextClassRef;
+
     /** {@inheritDoc} */
     public void init(final FilterConfig filterConfig) throws ServletException {
         servletContext = filterConfig.getServletContext();
@@ -82,7 +86,10 @@ public class Intercepter implements Filter {
         Validate.notNull(samlHelper, "SAML Helper isn't properly configured.");
         Validate.notNull(viewHelper, "View Helper isn't properly configured.");
 
-        logger.debug("uApprove initialized.");
+        authnContextClassRef = filterConfig.getInitParameter("authnContextClassRef");
+        logger.debug("uApprove initialized.{}", authnContextClassRef != null ? " authnContextClassRef is set to "
+                + authnContextClassRef : "");
+
     }
 
     /** {@inheritDoc} */
@@ -105,6 +112,13 @@ public class Intercepter implements Filter {
     public void
             intercept(final HttpServletRequest request, final HttpServletResponse response, final FilterChain chain)
                     throws IOException, ServletException {
+
+        if (authnContextClassRef != null
+                && !StringUtils.equals(authnContextClassRef,
+                        LoginHelper.getAuthContextClassRef(servletContext, request))) {
+            chain.doFilter(request, response);
+            return;
+        }
 
         if (!LoginHelper.isAuthenticated(servletContext, request, response)) {
             logger.trace("Request is not authenticated.");

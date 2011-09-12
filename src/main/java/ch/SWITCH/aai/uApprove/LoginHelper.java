@@ -67,6 +67,18 @@ public final class LoginHelper {
     }
 
     /**
+     * Gets the authentication context class reference.
+     * 
+     * @param servletContext The servlet context.
+     * @param request The HTTP request.
+     * @return Returns the authentication context class reference.
+     */
+    public static String getAuthContextClassRef(final ServletContext servletContext, final HttpServletRequest request) {
+        final LoginContext loginContext = getLoginContext(servletContext, request, false);
+        return loginContext != null ? loginContext.getAuthenticationMethod() : null;
+    }
+
+    /**
      * Gets the session.
      * 
      * @param request The HTTP request.
