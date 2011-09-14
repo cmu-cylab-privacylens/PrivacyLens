@@ -29,7 +29,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 
 import ch.SWITCH.aai.uApprove.AbstractJDBCStorage;
-import ch.SWITCH.aai.uApprove.ar.AttributeRelease;
+import ch.SWITCH.aai.uApprove.ar.AttributeReleaseConsent;
 
 /** JDBC implementation. */
 public class JDBCStorage extends AbstractJDBCStorage implements Storage {
@@ -38,58 +38,60 @@ public class JDBCStorage extends AbstractJDBCStorage implements Storage {
     @SuppressWarnings("unused")
     private final Logger logger = LoggerFactory.getLogger(JDBCStorage.class);
 
-    /** {@see AttributeRelease} row mapper. */
-    private static final class AttributeReleaseMapper implements ParameterizedRowMapper<AttributeRelease> {
+    /** {@see AttributeReleaseConsent} row mapper. */
+    private static final class AttributeReleaseConsentMapper implements ParameterizedRowMapper<AttributeReleaseConsent> {
         /** {@inheritDoc} */
-        public AttributeRelease mapRow(final ResultSet rs, final int rowNum) throws SQLException {
-            return new AttributeRelease(rs.getString("attributeId"), rs.getString("valuesHash"), new DateTime(
+        public AttributeReleaseConsent mapRow(final ResultSet rs, final int rowNum) throws SQLException {
+            return new AttributeReleaseConsent(rs.getString("attributeId"), rs.getString("valuesHash"), new DateTime(
                     rs.getTimestamp("consentDate")));
         }
     }
 
-    /** The attribute release mapper. */
-    private final AttributeReleaseMapper attributeReleaseMapper;
+    /** The attribute release consent mapper. */
+    private final AttributeReleaseConsentMapper attributeReleaseConsentMapper;
 
     /** Default constructor. */
     public JDBCStorage() {
         super();
-        attributeReleaseMapper = new AttributeReleaseMapper();
+        attributeReleaseConsentMapper = new AttributeReleaseConsentMapper();
     }
 
     /** {@inheritDoc} */
-    public List<AttributeRelease> readAttributeReleases(final String userId, final String relyingPartyId) {
+    public List<AttributeReleaseConsent> readAttributeReleaseConsents(final String userId, final String relyingPartyId) {
         try {
-            return getJdbcTemplate().query(getSqlStatements().getProperty("readAttributeReleases"),
-                    attributeReleaseMapper, userId, relyingPartyId);
+            return getJdbcTemplate().query(getSqlStatements().getProperty("readAttributeReleaseConsents"),
+                    attributeReleaseConsentMapper, userId, relyingPartyId);
         } catch (final EmptyResultDataAccessException e) {
             return Collections.emptyList();
         }
     }
 
     /** {@inheritDoc} */
-    public void deleteAttributeReleases(final String userId, final String relyingPartyId) {
-        getJdbcTemplate().update(getSqlStatements().getProperty("deleteAttributeReleases"), userId, relyingPartyId);
+    public void deleteAttributeReleaseConsents(final String userId, final String relyingPartyId) {
+        getJdbcTemplate().update(getSqlStatements().getProperty("deleteAttributeReleaseConsents"), userId,
+                relyingPartyId);
     }
 
     /** {@inheritDoc} */
-    public boolean containsAttributeReleases(final String userId, final String relyingPartyId) {
-        return getJdbcTemplate().queryForInt(getSqlStatements().getProperty("containsAttributeReleases"), userId,
-                relyingPartyId) > 0;
+    public boolean containsAttributeReleaseConsent(final String userId, final String relyingPartyId,
+            final String attributeId) {
+        return getJdbcTemplate().queryForInt(getSqlStatements().getProperty("containsAttributeReleaseConsent"), userId,
+                relyingPartyId, attributeId) > 0;
     }
 
     /** {@inheritDoc} */
-    public void updateAttributeRelease(final String userId, final String relyingPartyId,
-            final AttributeRelease attributeRelease) {
-        getJdbcTemplate().update(getSqlStatements().getProperty("updateAttributeRelease"),
-                attributeRelease.getValuesHash(), attributeRelease.getDate().toDate(), userId, relyingPartyId,
-                attributeRelease.getAttributeId());
+    public void updateAttributeReleaseConsent(final String userId, final String relyingPartyId,
+            final AttributeReleaseConsent attributeReleaseConsent) {
+        getJdbcTemplate().update(getSqlStatements().getProperty("updateAttributeReleaseConsent"),
+                attributeReleaseConsent.getValuesHash(), attributeReleaseConsent.getDate().toDate(), userId,
+                relyingPartyId, attributeReleaseConsent.getAttributeId());
     }
 
     /** {@inheritDoc} */
-    public void createAttributeRelease(final String userId, final String relyingPartyId,
-            final AttributeRelease attributeRelease) {
-        getJdbcTemplate().update(getSqlStatements().getProperty("createAttributeRelease"), userId, relyingPartyId,
-                attributeRelease.getAttributeId(), attributeRelease.getValuesHash(),
-                attributeRelease.getDate().toDate());
+    public void createAttributeReleaseConsent(final String userId, final String relyingPartyId,
+            final AttributeReleaseConsent attributeReleaseConsent) {
+        getJdbcTemplate().update(getSqlStatements().getProperty("createAttributeReleaseConsent"), userId,
+                relyingPartyId, attributeReleaseConsent.getAttributeId(), attributeReleaseConsent.getValuesHash(),
+                attributeReleaseConsent.getDate().toDate());
     }
 }

@@ -40,19 +40,19 @@ public final class AttributeReleaseHelper {
     }
 
     /**
-     * Creates a collection of @see AttributeRelease.
+     * Creates a collection of @see AttributeReleaseConsent.
      * 
      * @param attributes The attributes from where the attribute releases should created.
      * @param date The consent date for the attributes.
-     * @return Returns a collection of attribute releases
+     * @return Returns a collection of attribute release consents
      */
-    public static Collection<AttributeRelease> createAttributeReleases(final Collection<Attribute> attributes,
-            final DateTime date) {
-        final Collection<AttributeRelease> attributeReleases = new HashSet<AttributeRelease>();
+    public static Collection<AttributeReleaseConsent> createAttributeReleaseConsents(
+            final Collection<Attribute> attributes, final DateTime date) {
+        final Collection<AttributeReleaseConsent> attributeReleaseConsents = new HashSet<AttributeReleaseConsent>();
         for (final Attribute attribute : attributes) {
-            attributeReleases.add(new AttributeRelease(attribute, date));
+            attributeReleaseConsents.add(new AttributeReleaseConsent(attribute, date));
         }
-        return attributeReleases;
+        return attributeReleaseConsents;
     }
 
     /**
@@ -73,18 +73,18 @@ public final class AttributeReleaseHelper {
     }
 
     /**
-     * Checks whether the attributeRelease contains the attribute. Optionally compares the attribute values.
+     * Checks whether the attribute release consent contains the attribute. Optionally compares the attribute values.
      * 
      * @param attribute The attribute.
-     * @param attributeRelease The attribute release.
+     * @param attributeReleaseConsent The attribute release consent.
      * @param compareAttributeValues Indicates whether to compare the attribute values.
      * @return Returns true if the attribute release contains the attribute.
      */
-    public static boolean approvedAttribute(final Attribute attribute, final AttributeRelease attributeRelease,
-            final boolean compareAttributeValues) {
-        if (StringUtils.equals(attributeRelease.getAttributeId(), attribute.getId())) {
+    public static boolean approvedAttribute(final Attribute attribute,
+            final AttributeReleaseConsent attributeReleaseConsent, final boolean compareAttributeValues) {
+        if (StringUtils.equals(attributeReleaseConsent.getAttributeId(), attribute.getId())) {
             if (compareAttributeValues) {
-                return StringUtils.equals(attributeRelease.getValuesHash(), hashValues(attribute.getValues()));
+                return StringUtils.equals(attributeReleaseConsent.getValuesHash(), hashValues(attribute.getValues()));
             } else {
                 return true;
             }
@@ -94,18 +94,18 @@ public final class AttributeReleaseHelper {
     }
 
     /**
-     * Calls for all attributes and attribute releases the approvedAttribute method.
+     * Calls for all attributes and attribute release consents the approvedAttribute method.
      * 
      * @param attributes The attributes
-     * @param attributeReleases The attribute releases.
+     * @param attributeReleaseConsents The attribute release consents.
      * @param compareAttributeValues Indicates whether to compare the attribute values.
      * @return Returns true if all attributes are contained in of the attribute releases.
      */
     public static boolean approvedAttributes(final List<Attribute> attributes,
-            final List<AttributeRelease> attributeReleases, final boolean compareAttributeValues) {
+            final List<AttributeReleaseConsent> attributeReleaseConsents, final boolean compareAttributeValues) {
         for (final Attribute attribute : attributes) {
             boolean approved = false;
-            for (final AttributeRelease attributeRelease : attributeReleases) {
+            for (final AttributeReleaseConsent attributeRelease : attributeReleaseConsents) {
                 if (approvedAttribute(attribute, attributeRelease, compareAttributeValues)) {
                     approved = true;
                     break;

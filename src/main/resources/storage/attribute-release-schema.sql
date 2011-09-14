@@ -1,4 +1,4 @@
-CREATE TABLE AttributeRelease (
+CREATE TABLE AttributeReleaseConsent (
  userId         VARCHAR(104)                           NOT NULL,
  relyingPartyId VARCHAR(104)                           NOT NULL,
  attributeId    VARCHAR(104)                           NOT NULL,

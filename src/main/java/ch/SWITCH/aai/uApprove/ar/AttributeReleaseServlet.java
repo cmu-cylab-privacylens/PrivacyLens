@@ -93,10 +93,10 @@ public class AttributeReleaseServlet extends HttpServlet {
 
         if (generalConsent) {
             logger.debug("Create general consent for {}", principalName);
-            attributeReleaseModule.createConsent(principalName);
+            attributeReleaseModule.consentGeneralAttributeRelease(principalName);
         } else {
-            logger.debug("Create consent for {} to {}.", principalName, relyingPartyId);
-            attributeReleaseModule.createConsent(principalName, relyingPartyId, attributes);
+            logger.debug("Create consent for user {} to {}.", principalName, relyingPartyId);
+            attributeReleaseModule.consentAttributeRelease(principalName, relyingPartyId, attributes);
         }
 
         LoginHelper.returnToIdP(getServletContext(), req, resp);

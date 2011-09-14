@@ -17,6 +17,7 @@
 
 package ch.SWITCH.aai.uApprove.ar.storage;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.joda.time.DateTime;
@@ -31,7 +32,8 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import ch.SWITCH.aai.uApprove.ar.AttributeRelease;
+import ch.SWITCH.aai.uApprove.ar.Attribute;
+import ch.SWITCH.aai.uApprove.ar.AttributeReleaseConsent;
 
 /**
  * Tests JDBC storage using the Spring JDBC framework.
@@ -58,31 +60,33 @@ public class JDBCStorageTest extends AbstractTransactionalTestNGSpringContextTes
 
     /** Test. */
     @Test
-    public void crudAttributeRelease() {
+    public void crudAttributeReleaseConsent() {
         final String userId = "userId";
         final String relyingPartyId = "relyingPartyId";
-        final AttributeRelease attributeRelease1 = new AttributeRelease("id", "hash", new DateTime());
+        final Attribute attribute = new Attribute("id", Arrays.asList(new String[] {"value1", "value2"}));
+        final AttributeReleaseConsent attributeRelease1 = new AttributeReleaseConsent(attribute, new DateTime());
 
-        Assert.assertFalse(storage.containsAttributeReleases(userId, relyingPartyId));
+        Assert.assertFalse(storage.containsAttributeReleaseConsent(userId, relyingPartyId, attribute.getId()));
 
-        storage.createAttributeRelease(userId, relyingPartyId, attributeRelease1);
-        Assert.assertTrue(storage.containsAttributeReleases(userId, relyingPartyId));
+        storage.createAttributeReleaseConsent(userId, relyingPartyId, attributeRelease1);
+        Assert.assertTrue(storage.containsAttributeReleaseConsent(userId, relyingPartyId, attribute.getId()));
 
-        List<AttributeRelease> attributeReleases = storage.readAttributeReleases(userId, relyingPartyId);
+        List<AttributeReleaseConsent> attributeReleases = storage.readAttributeReleaseConsents(userId, relyingPartyId);
         Assert.assertEquals(attributeReleases.size(), 1);
         Assert.assertEquals(attributeReleases.get(0).getAttributeId(), attributeRelease1.getAttributeId());
         Assert.assertEquals(attributeReleases.get(0).getValuesHash(), attributeRelease1.getValuesHash());
         Assert.assertEquals(attributeReleases.get(0).getDate(), attributeRelease1.getDate());
 
-        final AttributeRelease attributeRelease2 = new AttributeRelease("id", "otherhash", new DateTime());
-        storage.updateAttributeRelease(userId, relyingPartyId, attributeRelease2);
+        final AttributeReleaseConsent attributeRelease2 =
+                new AttributeReleaseConsent("id", "otherhash", new DateTime());
+        storage.updateAttributeReleaseConsent(userId, relyingPartyId, attributeRelease2);
 
-        attributeReleases = storage.readAttributeReleases(userId, relyingPartyId);
+        attributeReleases = storage.readAttributeReleaseConsents(userId, relyingPartyId);
         Assert.assertEquals(attributeReleases.size(), 1);
         Assert.assertEquals(attributeReleases.get(0).getValuesHash(), attributeRelease2.getValuesHash());
 
-        storage.deleteAttributeReleases(userId, relyingPartyId);
-        Assert.assertFalse(storage.containsAttributeReleases(userId, relyingPartyId));
-        Assert.assertTrue(storage.readAttributeReleases(userId, relyingPartyId).isEmpty());
+        storage.deleteAttributeReleaseConsents(userId, relyingPartyId);
+        Assert.assertFalse(storage.containsAttributeReleaseConsent(userId, relyingPartyId, attribute.getId()));
+        Assert.assertTrue(storage.readAttributeReleaseConsents(userId, relyingPartyId).isEmpty());
     }
 }

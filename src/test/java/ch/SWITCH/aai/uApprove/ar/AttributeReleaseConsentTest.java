@@ -24,19 +24,20 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
- * Attribute Release Test.
+ * Attribute Release Consent Test.
  */
 
-public class AttributeReleaseTest {
+public class AttributeReleaseConsentTest {
 
     /** Test. */
     @Test
-    public void testCreateAttributeReleases() {
+    public void testCreateAttributeReleaseConsents() {
         final Attribute attribute = new Attribute("id", Arrays.asList(new String[] {"value1", "value2"}));
         final DateTime consentDate = new DateTime();
-        final AttributeRelease attributeRelease = new AttributeRelease(attribute, consentDate);
-        Assert.assertEquals(attributeRelease.getAttributeId(), attribute.getId());
-        Assert.assertEquals(attributeRelease.getValuesHash(), AttributeReleaseHelper.hashValues(attribute.getValues()));
-        Assert.assertEquals(attributeRelease.getDate(), consentDate);
+        final AttributeReleaseConsent attributeReleaseConsent = new AttributeReleaseConsent(attribute, consentDate);
+        Assert.assertEquals(attributeReleaseConsent.getAttributeId(), attribute.getId());
+        Assert.assertEquals(attributeReleaseConsent.getValuesHash(),
+                AttributeReleaseHelper.hashValues(attribute.getValues()));
+        Assert.assertEquals(attributeReleaseConsent.getDate(), consentDate);
     }
 }

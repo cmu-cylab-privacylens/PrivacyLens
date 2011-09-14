@@ -19,54 +19,56 @@ package ch.SWITCH.aai.uApprove.ar.storage;
 
 import java.util.List;
 
-import ch.SWITCH.aai.uApprove.ar.AttributeRelease;
+import ch.SWITCH.aai.uApprove.ar.AttributeReleaseConsent;
 
 /** Storage interface for user consent. */
 public interface Storage {
 
     /**
-     * Reads the attribute releases from the storage for a specific user and relying party.
+     * Reads the attribute release consents from the storage for a specific user and relying party.
      * 
      * @param userId The user id.
      * @param relyingPartyId The relying party id.
-     * @return Returns a collection of attribute releases, might be empty but never null.
+     * @return Returns a collection of attribute release consents, might be empty but never null.
      */
-    List<AttributeRelease> readAttributeReleases(final String userId, final String relyingPartyId);
+    List<AttributeReleaseConsent> readAttributeReleaseConsents(final String userId, final String relyingPartyId);
 
     /**
-     * Deletes the attribute releases from the storage for a specific user and relying party.
+     * Deletes the attribute release consents from the storage for a specific user and relying party.
      * 
      * @param userId The user id.
      * @param relyingPartyId The relying party id.
      */
-    void deleteAttributeReleases(final String userId, final String relyingPartyId);
+    void deleteAttributeReleaseConsents(final String userId, final String relyingPartyId);
 
     /**
-     * Checks if the storage contains attribute releases for a specific user and relying party.
+     * Checks if the storage contains attribute release consent for a specific user, relying party and attribute.
      * 
      * @param userId The user id.
      * @param relyingPartyId The relying party id.
-     * @return Returns true if the storage contains attribute releases, false otherwise.
+     * @param attributeId The attribute id.
+     * @return Returns true if the storage contains attribute release consent, false otherwise.
      */
-    boolean containsAttributeReleases(final String userId, final String relyingPartyId);
+    boolean containsAttributeReleaseConsent(final String userId, final String relyingPartyId, final String attributeId);
 
     /**
-     * Updates the attribute releases for a specific user and relying party.
+     * Updates the attribute release consent for a specific user and relying party.
      * 
      * @param userId The user id.
      * @param relyingPartyId The relying party id.
-     * @param attributeRelease The attribute release.
+     * @param attributeReleaseConsent The attribute release consent.
      */
-    void updateAttributeRelease(final String userId, String relyingPartyId, final AttributeRelease attributeRelease);
+    void updateAttributeReleaseConsent(final String userId, String relyingPartyId,
+            final AttributeReleaseConsent attributeReleaseConsent);
 
     /**
-     * Creates an attribute releases for a specific user and relying party.
+     * Creates an attribute release consent for a specific user and relying party.
      * 
      * @param userId The user id.
      * @param relyingPartyId The relying party id.
-     * @param attributeRelease The attribute release.
+     * @param attributeReleaseConsent The attribute release consent.
      */
-    void createAttributeRelease(final String userId, final String relyingPartyId,
-            final AttributeRelease attributeRelease);
+    void createAttributeReleaseConsent(final String userId, final String relyingPartyId,
+            final AttributeReleaseConsent attributeReleaseConsent);
 
 }

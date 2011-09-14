@@ -156,13 +156,14 @@ public class AttributeReleaseModule {
             return false;
         }
 
-        if (storage.containsAttributeReleases(principalName, WILDCARD)) {
+        if (storage.containsAttributeReleaseConsent(principalName, WILDCARD, WILDCARD)) {
             logger.debug("User {} has given gerneral consent.");
             return false;
         }
 
-        final List<AttributeRelease> attributeReleases = storage.readAttributeReleases(principalName, relyingPartyId);
-        if (AttributeReleaseHelper.approvedAttributes(attributes, attributeReleases, compareAttributeValues)) {
+        final List<AttributeReleaseConsent> attributeReleaseConsents =
+                storage.readAttributeReleaseConsents(principalName, relyingPartyId);
+        if (AttributeReleaseHelper.approvedAttributes(attributes, attributeReleaseConsents, compareAttributeValues)) {
             logger.debug("User {} has already approved attributes {} for relying party {}.", new Object[] {
                     principalName, relyingPartyId, attributes,});
             return false;
@@ -181,25 +182,33 @@ public class AttributeReleaseModule {
      */
     public void clearConsent(final String principalName, final String relyingPartyId) {
         logger.info("Clear user consent for {}.", principalName);
-        storage.deleteAttributeReleases(principalName, WILDCARD);
-        storage.deleteAttributeReleases(principalName, relyingPartyId);
+        storage.deleteAttributeReleaseConsents(principalName, WILDCARD);
+        storage.deleteAttributeReleaseConsents(principalName, relyingPartyId);
     }
 
     /**
-     * Creates attribute release consent.
+     * Creates or updates attribute release consent.
      * 
      * @param principalName The principal name.
      * @param relyingPartyId The relying party id.
      * @param attributes The attributes.
      */
-    public void
-            createConsent(final String principalName, final String relyingPartyId, final List<Attribute> attributes) {
+    public void consentAttributeRelease(final String principalName, final String relyingPartyId,
+            final List<Attribute> attributes) {
         logger.info("Create user consent for {} attributes from {} to {}.", new Object[] {attributes.size(),
                 principalName, relyingPartyId,});
         final DateTime consenDate = new DateTime();
         for (final Attribute attribute : attributes) {
-            final AttributeRelease attributeRelease = new AttributeRelease(attribute, consenDate);
-            storage.createAttributeRelease(principalName, relyingPartyId, attributeRelease);
+            final AttributeReleaseConsent attributeReleaseConsent = new AttributeReleaseConsent(attribute, consenDate);
+            if (storage.containsAttributeReleaseConsent(principalName, relyingPartyId, attribute.getId())) {
+                logger.debug("Update Attribute Release consent for user {}, relying party {} and attribute {}.",
+                        new Object[] {principalName, relyingPartyId, attribute.getId()});
+                storage.updateAttributeReleaseConsent(principalName, relyingPartyId, attributeReleaseConsent);
+            } else {
+                logger.debug("Create Attribute Release consent for user {}, relying party {} and attribute {}.",
+                        new Object[] {principalName, relyingPartyId, attribute.getId()});
+                storage.createAttributeReleaseConsent(principalName, relyingPartyId, attributeReleaseConsent);
+            }
         }
     }
 
@@ -208,9 +217,10 @@ public class AttributeReleaseModule {
      * 
      * @param principalName The principal name.
      */
-    public void createConsent(final String principalName) {
+    public void consentGeneralAttributeRelease(final String principalName) {
         logger.info("Create general consent for {}.", principalName);
-        final AttributeRelease attributeRelease = new AttributeRelease(WILDCARD, WILDCARD, new DateTime());
-        storage.createAttributeRelease(principalName, WILDCARD, attributeRelease);
+        final AttributeReleaseConsent attributeRelease =
+                new AttributeReleaseConsent(WILDCARD, WILDCARD, new DateTime());
+        storage.createAttributeReleaseConsent(principalName, WILDCARD, attributeRelease);
     }
 }

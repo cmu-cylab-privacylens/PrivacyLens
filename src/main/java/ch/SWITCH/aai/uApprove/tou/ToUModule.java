@@ -166,10 +166,10 @@ public class ToUModule {
 
         final ToUAcceptance touAcceptance = new ToUAcceptance(tou, new DateTime());
         if (storage.containsToUAcceptance(principalName, tou.getVersion())) {
-            logger.debug("Update ToU acceptance for User {} and ToU version {}.", principalName, tou.getVersion());
+            logger.debug("Update ToU acceptance for user {} and ToU version {}.", principalName, tou.getVersion());
             storage.updateToUAcceptance(principalName, touAcceptance);
         } else {
-            logger.debug("Create ToU acceptance for User {} and ToU version {}.", principalName, tou.getVersion());
+            logger.debug("Create ToU acceptance for user {} and ToU version {}.", principalName, tou.getVersion());
             storage.createToUAcceptance(principalName, touAcceptance);
         }
     }

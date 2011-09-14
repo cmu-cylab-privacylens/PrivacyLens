@@ -19,8 +19,8 @@ package ch.SWITCH.aai.uApprove.ar;
 
 import org.joda.time.DateTime;
 
-/** Represents an attribute release. */
-public class AttributeRelease {
+/** Represents an attribute release consent. */
+public class AttributeReleaseConsent {
 
     /** The attribute id. */
     private final String attributeId;
@@ -32,25 +32,25 @@ public class AttributeRelease {
     private final DateTime consentDate;
 
     /**
-     * Constructs a @see AttributeRelease.
+     * Constructs a @see AttributeReleaseConsent.
      * 
      * @param attributeId The id of the attribute.
      * @param valuesHash The hashed values.
      * @param consentDate The timestamp for this @see AttributeRelease.
      */
-    public AttributeRelease(final String attributeId, final String valuesHash, final DateTime consentDate) {
+    public AttributeReleaseConsent(final String attributeId, final String valuesHash, final DateTime consentDate) {
         this.attributeId = attributeId;
         this.valuesHash = valuesHash;
         this.consentDate = consentDate;
     }
 
     /**
-     * Constructs a @see AttributeRelease.
+     * Constructs a @see AttributeReleaseConsent.
      * 
      * @param attribute The @see Attribute.
      * @param consentDate The timestamp for this @see AttributeRelease.
      */
-    public AttributeRelease(final Attribute attribute, final DateTime consentDate) {
+    public AttributeReleaseConsent(final Attribute attribute, final DateTime consentDate) {
         this.attributeId = attribute.getId();
         this.valuesHash = AttributeReleaseHelper.hashValues(attribute.getValues());
         this.consentDate = consentDate;
