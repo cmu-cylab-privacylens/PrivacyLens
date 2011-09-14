@@ -32,7 +32,6 @@
         </dependencySet>
         <dependencySet>
             <outputDirectory>/scripts/lib</outputDirectory>
-            <useTransitiveFiltering>true</useTransitiveFiltering>
             <includes>
                 <include>org.codehaus.groovy:groovy-all</include>
             </includes>

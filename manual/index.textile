@@ -135,6 +135,20 @@ To finish the upgrade of uApprove the IdP must be re-deployed:
 
 bc. $IDP_INSTALL$/instal.sh
 
+h2. Upgrade from uApprove < 2.3
+
+* Configuration files: Please use the new configuration file and taylor them to your needs.
+* Database Migration: It is possible to migrate ToU acceptance and attribute release consent data using the "provided data migration script":#Upgrade.databaseMigration.
+
+bq(note). TODO Note about: _Terms Of Use Content Comparison_ and _Attribute Value Comparison_
+
+h3(#Upgrade.databaseMigration). Database Migration
+
+bc. 
+java -cp "$UAPPROVE_INSTALL$/scripts/lib/*.jar:$UAPPROVE_INSTALL$/lib/jdbc/optional/*.jar" groovy.ui.GroovyMain \
+  $UAPPROVE_INSTALL$/scripts/StorageMigration.groovy /opt/uApprove/conf/database.properties $IDP_HOME$/conf/uApprove.properties
+
+
 h1. Advanced Deployment
 
 This sections contains advanced configuration topics.
@@ -153,6 +167,24 @@ bc..
 h2. Storage
 
 h3. File-only
+
+@uApprove.properties@
+
+bc. 
+database.driver             = org.hsqldb.jdbcDriver
+database.url                = jdbc:hsqldb:file:/var/opt/uApprove/hsql.db
+database.username           = SA
+database.password           = 
+ 
+
+bc. 
+echo "SHUTDOWN;" > /tmp/shutdown
+java -jar $HSQLDB_HOME$/lib/sqltool.jar \
+  --inlineRC=url=jdbc:hsqldb:file:/var/opt/uApprove/hsql.db,user=SA,password= \
+  $UAPPROVE_INSTALL$/manual/storage/terms-of-use-schema.sql /tmp/shutdown
+java -jar $HSQLDB_HOME$/lib/sqltool.jar \
+  --inlineRC=url=jdbc:hsqldb:file:/var/opt/uApprove/hsql.db,user=SA,password= \
+  $UAPPROVE_INSTALL$/manual/storage/attribute-relase-schema.sql /tmp/shutdown
 
 TODO
 
