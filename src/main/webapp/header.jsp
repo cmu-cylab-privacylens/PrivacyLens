@@ -10,12 +10,6 @@
 	    <fmt:setLocale value="${locale}"/>
 	    <fmt:setBundle basename="${bundle}"/>
 	    
-	    <link rel="stylesheet" type="text/css" href="<%= request.getContextPath()%>/uApprove/styles.css"/> 
-	    <!--[if lte IE 8]>
-	    <link rel="stylesheet" type="text/css" href="<%= request.getContextPath()%>/uApprove/styles-patch-ie8.css"/>
-	    <![endif]-->
-	    <!--[if lte IE 7]>
-	    <link rel="stylesheet" type="text/css" href="<%= request.getContextPath()%>/uApprove/styles-patch.css"/>
-	    <![endif]-->
+	    <link rel="stylesheet" type="text/css" href="<%= request.getContextPath()%>/uApprove/styles.css"/>
 	    <title><fmt:message key="title"/></title>
 	</head>

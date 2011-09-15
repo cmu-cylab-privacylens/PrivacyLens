@@ -1,9 +1,10 @@
 /* Template */
 
-.shibbolet_bg_wide {
+.box {
     width:600px;
     margin-left: auto;
     margin-right: auto; 
+    margin-top: 50px;
     background-color: #FFFFFF;
    -webkit-box-shadow: 1px 1px 15px #999999;
     -moz-box-shadow: 1px 1px 15px #999999;
@@ -15,55 +16,22 @@
     padding: 1.268em;
 }
 
-.header {
-    width: 100%;
+.box-header {
+	float: right;
 }
 
-.menu li {
+.box-content {
     float: left;
-    list-style:none;
-    line-height:35px;
 }
 
-li {
-    padding-right: 10px;
-}
-        
-.menu li.last {
-    
-    background: url("../images/separator.gif") no-repeat scroll left center transparent;
-    padding: 0  0 0 8px;
-    float: left;
-    margin-right:10px;
-    list-style:none;
+body {
+    font-family:Verdana, Geneva, sans-serif;
+    font-size: 12px;
 }
 
 h1 {
-    font-family:Verdana, Geneva, sans-serif;
     font-size: 13px;
     padding-bottom: 12px;
-}
-
-h2 {
-    font-family:Verdana, Geneva, sans-serif;
-    font-size: 12px;
-    font-weight:bold;
-}
-
-h3 {
-    font-family:Verdana, Geneva, sans-serif;
-    font-size: 14px;
-    font-weight:bold;
-}
-
-p {
-    font-family:Verdana, Geneva, sans-serif;
-    font-size: 12px;
-}
-
-.content {
-    width: 100%;
-    float:left;
 }
 
 a {
@@ -80,21 +48,8 @@ a:focus, a:hover, a:active {
     color: #F39800;
     text-decoration: underline;
 }
-.aai_logo {
-    float:left;
-    padding-top: 35px;
-}
-
-.switch_logo {
-    float:right;
-}
-
-.switch_logo_mini {
-    float:right;
-    margin-top: -28px;
-}
     
-.box-shibbolet {
+#tou-content {
     margin-left:auto;
     margin-right:auto;
     height:100%x;
@@ -107,8 +62,7 @@ a:focus, a:hover, a:active {
     text-align: left;
 }
 
-.confirmation-shibbolet {
-    
+#tou-acceptance {
     height:30px;
     width:95%;
     border-style: solid;
@@ -171,15 +125,7 @@ a:focus, a:hover, a:active {
     padding-right:15px;
 }
     
-.menu {
-    background: url(../images/dual_line.gif) repeat-x scroll 0 100% transparent;
-    font-family: Verdana, Geneva, sans-serif;
-    font-size: 12px;
-    line-height: 45px;
-    float: left;
-    padding-left: 2px;
-    width: 100%;
-}
+
 
 
 /* Tooltip */
