@@ -60,21 +60,9 @@
         <property name="maxConnectionsPerPartition" value="20" />
     </bean>
      
-    <!-- 
-        Velocity resource loader configuration:
-        http://velocity.apache.org/engine/devel/developer-guide.html#Configuring_Resource_Loaders
-    -->
     <bean id="uApprove.viewHelper" class="ch.SWITCH.aai.uApprove.ViewHelper" init-method="initialize">
         <property name="defaultLocale" value="${view.defaultLocale}" />
         <property name="forceDefaultLocale" value="${view.forceDefaultLocale}" />
-        <property name="velocityProperties">
-            <value>
-                resource.loader = class
-                class.resource.loader.class = org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader
-            </value>
-        </property>
-        <property name="resourceBundleBase" value="messages" />
-        <property name="viewTemplateBase" value="views" />
     </bean>
     
     <bean id="uApprove.samlHelper" class="ch.SWITCH.aai.uApprove.ar.SAMLHelper" init-method="initialize">

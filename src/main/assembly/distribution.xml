@@ -5,7 +5,6 @@
     <id></id>
     <formats>
         <format>zip</format>
-        <format>dir</format>
     </formats>
     
     <dependencySets>
@@ -40,6 +39,11 @@
     
     
     <fileSets>
+        <fileSet>
+            <outputDirectory>/webapp</outputDirectory>
+            <directory>src/main/webapp/</directory>
+        </fileSet>
+    
         <fileSet>
             <outputDirectory>/manual</outputDirectory>
             <directory>manual</directory>

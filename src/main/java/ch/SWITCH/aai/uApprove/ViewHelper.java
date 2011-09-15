@@ -27,17 +27,13 @@
 
 package ch.SWITCH.aai.uApprove;
 
-import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Properties;
-import java.util.ResourceBundle;
+import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.VelocityEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,38 +42,8 @@ import org.slf4j.LoggerFactory;
  */
 public class ViewHelper {
 
-    /**
-     * Localized Strings.
-     */
-    public class LocalizedStrings {
-        /** Resource bundle. */
-        private final ResourceBundle resourceBundle;
-
-        /**
-         * Constructor.
-         * 
-         * @param resourceBundle The resource bundle to use.
-         */
-        public LocalizedStrings(final ResourceBundle resourceBundle) {
-            this.resourceBundle = resourceBundle;
-        }
-
-        /**
-         * Gets the string.
-         * 
-         * @param key The key.
-         * @return Returns the string.
-         */
-        public String get(final String key) {
-            return resourceBundle.getString(key);
-        }
-    }
-
     /** Class logger. */
     private final Logger logger = LoggerFactory.getLogger(Util.class);
-
-    /** Velocity engine. */
-    private final VelocityEngine velocityEngine;
 
     /** Default locale. */
     private Locale defaultLocale;
@@ -85,19 +51,10 @@ public class ViewHelper {
     /** Whether the default locale should forced. */
     private boolean forceDefaultLocale;
 
-    /** Base path for resource bundles. */
-    private String resourceBundleBase;
-
-    /** Base path for view templates. */
-    private String viewTemplateBase;
-
     /** Default constructor. */
     public ViewHelper() {
-        velocityEngine = new VelocityEngine();
         defaultLocale = Locale.getDefault();
         forceDefaultLocale = false;
-        resourceBundleBase = "messages";
-        viewTemplateBase = "views";
     }
 
     /**
@@ -106,19 +63,6 @@ public class ViewHelper {
     public void initialize() {
         logger.debug("ViewHelper initialized with {}default locale {}.", forceDefaultLocale ? "forced " : "",
                 defaultLocale);
-    }
-
-    /**
-     * Sets the velocity properties.
-     * 
-     * @param velocityProperties The velocity properties.
-     */
-    public void setVelocityProperties(final Properties velocityProperties) {
-        try {
-            velocityEngine.init(velocityProperties);
-        } catch (final Exception e) {
-            throw new UApproveException("Error while initializing the velocity engine.", e);
-        }
     }
 
     /**
@@ -137,24 +81,6 @@ public class ViewHelper {
      */
     public void setForceDefaultLocale(final boolean forceDefaultLocale) {
         this.forceDefaultLocale = forceDefaultLocale;
-    }
-
-    /**
-     * Sets the base path for resource bundles.
-     * 
-     * @param resourceBundleBase The resourceBundleBase to set.
-     */
-    public void setResourceBundleBase(final String resourceBundleBase) {
-        this.resourceBundleBase = resourceBundleBase;
-    }
-
-    /**
-     * Sets the base path for view templates.
-     * 
-     * @param viewTemplateBase The viewTemplateBase to set.
-     */
-    public void setViewTemplateBase(final String viewTemplateBase) {
-        this.viewTemplateBase = viewTemplateBase;
     }
 
     /**
@@ -184,32 +110,20 @@ public class ViewHelper {
      */
     public void showView(final HttpServletRequest request, final HttpServletResponse response, final String viewName,
             final Map<String, ?> viewContext) {
-        response.setContentType("text/html");
-        response.setCharacterEncoding("UTF-8");
 
-        final VelocityContext velocityContext = new VelocityContext();
-        velocityContext.put("MessageFormat", MessageFormat.class);
-        velocityContext.put("messages", getLocalizedMessages(viewName, selectLocale(request)));
+        request.setAttribute("bundle", String.format("messages.%s", viewName));
+        request.setAttribute("locale", selectLocale(request));
+        for (final Entry<String, ?> entry : viewContext.entrySet()) {
+            request.setAttribute(entry.getKey(), entry.getValue());
+        }
 
-        final String templateName = String.format("%s/%s.html", viewTemplateBase, viewName);
+        final String jsp = String.format("/%s.jsp", viewName);
         try {
-            velocityEngine.mergeTemplate(templateName, "UTF-8", new VelocityContext(viewContext, velocityContext),
-                    response.getWriter());
+            logger.trace("Show view {}.", jsp);
+            request.getRequestDispatcher(jsp).forward(request, response);
         } catch (final Exception e) {
-            throw new UApproveException("Error while merge and writing view.", e);
+            throw new UApproveException("Error while forwarding to view " + jsp, e);
         }
     }
 
-    /**
-     * Get the localized messages.
-     * 
-     * @param resource The resource.
-     * @param locale The locale.
-     * @return Returns the localized strings.
-     */
-    private LocalizedStrings getLocalizedMessages(final String resource, final Locale locale) {
-        final ResourceBundle resourceBundle =
-                ResourceBundle.getBundle(String.format("%s.%s", resourceBundleBase, resource), locale);
-        return new LocalizedStrings(resourceBundle);
-    }
 }
