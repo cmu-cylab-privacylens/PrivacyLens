@@ -111,19 +111,20 @@ public class ViewHelper {
     public void showView(final HttpServletRequest request, final HttpServletResponse response, final String viewName,
             final Map<String, ?> viewContext) {
 
+        request.setAttribute("view", viewName);
         request.setAttribute("bundle", String.format("messages.%s", viewName));
         request.setAttribute("locale", selectLocale(request));
+
         for (final Entry<String, ?> entry : viewContext.entrySet()) {
             request.setAttribute(entry.getKey(), entry.getValue());
         }
 
-        final String jsp = String.format("/%s.jsp", viewName);
+        final String jsp = String.format("/uApprove/%s.jsp", viewName);
+        logger.trace("Show view {}.", jsp);
         try {
-            logger.trace("Show view {}.", jsp);
             request.getRequestDispatcher(jsp).forward(request, response);
         } catch (final Exception e) {
             throw new UApproveException("Error while forwarding to view " + jsp, e);
         }
     }
-
 }
