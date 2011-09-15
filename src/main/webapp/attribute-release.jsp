@@ -39,7 +39,7 @@
 		                    </td>
 		                    <td>
 		                    <c:forEach var="value" items="${attribute.values}">
-		                        ${value} <br />
+		                        <strong>${value}</strong> <br />
 		                    </c:forEach>
 		                    </td>
 		                </tr>
@@ -48,19 +48,21 @@
 	            </table>
             </div>
 
-		    <div id="attributeRelease-consent">
-                <form action="" method="post">
-                    <div style="float:left;">
-			        <c:if test="${allowGeneralConsent}">
-			            <input type="checkbox" id="generalConsent" name="generalConsent" value="true"/>
-			            <label for="generalConsent"><fmt:message key="generalConsent"/></label>
-			        </c:if>
-                    </div>
-                    <div style="float:right;">
-                        <button type="submit"><fmt:message key="confirm"/></button>
-		            </div>
-		            <div style="clear:both;"></div>
-		        </form>
+            <div>
+			    <div id="attributeRelease-consent">
+	                <form action="" method="post" style="padding:10px">
+	                    <div style="float:left;">
+				        <c:if test="${allowGeneralConsent}">
+				            <input type="checkbox" id="generalConsent" name="generalConsent" value="true"/>
+				            <label for="generalConsent"><fmt:message key="generalConsent"/></label>
+				        </c:if>
+	                    </div>
+	                    <div style="float:right;">
+	                        <button type="submit"><fmt:message key="confirm"/></button>
+			            </div>
+			            <div style="clear:both;"></div>
+			        </form>
+			    </div>
 		    </div>    
         </div>
     </div>
