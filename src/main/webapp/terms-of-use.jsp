@@ -1,10 +1,10 @@
 <%@ include file="header.jsp" %>
 <body>
 	<div class="box">
-	    <div class="box-header">
+	    <div style="float:right;">
 	        <img src="<%= request.getContextPath()%>/uApprove/logo.png" alt=""/>
 	    </div>
-	    <div class="box-content">
+	    <div style="float:left;">
 		    <h1> <fmt:message key="title"/> </h1> 
 		    <div id="tou-content">
 	            ${tou.content}
@@ -18,6 +18,7 @@
                     <div style="float:right;">
                         <button type="submit"><fmt:message key="confirm"/></button>
                     </div>
+                    <div style="clear:both;"></div>
 	            </form>
 	        </div>
 	    </div>

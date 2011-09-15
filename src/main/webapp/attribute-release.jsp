@@ -1,49 +1,68 @@
 <%@ include file="header.jsp" %>
 <body>
+    <div class="box">
+        <div style="float:right;">
+            <img src="<%= request.getContextPath()%>/uApprove/logo.png" alt=""/>
+        </div>
+        <div style="float:left;">
+            <p>
+                <a class="tooltip" href="">
+                    <fmt:message key="releaseTo"> <fmt:param value="${relyingParty.name}"/> </fmt:message>
+                    <c:if test="${not empty relyingParty.description}"> <span>${relyingParty.description}</span> </c:if>
+                </a>    
+            </p>
+            
+            <div id="attributeRelease">
+	            <table>
+		            <thead>
+		               <tr>
+		                  <th colspan="2">
+		                      <fmt:message key="attributesHeader"/>
+		                  </th>
+		               </tr>
+		            </thead>
+		            <tbody>
+		            <c:forEach var="attribute" items="${attributes}" varStatus="status">
+	                    <c:choose>
+	                        <c:when test="${status.count % 2 == 0}">
+	                            <c:set var="rowStyle" value="background-color:#E4E5E3;"/>
+	                        </c:when>
+	                        <c:otherwise>
+	                            <c:set var="rowStyle" value=""/>
+	                        </c:otherwise>
+	                    </c:choose>
+		                <tr style="${rowStyle}">
+		                    <td>
+		                       <a class="tooltip" href="">${attribute.name}
+		                          <c:if test="${not empty attribute.description}"> <span>${attribute.description}</span> </c:if>
+		                       </a>
+		                    </td>
+		                    <td>
+		                    <c:forEach var="value" items="${attribute.values}">
+		                        ${value} <br />
+		                    </c:forEach>
+		                    </td>
+		                </tr>
+		           </c:forEach>
+		           </tbody>
+	            </table>
+            </div>
 
-    <div>
-        <a class="tooltip" href="">
-            <fmt:message key="releaseTo"> <fmt:param value="${relyingParty.name}"/> </fmt:message>
-            <c:if test="${not empty relyingParty.description}"> <span>${relyingParty.description}</span> </c:if>
-        </a>
+		    <div id="attributeRelease-consent">
+                <form action="" method="post">
+                    <div style="float:left;">
+			        <c:if test="${allowGeneralConsent}">
+			            <input type="checkbox" id="generalConsent" name="generalConsent" value="true"/>
+			            <label for="generalConsent"><fmt:message key="generalConsent"/></label>
+			        </c:if>
+                    </div>
+                    <div style="float:right;">
+                        <button type="submit"><fmt:message key="confirm"/></button>
+		            </div>
+		            <div style="clear:both;"></div>
+		        </form>
+		    </div>    
+        </div>
     </div>
-    
-    <div>
-	    <table>
-		    <thead>
-		       <tr>
-		          <td colspan="2">
-		              <fmt:message key="attributesHeader"/>
-		          </td>
-		       </tr>
-		    </thead>
-		    <tbody>
-		    <c:forEach var="attribute" items="${attributes}">
-		        <tr>
-		            <td>
-		               <a class="tooltip" href="">${attribute.name}
-		                  <c:if test="${not empty attribute.description}"> <span>${attribute.description}</span> </c:if>
-		               </a>
-		            </td>
-		            <td>
-		            <c:forEach var="value" items="${attribute.values}">
-		                ${value} <br />
-		            </c:forEach>
-		            </td>
-		        </tr>
-	       </c:forEach>
-	       </tbody>
-	    </table>
-    </div>
-    
-    <div>
-        <form action="" method="post">
-        <c:if test="${allowGeneralConsent}">
-            <input type="checkbox" id="generalConsent" name="generalConsent" value="true"/>
-            <label for="generalConsent"><fmt:message key="generalConsent"/></label>
-        </c:if>
-            <button type="submit"><fmt:message key="confirm"/></button>
-        </form>
-    </div>    
 </body>
 <%@ include file="footer.jsp" %>
