@@ -1,0 +1,173 @@
+@charset "UTF-8";
+
+/* Layout-independent adjustments | Layout-unabhängige Anpassungen ----------------------------------- */
+@import url("../../aai_wayf_idp_harmos_v2/css/iehacks.css");
+
+/* Layout-dependent adjustments | Layout-abhängige Anpassungen --------------------------------------- */
+@media screen
+{
+  /*-----------------------------------------------------------------------------------------------------*/
+
+  /**
+   * Bugfix for IE 3-Pixel-Jog Bug
+   *
+   * @bugfix
+   * @affected   IE 5.x/Win, IE6
+   * @css-for    IE 5.x/Win, IE6
+   * @valid      yes
+   */
+
+  * html #col1 {
+  	margin-right: -3px;
+  }
+  * html #col2 {
+  	margin-right: -3px;
+  }
+  * html .index #col2 {
+  	margin-left: -3px;
+	margin-right: 0;
+	width: 21.2727em;
+  }
+  * html .index #col3 {
+  	margin-right: 23.3636em;
+	height: 1%;
+  }
+  * html .c3 #col3 {
+  	margin-right: 23.5454em;
+  }
+  
+  * html #col3_content {
+  	margin-left: -3px;
+	padding-left: 1.7272em;
+  }
+	
+	/*----------------------------------------- Navigation ----------------------------------------*/
+	/*---------------------------------------------------------------------------------------------*/
+	#col1 ul li,
+	#col1 ul li a,
+	#col1 ul li a span.border_b,
+	#col1 ul li a span.border_b span	{
+		zoom: 1;
+	}
+	/*
+	* html .frontpage #col1 ul li a:focus, * html .frontpage #col1 ul li a:hover, * html .frontpage  #col1 ul li a:active, * html .frontpage  #col1 ul li a.current {
+		margin-top: -2px;
+		margin-bottom: -2px;
+		overflow: visible;
+	}
+	*/
+
+  /*-----------------------------------------------------------------------------------------------------*/
+  * html #border_bottom {
+    width: 29px;
+    height: 268px;
+  }
+  
+  * html #footer {
+	width: 74.6666em;
+  }
+  
+  /*-----------------------------------------------------------------------------------------------------*/
+  * html #topnav ul li.fontsizing,
+  * + html #topnav ul li.fontsizing {
+  	margin-top: -0.1em;
+  }
+  
+  /*-----------------------------------------------------------------------------------------------------*/
+  * html ul.orange {
+  	background: url("../../aai_wayf_idp_harmos_v2/images/nav/submenu_gelb_br.gif") no-repeat top right;
+	border-bottom: 1px solid #f0b95d;
+  }
+  * html ul.blue {
+  	background: url("../../aai_wayf_idp_harmos_v2/images/nav/submenu_blau_br.gif") no-repeat top right;
+	border-bottom: 1px solid #4f68a5;
+  }
+  * html ul.grey {
+  	background: url("../../aai_wayf_idp_harmos_v2/images/nav/submenu_grau_br.gif") no-repeat top right;
+	border-bottom: 1px solid #9ea8a7;
+  }
+  
+  /*-----------------------------------------------------------------------------------------------------*/
+  
+  /* Linkbox */
+  * html #whois {
+  	padding-bottom: 0;
+  }
+  
+  * html input.whois_url {
+  	width: 12em;
+  }
+  
+  /* ### Preformatted contents | Vorformatierte Inhalte #### */
+  pre, code, tt { 
+	font-family: monospace;
+	font-size: 109%;
+  }
+
+/*------------------------------------------ Teaserbox ----------------------------------------*/
+/*---------------------------------------------------------------------------------------------*/
+  * html .teaserbox {
+  	position: relative;
+  }
+	
+	.content_container,
+	.content_container .innercontent {
+		zoom: 1;
+	}
+  
+  
+/*----------------------------------------- Subcolumns ----------------------------------------*/
+/*---------------------------------------------------------------------------------------------*/
+  * html .subcolumns .subcm,
+  * html .subcolumns_border {word-wrap:break-word;overflow:hidden}
+  
+ 
+/*----------------------------------------- Oversized ----------------------------------------*/
+/*---------------------------------------------------------------------------------------------*/
+  * html .oversized_content {
+	margin-right: -165%;
+  }
+	
+	
+	/*------------------------------ Navigation AJAX-Frontpage ------------------------------*/
+	/*---------------------------------------------------------------------------------------------*/
+	.frontpage #col1 ul li,
+	.frontpage #col1 ul li a,
+	.frontpage #col1 ul li a span.border_b,
+	.frontpage #col1 ul li a span.border_b span	{
+		zoom: 1;
+	}
+	.frontpage #col1 ul li a:focus, .frontpage #col1 ul li a:hover, .frontpage #col1 ul li a:active, .frontpage #col1 ul li a.current {
+		margin-bottom: -2px;
+		margin-top: -2px;
+		overflow: visible;
+	}
+	.frontpage #col1 ul li a:focus span.border_b span, .frontpage #col1 ul li a:hover span.border_b span, .frontpage #col1 ul li a:active span.border_b span, .frontpage #col1 ul li a.current span.border_b span {
+		padding-top: 6px;
+	}
+	
+	.content_container,
+	.content_container .innercontent	{
+		zoom: 1;
+		height: auto;
+	}
+	* html .frontpage #col3 {
+    	margin-right: 242px;
+	}
+	
+		
+	.frontpage .ie_clearing {
+		display:none;
+	}
+	/* ----------- umantis IE7 hack ------------- */
+	.oversized_content {
+	width: 650px;
+	}
+	
+/*-----------------------------------Jumpbutton-Text IE7 hack  ----------------------------*/
+/*---------------------------------------------------------------------------------------------*/
+	.jumpbutton {
+	padding: 15px 0px 0px 0px;
+	}
+	
+}

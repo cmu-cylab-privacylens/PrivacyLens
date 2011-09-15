@@ -1,0 +1,210 @@
+/* Template */
+
+.shibbolet_bg_wide {
+    width:600px;
+    margin-left: auto;
+    margin-right: auto; 
+    background-color: #FFFFFF;
+   -webkit-box-shadow: 1px 1px 15px #999999;
+    -moz-box-shadow: 1px 1px 15px #999999;
+    box-shadow: 1px 1px 15px #999999;
+    -webkit-border-radius: 8px;
+    -moz-border-radius: 8px;
+    border-radius: 8px;
+    overflow: hidden;
+    padding: 1.268em;
+}
+
+.header {
+    width: 100%;
+}
+
+.menu li {
+    float: left;
+    list-style:none;
+    line-height:35px;
+}
+
+li {
+    padding-right: 10px;
+}
+        
+.menu li.last {
+    
+    background: url("../images/separator.gif") no-repeat scroll left center transparent;
+    padding: 0  0 0 8px;
+    float: left;
+    margin-right:10px;
+    list-style:none;
+}
+
+h1 {
+    font-family:Verdana, Geneva, sans-serif;
+    font-size: 13px;
+    padding-bottom: 12px;
+}
+
+h2 {
+    font-family:Verdana, Geneva, sans-serif;
+    font-size: 12px;
+    font-weight:bold;
+}
+
+h3 {
+    font-family:Verdana, Geneva, sans-serif;
+    font-size: 14px;
+    font-weight:bold;
+}
+
+p {
+    font-family:Verdana, Geneva, sans-serif;
+    font-size: 12px;
+}
+
+.content {
+    width: 100%;
+    float:left;
+}
+
+a {
+    color: #00247D;
+    text-decoration: underline;
+}
+
+a:visited {
+    color: #00247D;
+    text-decoration: underline;
+}
+
+a:focus, a:hover, a:active {
+    color: #F39800;
+    text-decoration: underline;
+}
+.aai_logo {
+    float:left;
+    padding-top: 35px;
+}
+
+.switch_logo {
+    float:right;
+}
+
+.switch_logo_mini {
+    float:right;
+    margin-top: -28px;
+}
+    
+.box-shibbolet {
+    margin-left:auto;
+    margin-right:auto;
+    height:100%x;
+    width:95%;
+    border-style: solid;
+    border-color: #666;
+    border-width: 1px;
+    margin:4px;
+    padding: 10px;
+    text-align: left;
+}
+
+.confirmation-shibbolet {
+    
+    height:30px;
+    width:95%;
+    border-style: solid;
+    border-color: #666;
+    border-width: 1px;
+    background-color: #F0F0F0;
+    margin:4px;
+    padding: 10px;
+    text-align: left;
+}
+
+.confirmation-card {
+    
+    height:80px;
+    width:95%;
+    border-style: solid;
+    border-color: #666;
+    border-width: 1px;
+    background-color: #F0F0F0;
+    margin:4px;
+    padding: 10px;
+    text-align: left;
+}
+
+#idcard
+{
+    font-family:Verdana, Geneva, sans-serif;
+    width:95%;
+    border-collapse:collapse;
+    border:solid 1px;
+    margin:12px;
+}
+
+#idcard td, #idcard th {
+    font-size:12px;
+    padding:3px 7px 2px 7px;
+}
+
+#idcard th  {
+    font-size:18px;
+    border:solid 1px black;
+    text-align:left;
+    padding-top:5px;
+    padding-bottom:4px;
+    background-color:#00247D;
+    color:#ffffff;
+}
+#idcard tr.alt td {
+    color:#000000;
+    background-color:#E4E5E3;
+}
+
+.user {
+    padding:35px 25px 17px 4px;
+}
+
+.login_button {
+    padding-bottom: -90px;
+    float:right;
+    padding-right:15px;
+}
+    
+.menu {
+    background: url(../images/dual_line.gif) repeat-x scroll 0 100% transparent;
+    font-family: Verdana, Geneva, sans-serif;
+    font-size: 12px;
+    line-height: 45px;
+    float: left;
+    padding-left: 2px;
+    width: 100%;
+}
+
+
+/* Tooltip */
+
+a.tooltip {
+    text-decoration: none;
+    position: relative;
+    cursor: default;
+    color: black;
+}
+
+a.tooltip:hover {
+    background: transparent; 
+}
+ 
+a.tooltip span {
+    display: none; 
+}  
+
+a.tooltip:hover span {
+    display: block;
+    border-radius: 5px 5px; -moz-border-radius: 5px; -webkit-border-radius: 5px; 
+    box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.1); -webkit-box-shadow: 5px 5px rgba(0, 0, 0, 0.1); -moz-box-shadow: 5px 5px rgba(0, 0, 0, 0.1);
+    position: absolute; left: 1em; top: 2em; z-index: 99;
+    margin-left: 0; width: 250px;
+    padding: 0.8em 1em;
+    background: #FFFFAA; border: 1px solid #FFAD33;
+}
