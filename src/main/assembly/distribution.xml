@@ -40,8 +40,13 @@
     
     <fileSets>
         <fileSet>
-            <outputDirectory>/webapp</outputDirectory>
-            <directory>src/main/webapp/</directory>
+            <outputDirectory>/</outputDirectory>
+            <directory></directory>
+            <includes>
+                <include>LICENSE</include>
+                <include>README</include>
+                <include>RELEASE-NOTES</include>
+            </includes>
         </fileSet>
     
         <fileSet>
@@ -63,6 +68,11 @@
         <fileSet>
             <outputDirectory>/scripts</outputDirectory>
             <directory>src/main/groovy</directory>
+        </fileSet>
+        
+        <fileSet>
+            <outputDirectory>/webapp</outputDirectory>
+            <directory>src/main/webapp/</directory>
         </fileSet>
     </fileSets>
   
