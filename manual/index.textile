@@ -25,8 +25,17 @@ bq(note). Provide the JDBC driver for your database to the classpath of the IdP.
 
 h2. Configuration Template
 
+Copying the configuration template to the IdPs configuration directory.
+
 * @cp@ (file)"UAPPROVE_INSTALL$/manual/configuration/uApprove.properties":configuration/uApprove.properties @$IDP_HOME$/conf@
 * @cp@ (file)"UAPPROVE_INSTALL$/manual/configuration/uApprove.xml":configuration/uApprove.xml @$IDP_HOME$/conf@
+
+h2. Webapp files
+
+Copying of the web application files like the JSP(Java Server Pages)s, CSS(Cascading Style Sheet) files and images to the IdPs webapp directory:
+
+* @mkdir $IDP_INSTALL$/src/main/webapp/uApprove@
+* @cp UAPPROVE_INSTALL$/webapp/* $IDP_INSTALL$/src/main/webapp/uApprove@
 
 h2. Database Preparation
 

@@ -137,40 +137,73 @@ public class Intercepter implements Filter {
             return;
         }
 
-        final String principalName = LoginHelper.getPrincipalName(servletContext, request);
-        final String relyingPartyId = LoginHelper.getRelyingPartyId(servletContext, request);
-
-        if (touModule.isEnabled() && touModule.requiresToUAcceptance(principalName, relyingPartyId)) {
-            LoginHelper.redirectToServlet(request, response, "/uApprove/TermsOfUse");
+        if (handleTermsOfUse(request, response)) {
             return;
-        } else {
-            if (attributeReleaseModule.isEnabled()) {
-
-                if (LoginHelper.isConsentRevocation(servletContext, request)) {
-                    logger.debug("Consent revovation requested. Clear consent.");
-                    attributeReleaseModule.clearConsent(principalName, relyingPartyId);
-                    LoginHelper.clearConsentRevocation(servletContext, request);
-                }
-
-                logger.debug("Resolving attributes for user {} and relying party {}.", principalName, relyingPartyId);
-                final List<Attribute> attributes =
-                        samlHelper.resolveAttributes(principalName, relyingPartyId, viewHelper.selectLocale(request),
-                                LoginHelper.getSession(request));
-
-                if (attributeReleaseModule.requiresConsent(principalName, relyingPartyId, attributes)) {
-                    LoginHelper.setAttributes(servletContext, request, attributes);
-                    LoginHelper.redirectToServlet(request, response, "/uApprove/AttributeRelease");
-                    return;
-                } else {
-                    chain.doFilter(request, response);
-                    return;
-                }
-            } else {
-                chain.doFilter(request, response);
-                return;
-            }
         }
 
+        if (handleAttributeRelease(request, response)) {
+            return;
+        }
+
+        chain.doFilter(request, response);
+        return;
+    }
+
+    /**
+     * Handles Terms Of Use.
+     * 
+     * @param request The request.
+     * @param response The response.
+     * @return Returns true if ToU were handled.
+     */
+    private boolean handleTermsOfUse(final HttpServletRequest request, final HttpServletResponse response) {
+
+        if (!touModule.isEnabled()) {
+            return false;
+        }
+
+        final String principalName = LoginHelper.getPrincipalName(servletContext, request);
+        final String relyingPartyId = LoginHelper.getRelyingPartyId(servletContext, request);
+        if (touModule.requiresToUAcceptance(principalName, relyingPartyId)) {
+            LoginHelper.redirectToServlet(request, response, "/uApprove/TermsOfUse");
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Handle Attribute Release.
+     * 
+     * @param request The request.
+     * @param response The response.
+     * @return Returns true if the attribute release were handled.
+     */
+    private boolean handleAttributeRelease(final HttpServletRequest request, final HttpServletResponse response) {
+
+        if (!attributeReleaseModule.isEnabled()) {
+            return false;
+        }
+
+        final String principalName = LoginHelper.getPrincipalName(servletContext, request);
+        final String relyingPartyId = LoginHelper.getRelyingPartyId(servletContext, request);
+        final List<Attribute> attributes =
+                samlHelper.resolveAttributes(principalName, relyingPartyId, viewHelper.selectLocale(request),
+                        LoginHelper.getSession(request));
+
+        if (LoginHelper.isConsentRevocation(servletContext, request)) {
+            logger.debug("Consent revovation requested. Clear consent.");
+            attributeReleaseModule.clearConsent(principalName, relyingPartyId);
+            LoginHelper.clearConsentRevocation(servletContext, request);
+        }
+
+        if (attributeReleaseModule.requiresConsent(principalName, relyingPartyId, attributes)) {
+            LoginHelper.setAttributes(servletContext, request, attributes);
+            LoginHelper.redirectToServlet(request, response, "/uApprove/AttributeRelease");
+            return true;
+        }
+
+        return false;
     }
 
     /** {@inheritDoc} */
