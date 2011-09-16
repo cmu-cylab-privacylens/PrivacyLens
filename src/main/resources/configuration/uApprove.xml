@@ -1,78 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:util="http://www.springframework.org/schema/util"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:p="http://www.springframework.org/schema/p" xmlns:util="http://www.springframework.org/schema/util"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
                            http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd
                            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
 
-        
+
     <context:property-placeholder location="classpath:/configuration/uApprove.properties" />
-    
-    <bean id="uApprove.touModule" class="ch.SWITCH.aai.uApprove.tou.ToUModule" init-method="initialize">
-        <property name="enabled" value="${tou.enabled}" />
+
+
+    <bean id="uApprove.touModule" class="ch.SWITCH.aai.uApprove.tou.ToUModule" init-method="initialize"
+        p:enabled="${tou.enabled}" p:compareContent="false">
         <property name="tou">
-            <bean class="ch.SWITCH.aai.uApprove.tou.ToU" init-method="initialize">
-                <property name="version" value="${tou.version}" />
-                <property name="resource" value="${tou.resource}" />
-            </bean>        
+            <bean class="ch.SWITCH.aai.uApprove.tou.ToU" init-method="initialize"
+                p:version="${tou.version}" p:resource="${tou.resource}" />
         </property>
         <property name="relyingParties">
-            <bean class="ch.SWITCH.aai.uApprove.RelyingPartyList">
-                <property name="regularExpressions" value="${services}"/>
-                <property name="blacklist" value="${services.blacklist}"/>
-            </bean>
+            <bean class="ch.SWITCH.aai.uApprove.RelyingPartyList"
+                p:regularExpressions="${services}" p:blacklist="${services.blacklist}" />
         </property>
-        <property name="compareContent" value="false" />
         <property name="storage">
-            <bean class="ch.SWITCH.aai.uApprove.tou.storage.JDBCStorage" init-method="initialize">
-                <property name="dataSource" ref="uApprove.dataSource" />
-                <property name="sqlStatements" value="classpath:/storage/sql-statements.properties"/>
-            </bean>
-        </property>
-    </bean>
-    
-    <bean id="uApprove.attributeReleaseModule" class="ch.SWITCH.aai.uApprove.ar.AttributeReleaseModule" init-method="initialize">
-        <property name="enabled" value="${ar.enabled}" />
-        <property name="allowGeneralConsent" value="${ar.allowGeneralConsent}" />
-        <property name="relyingParties">
-            <bean class="ch.SWITCH.aai.uApprove.RelyingPartyList">
-                <property name="regularExpressions" value="${services}"/>
-                <property name="blacklist" value="${services.blacklist}"/>
-            </bean>
-        </property>
-        <property name="compareAttributeValues" value="false" />
-        <property name="storage">
-            <bean class="ch.SWITCH.aai.uApprove.ar.storage.JDBCStorage" init-method="initialize">
-                <property name="dataSource" ref="uApprove.dataSource" />
-                <property name="sqlStatements" value="classpath:/storage/sql-statements.properties"/>
-            </bean>
+            <bean class="ch.SWITCH.aai.uApprove.tou.storage.JDBCStorage" init-method="initialize"
+                p:dataSource-ref="uApprove.dataSource" p:sqlStatements="classpath:/storage/sql-statements.properties" />
         </property>
     </bean>
 
-    <bean id="uApprove.dataSource" class="com.jolbox.bonecp.BoneCPDataSource" destroy-method="close" depends-on="shibboleth.LogbackLogging">
-        <property name="driverClass" value="${database.driver}" />
-        <property name="jdbcUrl" value="${database.url}" />
-        <property name="username" value="${database.username}" />
-        <property name="password" value="${database.password}" />
-        <property name="minConnectionsPerPartition" value="1" />
-        <property name="maxConnectionsPerPartition" value="20" />
+    <bean id="uApprove.attributeReleaseModule" class="ch.SWITCH.aai.uApprove.ar.AttributeReleaseModule" init-method="initialize"
+        p:enabled="${ar.enabled}" p:allowGeneralConsent="${ar.allowGeneralConsent}" p:compareAttributeValues="false">
+        <property name="relyingParties">
+            <bean class="ch.SWITCH.aai.uApprove.RelyingPartyList"
+                p:regularExpressions="${services}" p:blacklist="${services.blacklist}" />
+        </property>
+        <property name="storage">
+            <bean class="ch.SWITCH.aai.uApprove.ar.storage.JDBCStorage" init-method="initialize"
+                p:dataSource-ref="uApprove.dataSource" p:sqlStatements="classpath:/storage/sql-statements.properties" />
+        </property>
     </bean>
-     
-    <bean id="uApprove.viewHelper" class="ch.SWITCH.aai.uApprove.ViewHelper" init-method="initialize">
-        <property name="defaultLocale" value="${view.defaultLocale}" />
-        <property name="forceDefaultLocale" value="${view.forceDefaultLocale}" />
-    </bean>
-    
-    <bean id="uApprove.samlHelper" class="ch.SWITCH.aai.uApprove.ar.SAMLHelper" init-method="initialize">
-        <property name="attributeAuthority" ref="shibboleth.SAML2AttributeAuthority" />
-        <property name="relyingPartyConfigurationManager" ref="shibboleth.RelyingPartyConfigurationManager" />
+
+    <bean id="uApprove.dataSource" class="com.jolbox.bonecp.BoneCPDataSource" destroy-method="close" depends-on="shibboleth.LogbackLogging"
+        p:driverClass="${database.driver}" p:jdbcUrl="${database.url}"
+        p:username="${database.username}" p:password="${database.password}"
+        p:minConnectionsPerPartition="1" p:maxConnectionsPerPartition="20" />
+
+    <bean id="uApprove.viewHelper" class="ch.SWITCH.aai.uApprove.ViewHelper" init-method="initialize"
+        p:defaultLocale="${view.defaultLocale}" p:forceDefaultLocale="${view.forceDefaultLocale}" />
+
+    <bean id="uApprove.samlHelper" class="ch.SWITCH.aai.uApprove.ar.SAMLHelper" init-method="initialize"
+        p:attributeAuthority-ref="shibboleth.SAML2AttributeAuthority" p:relyingPartyConfigurationManager-ref="shibboleth.RelyingPartyConfigurationManager">
         <property name="attributeProcessor">
-            <bean class="ch.SWITCH.aai.uApprove.ar.AttributeProcessor">
-                <property name="blacklist" value="${ar.attributes.blacklist}" />
-                <property name="order" value="${ar.attributes.order}" />
-            </bean>
+            <bean class="ch.SWITCH.aai.uApprove.ar.AttributeProcessor"
+                p:blacklist="${ar.attributes.blacklist}" p:order="${ar.attributes.order}" />
         </property>
     </bean>
 </beans>

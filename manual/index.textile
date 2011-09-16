@@ -17,15 +17,20 @@ h2. Assumptions
 
 h2. Library Installation
 
-* @cp $UAPPROVE_INSTALL$/lib/uApprove-#version#.jar $IDP_INSTALL$/lib@
-* @cp $UAPPROVE_INSTALL$/lib/jdbc/*.jar $IDP_INSTALL$/lib@
-bq(note). Provide the JDBC driver for your database to the classpath of the IdP. Assure that there is only one version present. You might use the provided MySQL JDBC driver.
+Copying the libraries to the IdPs library directory:
 
-* @cp $UAPPROVE_INSTALL$/lib/jdbc/optional/mysql-connector-java-#version#.jar $IDP_INSTALL$/lib@
+* @cp $UAPPROVE_INSTALL$/lib/*.jar $IDP_INSTALL$/lib@
+* @cp $UAPPROVE_INSTALL$/lib/jdbc/*.jar $IDP_INSTALL$/lib@
+
+Provide the JDBC connector for your database to the classpath of the IdP:
+
+* @cp $UAPPROVE_INSTALL$/lib/jdbc/optional/#jdbc-connector#.jar $IDP_INSTALL$/lib@
+
+bq(note).  Assure that there is only one version present. You might use the provided MySQL or HSQL JDBC connector.
 
 h2. Configuration Template
 
-Copying the configuration template to the IdPs configuration directory.
+Copying the configuration template to the IdPs configuration directory:
 
 * @cp@ (file)"UAPPROVE_INSTALL$/manual/configuration/uApprove.properties":configuration/uApprove.properties @$IDP_HOME$/conf@
 * @cp@ (file)"UAPPROVE_INSTALL$/manual/configuration/uApprove.xml":configuration/uApprove.xml @$IDP_HOME$/conf@
@@ -47,7 +52,6 @@ bq(note). The following database parameters are examples.
 * Create the initial table structures using the schemas:
 ** "(file)$UAPPROVE_INSTALL$/manual/storage/attribute-release-schema.sql":storage/attribute-release-schema.sql.
 ** "(file)$UAPPROVE_INSTALL$/manual/storage/terms-of-use-schema.sql":storage/terms-of-use-schema.sql.
-
 
 h1. Basic Deployment
 
@@ -139,6 +143,8 @@ Optionally update your JDBC driver. You might use the provided MySQL JDBC driver
 
 bq(warning). Verify that the IdP classpath at @$IDP_INSTALL$/lib@ doesn't contain multiple versions of the same library.
 
+bq(note). Optionally update the web application and configuration files if you do not have any customizations.
+It is recommended to backup the old files first.
 
 To finish the upgrade of uApprove the IdP must be re-deployed:
 
@@ -149,9 +155,11 @@ h2. Upgrade from uApprove < 2.3
 * Configuration files: Please use the new configuration file and taylor them to your needs.
 * Database Migration: It is possible to migrate ToU acceptance and attribute release consent data using the "provided data migration script":#Upgrade.databaseMigration.
 
-bq(note). TODO Note about: _Terms Of Use Content Comparison_ and _Attribute Value Comparison_
+bq(note). If _Terms Of Use Content Comparison_ and/or _Attribute Value Comparison_ feature will be used, the lecacy database entries can not be used and must no be migrated.
 
 h3(#Upgrade.databaseMigration). Database Migration
+
+Migrate lecacy database to the new database:
 
 bc. 
 java -cp "$UAPPROVE_INSTALL$/scripts/lib/*.jar:$UAPPROVE_INSTALL$/lib/jdbc/optional/*.jar" groovy.ui.GroovyMain \
@@ -163,6 +171,8 @@ h1. Advanced Deployment
 This sections contains advanced configuration topics.
 
 h2. Reset Attribute Release Consent
+
+TODO
 
 Add a checkbox to @$IDP_INSTALL$/src/main/webapp/login.jsp@
 
@@ -176,6 +186,8 @@ bc..
 h2. Storage
 
 h3. File-only
+
+TODO
 
 @uApprove.properties@
 
@@ -195,7 +207,7 @@ java -jar $HSQLDB_HOME$/lib/sqltool.jar \
   --inlineRC=url=jdbc:hsqldb:file:/var/opt/uApprove/hsql.db,user=SA,password= \
   $UAPPROVE_INSTALL$/manual/storage/attribute-relase-schema.sql /tmp/shutdown
 
-TODO
+
 
 h3. Custom SQL Statements
 
@@ -211,7 +223,7 @@ Custom storage implementations might be provided in future. Some ideas are:
 
 * NOP(No Operation) Storage: This basically will retrieve users ToU acceptance and/or attribute release consent without remembering. This implies _alwaysRequireToUAcceptance_ and/or _alwaysRequireConsent_.
 * Cookie based Storage: This will remember users consent within a cookie. It could stored for just the session or some defined period (e.g., 10 days).
-* In Memory Storage: Already possible with @mem@ HSQLDB. Will store consent as long as the IdP process is alive.
+* In Memory Storage: Already possible with @mem@ HSQLDB. Will store consent as long as the IdP process is alive. Needs DB shema initialization.
 
 h2. Templates
 
@@ -293,4 +305,8 @@ bc. <PermitValueRule xsi:type="ua:AttributeInMetadata" onlyIfRequired="false">
 h2. Other
 
 bq(note). Other topics will be added on request.
+
+h1. Feedback
+
+Send general questions and comments to "aai@switch.ch":mailto:aai@switch.ch. For bug reports, please use our "issue tracking":http://forge.switch.ch/redmine/projects/uapprove.
 

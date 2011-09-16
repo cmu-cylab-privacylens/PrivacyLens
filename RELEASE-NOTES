@@ -1,4 +1,13 @@
 Release 2.3.0 2011-09-xx
 ------------------------
+Rewrite of the uApprove IdP extensions with the following main goals:
+- Simplify installation, configuration and maintenance.
+- Simplify customization.
+- Refactor storage module which had some issues concerning race
+  conditions.
 
- - TODO
+New functionality:
+- Relying Party blacklist/whitelist separate for the
+  ToU and Attribute Release Module
+- Optional ToU content comparing.
+- Optional attribute value(s) comparing. 

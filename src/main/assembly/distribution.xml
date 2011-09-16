@@ -12,6 +12,7 @@
             <outputDirectory>/lib</outputDirectory>
             <includes>
                 <include>ch.SWITCH.aai:uApprove</include>
+                <include>javax.servlet:jstl</include>
             </includes>
         </dependencySet>
         <dependencySet>
