@@ -5,11 +5,8 @@
             <img src="<%= request.getContextPath()%>/uApprove/logo.png" alt=""/>
         </div>
         <div style="float:left;">
-            <p>
-                <a class="tooltip" href="">
-                    <fmt:message key="releaseTo"> <fmt:param value="${relyingParty.name}"/> </fmt:message>
-                    <c:if test="${not empty relyingParty.description}"> <span>${relyingParty.description}</span> </c:if>
-                </a>    
+            <p title="${relyingParty.description}">
+                <fmt:message key="releaseTo"> <fmt:param value="${relyingParty.name}"/> </fmt:message>
             </p>
             
             <div id="attributeRelease">
@@ -32,10 +29,8 @@
 	                        </c:otherwise>
 	                    </c:choose>
 		                <tr style="${rowStyle}">
-		                    <td>
-		                       <a class="tooltip" href="">${attribute.name}
-		                          <c:if test="${not empty attribute.description}"> <span>${attribute.description}</span> </c:if>
-		                       </a>
+		                    <td title="${attribute.description}">
+		                      ${attribute.name}
 		                    </td>
 		                    <td>
 		                    <c:forEach var="value" items="${attribute.values}">

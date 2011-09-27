@@ -88,31 +88,3 @@ a:focus, a:hover, a:active {
     background-color:#00247D;
     color: white;
 }
-
-
-/* Tooltip */
-
-a.tooltip {
-    text-decoration: none;
-    position: relative;
-    cursor: default;
-    color: black;
-}
-
-a.tooltip:hover {
-    background: transparent; 
-}
- 
-a.tooltip span {
-    display: none; 
-}  
-
-a.tooltip:hover span {
-    display: block;
-    border-radius: 5px 5px; -moz-border-radius: 5px; -webkit-border-radius: 5px; 
-    box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.1); -webkit-box-shadow: 5px 5px rgba(0, 0, 0, 0.1); -moz-box-shadow: 5px 5px rgba(0, 0, 0, 0.1);
-    position: absolute; left: 0em; top: 1em; z-index: 99;
-    margin-left: 0; width: 250px;
-    padding: 0.8em 1em;
-    background: white; border: 1px solid #00247D;
-}
