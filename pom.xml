@@ -81,6 +81,7 @@
             <groupId>com.jolbox</groupId>
             <artifactId>bonecp</artifactId>
             <version>${bonecp.version}</version>
+            <scope>runtime</scope>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -91,7 +92,6 @@
                     <artifactId>log4j</artifactId>
                 </exclusion>
             </exclusions>
-            <scope>runtime</scope>
         </dependency>
         
         <!-- Optional JDBC Connectors -->
@@ -231,8 +231,8 @@
 
     <licenses>
         <license>
-            <name>Apache 2</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <name>BSD</name>
+            <url>http://www.opensource.org/licenses/BSD-3-Clause</url>
         </license>
     </licenses>
 

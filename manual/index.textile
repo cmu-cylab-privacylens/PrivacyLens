@@ -5,7 +5,7 @@ h1. Installation
 
 h2. Prerequisites
 
-* Shibboleth Identity Provider 2.3.3.
+* Shibboleth Identity Provider 2.3 or greater.
 * Database which supports JDBC.
 
 h2. Assumptions
@@ -125,7 +125,7 @@ h2. Deployment
 
 To activate uApprove the IdP must be re-deployed:
 
-bc. $IDP_INSTALL$/instal.sh
+bc. $IDP_INSTALL$/install.sh
 
 
 h1. Upgrade
@@ -148,7 +148,7 @@ It is recommended to backup the old files first.
 
 To finish the upgrade of uApprove the IdP must be re-deployed:
 
-bc. $IDP_INSTALL$/instal.sh
+bc. $IDP_INSTALL$/install.sh
 
 h2. Upgrade from uApprove < 2.3
 
@@ -187,9 +187,8 @@ h2. Storage
 
 h3. File-only
 
-TODO
-
-@uApprove.properties@
+For a simple deployment a file only database can be used. HSQL provides such an option.
+Define the according database properties in @uApprove.properties@:
 
 bc. 
 database.driver             = org.hsqldb.jdbcDriver
@@ -197,6 +196,7 @@ database.url                = jdbc:hsqldb:file:/var/opt/uApprove/hsql.db
 database.username           = SA
 database.password           = 
  
+Initializing the database with the provided schemas:
 
 bc. 
 echo "SHUTDOWN;" > /tmp/shutdown
@@ -206,8 +206,11 @@ java -jar $HSQLDB_HOME$/lib/sqltool.jar \
 java -jar $HSQLDB_HOME$/lib/sqltool.jar \
   --inlineRC=url=jdbc:hsqldb:file:/var/opt/uApprove/hsql.db,user=SA,password= \
   $UAPPROVE_INSTALL$/manual/storage/attribute-relase-schema.sql /tmp/shutdown
+  
+  
+bq(note). @$HSQLDB_HOME$@ defines the location where the downloaded "HSQL distribution":http://hsqldb.org/ is extracted.
 
-
+bq(note). Assure that the user running the container (e.g., tomcat) has write permission to the db directory.
 
 h3. Custom SQL Statements
 
