@@ -44,7 +44,6 @@ import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 public abstract class AbstractJDBCStorage {
 
     /** Class logger. */
-    @SuppressWarnings("unused")
     private final Logger logger = LoggerFactory.getLogger(AbstractJDBCStorage.class);
 
     /** The SQL Statements. */
@@ -72,8 +71,8 @@ public abstract class AbstractJDBCStorage {
         try {
             sqlStatements.load(sqlStamentsResource.getInputStream());
         } catch (final IOException e) {
-            throw new UApproveException("Error reading SQL statements from resource "
-                    + sqlStamentsResource.getDescription(), e);
+            logger.error("Error reading SQL statements from resource {}.", sqlStamentsResource.getDescription(), e);
+            throw new IllegalArgumentException(e);
         }
     }
 

@@ -34,7 +34,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
-import ch.SWITCH.aai.uApprove.UApproveException;
 import ch.SWITCH.aai.uApprove.Util;
 
 /** Represents the terms of use. */
@@ -68,7 +67,8 @@ public class ToU {
             content = Util.readResource(resource);
             logger.trace("Initializing ToU from {}.", resource.getDescription());
         } catch (final IOException e) {
-            throw new UApproveException("Error while reading ToU resource " + resource.getDescription(), e);
+            logger.error("Error while reading ToU resource {}.", resource.getDescription(), e);
+            throw new IllegalArgumentException(e);
         }
     }
 

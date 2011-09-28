@@ -105,8 +105,10 @@ public class Intercepter implements Filter {
     /** {@inheritDoc} */
     public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
             throws IOException, ServletException {
+
         Validate.isTrue(request instanceof HttpServletRequest, "Not an HttpServletRequest.");
         Validate.isTrue(response instanceof HttpServletResponse, "Not an HttpServletResponse.");
+
         intercept((HttpServletRequest) request, (HttpServletResponse) response, chain);
     }
 
@@ -124,15 +126,14 @@ public class Intercepter implements Filter {
                     throws IOException, ServletException {
 
         if (authnContextClassRef != null
-                && !StringUtils.equals(authnContextClassRef,
-                        LoginHelper.getAuthContextClassRef(servletContext, request))) {
+                && !StringUtils.equals(authnContextClassRef, IdPHelper.getAuthContextClassRef(servletContext, request))) {
             chain.doFilter(request, response);
             return;
         }
 
-        if (!LoginHelper.isAuthenticated(servletContext, request, response)) {
+        if (!IdPHelper.isAuthenticated(servletContext, request, response)) {
             logger.trace("Request is not authenticated.");
-            LoginHelper.testAndSetConsentRevocation(servletContext, request);
+            IdPHelper.testAndSetConsentRevocation(servletContext, request);
             chain.doFilter(request, response);
             return;
         }
@@ -162,10 +163,10 @@ public class Intercepter implements Filter {
             return false;
         }
 
-        final String principalName = LoginHelper.getPrincipalName(servletContext, request);
-        final String relyingPartyId = LoginHelper.getRelyingPartyId(servletContext, request);
+        final String principalName = IdPHelper.getPrincipalName(servletContext, request);
+        final String relyingPartyId = IdPHelper.getRelyingPartyId(servletContext, request);
         if (touModule.requiresToUAcceptance(principalName, relyingPartyId)) {
-            LoginHelper.redirectToServlet(request, response, "/uApprove/TermsOfUse");
+            IdPHelper.redirectToServlet(servletContext, request, response, "/uApprove/TermsOfUse");
             return true;
         }
 
@@ -185,21 +186,21 @@ public class Intercepter implements Filter {
             return false;
         }
 
-        final String principalName = LoginHelper.getPrincipalName(servletContext, request);
-        final String relyingPartyId = LoginHelper.getRelyingPartyId(servletContext, request);
+        final String principalName = IdPHelper.getPrincipalName(servletContext, request);
+        final String relyingPartyId = IdPHelper.getRelyingPartyId(servletContext, request);
         final List<Attribute> attributes =
                 samlHelper.resolveAttributes(principalName, relyingPartyId, viewHelper.selectLocale(request),
-                        LoginHelper.getSession(request));
+                        IdPHelper.getSession(request));
 
-        if (LoginHelper.isConsentRevocation(servletContext, request)) {
+        if (IdPHelper.isConsentRevocation(servletContext, request)) {
             logger.debug("Consent revovation requested. Clear consent.");
             attributeReleaseModule.clearConsent(principalName, relyingPartyId);
-            LoginHelper.clearConsentRevocation(servletContext, request);
+            IdPHelper.clearConsentRevocation(servletContext, request);
         }
 
         if (attributeReleaseModule.requiresConsent(principalName, relyingPartyId, attributes)) {
-            LoginHelper.setAttributes(servletContext, request, attributes);
-            LoginHelper.redirectToServlet(request, response, "/uApprove/AttributeRelease");
+            IdPHelper.setAttributes(servletContext, request, attributes);
+            IdPHelper.redirectToServlet(servletContext, request, response, "/uApprove/AttributeRelease");
             return true;
         }
 

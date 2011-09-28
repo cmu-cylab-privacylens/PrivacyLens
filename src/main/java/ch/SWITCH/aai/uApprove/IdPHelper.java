@@ -37,24 +37,27 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.Validate;
+import org.opensaml.ws.transport.http.HttpServletRequestAdapter;
+import org.opensaml.ws.transport.http.HttpServletResponseAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.SWITCH.aai.uApprove.ar.Attribute;
+import edu.internet2.middleware.shibboleth.common.profile.AbstractErrorHandler;
 import edu.internet2.middleware.shibboleth.common.session.Session;
 import edu.internet2.middleware.shibboleth.idp.authn.LoginContext;
 import edu.internet2.middleware.shibboleth.idp.util.HttpServletHelper;
 
 /**
- * Provides helper functions to retrieve information about the login from the IdP.
+ * Provides helper functions to retrieve information from the IdP.
  */
-public final class LoginHelper {
+public final class IdPHelper {
 
     /** Class logger. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(LoginHelper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IdPHelper.class);
 
     /** Default constructor for utility classes is private. */
-    private LoginHelper() {
+    private IdPHelper() {
     }
 
     /**
@@ -175,26 +178,30 @@ public final class LoginHelper {
             LOGGER.trace("Redirect to {}.", profileUrl);
             response.sendRedirect(profileUrl);
         } catch (final IOException e) {
-            throw new UApproveException("Error sending user back to profile handler at " + profileUrl, e);
+            LOGGER.error("Error redirecting to profile handler at {}.", profileUrl, e);
+            handleException(servletContext, request, response, e);
         }
     }
 
     /**
      * Redirects to a servlet.
      * 
+     * @param servletContext The servlet context.
      * @param request The HTTP request.
      * @param response The HTTP response.
      * @param servletPath The servlet path.
      */
-    public static void redirectToServlet(final HttpServletRequest request, final HttpServletResponse response,
-            final String servletPath) {
+    public static void redirectToServlet(final ServletContext servletContext, final HttpServletRequest request,
+            final HttpServletResponse response, final String servletPath) {
         final String servletUrl = HttpServletHelper.getContextRelativeUrl(request, servletPath).buildURL();
         try {
             LOGGER.trace("Redirect to {}.", servletUrl);
             response.sendRedirect(servletUrl);
         } catch (final IOException e) {
-            throw new UApproveException("Error sending user to servlet " + servletUrl, e);
+            LOGGER.error("Error redirecting to servlet at {}.", servletUrl, e);
+            handleException(servletContext, request, response, e);
         }
+
     }
 
     /**
@@ -266,5 +273,23 @@ public final class LoginHelper {
         @SuppressWarnings("unchecked") final List<Attribute> attributes =
                 (List<Attribute>) loginContext.getProperty("uApprove.attributes");
         return attributes;
+    }
+
+    /**
+     * Handles exception by using the IdPs error handler.
+     * 
+     * @param servletContext The servlet context
+     * @param request The HTTP request.
+     * @param response The HTTP response.
+     * @param exception The exception.
+     */
+    public static void handleException(final ServletContext servletContext, final HttpServletRequest request,
+            final HttpServletResponse response, final Exception exception) {
+        request.setAttribute(AbstractErrorHandler.ERROR_KEY, exception);
+        HttpServletHelper
+                .getProfileHandlerManager(servletContext)
+                .getErrorHandler()
+                .processRequest(new HttpServletRequestAdapter(request),
+                        new HttpServletResponseAdapter(response, request.isSecure()));
     }
 }

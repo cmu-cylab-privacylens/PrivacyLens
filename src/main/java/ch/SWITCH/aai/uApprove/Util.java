@@ -46,7 +46,6 @@ import org.springframework.core.io.Resource;
 public final class Util {
 
     /** Class logger. */
-    @SuppressWarnings("unused")
     private static final Logger LOGGER = LoggerFactory.getLogger(Util.class);
 
     /** The message digest. */
@@ -56,7 +55,8 @@ public final class Util {
         try {
             sha256 = MessageDigest.getInstance("SHA-256");
         } catch (final NoSuchAlgorithmException e) {
-            throw new UApproveException("Error getting message digest instance.", e);
+            LOGGER.error("Error getting message digest instance.", e);
+            throw new IllegalStateException(e);
         }
     }
 

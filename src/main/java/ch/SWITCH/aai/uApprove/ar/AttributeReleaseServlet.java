@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import ch.SWITCH.aai.uApprove.LoginHelper;
+import ch.SWITCH.aai.uApprove.IdPHelper;
 import ch.SWITCH.aai.uApprove.ViewHelper;
 
 /**
@@ -81,13 +81,13 @@ public class AttributeReleaseServlet extends HttpServlet {
     /** {@inheritDoc} */
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException,
             IOException {
-        final String relyingPartyId = LoginHelper.getRelyingPartyId(getServletContext(), req);
-        final List<Attribute> attributes = LoginHelper.getAttributes(getServletContext(), req);
+        final String relyingPartyId = IdPHelper.getRelyingPartyId(getServletContext(), req);
+        final List<Attribute> attributes = IdPHelper.getAttributes(getServletContext(), req);
         final Map<String, Object> context = new HashMap<String, Object>();
         context.put("relyingParty", samlHelper.readRelyingParty(relyingPartyId, viewHelper.selectLocale(req)));
         context.put("attributes", attributes);
         context.put("allowGeneralConsent", attributeReleaseModule.isAllowGeneralConsent());
-        viewHelper.showView(req, resp, "attribute-release", context);
+        viewHelper.showView(getServletContext(), req, resp, "attribute-release", context);
     }
 
     /** {@inheritDoc} */
@@ -97,9 +97,9 @@ public class AttributeReleaseServlet extends HttpServlet {
         final boolean generalConsent =
                 attributeReleaseModule.isAllowGeneralConsent()
                         && BooleanUtils.toBoolean(req.getParameter("generalConsent"));
-        final String principalName = LoginHelper.getPrincipalName(getServletContext(), req);
-        final String relyingPartyId = LoginHelper.getRelyingPartyId(getServletContext(), req);
-        final List<Attribute> attributes = LoginHelper.getAttributes(getServletContext(), req);
+        final String principalName = IdPHelper.getPrincipalName(getServletContext(), req);
+        final String relyingPartyId = IdPHelper.getRelyingPartyId(getServletContext(), req);
+        final List<Attribute> attributes = IdPHelper.getAttributes(getServletContext(), req);
 
         if (generalConsent) {
             logger.debug("Create general consent for {}", principalName);
@@ -109,6 +109,6 @@ public class AttributeReleaseServlet extends HttpServlet {
             attributeReleaseModule.consentAttributeRelease(principalName, relyingPartyId, attributes);
         }
 
-        LoginHelper.returnToIdP(getServletContext(), req, resp);
+        IdPHelper.returnToIdP(getServletContext(), req, resp);
     }
 }

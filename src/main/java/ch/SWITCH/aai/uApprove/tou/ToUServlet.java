@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import ch.SWITCH.aai.uApprove.LoginHelper;
+import ch.SWITCH.aai.uApprove.IdPHelper;
 import ch.SWITCH.aai.uApprove.ViewHelper;
 
 /**
@@ -77,7 +77,7 @@ public class ToUServlet extends HttpServlet {
             IOException {
         final Map<String, Object> context = new HashMap<String, Object>();
         context.put("tou", touModule.getTou());
-        viewHelper.showView(req, resp, "terms-of-use", context);
+        viewHelper.showView(getServletContext(), req, resp, "terms-of-use", context);
     }
 
     /** {@inheritDoc} */
@@ -85,11 +85,11 @@ public class ToUServlet extends HttpServlet {
             IOException {
 
         if (BooleanUtils.toBoolean(req.getParameter("accept"))) {
-            final String principalName = LoginHelper.getPrincipalName(getServletContext(), req);
+            final String principalName = IdPHelper.getPrincipalName(getServletContext(), req);
             touModule.acceptToU(principalName);
         }
 
-        LoginHelper.returnToIdP(getServletContext(), req, resp);
+        IdPHelper.returnToIdP(getServletContext(), req, resp);
     }
 
 }

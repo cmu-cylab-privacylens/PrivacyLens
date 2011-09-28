@@ -46,7 +46,6 @@ import org.opensaml.saml2.metadata.provider.MetadataProviderException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.SWITCH.aai.uApprove.UApproveException;
 import edu.internet2.middleware.shibboleth.common.attribute.AttributeRequestException;
 import edu.internet2.middleware.shibboleth.common.attribute.BaseAttribute;
 import edu.internet2.middleware.shibboleth.common.attribute.provider.SAML2AttributeAuthority;
@@ -133,7 +132,8 @@ public class SAMLHelper {
         try {
             baseAttributes = attributeAuthority.getAttributes(requestCtx);
         } catch (final AttributeRequestException e) {
-            throw new UApproveException("Error while retrieving attributes for " + principalName, e);
+            logger.error("Error while retrieving attributes for {}.", principalName, e);
+            throw new IllegalStateException(e);
         }
 
         final List<Attribute> attributes = new ArrayList<Attribute>();
@@ -153,13 +153,6 @@ public class SAMLHelper {
             logger.trace("Attribute: {} {}, localized names {}, localized descriptions {}.", new Object[] {
                     baseAttribute.getId(), attributeValues, baseAttribute.getDisplayNames().keySet(),
                     baseAttribute.getDisplayDescriptions().keySet(),});
-
-            logger.debug("{}", baseAttribute.getDisplayNames());
-            logger.debug("{}", locale);
-            logger.debug("{}", locale.getLanguage());
-            logger.debug("{}", baseAttribute.getDisplayNames().containsKey(locale));
-            logger.debug("{}", baseAttribute.getDisplayNames().containsKey(locale.getLanguage()));
-
             attributes.add(new Attribute(baseAttribute.getId(), baseAttribute.getDisplayNames().get(locale),
                     baseAttribute.getDisplayDescriptions().get(locale), attributeValues));
         }
@@ -188,14 +181,16 @@ public class SAMLHelper {
         try {
             localEntityMetadata = metadataProvider.getEntityDescriptor(providerId);
         } catch (final MetadataProviderException e) {
-            throw new UApproveException("Error while retrieving metadata descriptor for " + providerId, e);
+            logger.error("Error while retrieving metadata descriptor for {}", providerId, e);
+            throw new IllegalStateException(e);
         }
 
         EntityDescriptor peerEntityMetadata = null;
         try {
             peerEntityMetadata = metadataProvider.getEntityDescriptor(relyingPartyId);
         } catch (final MetadataProviderException e) {
-            throw new UApproveException("Error while retrieving metadata descriptor for " + relyingPartyId, e);
+            logger.error("Error while retrieving metadata descriptor for {}.", relyingPartyId, e);
+            throw new IllegalStateException(e);
         }
 
         @SuppressWarnings("rawtypes") final BaseSAMLProfileRequestContext<?, ?, ?, ?> requestCtx =
@@ -232,7 +227,8 @@ public class SAMLHelper {
                 return new RelyingParty(relyingPartyId);
             }
         } catch (final MetadataProviderException e) {
-            throw new UApproveException("Error while retrieving metadata descriptor for " + relyingPartyId, e);
+            logger.error("Error while retrieving metadata descriptor for {}.", relyingPartyId, e);
+            throw new IllegalStateException(e);
         }
         final AttributeConsumingService attrService = getAttributeConsumingService(entityDescriptor);
         if (attrService == null) {

@@ -31,6 +31,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -103,13 +104,14 @@ public class ViewHelper {
     /**
      * Renders and shows the view.
      * 
+     * @param servletContext The servlet context;
      * @param request The HTTP request.
      * @param response The HTTP response.
      * @param viewName The view name.
      * @param viewContext The view context.
      */
-    public void showView(final HttpServletRequest request, final HttpServletResponse response, final String viewName,
-            final Map<String, ?> viewContext) {
+    public void showView(final ServletContext servletContext, final HttpServletRequest request,
+            final HttpServletResponse response, final String viewName, final Map<String, ?> viewContext) {
 
         request.setAttribute("view", viewName);
         request.setAttribute("bundle", String.format("messages.%s", viewName));
@@ -124,7 +126,8 @@ public class ViewHelper {
         try {
             request.getRequestDispatcher(jsp).forward(request, response);
         } catch (final Exception e) {
-            throw new UApproveException("Error while forwarding to view " + jsp, e);
+            logger.error("Error while forwarding to view {}.", jsp, e);
+            IdPHelper.handleException(servletContext, request, response, e);
         }
     }
 }
