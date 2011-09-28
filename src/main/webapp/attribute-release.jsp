@@ -34,7 +34,7 @@
 		                    </td>
 		                    <td>
 		                    <c:forEach var="value" items="${attribute.values}">
-		                        <strong>${value}</strong> <br />
+		                        <strong>${fn:replace(value, '$', '<br />')}</strong> <br />
 		                    </c:forEach>
 		                    </td>
 		                </tr>
