@@ -36,6 +36,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
@@ -76,7 +77,8 @@ public final class Util {
         final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(resource.getInputStream()));
         String line = null;
         while ((line = bufferedReader.readLine()) != null) {
-            stringBuilder.append(line + "\n");
+            stringBuilder.append(line);
+            stringBuilder.append("\n");
         }
         bufferedReader.close();
         return stringBuilder.toString();
@@ -100,6 +102,7 @@ public final class Util {
      * @return Returns a list of Strings.
      */
     public static List<String> stringToList(final String string) {
-        return Arrays.asList(string.split("\\s+"));
+
+        return Arrays.asList(StringUtils.trimToEmpty(string).split("\\s+"));
     }
 }

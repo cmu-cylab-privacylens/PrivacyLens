@@ -29,6 +29,7 @@ package ch.SWITCH.aai.uApprove.tou;
 
 import java.io.IOException;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +55,7 @@ public class ToU {
      * @param version The version of the terms of use to set.
      */
     public void setVersion(final String version) {
-        this.version = version;
+        this.version = StringUtils.trimToEmpty(version);
     }
 
     /**

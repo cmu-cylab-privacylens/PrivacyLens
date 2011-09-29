@@ -109,7 +109,12 @@ public class Intercepter implements Filter {
         Validate.isTrue(request instanceof HttpServletRequest, "Not an HttpServletRequest.");
         Validate.isTrue(response instanceof HttpServletResponse, "Not an HttpServletResponse.");
 
-        intercept((HttpServletRequest) request, (HttpServletResponse) response, chain);
+        try {
+            intercept((HttpServletRequest) request, (HttpServletResponse) response, chain);
+        } catch (final Throwable t) {
+            logger.error("Error while intercepting request.", t);
+            IdPHelper.handleException(servletContext, (HttpServletRequest) request, (HttpServletResponse) response, t);
+        }
     }
 
     /**

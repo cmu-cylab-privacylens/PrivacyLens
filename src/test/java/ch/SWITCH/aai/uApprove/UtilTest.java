@@ -27,6 +27,8 @@
 
 package ch.SWITCH.aai.uApprove;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -53,5 +55,9 @@ public class UtilTest {
         Assert.assertEquals(Util.stringToList("1 2 3").size(), 3);
         Assert.assertEquals(Util.stringToList("1  2  3").size(), 3);
         Assert.assertEquals(Util.stringToList("1\n2\n3").size(), 3);
+
+        final List<String> values = Util.stringToList("  1    \n 2  ");
+        Assert.assertEquals(values.get(0), "1");
+        Assert.assertEquals(values.get(1), "2");
     }
 }

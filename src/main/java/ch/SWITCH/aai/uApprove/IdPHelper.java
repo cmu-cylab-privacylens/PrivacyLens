@@ -281,11 +281,11 @@ public final class IdPHelper {
      * @param servletContext The servlet context
      * @param request The HTTP request.
      * @param response The HTTP response.
-     * @param exception The exception.
+     * @param t The exception.
      */
     public static void handleException(final ServletContext servletContext, final HttpServletRequest request,
-            final HttpServletResponse response, final Exception exception) {
-        request.setAttribute(AbstractErrorHandler.ERROR_KEY, exception);
+            final HttpServletResponse response, final Throwable t) {
+        request.setAttribute(AbstractErrorHandler.ERROR_KEY, t);
         HttpServletHelper
                 .getProfileHandlerManager(servletContext)
                 .getErrorHandler()
