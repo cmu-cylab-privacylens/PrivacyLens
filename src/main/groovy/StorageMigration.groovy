@@ -39,7 +39,7 @@ new File(this.args[1]).withInputStream { stream ->
 }
 
 def fromSql = Sql.newInstance(properties['url'], properties['user'], properties['password'], properties['driver'])
-def toSql = Sql.newInstance(properties['database.url'], properties['database.user'], properties['database.password'], properties['database.driver'])
+def toSql = Sql.newInstance(properties['database.url'], properties['database.username'], properties['database.password'], properties['database.driver'])
 
 println "Terms Of Use Migration"
 

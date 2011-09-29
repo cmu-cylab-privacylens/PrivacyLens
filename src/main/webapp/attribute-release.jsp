@@ -48,12 +48,12 @@
 	                <form action="" method="post" style="padding:10px">
 	                    <div style="float:left;">
 				        <c:if test="${allowGeneralConsent}">
-				            <input type="checkbox" id="generalConsent" name="generalConsent" value="true"/>
+				            <input id="generalConsent" type="checkbox" name="generalConsent" value="true" />
 				            <label for="generalConsent"><fmt:message key="generalConsent"/></label>
 				        </c:if>
 	                    </div>
 	                    <div style="float:right;">
-	                        <button type="submit"><fmt:message key="confirm"/></button>
+	                        <input type="submit" name="confirm" value="<fmt:message key="confirm"/>" />
 			            </div>
 			            <div style="clear:both;"></div>
 			        </form>

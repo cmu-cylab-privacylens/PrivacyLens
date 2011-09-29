@@ -1,7 +1,7 @@
 
 This document contains the uApprove deployment guide.
 
-h1. Installation
+h1(#Installation). Installation
 
 h2. Prerequisites
 
@@ -130,6 +130,9 @@ bc. $IDP_INSTALL$/install.sh
 
 h1. Upgrade
 
+bq(warn). If your upgrading from uApprove < 2.3 please read the according "upgrade information":#Upgrade.lt23 and
+follow the "installation instructions":#Installation.
+
 * @rm $IDP_INSTALL$/lib/uApprove-#old-version#.jar@
 * @cp $UAPPROVE_INSTALL$/lib/uApprove-#new-version#.jar $IDP_INSTALL$/lib@
 
@@ -150,14 +153,14 @@ To finish the upgrade of uApprove the IdP must be re-deployed:
 
 bc. $IDP_INSTALL$/install.sh
 
-h2. Upgrade from uApprove < 2.3
+h2(#Upgrade.lt23). Upgrade from uApprove < 2.3
 
 * Configuration files: Please use the new configuration file and taylor them to your needs.
-* Database Migration: It is possible to migrate ToU acceptance and attribute release consent data using the "provided data migration script":#Upgrade.databaseMigration.
+* Database Migration: It is possible to migrate ToU acceptance and attribute release consent data using the "provided data migration script":#Upgrade.lt23.databaseMigration.
 
 bq(note). If _Terms Of Use Content Comparison_ and/or _Attribute Value Comparison_ feature will be used, the lecacy database entries can not be used and must no be migrated.
 
-h3(#Upgrade.databaseMigration). Database Migration
+h3(#Upgrade.lt23.databaseMigration). Database Migration
 
 Migrate lecacy database to the new database:
 

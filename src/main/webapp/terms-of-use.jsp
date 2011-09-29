@@ -12,11 +12,11 @@
 	        <div id="tou-acceptance">
 	            <form action="" method="post">
 	                <div style="float:left;">
-                        <input type="checkbox" id="accept" name="accept" value="true"/>
+                        <input id="accept" type="checkbox" name="accept" value="true" />
                         <label for="accept"><fmt:message key="accept"/></label>  
 	                </div>
                     <div style="float:right;">
-                        <button type="submit"><fmt:message key="confirm"/></button>
+                        <input type="submit" name="confirm" value="<fmt:message key="confirm"/>" />
                     </div>
                     <div style="clear:both;"></div>
 	            </form>
