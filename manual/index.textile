@@ -271,14 +271,12 @@ h2. Localization
 
 h3. Custom Messages
 
-You might adjust/extend the provided resource bundles and place them in the IdPs classpath (e.g., @$IDP_INSTALL$/src/main/webapp/WEB-INF/classes/uApproveMessages@).
+You might adjust/extend the "contained":https://subversion.switch.ch/svn/general/aai/uApprove/trunk/src/main/resources/messages/ resource bundles and place them in the IdPs classpath (e.g., @$IDP_INSTALL$/src/main/webapp/WEB-INF/classes/uApproveMessages@).
 Specify your bundles base in @$IDP_HOME$/conf/uApprove.xml@:
 
 bc. 
     <bean id="uApprove.viewHelper" class="ch.SWITCH.aai.uApprove.ViewHelper" ...
         p:messagesBase="uApproveMessages" />
-
-TODO
 
 h3. Attribute Names and Descriptions
 
