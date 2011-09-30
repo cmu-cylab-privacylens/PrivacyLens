@@ -1,7 +1,7 @@
 
 This document contains the uApprove deployment guide.
 
-h1(#Installation). Installation
+h1. Installation
 
 h2. Prerequisites
 
@@ -40,7 +40,7 @@ h2. Webapp files
 Copying of the web application files like the JSP(Java Server Pages)s, CSS(Cascading Style Sheet) files and images to the IdPs webapp directory:
 
 * @mkdir $IDP_INSTALL$/src/main/webapp/uApprove@
-* @cp UAPPROVE_INSTALL$/webapp/* $IDP_INSTALL$/src/main/webapp/uApprove@
+* @cp $UAPPROVE_INSTALL$/webapp/* $IDP_INSTALL$/src/main/webapp/uApprove@
 
 h2. Database Preparation
 
@@ -130,7 +130,7 @@ bc. $IDP_INSTALL$/install.sh
 
 h1. Upgrade
 
-bq(warn). If your upgrading from uApprove < 2.3 please read the according "upgrade information":#Upgrade.lt23 and
+bq(warn). If your upgrading from uApprove < 2.3 please read the according "upgrade information":#UpgradefromuApprove2.3 and
 follow the "installation instructions":#Installation.
 
 * @rm $IDP_INSTALL$/lib/uApprove-#old-version#.jar@
@@ -153,14 +153,16 @@ To finish the upgrade of uApprove the IdP must be re-deployed:
 
 bc. $IDP_INSTALL$/install.sh
 
-h2(#Upgrade.lt23). Upgrade from uApprove < 2.3
+h2. Upgrade from uApprove < 2.3
 
+* Legacy uApprove (< 2.3) deployment: Please remove it.
 * Configuration files: Please use the new configuration file and taylor them to your needs.
-* Database Migration: It is possible to migrate ToU acceptance and attribute release consent data using the "provided data migration script":#Upgrade.lt23.databaseMigration.
+* Database Migration: It is possible to migrate ToU acceptance and attribute release consent data using the "provided data migration script":#DatabaseMigration.
 
-bq(note). If _Terms Of Use Content Comparison_ and/or _Attribute Value Comparison_ feature will be used, the lecacy database entries can not be used and must no be migrated.
+bq(note). If _Terms Of Use Content Comparison_ and/or _Attribute Value Comparison_ feature will be used,
+the lecacy database entries can not be used and must not be migrated.
 
-h3(#Upgrade.lt23.databaseMigration). Database Migration
+h3. Database Migration
 
 Migrate lecacy database to the new database:
 
@@ -175,17 +177,17 @@ This sections contains advanced configuration topics.
 
 h2. Reset Attribute Release Consent
 
-TODO
+For providing the feature that a user is able to clear[1] her attribute release consent during the login flow, 
+add a checkbox to @$IDP_INSTALL$/src/main/webapp/login.jsp@:
 
-Add a checkbox to @$IDP_INSTALL$/src/main/webapp/login.jsp@
-
-bc.. 
+bc. 
 <form action="<%=request.getAttribute("actionUrl")%>" method="post">
   ...
   <input id="uApprove.consent-revocation" type="checkbox" name="uApprove.consent-revocation" value="true"/>
   <label for="uApprove.consent-revocation">Clear my attribute release consent</label>
   ...
 </form>
+
 h2. Storage
 
 h3. File-only
@@ -217,11 +219,38 @@ bq(note). Assure that the user running the container (e.g., tomcat) has write pe
 
 h3. Custom SQL Statements
 
-TODO
+# Copy the provided "(file)$UAPPROVE_INSTALL$/manual/storage/sql-statements.properties":storage/sql-statements.properties to @$IDP_HOME$/conf/uApprove.sql-statements.properties@.
+# Adjust @$IDP_HOME$/conf/uApprove.sql-statements.properties@ according your needs.
+# Enable your custom @sql-statements.properties@ in @$IDP_HOME$/conf/uApprove.xml@:
+
+bc.. 
+    <bean id="uApprove.touModule" class="ch.SWITCH.aai.uApprove.tou.ToUModule" ...>
+        <!-- ... -->
+        <property name="storage">
+            <bean class="ch.SWITCH.aai.uApprove.tou.storage.JDBCStorage" init-method="initialize"
+                p:dataSource-ref="uApprove.dataSource" p:sqlStatements="file:/$IDP_HOME$/conf/uApprove.sql-statements.properties" />
+        </property>
+    </bean>
+    
+    <!-- ... -->
+    
+    <bean id="uApprove.attributeReleaseModule" class="ch.SWITCH.aai.uApprove.ar.AttributeReleaseModule" ...>
+        <!-- ... -->
+        <property name="storage">
+            <bean class="ch.SWITCH.aai.uApprove.ar.storage.JDBCStorage" init-method="initialize"
+                p:dataSource-ref="uApprove.dataSource" p:sqlStatements="file:/$IDP_HOME$/conf/uApprove.sql-statements.properties" />
+        </property>
+    </bean>
 
 h3. JDBC Connection Pool Tuning
 
-TODO
+Cf. "BoneCP config API":http://jolbox.com/bonecp/downloads/site/apidocs/com/jolbox/bonecp/BoneCPConfig.html for a list of all the available configuration settings.
+
+The settings are defined in @$IDP_HOME$/conf/uApprove.xml@:
+
+bc. 
+    <bean id="uApprove.dataSource" class="com.jolbox.bonecp.BoneCPDataSource" ...
+        p:minConnectionsPerPartition="1" p:maxConnectionsPerPartition="20" ... />
 
 h3. Custom Storage
 
@@ -235,43 +264,44 @@ h2. Templates
 
 h3. Custom View Templates
 
-TODO
+Feel free to customize the JSP(JavaServer Pages), CSS(Cascading Style Sheets) and image files located in @$UAPPROVE_INSTALL$/webapp/@.
+For convienience the JSTL(JavaServer Pages Standard Tag Library) is used, cf. "JSTL reference":http://java.sun.com/products/jsp/jstl/reference/docs/index.html.
 
 h2. Localization
 
 h3. Custom Messages
 
+You might adjust/extend the provided resource bundles and place them in the IdPs classpath (e.g., @$IDP_INSTALL$/src/main/webapp/WEB-INF/classes/uApproveMessages@).
+Specify your bundles base in @$IDP_HOME$/conf/uApprove.xml@:
+
+bc. 
+    <bean id="uApprove.viewHelper" class="ch.SWITCH.aai.uApprove.ViewHelper" ...
+        p:messagesBase="uApproveMessages" />
+
 TODO
 
 h3. Attribute Names and Descriptions
 
-See "(file)attribute-descriptions.xml":attribute-descriptions.xml for an example 
-how to configure the localized attribute names and descriptions.
+See "(file)attribute-descriptions.xml":attribute-descriptions.xml for an example how to configure the localized attribute names and descriptions.
 
 h3. Relying Party Names and Descriptions
 
-TODO
+Currently only the attribute consumin service descriptors in metadata are supported, toe retrieve localized relying arty names and descriptions.
+For providing such names and descriptions extend the metadata for the SP like:
 
-h2. Strict Comparison
-
-h3. Terms Of Use Content Comparison
-
-TODO
-
-h3. Attribute Value Comparison
-
-TODO
-
-h2. Service Provider Black/Whitelist
-
-h3. Different Lists for Terms Of Use and Attribute Release Module
-
-TODO
-
-
-h3. Specific authContextClassRef required
-
-TODO
+bc. 
+<EntityDescriptor entityID="https://sp.example.org/shibboleth">
+    <!-- ... -->
+    <SPSSODescriptor>
+        <!-- ... -->
+        <AttributeConsumingService index="1">
+            <ServiceName xml:lang="en">Example SP</ServiceName>
+            <!-- Service names in other languages -->
+            <ServiceDescription xml:lang="en">Some description of Example SP</ServiceDescription>
+            <!-- Service descriptions in other languages -->
+        </AttributeConsumingService>
+    </SPSSODescriptor>
+</EntityDescriptor>
 
 h2. Attribute In Attribute Requester's Metadata Plugin
 
@@ -310,9 +340,20 @@ bc. <PermitValueRule xsi:type="ua:AttributeInMetadata" onlyIfRequired="false">
 
 h2. Other
 
-bq(note). Other topics will be added on request.
+bq(note). Other topics will be added upon request. Some candidates are:
+
+* Strict Comparison
+** Terms Of Use Content Comparison
+** Attribute Value Comparison
+* Black/Whitelisting
+** Different Lists for Terms Of Use and Attribute Release Module
+** Specific authContextClassRef required
 
 h1. Feedback
 
 Send general questions and comments to "aai@switch.ch":mailto:aai@switch.ch. For bug reports, please use our "issue tracking":http://forge.switch.ch/redmine/projects/uapprove.
+
+
+fn1. Clear means to delete general consent if it was given as well delete as all attribute release consents for the accessed relying party.
+
 
