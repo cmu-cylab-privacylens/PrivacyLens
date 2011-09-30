@@ -52,10 +52,14 @@ public class ViewHelper {
     /** Whether the default locale should forced. */
     private boolean forceDefaultLocale;
 
+    /** Messages base. */
+    private String messagesBase;
+
     /** Default constructor. */
     public ViewHelper() {
         defaultLocale = Locale.getDefault();
         forceDefaultLocale = false;
+        messagesBase = "messages.";
     }
 
     /**
@@ -82,6 +86,15 @@ public class ViewHelper {
      */
     public void setForceDefaultLocale(final boolean forceDefaultLocale) {
         this.forceDefaultLocale = forceDefaultLocale;
+    }
+
+    /**
+     * Sets the messages base.
+     * 
+     * @param messagesBase The messagesBase to set.
+     */
+    public void setMessagesBase(final String messagesBase) {
+        this.messagesBase = messagesBase;
     }
 
     /**
@@ -114,7 +127,7 @@ public class ViewHelper {
             final HttpServletResponse response, final String viewName, final Map<String, ?> viewContext) {
 
         request.setAttribute("view", viewName);
-        request.setAttribute("bundle", String.format("messages.%s", viewName));
+        request.setAttribute("bundle", String.format("%s.%s", messagesBase, viewName));
         request.setAttribute("locale", selectLocale(request));
 
         for (final Entry<String, ?> entry : viewContext.entrySet()) {

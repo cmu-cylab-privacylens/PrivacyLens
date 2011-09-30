@@ -44,7 +44,8 @@
         p:minConnectionsPerPartition="1" p:maxConnectionsPerPartition="20" />
 
     <bean id="uApprove.viewHelper" class="ch.SWITCH.aai.uApprove.ViewHelper" init-method="initialize"
-        p:defaultLocale="${view.defaultLocale}" p:forceDefaultLocale="${view.forceDefaultLocale}" />
+        p:defaultLocale="${view.defaultLocale}" p:forceDefaultLocale="${view.forceDefaultLocale}"
+        p:messagesBase="messages" />
 
     <bean id="uApprove.samlHelper" class="ch.SWITCH.aai.uApprove.ar.SAMLHelper" init-method="initialize"
         p:attributeAuthority-ref="shibboleth.SAML2AttributeAuthority" p:relyingPartyConfigurationManager-ref="shibboleth.RelyingPartyConfigurationManager">
