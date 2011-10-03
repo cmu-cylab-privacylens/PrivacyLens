@@ -167,7 +167,7 @@ public class AttributeReleaseModule {
         }
 
         if (storage.containsAttributeReleaseConsent(principalName, WILDCARD, WILDCARD)) {
-            logger.debug("User {} has given gerneral consent.");
+            logger.debug("User {} has given gerneral consent.", principalName);
             return false;
         }
 
