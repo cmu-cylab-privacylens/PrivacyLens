@@ -1,48 +1,44 @@
 
 This document contains the uApprove deployment guide.
 
-h1. Installation
+h1. 1 Installation
 
-h2. Prerequisites
+h2. 1.1 Prerequisites
 
 * Shibboleth Identity Provider 2.3 or greater.
 * Database which supports JDBC.
 
-h2. Assumptions
+h2. 1.2 Assumptions
 
-* IDP_HOME
 * The Shibboleth Identity Provider is unpacked at @$IDP_INSTALL$@ (e.g., @/opt/shibboleth-identity-provider-#version#@).
 * The Shibboleth Identity Provider is installed at @$IDP_HOME$@ (e.g., @/opt/shibboleth-idp@).
 * "uApprove":http://www.switch.ch/aai/uApprove is downloaded and unpacked at @$UAPPROVE_INSTALL$@ (e.g., @/tmp/uApprove-#version#@).
 
-h2. Library Installation
+h2. 1.3 Library Installation
 
 Copying the libraries to the IdPs library directory:
 
 * @cp $UAPPROVE_INSTALL$/lib/*.jar $IDP_INSTALL$/lib@
 * @cp $UAPPROVE_INSTALL$/lib/jdbc/*.jar $IDP_INSTALL$/lib@
+* Provide the JDBC connector for your database to the classpath of the IdP. You might use one of the provided MySQL or HSQL JDBC connector: <br /> @cp $UAPPROVE_INSTALL$/lib/jdbc/optional/#jdbc-connector#.jar $IDP_INSTALL$/lib@
 
-Provide the JDBC connector for your database to the classpath of the IdP:
+bq(note). Assure that only one version of each library is present in @$IDP_INSTALL$/lib@.
 
-* @cp $UAPPROVE_INSTALL$/lib/jdbc/optional/#jdbc-connector#.jar $IDP_INSTALL$/lib@
-
-bq(note).  Assure that there is only one version present. You might use the provided MySQL or HSQL JDBC connector.
-
-h2. Configuration Template
+h2. 1.4 Configuration Template
 
 Copying the configuration template to the IdPs configuration directory:
 
-* @cp@ (file)"UAPPROVE_INSTALL$/manual/configuration/uApprove.properties":configuration/uApprove.properties @$IDP_HOME$/conf@
-* @cp@ (file)"UAPPROVE_INSTALL$/manual/configuration/uApprove.xml":configuration/uApprove.xml @$IDP_HOME$/conf@
+* @cp@ "(file)UAPPROVE_INSTALL$/manual/configuration/uApprove.properties":configuration/uApprove.properties @$IDP_HOME$/conf@
+* @cp@ "(file)UAPPROVE_INSTALL$/manual/configuration/uApprove.xml":configuration/uApprove.xml @$IDP_HOME$/conf@
 
-h2. Webapp files
+h2. 1.5 Webapp files
 
 Copying of the web application files like the JSP(Java Server Pages)s, CSS(Cascading Style Sheet) files and images to the IdPs webapp directory:
 
 * @mkdir $IDP_INSTALL$/src/main/webapp/uApprove@
 * @cp $UAPPROVE_INSTALL$/webapp/* $IDP_INSTALL$/src/main/webapp/uApprove@
 
-h2. Database Preparation
+h2. 1.6 Database Preparation
 
 bq(note). The following database parameters are examples.
 
@@ -50,12 +46,12 @@ bq(note). The following database parameters are examples.
 * Create a database user with the username "uApprove" and password "uApprove".
 * Grant @INSERT, SELECT, UPDATE, DELETE@ rights for the user.
 * Create the initial table structures using the schemas:
-** "(file)$UAPPROVE_INSTALL$/manual/storage/attribute-release-schema.sql":storage/attribute-release-schema.sql.
 ** "(file)$UAPPROVE_INSTALL$/manual/storage/terms-of-use-schema.sql":storage/terms-of-use-schema.sql.
+** "(file)$UAPPROVE_INSTALL$/manual/storage/attribute-release-schema.sql":storage/attribute-release-schema.sql.
 
-h1. Basic Deployment
+h1. 2 Basic Deployment
 
-h2. Web Application Deployment Descriptor
+h2. 2.1 Web Application Deployment Descriptor
 
 Extend the IdP web application deployment descriptor (@$IDP_INSTALL$/src/main/webapp/WEB-INF/web.xml@):
 
@@ -106,7 +102,7 @@ bc..
     </servlet-mapping>
 
 </web-app>
-h2. Custom Configuration
+h2. 2.2 Custom Configuration
 
 In @$IDP_HOME$/conf/uApprove.xml@ change:
 
@@ -121,30 +117,32 @@ bc.
 Customize @$IDP_HOME$/conf/uApprove.properties@ according your database environment and required features. See "inline documentation":configuration/uApprove.properties for configuration options.
 
 
-h2. Deployment
+h2. 2.3 Deployment
 
 To activate uApprove the IdP must be re-deployed:
 
 bc. $IDP_INSTALL$/install.sh
 
 
-h1. Upgrade
+h1. 3 Upgrade 
 
-bq(warn). If your upgrading from uApprove < 2.3 please read the according "upgrade information":#UpgradefromuApprove2.3 and
-follow the "installation instructions":#Installation.
+bq(warn). If your upgrading from uApprove < 2.3 please read the according "upgrade information":#a3.1UpgradefromuApprove2.3 and
+follow the "installation instructions":#a1Installation.
 
 * @rm $IDP_INSTALL$/lib/uApprove-#old-version#.jar@
 * @cp $UAPPROVE_INSTALL$/lib/uApprove-#new-version#.jar $IDP_INSTALL$/lib@
 
-Optionally update your the JDBC dependencies:
+Optionally update the JDBC dependencies:
 
 * @cp $UAPPROVE_INSTALL$/lib/jdbc/*.jar $IDP_INSTALL$/lib@
 
-Optionally update your JDBC driver. You might use the provided MySQL JDBC driver:
+Optionally update the JDBC connector for your database. You might use one of the provided MySQL or HSQL JDBC connector:
 
-* @cp $UAPPROVE_INSTALL$/lib/jdbc/optional/mysql-connector-java-#version#.jar $IDP_INSTALL$/lib@
+* @cp $UAPPROVE_INSTALL$/lib/jdbc/optional/#jdbc-connector#.jar $IDP_INSTALL$/lib@
 
-bq(warning). Verify that the IdP classpath at @$IDP_INSTALL$/lib@ doesn't contain multiple versions of the same library.
+
+bq(warn). Verify that only one version of each library is present in @$IDP_INSTALL$/lib@.
+
 
 bq(note). Optionally update the web application and configuration files if you do not have any customizations.
 It is recommended to backup the old files first.
@@ -153,10 +151,10 @@ To finish the upgrade of uApprove the IdP must be re-deployed:
 
 bc. $IDP_INSTALL$/install.sh
 
-h2. Upgrade from uApprove < 2.3
+h2. 3.1 Upgrade from uApprove < 2.3
 
 * Legacy uApprove (< 2.3) deployment: Please remove it.
-* Configuration files: Please use the new configuration file and taylor them to your needs.
+* Configuration files: Please use the new configuration file and tailor them to your needs.
 * Database Migration: It is possible to migrate ToU acceptance and attribute release consent data using the "provided data migration script":#DatabaseMigration.
 
 bq(note). If _Terms Of Use Content Comparison_ and/or _Attribute Value Comparison_ feature will be used,
@@ -171,11 +169,11 @@ java -cp "$UAPPROVE_INSTALL$/scripts/lib/*.jar:$UAPPROVE_INSTALL$/lib/jdbc/optio
   $UAPPROVE_INSTALL$/scripts/StorageMigration.groovy /opt/uApprove/conf/database.properties $IDP_HOME$/conf/uApprove.properties
 
 
-h1. Advanced Deployment
+h1. 4 Advanced Deployment
 
 This sections contains advanced configuration topics.
 
-h2. Reset Attribute Release Consent
+h2. 4.1 Reset Attribute Release Consent
 
 For providing the feature that a user is able to clear[1] her attribute release consent during the login flow, 
 add a checkbox to @$IDP_INSTALL$/src/main/webapp/login.jsp@:
@@ -188,7 +186,7 @@ bc.
   ...
 </form>
 
-h2. Storage
+h2. 4.2 Storage
 
 h3. File-only
 
@@ -260,14 +258,14 @@ Custom storage implementations might be provided in future. Some ideas are:
 * Cookie based Storage: This will remember users consent within a cookie. It could stored for just the session or some defined period (e.g., 10 days).
 * In Memory Storage: Already possible with @mem@ HSQLDB. Will store consent as long as the IdP process is alive. Needs DB shema initialization.
 
-h2. Templates
+h2. 4.3 Templates
 
 h3. Custom View Templates
 
 Feel free to customize the JSP(JavaServer Pages), CSS(Cascading Style Sheets) and image files located in @$UAPPROVE_INSTALL$/webapp/@.
 For convienience the JSTL(JavaServer Pages Standard Tag Library) is used, cf. "JSTL reference":http://java.sun.com/products/jsp/jstl/reference/docs/index.html.
 
-h2. Localization
+h2. 4.4 Localization
 
 h3. Custom Messages
 
@@ -280,7 +278,7 @@ bc.
 
 h3. Attribute Names and Descriptions
 
-See "(file)attribute-descriptions.xml":attribute-descriptions.xml for an example how to configure the localized attribute names and descriptions.
+See "(file)attribute-descriptions.xml":examples/attribute-descriptions.xml for an example how to configure the localized attribute names and descriptions.
 
 h3. Relying Party Names and Descriptions
 
@@ -301,11 +299,11 @@ bc.
     </SPSSODescriptor>
 </EntityDescriptor>
 
-h2. Attribute In Attribute Requester's Metadata Plugin
+h2. 4.5 Attribute In Attribute Requester's Metadata Plugin
 
 h3. Installation
 
-The plugin is installed by default with uApprove (uApprove-#version#.jar). 
+The plugin is installed by default with uApprove (@uApprove-#version#.jar@). 
 
 h3. Configuration Attribute In Requester's Metadata Matching Rule
 
@@ -336,9 +334,9 @@ Example Permit Value Rule using the AttributeInMetadata Match Function:
 
 bc. <PermitValueRule xsi:type="ua:AttributeInMetadata" onlyIfRequired="false">
 
-h2. Other
+h2. 4.6 Other
 
-bq(note). Other topics will be added upon request. Some candidates are:
+Other topics will be added upon request. Some candidates are:
 
 * Strict Comparison
 ** Terms Of Use Content Comparison
@@ -347,7 +345,7 @@ bq(note). Other topics will be added upon request. Some candidates are:
 ** Different Lists for Terms Of Use and Attribute Release Module
 ** Specific authContextClassRef required
 
-h1. Feedback
+h1. 5 Feedback
 
 Send general questions and comments to "aai@switch.ch":mailto:aai@switch.ch. For bug reports, please use our "issue tracking":http://forge.switch.ch/redmine/projects/uapprove.
 
