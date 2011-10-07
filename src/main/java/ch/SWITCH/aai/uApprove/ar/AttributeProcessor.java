@@ -30,7 +30,13 @@ package ch.SWITCH.aai.uApprove.ar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ch.SWITCH.aai.uApprove.Util;
 
@@ -38,6 +44,10 @@ import ch.SWITCH.aai.uApprove.Util;
  * Attribute Processor.
  */
 public class AttributeProcessor {
+
+    /** Class logger. */
+    @SuppressWarnings("unused")
+    private final Logger logger = LoggerFactory.getLogger(AttributeProcessor.class);
 
     /** The attribute blacklist. */
     private List<String> blacklist;
@@ -106,5 +116,45 @@ public class AttributeProcessor {
                 return rank1 - rank2;
             }
         });
+    }
+
+    /**
+     * Removes null/empty/blank values.
+     * 
+     * @param attribute The attribute.
+     */
+    public void removeEmptyValues(final Attribute attribute) {
+        final Iterator<String> iterator = attribute.getValues().iterator();
+        while (iterator.hasNext()) {
+            final String x = iterator.next();
+            if (StringUtils.isBlank(x)) {
+                iterator.remove();
+            }
+        }
+    }
+
+    /**
+     * Removes duplicate values.
+     * 
+     * @param attribute The attribute.
+     */
+    public void removeDuplicateValues(final Attribute attribute) {
+        final Set<String> set = new LinkedHashSet<String>(attribute.getValues());
+        attribute.getValues().clear();
+        attribute.getValues().addAll(set);
+    }
+
+    /**
+     * Removes attributes which does not contain any values.
+     * 
+     * @param attributes List of attributes.
+     */
+    public void removeEmptyAttributes(final List<Attribute> attributes) {
+        final Iterator<Attribute> iterator = attributes.iterator();
+        while (iterator.hasNext()) {
+            if (iterator.next().getValues().isEmpty()) {
+                iterator.remove();
+            }
+        }
     }
 }

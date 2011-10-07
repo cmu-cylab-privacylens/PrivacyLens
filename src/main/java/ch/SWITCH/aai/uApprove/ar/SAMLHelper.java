@@ -146,7 +146,7 @@ public class SAMLHelper {
                 } else if (valueObj instanceof ScopedAttributeValue) {
                     final ScopedAttributeValue scopedAttr = (ScopedAttributeValue) valueObj;
                     attributeValues.add(scopedAttr.getValue() + "@" + scopedAttr.getScope());
-                } else {
+                } else if (valueObj != null) {
                     attributeValues.add(String.valueOf(valueObj));
                 }
             }
@@ -157,7 +157,17 @@ public class SAMLHelper {
                     baseAttribute.getDisplayDescriptions().get(locale), attributeValues));
         }
 
+        logger.trace("{} attributes resolved.", attributes.size());
         attributeProcessor.removeBlacklistedAttributes(attributes);
+        logger.trace("{} attributes retained after removing blacklisted attributes.", attributes.size());
+        for (final Attribute attribute : attributes) {
+            logger.trace("Raw values for attribute {}: {}.", attribute.getId(), attribute.getValues());
+            attributeProcessor.removeEmptyValues(attribute);
+            attributeProcessor.removeDuplicateValues(attribute);
+            logger.trace("Cleaned values for attribute {}: {}.", attribute.getId(), attribute.getValues());
+        }
+        attributeProcessor.removeEmptyAttributes(attributes);
+        logger.trace("{} attributes retained after removing empty attributes.", attributes.size());
         attributeProcessor.sortAttributes(attributes);
         return attributes;
     }
@@ -236,7 +246,7 @@ public class SAMLHelper {
             return new RelyingParty(relyingPartyId);
         } else {
             logger.trace("Relying party: {}, localized names {}, localized descriptions {}.", new Object[] {
-                    relyingPartyId, attrService.getNames().size(), attrService.getDescriptions().size(),});
+                    relyingPartyId, attrService.getNames(), attrService.getDescriptions(),});
 
             String localizedName = null;
             for (final ServiceName element : attrService.getNames()) {
