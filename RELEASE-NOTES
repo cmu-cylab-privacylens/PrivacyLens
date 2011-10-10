@@ -1,3 +1,11 @@
+Release 2.3.1 2011-10-10
+------------------------
+#0915 - Duplicate values shown on attribute consent page.
+#1041 - Filter null value / empty attributes.
+#1045 - Namespace mismatch in attribute filter plugin schema.
+
+      - Manual corrections and improvements
+
 Release 2.3.0 2011-10-03
 ------------------------
 Rewrite of the uApprove IdP extensions with the following main goals:

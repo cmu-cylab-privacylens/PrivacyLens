@@ -28,8 +28,8 @@ h2. 1.4 Configuration Template
 
 Copying the configuration template to the IdPs configuration directory:
 
-* @cp@ "(file)UAPPROVE_INSTALL$/manual/configuration/uApprove.properties":configuration/uApprove.properties @$IDP_HOME$/conf@
-* @cp@ "(file)UAPPROVE_INSTALL$/manual/configuration/uApprove.xml":configuration/uApprove.xml @$IDP_HOME$/conf@
+* @cp@ "(file)$UAPPROVE_INSTALL$/manual/configuration/uApprove.properties":configuration/uApprove.properties @$IDP_HOME$/conf@
+* @cp@ "(file)$UAPPROVE_INSTALL$/manual/configuration/uApprove.xml":configuration/uApprove.xml @$IDP_HOME$/conf@
 
 h2. 1.5 Webapp files
 
