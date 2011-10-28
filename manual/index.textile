@@ -213,7 +213,7 @@ java -jar $HSQLDB_HOME$/lib/sqltool.jar \
   
 bq(note). @$HSQLDB_HOME$@ defines the location where the downloaded "HSQL distribution":http://hsqldb.org/ is extracted.
 
-bq(note). Assure that the user running the container (e.g., tomcat) has write permission to the db directory.
+bq(note). Assure that the user running the container (e.g., Jetty) has write permission to the db directory.
 
 h3. Custom SQL Statements
 
@@ -345,7 +345,17 @@ Other topics will be added upon request. Some candidates are:
 ** Different Lists for Terms Of Use and Attribute Release Module
 ** Specific authContextClassRef required
 
-h1. 5 Feedback
+h1. 5 Troubleshooting
+
+h2. Logging
+
+Fatal errors may found in the containter standard error/out (e.g., Jetty's @$JETTY_HOME$/logs/`date +%Y_%m_%d`.stderrout.log@).
+
+uApprove logs to @$IDP_HOME$/logs/idp-process.log@. For enabling @DEBUG@ log level, define a corresponding logger in @$IDP_HOME$/conf/logging.xml@:
+
+bc. <logger name="ch.SWITCH.aai.uApprove" level="DEBUG"/>
+
+h1. 6 Feedback
 
 Send general questions and comments to "aai@switch.ch":mailto:aai@switch.ch. For bug reports, please use our "issue tracking":http://forge.switch.ch/redmine/projects/uapprove.
 
