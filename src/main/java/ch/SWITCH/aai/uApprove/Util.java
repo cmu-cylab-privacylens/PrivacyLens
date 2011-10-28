@@ -33,6 +33,7 @@ import java.io.InputStreamReader;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.codec.binary.Hex;
@@ -102,7 +103,10 @@ public final class Util {
      * @return Returns a list of Strings.
      */
     public static List<String> stringToList(final String string) {
-
-        return Arrays.asList(StringUtils.trimToEmpty(string).split("\\s+"));
+        final String input = StringUtils.trimToEmpty(string);
+        if (StringUtils.isEmpty(input)) {
+            return Collections.emptyList();
+        }
+        return Arrays.asList(input.split("\\s+"));
     }
 }

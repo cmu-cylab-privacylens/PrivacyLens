@@ -27,40 +27,39 @@
 
 package ch.SWITCH.aai.uApprove;
 
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
- * Util test.
+ * Tests the relying party list.
  */
-public class UtilTest {
+public class RelyingPartyListTest {
 
-    /** Class logger. */
-    @SuppressWarnings("unused")
-    private final Logger logger = LoggerFactory.getLogger(UtilTest.class);
+    /** The relying party list. */
+    private RelyingPartyList relyingPartyList;
 
-    /** Test. */
-    @Test
-    public void testFingerprint() {
-        Assert.assertEquals("9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08", Util.hash("test"));
+    /** Before class. */
+    @BeforeClass
+    public void initialize() {
+        relyingPartyList = new RelyingPartyList();
+        final String expressions =
+                "^https://sp\\.example1\\.org/shibboleth$ ^https://sp\\.example2\\.org/shibboleth$ ^https://.*\\.example3\\.org/shibboleth$";
+        relyingPartyList.setRegularExpressions(expressions);
     }
 
     /** Test. */
     @Test
-    public void testStringToList() {
-        Assert.assertEquals(Util.stringToList("1 2 3").size(), 3);
-        Assert.assertEquals(Util.stringToList("1  2  3").size(), 3);
-        Assert.assertEquals(Util.stringToList("1\n2\n3").size(), 3);
-
-        final List<String> values = Util.stringToList("  1    \n 2  ");
-        Assert.assertEquals(values.get(0), "1");
-        Assert.assertEquals(values.get(1), "2");
-
-        final List<String> noValues = Util.stringToList("");
-        Assert.assertTrue(noValues.isEmpty());
+    public void testContains() {
+        for (final Boolean isBlacklist : new Boolean[] {true, false}) {
+            relyingPartyList.setBlacklist(isBlacklist);
+            Assert.assertTrue(relyingPartyList.contains("https://sp.example1.org/shibboleth") != isBlacklist);
+            Assert.assertTrue(relyingPartyList.contains("https://sp.example1.org/shibboleth") != isBlacklist);
+            Assert.assertTrue(relyingPartyList.contains("https://sp.example2.org/shibboleth") != isBlacklist);
+            Assert.assertTrue(relyingPartyList.contains("https://sp.example3.org/shibboleth") != isBlacklist);
+            Assert.assertTrue(relyingPartyList.contains("https://xx.example3.org/shibboleth") != isBlacklist);
+            Assert.assertFalse(relyingPartyList.contains("https://xx.example1.org/shibboleth") != isBlacklist);
+            Assert.assertFalse(relyingPartyList.contains("https://sp.example4.org/shibboleth") != isBlacklist);
+        }
     }
 }
