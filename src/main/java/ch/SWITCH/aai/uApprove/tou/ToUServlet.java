@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -54,8 +55,10 @@ public class ToUServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     /** Class logger. */
-    @SuppressWarnings("unused")
     private final Logger logger = LoggerFactory.getLogger(ToUServlet.class);
+
+    /** The servlet context. */
+    private ServletContext servletContext;
 
     /** The Terms Of Use Module. */
     private ToUModule touModule;
@@ -65,31 +68,45 @@ public class ToUServlet extends HttpServlet {
 
     /** {@inheritDoc} */
     public void init() throws ServletException {
-        super.init();
-        final WebApplicationContext appContext =
-                WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-        touModule = (ToUModule) appContext.getBean("uApprove.touModule", ToUModule.class);
-        viewHelper = (ViewHelper) appContext.getBean("uApprove.viewHelper", ViewHelper.class);
+        try {
+            super.init();
+            servletContext = getServletContext();
+            final WebApplicationContext appContext =
+                    WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+            touModule = (ToUModule) appContext.getBean("uApprove.touModule", ToUModule.class);
+            viewHelper = (ViewHelper) appContext.getBean("uApprove.viewHelper", ViewHelper.class);
+        } catch (final Throwable t) {
+            logger.error("Error while initializing Terms of Use Servlet.", t);
+            throw new ServletException(t);
+        }
     }
 
     /** {@inheritDoc} */
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException,
             IOException {
-        final Map<String, Object> context = new HashMap<String, Object>();
-        context.put("tou", touModule.getTou());
-        viewHelper.showView(getServletContext(), req, resp, "terms-of-use", context);
+        try {
+            final Map<String, Object> context = new HashMap<String, Object>();
+            context.put("tou", touModule.getTou());
+            viewHelper.showView(servletContext, req, resp, "terms-of-use", context);
+        } catch (final Throwable t) {
+            logger.error("Error while GET Terms of Use Servlet.", t);
+            IdPHelper.handleException(servletContext, req, resp, t);
+        }
     }
 
     /** {@inheritDoc} */
     protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException,
             IOException {
-
-        if (BooleanUtils.toBoolean(req.getParameter("accept"))) {
-            final String principalName = IdPHelper.getPrincipalName(getServletContext(), req);
-            touModule.acceptToU(principalName);
+        try {
+            if (BooleanUtils.toBoolean(req.getParameter("accept"))) {
+                final String principalName = IdPHelper.getPrincipalName(servletContext, req);
+                touModule.acceptToU(principalName);
+            }
+            IdPHelper.returnToIdP(servletContext, req, resp);
+        } catch (final Throwable t) {
+            logger.error("Error while POST Terms of Use Servlet.", t);
+            IdPHelper.handleException(servletContext, req, resp, t);
         }
-
-        IdPHelper.returnToIdP(getServletContext(), req, resp);
     }
 
 }

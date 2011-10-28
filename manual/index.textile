@@ -347,11 +347,12 @@ Other topics will be added upon request. Some candidates are:
 
 h1. 5 Troubleshooting
 
-h2. Logging
+* Check @$IDP_HOME$/logs/idp-process.log@ for @ERROR@ or @WARN@ messages.
+* Check container standard error/out (e.g., Jetty's @$JETTY_HOME$/logs/`date +%Y_%m_%d`.stderrout.log@) for error messages.
 
-Fatal errors may found in the containter standard error/out (e.g., Jetty's @$JETTY_HOME$/logs/`date +%Y_%m_%d`.stderrout.log@).
+h2. Debugging
 
-uApprove logs to @$IDP_HOME$/logs/idp-process.log@. For enabling @DEBUG@ log level, define a corresponding logger in @$IDP_HOME$/conf/logging.xml@:
+Enabling @DEBUG@ or @TRACE@ log level for uApprove in @$IDP_HOME$/conf/logging.xml@:
 
 bc. <logger name="ch.SWITCH.aai.uApprove" level="DEBUG"/>
 

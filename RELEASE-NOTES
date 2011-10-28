@@ -1,10 +1,19 @@
-Release 2.3.1 2011-10-10
+Release 2.3.2 2011-xx-xx
 ------------------------
+
+#1010 - Improved error handling and logging.
+#1043 - Error Handling for the servlets.
+#1060 - Empty list and regular expressions.
+
+      - Manual corrections and improvements.
+
+Release 2.3.1 2011-10-10
+
 #0915 - Duplicate values shown on attribute consent page.
 #1041 - Filter null value / empty attributes.
 #1045 - Namespace mismatch in attribute filter plugin schema.
 
-      - Manual corrections and improvements
+      - Manual corrections and improvements.
 
 Release 2.3.0 2011-10-03
 ------------------------

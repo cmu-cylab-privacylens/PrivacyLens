@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -57,6 +58,9 @@ public class AttributeReleaseServlet extends HttpServlet {
     /** Class logger. */
     private final Logger logger = LoggerFactory.getLogger(AttributeReleaseServlet.class);
 
+    /** The servlet context. */
+    private ServletContext servletContext;
+
     /** The Attribute Release module. */
     private AttributeReleaseModule attributeReleaseModule;
 
@@ -68,47 +72,61 @@ public class AttributeReleaseServlet extends HttpServlet {
 
     /** {@inheritDoc} */
     public void init() throws ServletException {
-        super.init();
-        final WebApplicationContext appContext =
-                WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-        attributeReleaseModule =
-                (AttributeReleaseModule) appContext.getBean("uApprove.attributeReleaseModule",
-                        AttributeReleaseModule.class);
-        samlHelper = (SAMLHelper) appContext.getBean("uApprove.samlHelper", SAMLHelper.class);
-        viewHelper = (ViewHelper) appContext.getBean("uApprove.viewHelper", ViewHelper.class);
+        try {
+            super.init();
+            servletContext = getServletContext();
+            final WebApplicationContext appContext =
+                    WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+            attributeReleaseModule =
+                    (AttributeReleaseModule) appContext.getBean("uApprove.attributeReleaseModule",
+                            AttributeReleaseModule.class);
+            samlHelper = (SAMLHelper) appContext.getBean("uApprove.samlHelper", SAMLHelper.class);
+            viewHelper = (ViewHelper) appContext.getBean("uApprove.viewHelper", ViewHelper.class);
+        } catch (final Throwable t) {
+            logger.error("Error while initializing Attribute Release Servlet.", t);
+            throw new ServletException(t);
+        }
     }
 
     /** {@inheritDoc} */
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException,
             IOException {
-        final String relyingPartyId = IdPHelper.getRelyingPartyId(getServletContext(), req);
-        final List<Attribute> attributes = IdPHelper.getAttributes(getServletContext(), req);
-        final Map<String, Object> context = new HashMap<String, Object>();
-        context.put("relyingParty", samlHelper.readRelyingParty(relyingPartyId, viewHelper.selectLocale(req)));
-        context.put("attributes", attributes);
-        context.put("allowGeneralConsent", attributeReleaseModule.isAllowGeneralConsent());
-        viewHelper.showView(getServletContext(), req, resp, "attribute-release", context);
+        try {
+            final String relyingPartyId = IdPHelper.getRelyingPartyId(servletContext, req);
+            final List<Attribute> attributes = IdPHelper.getAttributes(servletContext, req);
+            final Map<String, Object> context = new HashMap<String, Object>();
+            context.put("relyingParty", samlHelper.readRelyingParty(relyingPartyId, viewHelper.selectLocale(req)));
+            context.put("attributes", attributes);
+            context.put("allowGeneralConsent", attributeReleaseModule.isAllowGeneralConsent());
+            viewHelper.showView(servletContext, req, resp, "attribute-release", context);
+        } catch (final Throwable t) {
+            logger.error("Error while GET Attribute Release Servlet.", t);
+            IdPHelper.handleException(servletContext, req, resp, t);
+        }
     }
 
     /** {@inheritDoc} */
     protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException,
             IOException {
+        try {
+            final boolean generalConsent =
+                    attributeReleaseModule.isAllowGeneralConsent()
+                            && BooleanUtils.toBoolean(req.getParameter("generalConsent"));
+            final String principalName = IdPHelper.getPrincipalName(servletContext, req);
+            final String relyingPartyId = IdPHelper.getRelyingPartyId(servletContext, req);
+            final List<Attribute> attributes = IdPHelper.getAttributes(servletContext, req);
 
-        final boolean generalConsent =
-                attributeReleaseModule.isAllowGeneralConsent()
-                        && BooleanUtils.toBoolean(req.getParameter("generalConsent"));
-        final String principalName = IdPHelper.getPrincipalName(getServletContext(), req);
-        final String relyingPartyId = IdPHelper.getRelyingPartyId(getServletContext(), req);
-        final List<Attribute> attributes = IdPHelper.getAttributes(getServletContext(), req);
-
-        if (generalConsent) {
-            logger.debug("Create general consent for {}", principalName);
-            attributeReleaseModule.consentGeneralAttributeRelease(principalName);
-        } else {
-            logger.debug("Create consent for user {} to {}.", principalName, relyingPartyId);
-            attributeReleaseModule.consentAttributeRelease(principalName, relyingPartyId, attributes);
+            if (generalConsent) {
+                logger.debug("Create general consent for {}", principalName);
+                attributeReleaseModule.consentGeneralAttributeRelease(principalName);
+            } else {
+                logger.debug("Create consent for user {} to {}.", principalName, relyingPartyId);
+                attributeReleaseModule.consentAttributeRelease(principalName, relyingPartyId, attributes);
+            }
+            IdPHelper.returnToIdP(servletContext, req, resp);
+        } catch (final Throwable t) {
+            logger.error("Error while POST Attribute Release Servlet.", t);
+            IdPHelper.handleException(servletContext, req, resp, t);
         }
-
-        IdPHelper.returnToIdP(getServletContext(), req, resp);
     }
 }

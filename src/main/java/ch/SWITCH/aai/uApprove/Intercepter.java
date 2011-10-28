@@ -80,26 +80,30 @@ public class Intercepter implements Filter {
 
     /** {@inheritDoc} */
     public void init(final FilterConfig filterConfig) throws ServletException {
-        servletContext = filterConfig.getServletContext();
-        final WebApplicationContext appContext =
-                WebApplicationContextUtils.getRequiredWebApplicationContext(filterConfig.getServletContext());
-        touModule = (ToUModule) appContext.getBean("uApprove.touModule", ToUModule.class);
-        attributeReleaseModule =
-                (AttributeReleaseModule) appContext.getBean("uApprove.attributeReleaseModule",
-                        AttributeReleaseModule.class);
-        samlHelper = (SAMLHelper) appContext.getBean("uApprove.samlHelper", SAMLHelper.class);
+        try {
+            servletContext = filterConfig.getServletContext();
+            final WebApplicationContext appContext =
+                    WebApplicationContextUtils.getRequiredWebApplicationContext(filterConfig.getServletContext());
+            touModule = (ToUModule) appContext.getBean("uApprove.touModule", ToUModule.class);
+            attributeReleaseModule =
+                    (AttributeReleaseModule) appContext.getBean("uApprove.attributeReleaseModule",
+                            AttributeReleaseModule.class);
+            samlHelper = (SAMLHelper) appContext.getBean("uApprove.samlHelper", SAMLHelper.class);
 
-        viewHelper = (ViewHelper) appContext.getBean("uApprove.viewHelper", ViewHelper.class);
+            viewHelper = (ViewHelper) appContext.getBean("uApprove.viewHelper", ViewHelper.class);
 
-        Validate.notNull(touModule, "ToU module isn't properly configured.");
-        Validate.notNull(attributeReleaseModule, "Attribute Release module isn't properly configured.");
-        Validate.notNull(samlHelper, "SAML Helper isn't properly configured.");
-        Validate.notNull(viewHelper, "View Helper isn't properly configured.");
+            Validate.notNull(touModule, "ToU module isn't properly configured.");
+            Validate.notNull(attributeReleaseModule, "Attribute Release module isn't properly configured.");
+            Validate.notNull(samlHelper, "SAML Helper isn't properly configured.");
+            Validate.notNull(viewHelper, "View Helper isn't properly configured.");
 
-        authnContextClassRef = filterConfig.getInitParameter("authnContextClassRef");
-        logger.debug("uApprove initialized.{}", authnContextClassRef != null ? " authnContextClassRef is set to "
-                + authnContextClassRef : "");
-
+            authnContextClassRef = filterConfig.getInitParameter("authnContextClassRef");
+            logger.debug("uApprove initialized.{}", authnContextClassRef != null ? " authnContextClassRef is set to "
+                    + authnContextClassRef : "");
+        } catch (final Throwable t) {
+            logger.error("Error while initializing uApprove interceptor.", t);
+            throw new ServletException(t);
+        }
     }
 
     /** {@inheritDoc} */
