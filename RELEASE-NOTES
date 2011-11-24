@@ -3,8 +3,9 @@ Release 2.3.2 2011-xx-xx
 #1010 - Improved error handling and logging.
 #1043 - Error Handling for the servlets.
 #1060 - Empty list and regular expressions.
-#1108 - Explict profile url-pattern in filter
-#1115 - Support for isPassive
+#1064 - Back button behavior.
+#1108 - Explicit profile url-pattern in filter.
+#1115 - Support for isPassive.
 
       - Manual corrections and improvements.
 

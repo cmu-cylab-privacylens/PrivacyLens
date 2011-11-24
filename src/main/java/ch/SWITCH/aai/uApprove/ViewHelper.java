@@ -59,7 +59,7 @@ public class ViewHelper {
     public ViewHelper() {
         defaultLocale = Locale.getDefault();
         forceDefaultLocale = false;
-        messagesBase = "messages.";
+        messagesBase = "messages";
     }
 
     /**
