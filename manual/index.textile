@@ -77,7 +77,13 @@ bc..
 
     <filter-mapping>
         <filter-name>uApprove</filter-name>
-        <url-pattern>/profile/*</url-pattern>
+        <url-pattern>/profile/Shibboleth/SSO</url-pattern>
+        <url-pattern>/profile/SAML1/SOAP/AttributeQuery</url-pattern>
+        <url-pattern>/profile/SAML1/SOAP/ArtifactResolution</url-pattern>
+        <url-pattern>/profile/SAML2/POST/SSO</url-pattern>
+        <url-pattern>/profile/SAML2/POST-SimpleSign/SSO</url-pattern>
+        <url-pattern>/profile/SAML2/Redirect/SSO</url-pattern>
+        <url-pattern>/profile/SAML2/Unsolicited/SSO</url-pattern>
         <url-pattern>/Authn/UserPassword</url-pattern>
     </filter-mapping>
 
