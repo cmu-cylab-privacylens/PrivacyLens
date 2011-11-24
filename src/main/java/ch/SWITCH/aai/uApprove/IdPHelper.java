@@ -45,6 +45,7 @@ import org.slf4j.LoggerFactory;
 import ch.SWITCH.aai.uApprove.ar.Attribute;
 import edu.internet2.middleware.shibboleth.common.profile.AbstractErrorHandler;
 import edu.internet2.middleware.shibboleth.common.session.Session;
+import edu.internet2.middleware.shibboleth.idp.authn.AuthenticationException;
 import edu.internet2.middleware.shibboleth.idp.authn.LoginContext;
 import edu.internet2.middleware.shibboleth.idp.util.HttpServletHelper;
 
@@ -163,6 +164,19 @@ public final class IdPHelper {
     }
 
     /**
+     * Indicates whether the request is passive or not.
+     * 
+     * @param servletContext The servlet context.
+     * @param request The HTTP request.
+     * @return Returns whether the request is passive or not.
+     */
+    public static boolean isPassiveRequest(final ServletContext servletContext, final HttpServletRequest request) {
+        final boolean isPassive = getLoginContext(servletContext, request, true).isPassiveAuthRequired();
+        LOGGER.trace("Request is {} passive.", isPassive ? "" : "not");
+        return isPassive;
+    }
+
+    /**
      * Return to the IdP.
      * 
      * @param servletContext The servlet context.
@@ -278,7 +292,7 @@ public final class IdPHelper {
     /**
      * Handles exception by using the IdPs error handler.
      * 
-     * @param servletContext The servlet context
+     * @param servletContext The servlet context.
      * @param request The HTTP request.
      * @param response The HTTP response.
      * @param t The exception.
@@ -291,5 +305,17 @@ public final class IdPHelper {
                 .getErrorHandler()
                 .processRequest(new HttpServletRequestAdapter(request),
                         new HttpServletResponseAdapter(response, request.isSecure()));
+    }
+
+    /**
+     * Sets an authentication failure.
+     * 
+     * @param servletContext The servlet context.
+     * @param request The HTTP request.
+     * @param e The authentication exception.
+     */
+    public static void setAuthenticationFailure(final ServletContext servletContext, final HttpServletRequest request,
+            final AuthenticationException e) {
+        getLoginContext(servletContext, request, true).setAuthenticationFailure(e);
     }
 }

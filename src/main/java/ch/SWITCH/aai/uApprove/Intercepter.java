@@ -51,6 +51,7 @@ import ch.SWITCH.aai.uApprove.ar.Attribute;
 import ch.SWITCH.aai.uApprove.ar.AttributeReleaseModule;
 import ch.SWITCH.aai.uApprove.ar.SAMLHelper;
 import ch.SWITCH.aai.uApprove.tou.ToUModule;
+import edu.internet2.middleware.shibboleth.idp.authn.PassiveAuthenticationException;
 
 /**
  * uApprove request intercepter.
@@ -175,6 +176,12 @@ public class Intercepter implements Filter {
         final String principalName = IdPHelper.getPrincipalName(servletContext, request);
         final String relyingPartyId = IdPHelper.getRelyingPartyId(servletContext, request);
         if (touModule.requiresToUAcceptance(principalName, relyingPartyId)) {
+
+            if (IdPHelper.isPassiveRequest(servletContext, request)) {
+                IdPHelper.setAuthenticationFailure(servletContext, request, new PassiveAuthenticationException());
+                return false;
+            }
+
             IdPHelper.redirectToServlet(servletContext, request, response, "/uApprove/TermsOfUse");
             return true;
         }
@@ -209,6 +216,12 @@ public class Intercepter implements Filter {
 
         if (attributeReleaseModule.requiresConsent(principalName, relyingPartyId, attributes)) {
             IdPHelper.setAttributes(servletContext, request, attributes);
+
+            if (IdPHelper.isPassiveRequest(servletContext, request)) {
+                IdPHelper.setAuthenticationFailure(servletContext, request, new PassiveAuthenticationException());
+                return false;
+            }
+
             IdPHelper.redirectToServlet(servletContext, request, response, "/uApprove/AttributeRelease");
             return true;
         }
