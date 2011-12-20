@@ -227,8 +227,8 @@ public final class IdPHelper {
     public static void
             testAndSetConsentRevocation(final ServletContext servletContext, final HttpServletRequest request) {
         final boolean consentRevocation = BooleanUtils.toBoolean(request.getParameter("uApprove.consent-revocation"));
+        LOGGER.trace("Consent revocation is {} set.", consentRevocation ? "" : "not");
         if (consentRevocation) {
-            LOGGER.trace("Consent revocation is set.");
             final LoginContext loginContext = getLoginContext(servletContext, request, true);
             loginContext.setProperty("uApprove.consent-revocation", consentRevocation);
         }
