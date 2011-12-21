@@ -161,6 +161,7 @@ h2. 3.1 Upgrade from uApprove < 2.3
 
 * Legacy uApprove (< 2.3) deployment: Please remove it.
 * Configuration files: Please use the new configuration file and tailor them to your needs. Note: The new ToU is an HTML file, which you can customize, just copy the content from your lecacy ToU XML to a plain HTML file.
+* JSP(JavaServer Pages): Please use the new provided JSP files. If you use "Reset Attribute Release Consent":#a4.1ResetAttributeReleaseConsent, please adjust your @login.jsp@.
 * Database Migration: It is possible to migrate ToU acceptance and attribute release consent data using the "provided data migration script":#DatabaseMigration.
 
 bq(note). If _Terms Of Use Content Comparison_ and/or _Attribute Value Comparison_ feature will be used,
