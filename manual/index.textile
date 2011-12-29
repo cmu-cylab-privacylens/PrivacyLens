@@ -175,6 +175,10 @@ bc.
 java -cp "$UAPPROVE_INSTALL$/scripts/lib/*.jar:$UAPPROVE_INSTALL$/lib/jdbc/optional/*.jar" groovy.ui.GroovyMain \
   $UAPPROVE_INSTALL$/scripts/StorageMigration.groovy /opt/uApprove/conf/database.properties $IDP_HOME$/conf/uApprove.properties
 
+h2. 3.2 Upgrade from uApprove 2.3 to 2.4
+
+* In version 2.4 "@c3p0@":http://www.mchange.com/projects/c3p0/ is used as the connection pooling library (instead of @boneCP@ in uApprove 2.3). The reason was, that some deployers reported connection repairing issues with remote databases. @c3p0@ offers also an easier deployment, because this library is used by the IdP as well. Please assure following upgrade steps:
+** Adjust the @uApprove.dataSource@ bean in @$IDP_HOME$/conf/uApprove.xml@ (i.e., replace the @bonecp.BoneCPDataSource@ with the @c3p0.ComboPooledDataSource@, see "(file)$UAPPROVE_INSTALL$/manual/configuration/uApprove.xml":configuration/uApprove.xml). Please refer to "JDBC Connection Pool Tuning":#JDBCConnectionPoolTuning for advanced configuration properties.
 
 h1. 4 Advanced Deployment
 
@@ -249,13 +253,13 @@ bc..
 
 h3. JDBC Connection Pool Tuning
 
-Cf. "BoneCP config API":http://jolbox.com/bonecp/downloads/site/apidocs/com/jolbox/bonecp/BoneCPConfig.html for a list of all the available configuration settings.
+Cf. "@c3p0@ configuration properties":http://www.mchange.com/projects/c3p0/#configuration_properties for a list of all available configuration properties.
 
 The settings are defined in @$IDP_HOME$/conf/uApprove.xml@:
 
 bc. 
-    <bean id="uApprove.dataSource" class="com.jolbox.bonecp.BoneCPDataSource" ...
-        p:minConnectionsPerPartition="1" p:maxConnectionsPerPartition="20" ... />
+    <bean id="uApprove.dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" ...
+        p:minPoolSize="3" p:maxPoolSize="15" ... />
 
 h3. Custom Storage
 

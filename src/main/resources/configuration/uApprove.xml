@@ -38,10 +38,9 @@
         </property>
     </bean>
 
-    <bean id="uApprove.dataSource" class="com.jolbox.bonecp.BoneCPDataSource" destroy-method="close" depends-on="shibboleth.LogbackLogging"
+    <bean id="uApprove.dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close" depends-on="shibboleth.LogbackLogging"
         p:driverClass="${database.driver}" p:jdbcUrl="${database.url}"
-        p:username="${database.username}" p:password="${database.password}"
-        p:minConnectionsPerPartition="1" p:maxConnectionsPerPartition="20" />
+        p:user="${database.username}" p:password="${database.password}" />
 
     <bean id="uApprove.viewHelper" class="ch.SWITCH.aai.uApprove.ViewHelper" init-method="initialize"
         p:defaultLocale="${view.defaultLocale}" p:forceDefaultLocale="${view.forceDefaultLocale}"
