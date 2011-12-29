@@ -67,6 +67,14 @@ public class JDBCStorage extends AbstractJDBCStorage implements Storage {
     }
 
     /** {@inheritDoc} */
+    public void createAttributeReleaseConsent(final String userId, final String relyingPartyId,
+            final AttributeReleaseConsent attributeReleaseConsent) {
+        getJdbcTemplate().update(getSqlStatements().getProperty("createAttributeReleaseConsent"), userId,
+                relyingPartyId, attributeReleaseConsent.getAttributeId(), attributeReleaseConsent.getValuesHash(),
+                attributeReleaseConsent.getDate().toDate());
+    }
+
+    /** {@inheritDoc} */
     public List<AttributeReleaseConsent> readAttributeReleaseConsents(final String userId, final String relyingPartyId) {
         try {
             return getJdbcTemplate().query(getSqlStatements().getProperty("readAttributeReleaseConsents"),
@@ -74,6 +82,14 @@ public class JDBCStorage extends AbstractJDBCStorage implements Storage {
         } catch (final EmptyResultDataAccessException e) {
             return Collections.emptyList();
         }
+    }
+
+    /** {@inheritDoc} */
+    public void updateAttributeReleaseConsent(final String userId, final String relyingPartyId,
+            final AttributeReleaseConsent attributeReleaseConsent) {
+        getJdbcTemplate().update(getSqlStatements().getProperty("updateAttributeReleaseConsent"),
+                attributeReleaseConsent.getValuesHash(), attributeReleaseConsent.getDate().toDate(), userId,
+                relyingPartyId, attributeReleaseConsent.getAttributeId());
     }
 
     /** {@inheritDoc} */
@@ -87,21 +103,5 @@ public class JDBCStorage extends AbstractJDBCStorage implements Storage {
             final String attributeId) {
         return getJdbcTemplate().queryForInt(getSqlStatements().getProperty("containsAttributeReleaseConsent"), userId,
                 relyingPartyId, attributeId) > 0;
-    }
-
-    /** {@inheritDoc} */
-    public void updateAttributeReleaseConsent(final String userId, final String relyingPartyId,
-            final AttributeReleaseConsent attributeReleaseConsent) {
-        getJdbcTemplate().update(getSqlStatements().getProperty("updateAttributeReleaseConsent"),
-                attributeReleaseConsent.getValuesHash(), attributeReleaseConsent.getDate().toDate(), userId,
-                relyingPartyId, attributeReleaseConsent.getAttributeId());
-    }
-
-    /** {@inheritDoc} */
-    public void createAttributeReleaseConsent(final String userId, final String relyingPartyId,
-            final AttributeReleaseConsent attributeReleaseConsent) {
-        getJdbcTemplate().update(getSqlStatements().getProperty("createAttributeReleaseConsent"), userId,
-                relyingPartyId, attributeReleaseConsent.getAttributeId(), attributeReleaseConsent.getValuesHash(),
-                attributeReleaseConsent.getDate().toDate());
     }
 }

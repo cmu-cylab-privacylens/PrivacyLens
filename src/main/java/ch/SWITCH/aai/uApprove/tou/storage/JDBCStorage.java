@@ -73,12 +73,6 @@ public class JDBCStorage extends AbstractJDBCStorage implements Storage {
     }
 
     /** {@inheritDoc} */
-    public void updateToUAcceptance(final String userId, final ToUAcceptance touAcceptance) {
-        getJdbcTemplate().update(getSqlStatements().getProperty("updateToUAcceptance"), touAcceptance.getFingerprint(),
-                touAcceptance.getAcceptanceDate().toDate(), userId, touAcceptance.getVersion());
-    }
-
-    /** {@inheritDoc} */
     public ToUAcceptance readToUAcceptance(final String userId, final String version) {
         try {
             return getJdbcTemplate().queryForObject(getSqlStatements().getProperty("readToUAcceptance"),
@@ -86,6 +80,12 @@ public class JDBCStorage extends AbstractJDBCStorage implements Storage {
         } catch (final EmptyResultDataAccessException e) {
             return null;
         }
+    }
+
+    /** {@inheritDoc} */
+    public void updateToUAcceptance(final String userId, final ToUAcceptance touAcceptance) {
+        getJdbcTemplate().update(getSqlStatements().getProperty("updateToUAcceptance"), touAcceptance.getFingerprint(),
+                touAcceptance.getAcceptanceDate().toDate(), userId, touAcceptance.getVersion());
     }
 
     /** {@inheritDoc} */

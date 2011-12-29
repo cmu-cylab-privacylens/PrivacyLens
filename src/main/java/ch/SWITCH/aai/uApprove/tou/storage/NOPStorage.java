@@ -27,42 +27,39 @@
 
 package ch.SWITCH.aai.uApprove.tou.storage;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ch.SWITCH.aai.uApprove.tou.ToUAcceptance;
 
-/** Storage interface for terms of use. */
-public interface Storage {
+/**
+ * No operation implementation of the terms of use acceptance storage interface. I.e., this implementation will not
+ * persist any data nor get any data.
+ */
+public class NOPStorage implements Storage {
 
-    /**
-     * Creates a terms of use acceptance.
-     * 
-     * @param userId The user id.
-     * @param touAcceptance terms of use acceptance.
-     */
-    public void createToUAcceptance(final String userId, final ToUAcceptance touAcceptance);
+    /** Class logger. */
+    @SuppressWarnings("unused")
+    private final Logger logger = LoggerFactory.getLogger(NOPStorage.class);
 
-    /**
-     * Reads a terms of use acceptance.
-     * 
-     * @param userId The user id.
-     * @param version Terms of use version.
-     * @return Returns a terms of use acceptance, might be empty but never null.
-     */
-    public ToUAcceptance readToUAcceptance(final String userId, final String version);
+    /** {@inheritDoc} */
+    public void createToUAcceptance(final String userId, final ToUAcceptance touAcceptance) {
+        return;
+    }
 
-    /**
-     * Updates a terms of use acceptance.
-     * 
-     * @param userId The user id.
-     * @param touAcceptance terms of use acceptance.
-     */
-    public void updateToUAcceptance(final String userId, final ToUAcceptance touAcceptance);
+    /** {@inheritDoc} */
+    public ToUAcceptance readToUAcceptance(final String userId, final String version) {
+        return null;
+    }
 
-    /**
-     * Checks if the storage contains a terms of use acceptance for a specific user.
-     * 
-     * @param userId The user id.
-     * @param version Terms of use version.
-     * @return Returns true if the storage contains the terms of use acceptance, false otherwise.
-     */
-    public boolean containsToUAcceptance(final String userId, final String version);
+    /** {@inheritDoc} */
+    public void updateToUAcceptance(final String userId, final ToUAcceptance touAcceptance) {
+        return;
+    }
+
+    /** {@inheritDoc} */
+    public boolean containsToUAcceptance(final String userId, final String version) {
+        return false;
+    }
+
 }
