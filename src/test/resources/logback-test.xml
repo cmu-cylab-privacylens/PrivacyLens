@@ -8,7 +8,7 @@
     </appender>
 
     <logger name="org.springframework" level="warn"/>
-    <logger name="com.jolbox.bonecp" level="warn"/>
+    <logger name="com.mchange.v2" level="warn"/>
     
     <root level="all">
         <appender-ref ref="STDOUT" />
