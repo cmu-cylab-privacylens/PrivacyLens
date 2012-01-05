@@ -143,7 +143,7 @@ public class Intercepter implements Filter {
 
         if (!IdPHelper.isAuthenticated(servletContext, request, response)) {
             logger.trace("Request is not authenticated.");
-            IdPHelper.testAndSetConsentRevocation(servletContext, request);
+            IdPHelper.setConsentRevocationRequested(servletContext, request);
             chain.doFilter(request, response);
             return;
         }
@@ -170,6 +170,10 @@ public class Intercepter implements Filter {
     private boolean handleTermsOfUse(final HttpServletRequest request, final HttpServletResponse response) {
 
         if (!touModule.isEnabled()) {
+            return false;
+        }
+
+        if (IdPHelper.isToUAccepted(servletContext, request)) {
             return false;
         }
 
@@ -202,16 +206,19 @@ public class Intercepter implements Filter {
             return false;
         }
 
+        if (IdPHelper.isAttributeReleaseConsented(servletContext, request)) {
+            return false;
+        }
+
         final String principalName = IdPHelper.getPrincipalName(servletContext, request);
         final String relyingPartyId = IdPHelper.getRelyingPartyId(servletContext, request);
         final List<Attribute> attributes =
                 samlHelper.resolveAttributes(principalName, relyingPartyId, viewHelper.selectLocale(request),
                         IdPHelper.getSession(request));
 
-        if (IdPHelper.isConsentRevocation(servletContext, request)) {
+        if (IdPHelper.isConsentRevocationRequested(servletContext, request)) {
             logger.debug("Consent revovation requested. Clear consent.");
             attributeReleaseModule.clearConsent(principalName, relyingPartyId);
-            IdPHelper.clearConsentRevocation(servletContext, request);
         }
 
         if (attributeReleaseModule.requiresConsent(principalName, relyingPartyId, attributes)) {

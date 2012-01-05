@@ -101,6 +101,7 @@ public class ToUServlet extends HttpServlet {
             if (BooleanUtils.toBoolean(req.getParameter("accept"))) {
                 final String principalName = IdPHelper.getPrincipalName(servletContext, req);
                 touModule.acceptToU(principalName);
+                IdPHelper.setToUAccepted(servletContext, req);
             }
             IdPHelper.returnToIdP(servletContext, req, resp);
         } catch (final Throwable t) {

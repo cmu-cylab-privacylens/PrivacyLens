@@ -224,13 +224,13 @@ public final class IdPHelper {
      * @param servletContext The servlet context.
      * @param request The HTTP request.
      */
-    public static void
-            testAndSetConsentRevocation(final ServletContext servletContext, final HttpServletRequest request) {
+    public static void setConsentRevocationRequested(final ServletContext servletContext,
+            final HttpServletRequest request) {
         final boolean consentRevocation = BooleanUtils.toBoolean(request.getParameter("uApprove.consent-revocation"));
         LOGGER.trace("Consent revocation is {} set.", consentRevocation ? "" : "not");
         if (consentRevocation) {
             final LoginContext loginContext = getLoginContext(servletContext, request, true);
-            loginContext.setProperty("uApprove.consent-revocation", consentRevocation);
+            loginContext.setProperty("uApprove.consentRevocationRequested", consentRevocation);
         }
     }
 
@@ -241,25 +241,15 @@ public final class IdPHelper {
      * @param request The HTTP request.
      * @return Returns true if consent revocation was requested.
      */
-    public static boolean isConsentRevocation(final ServletContext servletContext, final HttpServletRequest request) {
+    public static boolean isConsentRevocationRequested(final ServletContext servletContext,
+            final HttpServletRequest request) {
         final LoginContext loginContext = getLoginContext(servletContext, request, true);
-        final Object consentRevocation = loginContext.getProperty("uApprove.consent-revocation");
+        final Object consentRevocation = loginContext.getProperty("uApprove.consentRevocationRequested");
         if (consentRevocation instanceof Boolean) {
             return (Boolean) consentRevocation;
         } else {
             return false;
         }
-    }
-
-    /**
-     * Clears the consent revocation request.
-     * 
-     * @param servletContext The servlet context.
-     * @param request The HTTP request.
-     */
-    public static void clearConsentRevocation(final ServletContext servletContext, final HttpServletRequest request) {
-        final LoginContext loginContext = getLoginContext(servletContext, request, true);
-        loginContext.setProperty("uApprove.consent-revocation", false);
     }
 
     /**
@@ -287,6 +277,38 @@ public final class IdPHelper {
         @SuppressWarnings("unchecked") final List<Attribute> attributes =
                 (List<Attribute>) loginContext.getProperty("uApprove.attributes");
         return attributes;
+    }
+
+    public static void setToUAccepted(final ServletContext servletContext, final HttpServletRequest request) {
+        final LoginContext loginContext = getLoginContext(servletContext, request, true);
+        loginContext.setProperty("uApprove.touAccepted", true);
+    }
+
+    public static boolean isToUAccepted(final ServletContext servletContext, final HttpServletRequest request) {
+        final LoginContext loginContext = getLoginContext(servletContext, request, true);
+        final Object touAccepted = loginContext.getProperty("uApprove.touAccepted");
+        if (touAccepted instanceof Boolean) {
+            return (Boolean) touAccepted;
+        } else {
+            return false;
+        }
+    }
+
+    public static void setAttributeReleaseConsented(final ServletContext servletContext,
+            final HttpServletRequest request) {
+        final LoginContext loginContext = getLoginContext(servletContext, request, true);
+        loginContext.setProperty("uApprove.attributeReleaseConsented", true);
+    }
+
+    public static boolean isAttributeReleaseConsented(final ServletContext servletContext,
+            final HttpServletRequest request) {
+        final LoginContext loginContext = getLoginContext(servletContext, request, true);
+        final Object attributeReleaseConsented = loginContext.getProperty("uApprove.attributeReleaseConsented");
+        if (attributeReleaseConsented instanceof Boolean) {
+            return (Boolean) attributeReleaseConsented;
+        } else {
+            return false;
+        }
     }
 
     /**

@@ -142,9 +142,10 @@ public class AttributeReleaseModule {
     public void initialize() {
         if (enabled) {
             Validate.notNull(storage, "Storage is not set.");
+            logger.trace("Attribute Release initialized with storage type {}.", storage.getClass().getSimpleName());
             logger.debug(
-                    "Attribute Release Module initialzed with {} general consent. Attribute values are {}compared.",
-                    isAllowGeneralConsent() ? "enabled" : "disabled", compareAttributeValues ? "" : "not ");
+                    "Attribute Release Module initialzed with {} general consent. Attribute values are{}compared.",
+                    isAllowGeneralConsent() ? "enabled" : "disabled", compareAttributeValues ? " " : " not ");
         } else {
             logger.debug("Attribute Release Module is not enabled.");
         }

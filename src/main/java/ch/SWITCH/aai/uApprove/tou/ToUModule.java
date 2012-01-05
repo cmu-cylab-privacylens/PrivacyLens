@@ -133,10 +133,11 @@ public class ToUModule {
      */
     public void initialize() {
         if (enabled) {
-            Validate.notNull(tou, "ToU is not set.");
             Validate.notNull(storage, "Storage is not set.");
-            logger.debug("ToU Module initialized with ToU version {}. Content is {}compared.", getTou().getVersion(),
-                    compareContent ? "" : "not ");
+            logger.trace("ToU Module initialized with storage type {}.", storage.getClass().getSimpleName());
+            Validate.notNull(tou, "ToU is not set.");
+            logger.debug("ToU Module initialized with ToU version {}. Content is{}compared.", getTou().getVersion(),
+                    compareContent ? " " : " not ");
         } else {
             logger.debug("ToU Module is not enabled.");
         }

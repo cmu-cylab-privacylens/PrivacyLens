@@ -123,6 +123,7 @@ public class AttributeReleaseServlet extends HttpServlet {
                 logger.debug("Create consent for user {} to {}.", principalName, relyingPartyId);
                 attributeReleaseModule.consentAttributeRelease(principalName, relyingPartyId, attributes);
             }
+            IdPHelper.setAttributeReleaseConsented(servletContext, req);
             IdPHelper.returnToIdP(servletContext, req, resp);
         } catch (final Throwable t) {
             logger.error("Error while POST Attribute Release Servlet.", t);
