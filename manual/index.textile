@@ -260,14 +260,37 @@ The settings are defined in @$IDP_HOME$/conf/uApprove.xml@:
 bc. 
     <bean id="uApprove.dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" ...
         p:minPoolSize="3" p:maxPoolSize="15" ... />
+        
+N.B. You are free to use another JDBC connection pooling library (e.g., "BoneCP":http://jolbox.com/). Just provide the right data source class name in the bean definition as well the required libraries in the classpath.
 
-h3. Custom Storage
+h3. NOP Storage
+
+The NOP(No Operation) storage basically retrieves users ToU acceptance and/or attribute release consent without requiring any JDBC storage.
+This implies _alwaysRequireToUAcceptance_ and/or _alwaysRequireConsent_.
+
+You might enable NOP(No Operation) storage for the ToU and/or attribute release module in @$IDP_HOME$/conf/uApprove.xml@:
+
+bc. 
+    <bean id="uApprove.touModule" ...
+        ...
+        <property name="storage">
+            <bean class="ch.SWITCH.aai.uApprove.tou.storage.NOPStorage" />
+        </property>
+    </bean>
+
+bc. 
+    <bean id="uApprove.uApprove.attributeReleaseModule" ...
+        ...
+        <property name="storage">
+            <bean class="ch.SWITCH.aai.uApprove.ar.storage.NOPStorage" />
+        </property>
+    </bean>
+
+h3. Other Storage Implementations
 
 Custom storage implementations might be provided in future. Some ideas are:
 
-* NOP(No Operation) Storage: This basically will retrieve users ToU acceptance and/or attribute release consent without remembering. This implies _alwaysRequireToUAcceptance_ and/or _alwaysRequireConsent_.
 * Cookie based Storage: This will remember users consent within a cookie. It could stored for just the session or some defined period (e.g., 10 days).
-* In Memory Storage: Already possible with @mem@ HSQLDB. Will store consent as long as the IdP process is alive. Needs DB shema initialization.
 
 h2. 4.3 Templates
 
@@ -310,7 +333,21 @@ bc.
     </SPSSODescriptor>
 </EntityDescriptor>
 
-h2. 4.5 Attribute In Attribute Requester's Metadata Plugin
+h2. 4.5 Strict Comparison
+
+h3. Terms Of Use Content Comparison
+
+In the default configuration, only the ToU version is compared to evaluate if a user accepted the ToU. You might enable that the ToU content is compared too in @$IDP_HOME$/conf/uApprove.xml@: 
+
+bc. <bean id="uApprove.touModule" ... p:compareContent="true" ...
+
+h3. Attribute Value(s) Comparison
+
+In the default configuration, only the attribute ID is compared to evaluate if a user consented attibute release. You might enable that attribute value(s) are compared too in @$IDP_HOME$/conf/uApprove.xml@: 
+
+bc. <bean id="uApprove.attributeReleaseModule" ... p:compareAttributeValues="true" ...
+
+h2. 4.6 Attribute In Attribute Requester's Metadata Plugin
 
 h3. Installation
 
@@ -345,13 +382,10 @@ Example Permit Value Rule using the AttributeInMetadata Match Function:
 
 bc. <PermitValueRule xsi:type="ua:AttributeInMetadata" onlyIfRequired="false">
 
-h2. 4.6 Other
+h2. 4.7 Other
 
 Other topics will be added upon request. Some candidates are:
 
-* Strict Comparison
-** Terms Of Use Content Comparison
-** Attribute Value Comparison
 * Black/Whitelisting
 ** Different Lists for Terms Of Use and Attribute Release Module
 ** Specific authContextClassRef required
