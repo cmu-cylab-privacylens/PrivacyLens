@@ -43,6 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.SWITCH.aai.uApprove.ar.Attribute;
+import edu.internet2.middleware.shibboleth.common.log.AuditLogEntry;
 import edu.internet2.middleware.shibboleth.common.profile.AbstractErrorHandler;
 import edu.internet2.middleware.shibboleth.common.session.Session;
 import edu.internet2.middleware.shibboleth.idp.authn.AuthenticationException;
@@ -339,5 +340,19 @@ public final class IdPHelper {
     public static void setAuthenticationFailure(final ServletContext servletContext, final HttpServletRequest request,
             final AuthenticationException e) {
         getLoginContext(servletContext, request, true).setAuthenticationFailure(e);
+    }
+
+    public static void writeAuditLog(final String event, final String principalName, final String relyingPartyId,
+            final List<String> data) {
+
+        final AuditLogEntry auditLogEntry = new AuditLogEntry();
+        auditLogEntry.setRequestBinding("ch.SWITCH.aai.uApprove");
+        auditLogEntry.setMessageProfile(event);
+        auditLogEntry.setPrincipalName(principalName);
+        auditLogEntry.setRelyingPartyId(relyingPartyId);
+        auditLogEntry.getReleasedAttributes().addAll(data);
+
+        final Logger logger = LoggerFactory.getLogger(AuditLogEntry.AUDIT_LOGGER_NAME);
+        logger.info(auditLogEntry.toString());
     }
 }

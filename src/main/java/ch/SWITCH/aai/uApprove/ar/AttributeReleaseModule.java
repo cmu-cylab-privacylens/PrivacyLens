@@ -27,14 +27,18 @@
 
 package ch.SWITCH.aai.uApprove.ar;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.SWITCH.aai.uApprove.Util;
 import ch.SWITCH.aai.uApprove.ar.storage.Storage;
 
 /**
@@ -53,6 +57,9 @@ public class AttributeReleaseModule {
     /** Module enabled. */
     private boolean enabled;
 
+    /** Audit log enabled. */
+    private boolean auditLogEnabled;
+
     /** General Consent allowed. */
     private boolean allowGeneralConsent;
 
@@ -68,6 +75,7 @@ public class AttributeReleaseModule {
     /** Default constructor. */
     public AttributeReleaseModule() {
         enabled = false;
+        auditLogEnabled = false;
         allowGeneralConsent = false;
         enabledRelyingParties = Collections.emptyList();
         compareAttributeValues = true;
@@ -89,6 +97,15 @@ public class AttributeReleaseModule {
      */
     public boolean isEnabled() {
         return enabled;
+    }
+
+    /**
+     * Sets if the ToU audit log is enabled.
+     * 
+     * @param auditLogEnabled The auditLogEnabled to set.
+     */
+    public void setAuditLogEnabled(final boolean auditLogEnabled) {
+        this.auditLogEnabled = auditLogEnabled;
     }
 
     /**
@@ -195,6 +212,10 @@ public class AttributeReleaseModule {
         logger.info("Clear user consent for {}.", principalName);
         storage.deleteAttributeReleaseConsents(principalName, WILDCARD);
         storage.deleteAttributeReleaseConsents(principalName, relyingPartyId);
+
+        if (auditLogEnabled) {
+            Util.auditLog("ar.clearConsent", principalName, relyingPartyId, Arrays.asList(new String[] {}));
+        }
     }
 
     /**
@@ -221,6 +242,14 @@ public class AttributeReleaseModule {
                 storage.createAttributeReleaseConsent(principalName, relyingPartyId, attributeReleaseConsent);
             }
         }
+
+        if (auditLogEnabled) {
+            final List<String> attributeIds = new ArrayList<String>();
+            for (final Attribute attribute : attributes) {
+                attributeIds.add(attribute.getId());
+            }
+            Util.auditLog("ar.consent", principalName, relyingPartyId, attributeIds);
+        }
     }
 
     /**
@@ -233,5 +262,9 @@ public class AttributeReleaseModule {
         final AttributeReleaseConsent attributeRelease =
                 new AttributeReleaseConsent(WILDCARD, WILDCARD, new DateTime());
         storage.createAttributeReleaseConsent(principalName, WILDCARD, attributeRelease);
+
+        if (auditLogEnabled) {
+            Util.auditLog("ar.generalConsent", principalName, StringUtils.EMPTY, Arrays.asList(new String[] {}));
+        }
     }
 }

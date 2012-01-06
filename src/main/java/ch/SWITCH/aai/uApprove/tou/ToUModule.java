@@ -27,13 +27,16 @@
 
 package ch.SWITCH.aai.uApprove.tou;
 
+import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.SWITCH.aai.uApprove.Util;
 import ch.SWITCH.aai.uApprove.tou.storage.Storage;
 
 /**
@@ -46,6 +49,9 @@ public class ToUModule {
 
     /** Module enabled. */
     private boolean enabled;
+
+    /** Audit log enabled. */
+    private boolean auditLogEnabled;
 
     /** Terms Of Use. */
     private ToU tou;
@@ -62,6 +68,7 @@ public class ToUModule {
     /** Default constructor. */
     public ToUModule() {
         enabled = false;
+        auditLogEnabled = false;
         compareContent = true;
     }
 
@@ -81,6 +88,15 @@ public class ToUModule {
      */
     public boolean isEnabled() {
         return enabled;
+    }
+
+    /**
+     * Sets if the ToU audit log is enabled.
+     * 
+     * @param auditLogEnabled The auditLogEnabled to set.
+     */
+    public void setAuditLogEnabled(final boolean auditLogEnabled) {
+        this.auditLogEnabled = auditLogEnabled;
     }
 
     /**
@@ -182,6 +198,11 @@ public class ToUModule {
         } else {
             logger.debug("Create ToU acceptance for user {} and ToU version {}.", principalName, tou.getVersion());
             storage.createToUAcceptance(principalName, touAcceptance);
+        }
+
+        if (auditLogEnabled) {
+            Util.auditLog("tou.acceptance", principalName, StringUtils.EMPTY,
+                    Arrays.asList(new String[] {touAcceptance.getVersion(), touAcceptance.getFingerprint()}));
         }
     }
 }

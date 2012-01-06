@@ -11,7 +11,7 @@
 
 
     <bean id="uApprove.touModule" class="ch.SWITCH.aai.uApprove.tou.ToUModule" init-method="initialize"
-        p:enabled="${tou.enabled}" p:compareContent="false">
+        p:enabled="${tou.enabled}" p:auditLogEnabled="false" p:compareContent="false">
         <property name="tou">
             <bean class="ch.SWITCH.aai.uApprove.tou.ToU" init-method="initialize"
                 p:version="${tou.version}" p:resource="${tou.resource}" />
@@ -27,7 +27,7 @@
     </bean>
 
     <bean id="uApprove.attributeReleaseModule" class="ch.SWITCH.aai.uApprove.ar.AttributeReleaseModule" init-method="initialize"
-        p:enabled="${ar.enabled}" p:allowGeneralConsent="${ar.allowGeneralConsent}" p:compareAttributeValues="false">
+        p:enabled="${ar.enabled}" p:auditLogEnabled="false" p:allowGeneralConsent="${ar.allowGeneralConsent}" p:compareAttributeValues="false">
         <property name="relyingParties">
             <bean class="ch.SWITCH.aai.uApprove.RelyingPartyList"
                 p:regularExpressions="${services}" p:blacklist="${services.blacklist}" />

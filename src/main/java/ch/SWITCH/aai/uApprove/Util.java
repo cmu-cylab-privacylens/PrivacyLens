@@ -109,4 +109,9 @@ public final class Util {
         }
         return Arrays.asList(input.split("\\s+"));
     }
+
+    public static void auditLog(final String event, final String principalName, final String relyingPartyId,
+            final List<String> data) {
+        IdPHelper.writeAuditLog(event, principalName, relyingPartyId, data);
+    }
 }
