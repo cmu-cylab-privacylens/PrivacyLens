@@ -3,11 +3,13 @@ Release 2.4.0 2012-01-xx
 #1011 - Keep acceptance/approval state in LoginContext.
 #1013 - NOP Storage (alwaysRequireToUAcceptance/alwaysRequireConsent).
 #1168 - Switch from BoneCP to c3p0.
+#1178 - Enable audit logging.
 
       - Manual corrections and improvements.
         - BoneCP replaced by c3p0 as default JDBC pooling library.
-        - alwaysRequireToUAcceptance alwaysRequireConsent (NOPStorage) documented.
+        - NOP Storage (alwaysRequireToUAcceptance/alwaysRequireConsent) documented.
         - Strict value and content comparison documented.
+        - Audit logging documentation.
 
 Release 2.3.2 2011-11-24
 ------------------------

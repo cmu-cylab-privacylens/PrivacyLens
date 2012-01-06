@@ -347,7 +347,35 @@ In the default configuration, only the attribute ID is compared to evaluate if a
 
 bc. <bean id="uApprove.attributeReleaseModule" ... p:compareAttributeValues="true" ...
 
-h2. 4.6 Attribute In Attribute Requester's Metadata Plugin
+
+h2. 4.6 Audit Logging
+
+uApprove allows (faciliating the IDP's audit log) to enable audit logging to @$IDP_HOME$/logs/idp-audit.log@.
+
+h3. Enable Terms Of Use Audit Log
+
+You might enable ToU audit log in in @$IDP_HOME$/conf/uApprove.xml@: 
+
+bc. <bean id="uApprove.touModule" ... p:auditLogEnabled="true" ...
+
+Example:
+
+bc. 20120101T010000Z|ch.SWITCH.aai.uApprove|||tou.acceptance|null|null|null|student1||1.0,5b2ee897c08c79a09cd57e8602d605bf8c52db17de9793677c36b5c78644b2b3,|
+
+h3. Enable Attribute Release Audit Log
+
+You might enable attribute release audit log in in @$IDP_HOME$/conf/uApprove.xml@:
+
+bc. <bean id="uApprove.attributeReleaseModule" ... p:auditLogEnabled="true" ...
+
+Examples:
+
+bc. 
+20120101T010000Z|ch.SWITCH.aai.uApprove||https://sp.example.org/shibboleth|ar.consent|null|null|null|student1||uid,surname,givenName,|
+20120101T010000Z|ch.SWITCH.aai.uApprove||https://sp.example.org/shibboleth|ar.clearConsent|null|null|null|student1|||
+20120101T010000Z|ch.SWITCH.aai.uApprove|||ar.generalConsent|null|null|null|student1|||
+
+h2. 4.7 Attribute In Attribute Requester's Metadata Plugin
 
 h3. Installation
 
@@ -382,7 +410,7 @@ Example Permit Value Rule using the AttributeInMetadata Match Function:
 
 bc. <PermitValueRule xsi:type="ua:AttributeInMetadata" onlyIfRequired="false">
 
-h2. 4.7 Other
+h2. 4.8 Other
 
 Other topics will be added upon request. Some candidates are:
 
