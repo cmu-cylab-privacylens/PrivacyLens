@@ -280,11 +280,24 @@ public final class IdPHelper {
         return attributes;
     }
 
+    /**
+     * Sets ToU accepted.
+     * 
+     * @param servletContext The servlet context.
+     * @param request The HTTP request.
+     */
     public static void setToUAccepted(final ServletContext servletContext, final HttpServletRequest request) {
         final LoginContext loginContext = getLoginContext(servletContext, request, true);
         loginContext.setProperty("uApprove.touAccepted", true);
     }
 
+    /**
+     * Gets ToU accepted.
+     * 
+     * @param servletContext The servlet context.
+     * @param request The HTTP request.
+     * @return Returns true if ToU is accepted.
+     */
     public static boolean isToUAccepted(final ServletContext servletContext, final HttpServletRequest request) {
         final LoginContext loginContext = getLoginContext(servletContext, request, true);
         final Object touAccepted = loginContext.getProperty("uApprove.touAccepted");
@@ -295,12 +308,25 @@ public final class IdPHelper {
         }
     }
 
+    /**
+     * Sets attribute release consented.
+     * 
+     * @param servletContext The servlet context.
+     * @param request The HTTP request.
+     */
     public static void setAttributeReleaseConsented(final ServletContext servletContext,
             final HttpServletRequest request) {
         final LoginContext loginContext = getLoginContext(servletContext, request, true);
         loginContext.setProperty("uApprove.attributeReleaseConsented", true);
     }
 
+    /**
+     * Gets attribute release consented.
+     * 
+     * @param servletContext The servlet context.
+     * @param request The HTTP request.
+     * @return Returns true if attribute release is consented.
+     */
     public static boolean isAttributeReleaseConsented(final ServletContext servletContext,
             final HttpServletRequest request) {
         final LoginContext loginContext = getLoginContext(servletContext, request, true);
@@ -342,6 +368,14 @@ public final class IdPHelper {
         getLoginContext(servletContext, request, true).setAuthenticationFailure(e);
     }
 
+    /**
+     * Writes an audit log entry using the IdPs facilities.
+     * 
+     * @param event The event to log.
+     * @param principalName The principal name to log.
+     * @param relyingPartyId The relying party id to log.
+     * @param data The data to log.
+     */
     public static void writeAuditLog(final String event, final String principalName, final String relyingPartyId,
             final List<String> data) {
 

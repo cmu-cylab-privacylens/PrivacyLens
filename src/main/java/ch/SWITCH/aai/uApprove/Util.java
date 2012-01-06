@@ -110,6 +110,14 @@ public final class Util {
         return Arrays.asList(input.split("\\s+"));
     }
 
+    /**
+     * Logs an audit log.
+     * 
+     * @param event The event to log.
+     * @param principalName The principal name to log.
+     * @param relyingPartyId The relying party id to log.
+     * @param data The data to log.
+     */
     public static void auditLog(final String event, final String principalName, final String relyingPartyId,
             final List<String> data) {
         IdPHelper.writeAuditLog(event, principalName, relyingPartyId, data);

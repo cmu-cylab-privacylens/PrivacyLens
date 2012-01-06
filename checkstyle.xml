@@ -87,7 +87,7 @@
     <module name="PackageDeclaration"/>
     <module name="ParameterAssignment"/>
     <module name="ReturnCount">
-      <property name="max" value="4"/>
+      <property name="max" value="8"/>
     </module>
     <module name="StringLiteralEquality"/>
     <module name="SuperFinalize"/>
