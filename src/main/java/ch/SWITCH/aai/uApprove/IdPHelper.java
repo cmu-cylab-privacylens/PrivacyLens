@@ -133,7 +133,7 @@ public final class IdPHelper {
         }
 
         final boolean isPrincipalAuthenticated = loginContext.isPrincipalAuthenticated();
-        LOGGER.trace("Principal is {}autenticated.", isPrincipalAuthenticated ? "" : "not ");
+        LOGGER.trace("Principal is {}authenticated.", isPrincipalAuthenticated ? "" : "not ");
 
         return isPrincipalAuthenticated;
     }
