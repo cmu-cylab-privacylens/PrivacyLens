@@ -259,7 +259,9 @@ The settings are defined in @$IDP_HOME$/conf/uApprove.xml@:
 
 bc. 
     <bean id="uApprove.dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" ...
-        p:minPoolSize="3" p:maxPoolSize="15" ... />
+        ...
+        p:preferredTestQuery="select 1;" p:idleConnectionTestPeriod="200"
+        p:minPoolSize="3" p:maxPoolSize="15"/>
         
 N.B. You are free to use another JDBC connection pooling library (e.g., "BoneCP":http://jolbox.com/). Just provide the right data source class name in the bean definition as well the required libraries in the classpath.
 
