@@ -125,7 +125,7 @@ public final class IdPHelper {
             return false;
         }
 
-        if (request.getParameterMap().containsKey("SAMLRequest")) {
+        if (request.getParameterMap().containsKey("SAMLRequest") || request.getParameterMap().containsKey("shire")) {
             LOGGER.trace("Unbind login context.");
             HttpServletHelper.unbindLoginContext(HttpServletHelper.getStorageService(servletContext), servletContext,
                     request, response);
