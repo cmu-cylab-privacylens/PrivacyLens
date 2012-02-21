@@ -93,6 +93,11 @@ public class JDBCStorage extends AbstractJDBCStorage implements Storage {
 
     /** {@inheritDoc} */
     public boolean containsToUAcceptance(final String userId, final String version) {
-        return getJdbcTemplate().queryForInt(getSqlStatements().getProperty("containsToUAcceptance"), userId, version) > 0;
+        try {
+            return getJdbcTemplate().queryForInt(getSqlStatements().getProperty("containsToUAcceptance"), userId,
+                    version) > 0;
+        } catch (final InvalidResultSetAccessException e) {
+            return false;
+        }
     }
 }

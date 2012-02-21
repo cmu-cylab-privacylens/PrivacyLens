@@ -104,7 +104,11 @@ public class JDBCStorage extends AbstractJDBCStorage implements Storage {
     /** {@inheritDoc} */
     public boolean containsAttributeReleaseConsent(final String userId, final String relyingPartyId,
             final String attributeId) {
-        return getJdbcTemplate().queryForInt(getSqlStatements().getProperty("containsAttributeReleaseConsent"), userId,
-                relyingPartyId, attributeId) > 0;
+        try {
+            return getJdbcTemplate().queryForInt(getSqlStatements().getProperty("containsAttributeReleaseConsent"),
+                    userId, relyingPartyId, attributeId) > 0;
+        } catch (final InvalidResultSetAccessException e) {
+            return false;
+        }
     }
 }
