@@ -5,4 +5,4 @@ CREATE TABLE ToUAcceptance (
  acceptanceDate TIMESTAMP    DEFAULT CURRENT_TIMESTAMP NOT NULL,
     
  PRIMARY KEY (userId, version)
-);
+)

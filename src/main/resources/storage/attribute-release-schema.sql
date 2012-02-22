@@ -6,4 +6,4 @@ CREATE TABLE AttributeReleaseConsent (
  consentDate    TIMESTAMP    DEFAULT CURRENT_TIMESTAMP NOT NULL,
 
  PRIMARY KEY (userId, relyingPartyId, attributeId)
-);
+)
