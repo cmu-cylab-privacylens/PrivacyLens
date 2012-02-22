@@ -61,7 +61,7 @@ bc..
 
     <context-param>
         <param-name>contextConfigLocation</param-name>
-        <param-value>$IDP_HOME$$/conf/internal.xml; $IDP_HOME$/conf/service.xml; $IDP_HOME$/conf/uApprove.xml</param-value>
+        <param-value>$IDP_HOME$/conf/internal.xml; $IDP_HOME$/conf/service.xml; $IDP_HOME$/conf/uApprove.xml</param-value>
     </context-param>
 
     <!-- IdP Listeners, Filters and Servlets -->
