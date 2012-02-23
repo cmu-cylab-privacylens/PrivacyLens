@@ -36,6 +36,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.dao.RecoverableDataAccessException;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 
 import ch.SWITCH.aai.uApprove.AbstractJDBCStorage;
@@ -69,9 +70,14 @@ public class JDBCStorage extends AbstractJDBCStorage implements Storage {
     /** {@inheritDoc} */
     public void createAttributeReleaseConsent(final String userId, final String relyingPartyId,
             final AttributeReleaseConsent attributeReleaseConsent) {
-        getJdbcTemplate().update(getSqlStatements().getProperty("createAttributeReleaseConsent"), userId,
-                relyingPartyId, attributeReleaseConsent.getAttributeId(), attributeReleaseConsent.getValuesHash(),
-                attributeReleaseConsent.getDate().toDate());
+        try {
+            getJdbcTemplate().update(getSqlStatements().getProperty("createAttributeReleaseConsent"), userId,
+                    relyingPartyId, attributeReleaseConsent.getAttributeId(), attributeReleaseConsent.getValuesHash(),
+                    attributeReleaseConsent.getDate().toDate());
+        } catch (final RecoverableDataAccessException e) {
+            handleRecoverableDataAccessException(e);
+        }
+
     }
 
     /** {@inheritDoc} */
@@ -81,27 +87,43 @@ public class JDBCStorage extends AbstractJDBCStorage implements Storage {
                     attributeReleaseConsentMapper, userId, relyingPartyId);
         } catch (final EmptyResultDataAccessException e) {
             return Collections.emptyList();
+        } catch (final RecoverableDataAccessException e) {
+            handleRecoverableDataAccessException(e);
+            return Collections.emptyList();
         }
     }
 
     /** {@inheritDoc} */
     public void updateAttributeReleaseConsent(final String userId, final String relyingPartyId,
             final AttributeReleaseConsent attributeReleaseConsent) {
-        getJdbcTemplate().update(getSqlStatements().getProperty("updateAttributeReleaseConsent"),
-                attributeReleaseConsent.getValuesHash(), attributeReleaseConsent.getDate().toDate(), userId,
-                relyingPartyId, attributeReleaseConsent.getAttributeId());
+        try {
+            getJdbcTemplate().update(getSqlStatements().getProperty("updateAttributeReleaseConsent"),
+                    attributeReleaseConsent.getValuesHash(), attributeReleaseConsent.getDate().toDate(), userId,
+                    relyingPartyId, attributeReleaseConsent.getAttributeId());
+        } catch (final RecoverableDataAccessException e) {
+            handleRecoverableDataAccessException(e);
+        }
     }
 
     /** {@inheritDoc} */
     public void deleteAttributeReleaseConsents(final String userId, final String relyingPartyId) {
-        getJdbcTemplate().update(getSqlStatements().getProperty("deleteAttributeReleaseConsents"), userId,
-                relyingPartyId);
+        try {
+            getJdbcTemplate().update(getSqlStatements().getProperty("deleteAttributeReleaseConsents"), userId,
+                    relyingPartyId);
+        } catch (final RecoverableDataAccessException e) {
+            handleRecoverableDataAccessException(e);
+        }
     }
 
     /** {@inheritDoc} */
     public boolean containsAttributeReleaseConsent(final String userId, final String relyingPartyId,
             final String attributeId) {
-        return getJdbcTemplate().queryForInt(getSqlStatements().getProperty("containsAttributeReleaseConsent"), userId,
-                relyingPartyId, attributeId) > 0;
+        try {
+            return getJdbcTemplate().queryForInt(getSqlStatements().getProperty("containsAttributeReleaseConsent"),
+                    userId, relyingPartyId, attributeId) > 0;
+        } catch (final RecoverableDataAccessException e) {
+            handleRecoverableDataAccessException(e);
+            return false;
+        }
     }
 }

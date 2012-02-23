@@ -36,6 +36,7 @@ import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
+import org.springframework.dao.RecoverableDataAccessException;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 
 /**
@@ -51,6 +52,14 @@ public abstract class AbstractJDBCStorage {
 
     /** The JDBC template. */
     private SimpleJdbcTemplate jdbcTemplate;
+
+    /** Whether JDBC connections should be handled graceful. */
+    private boolean isGraceful;
+
+    /** Default constructor. */
+    protected AbstractJDBCStorage() {
+        isGraceful = false;
+    }
 
     /**
      * Sets the data source.
@@ -77,6 +86,15 @@ public abstract class AbstractJDBCStorage {
     }
 
     /**
+     * Sets whether is graceful or not.
+     * 
+     * @param isGraceful The graceful to set.
+     */
+    public void setGraceful(final boolean isGraceful) {
+        this.isGraceful = isGraceful;
+    }
+
+    /**
      * Gets the sql statements.
      * 
      * @return Returns the sqlStatements.
@@ -100,5 +118,18 @@ public abstract class AbstractJDBCStorage {
     public void initialize() {
         Validate.notNull(jdbcTemplate, "Datasource is not set.");
         Validate.notEmpty(sqlStatements, "SQL statements are not set.");
+    }
+
+    /**
+     * Handles recoverable exceptions dependent of being graceful or not.
+     * 
+     * @param e The exception.
+     */
+    protected void handleRecoverableDataAccessException(final RecoverableDataAccessException e) {
+        if (isGraceful) {
+            logger.warn("Storage issue.", e);
+        } else {
+            throw e;
+        }
     }
 }

@@ -22,7 +22,7 @@
         </property>
         <property name="storage">
             <bean class="ch.SWITCH.aai.uApprove.tou.storage.JDBCStorage" init-method="initialize"
-                p:dataSource-ref="uApprove.dataSource" p:sqlStatements="classpath:/storage/sql-statements.properties" />
+                p:dataSource-ref="uApprove.dataSource" p:sqlStatements="classpath:/storage/sql-statements.properties" p:graceful="false" />
         </property>
     </bean>
 
@@ -34,7 +34,7 @@
         </property>
         <property name="storage">
             <bean class="ch.SWITCH.aai.uApprove.ar.storage.JDBCStorage" init-method="initialize"
-                p:dataSource-ref="uApprove.dataSource" p:sqlStatements="classpath:/storage/sql-statements.properties" />
+                p:dataSource-ref="uApprove.dataSource" p:sqlStatements="classpath:/storage/sql-statements.properties" p:graceful="false" />
         </property>
     </bean>
 

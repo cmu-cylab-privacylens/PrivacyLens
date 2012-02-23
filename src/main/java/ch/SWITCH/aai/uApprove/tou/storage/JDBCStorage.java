@@ -34,6 +34,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.dao.RecoverableDataAccessException;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 
 import ch.SWITCH.aai.uApprove.AbstractJDBCStorage;
@@ -68,8 +69,13 @@ public class JDBCStorage extends AbstractJDBCStorage implements Storage {
 
     /** {@inheritDoc} */
     public void createToUAcceptance(final String userId, final ToUAcceptance touAcceptance) {
-        getJdbcTemplate().update(getSqlStatements().getProperty("createToUAcceptance"), userId,
-                touAcceptance.getVersion(), touAcceptance.getFingerprint(), touAcceptance.getAcceptanceDate().toDate());
+        try {
+            getJdbcTemplate().update(getSqlStatements().getProperty("createToUAcceptance"), userId,
+                    touAcceptance.getVersion(), touAcceptance.getFingerprint(),
+                    touAcceptance.getAcceptanceDate().toDate());
+        } catch (final RecoverableDataAccessException e) {
+            handleRecoverableDataAccessException(e);
+        }
     }
 
     /** {@inheritDoc} */
@@ -79,17 +85,31 @@ public class JDBCStorage extends AbstractJDBCStorage implements Storage {
                     touAcceptanceMapper, userId, version);
         } catch (final EmptyResultDataAccessException e) {
             return null;
+        } catch (final RecoverableDataAccessException e) {
+            handleRecoverableDataAccessException(e);
+            return null;
         }
     }
 
     /** {@inheritDoc} */
     public void updateToUAcceptance(final String userId, final ToUAcceptance touAcceptance) {
-        getJdbcTemplate().update(getSqlStatements().getProperty("updateToUAcceptance"), touAcceptance.getFingerprint(),
-                touAcceptance.getAcceptanceDate().toDate(), userId, touAcceptance.getVersion());
+        try {
+            getJdbcTemplate().update(getSqlStatements().getProperty("updateToUAcceptance"),
+                    touAcceptance.getFingerprint(), touAcceptance.getAcceptanceDate().toDate(), userId,
+                    touAcceptance.getVersion());
+        } catch (final RecoverableDataAccessException e) {
+            handleRecoverableDataAccessException(e);
+        }
     }
 
     /** {@inheritDoc} */
     public boolean containsToUAcceptance(final String userId, final String version) {
-        return getJdbcTemplate().queryForInt(getSqlStatements().getProperty("containsToUAcceptance"), userId, version) > 0;
+        try {
+            return getJdbcTemplate().queryForInt(getSqlStatements().getProperty("containsToUAcceptance"), userId,
+                    version) > 0;
+        } catch (final RecoverableDataAccessException e) {
+            handleRecoverableDataAccessException(e);
+            return false;
+        }
     }
 }

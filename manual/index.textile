@@ -236,8 +236,8 @@ bc..
     <bean id="uApprove.touModule" class="ch.SWITCH.aai.uApprove.tou.ToUModule" ...>
         <!-- ... -->
         <property name="storage">
-            <bean class="ch.SWITCH.aai.uApprove.tou.storage.JDBCStorage" init-method="initialize"
-                p:dataSource-ref="uApprove.dataSource" p:sqlStatements="file:/$IDP_HOME$/conf/uApprove.sql-statements.properties" />
+            <bean class="ch.SWITCH.aai.uApprove.tou.storage.JDBCStorage" ...
+                p:sqlStatements="file:/$IDP_HOME$/conf/uApprove.sql-statements.properties" ... />
         </property>
     </bean>
     
@@ -246,8 +246,35 @@ bc..
     <bean id="uApprove.attributeReleaseModule" class="ch.SWITCH.aai.uApprove.ar.AttributeReleaseModule" ...>
         <!-- ... -->
         <property name="storage">
-            <bean class="ch.SWITCH.aai.uApprove.ar.storage.JDBCStorage" init-method="initialize"
-                p:dataSource-ref="uApprove.dataSource" p:sqlStatements="file:/$IDP_HOME$/conf/uApprove.sql-statements.properties" />
+            <bean class="ch.SWITCH.aai.uApprove.ar.storage.JDBCStorage" ...
+               p:sqlStatements="file:/$IDP_HOME$/conf/uApprove.sql-statements.properties" ... />
+        </property>
+    </bean>
+    
+h2. Graceful JDBC Connection Handling
+
+The JDBC storage can be configured to act graceful in case of a tempory database issue (e.g., communication link is not available).
+Instead throwing exceptions and display the error page, no persistent actions are applied.
+This implies that the users, idenpently of former ToU accetances and/or attribute release consents have to accept/consent again (if they already had) or have to do it during the next login (if it was the first time).
+
+The settings are defined in @$IDP_HOME$/conf/uApprove.xml@:
+
+bc. 
+    <bean id="uApprove.touModule" class="ch.SWITCH.aai.uApprove.tou.ToUModule" ...>
+        <!-- ... -->
+        <property name="storage">
+            <bean class="ch.SWITCH.aai.uApprove.tou.storage.JDBCStorage" ...
+                p:graceful="true" ... />
+        </property>
+    </bean>
+    
+    <!-- ... -->
+    
+    <bean id="uApprove.attributeReleaseModule" class="ch.SWITCH.aai.uApprove.ar.AttributeReleaseModule" ...>
+        <!-- ... -->
+        <property name="storage">
+            <bean class="ch.SWITCH.aai.uApprove.ar.storage.JDBCStorage" ...
+               p:graceful="true"
         </property>
     </bean>
 
