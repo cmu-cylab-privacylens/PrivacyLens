@@ -36,7 +36,7 @@ import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
-import org.springframework.dao.RecoverableDataAccessException;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 
 /**
@@ -121,11 +121,11 @@ public abstract class AbstractJDBCStorage {
     }
 
     /**
-     * Handles recoverable exceptions dependent of being graceful or not.
+     * Handles data access exceptions dependent of being graceful or not.
      * 
      * @param e The exception.
      */
-    protected void handleRecoverableDataAccessException(final RecoverableDataAccessException e) {
+    protected void handleDataAccessException(final DataAccessException e) {
         if (isGraceful) {
             logger.warn("Storage issue.", e);
         } else {

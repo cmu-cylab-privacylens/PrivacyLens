@@ -35,8 +35,8 @@ import java.util.List;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.dao.RecoverableDataAccessException;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 
 import ch.SWITCH.aai.uApprove.AbstractJDBCStorage;
@@ -74,8 +74,8 @@ public class JDBCStorage extends AbstractJDBCStorage implements Storage {
             getJdbcTemplate().update(getSqlStatements().getProperty("createAttributeReleaseConsent"), userId,
                     relyingPartyId, attributeReleaseConsent.getAttributeId(), attributeReleaseConsent.getValuesHash(),
                     attributeReleaseConsent.getDate().toDate());
-        } catch (final RecoverableDataAccessException e) {
-            handleRecoverableDataAccessException(e);
+        } catch (final DataAccessException e) {
+            handleDataAccessException(e);
         }
 
     }
@@ -87,8 +87,8 @@ public class JDBCStorage extends AbstractJDBCStorage implements Storage {
                     attributeReleaseConsentMapper, userId, relyingPartyId);
         } catch (final EmptyResultDataAccessException e) {
             return Collections.emptyList();
-        } catch (final RecoverableDataAccessException e) {
-            handleRecoverableDataAccessException(e);
+        } catch (final DataAccessException e) {
+            handleDataAccessException(e);
             return Collections.emptyList();
         }
     }
@@ -100,8 +100,8 @@ public class JDBCStorage extends AbstractJDBCStorage implements Storage {
             getJdbcTemplate().update(getSqlStatements().getProperty("updateAttributeReleaseConsent"),
                     attributeReleaseConsent.getValuesHash(), attributeReleaseConsent.getDate().toDate(), userId,
                     relyingPartyId, attributeReleaseConsent.getAttributeId());
-        } catch (final RecoverableDataAccessException e) {
-            handleRecoverableDataAccessException(e);
+        } catch (final DataAccessException e) {
+            handleDataAccessException(e);
         }
     }
 
@@ -110,8 +110,8 @@ public class JDBCStorage extends AbstractJDBCStorage implements Storage {
         try {
             getJdbcTemplate().update(getSqlStatements().getProperty("deleteAttributeReleaseConsents"), userId,
                     relyingPartyId);
-        } catch (final RecoverableDataAccessException e) {
-            handleRecoverableDataAccessException(e);
+        } catch (final DataAccessException e) {
+            handleDataAccessException(e);
         }
     }
 
@@ -121,8 +121,8 @@ public class JDBCStorage extends AbstractJDBCStorage implements Storage {
         try {
             return getJdbcTemplate().queryForInt(getSqlStatements().getProperty("containsAttributeReleaseConsent"),
                     userId, relyingPartyId, attributeId) > 0;
-        } catch (final RecoverableDataAccessException e) {
-            handleRecoverableDataAccessException(e);
+        } catch (final DataAccessException e) {
+            handleDataAccessException(e);
             return false;
         }
     }

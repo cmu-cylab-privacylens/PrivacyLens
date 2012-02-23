@@ -33,8 +33,8 @@ import java.sql.SQLException;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.dao.RecoverableDataAccessException;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 
 import ch.SWITCH.aai.uApprove.AbstractJDBCStorage;
@@ -73,8 +73,8 @@ public class JDBCStorage extends AbstractJDBCStorage implements Storage {
             getJdbcTemplate().update(getSqlStatements().getProperty("createToUAcceptance"), userId,
                     touAcceptance.getVersion(), touAcceptance.getFingerprint(),
                     touAcceptance.getAcceptanceDate().toDate());
-        } catch (final RecoverableDataAccessException e) {
-            handleRecoverableDataAccessException(e);
+        } catch (final DataAccessException e) {
+            handleDataAccessException(e);
         }
     }
 
@@ -85,8 +85,8 @@ public class JDBCStorage extends AbstractJDBCStorage implements Storage {
                     touAcceptanceMapper, userId, version);
         } catch (final EmptyResultDataAccessException e) {
             return null;
-        } catch (final RecoverableDataAccessException e) {
-            handleRecoverableDataAccessException(e);
+        } catch (final DataAccessException e) {
+            handleDataAccessException(e);
             return null;
         }
     }
@@ -97,8 +97,8 @@ public class JDBCStorage extends AbstractJDBCStorage implements Storage {
             getJdbcTemplate().update(getSqlStatements().getProperty("updateToUAcceptance"),
                     touAcceptance.getFingerprint(), touAcceptance.getAcceptanceDate().toDate(), userId,
                     touAcceptance.getVersion());
-        } catch (final RecoverableDataAccessException e) {
-            handleRecoverableDataAccessException(e);
+        } catch (final DataAccessException e) {
+            handleDataAccessException(e);
         }
     }
 
@@ -107,8 +107,8 @@ public class JDBCStorage extends AbstractJDBCStorage implements Storage {
         try {
             return getJdbcTemplate().queryForInt(getSqlStatements().getProperty("containsToUAcceptance"), userId,
                     version) > 0;
-        } catch (final RecoverableDataAccessException e) {
-            handleRecoverableDataAccessException(e);
+        } catch (final DataAccessException e) {
+            handleDataAccessException(e);
             return false;
         }
     }
