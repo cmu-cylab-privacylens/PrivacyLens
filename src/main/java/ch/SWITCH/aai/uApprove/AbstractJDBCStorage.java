@@ -88,10 +88,10 @@ public abstract class AbstractJDBCStorage {
     /**
      * Sets whether is graceful or not.
      * 
-     * @param isGraceful The graceful to set.
+     * @param graceful The graceful to set.
      */
-    public void setGraceful(final boolean isGraceful) {
-        this.isGraceful = isGraceful;
+    public void setGraceful(final boolean graceful) {
+        isGraceful = graceful;
     }
 
     /**

@@ -256,6 +256,8 @@ h2. Graceful JDBC Connection Handling
 The JDBC storage can be configured to act graceful in case of a tempory database issue (e.g., communication link is not available). Instead throwing exceptions and display the error page, no persistent actions are applied.
 This implies that the users, idenpently of former ToU accetances and/or attribute release consents have to accept/consent again (if they already had) or have to do it during the next login (if it was the first time).
 
+N.B. It might make sense to set "checkoutTimeout":http://www.mchange.com/projects/c3p0/#checkoutTimeout to an appropiate low value - so as the user has not bothersome latency.
+
 The settings are defined in @$IDP_HOME$/conf/uApprove.xml@:
 
 bc.. 
@@ -277,6 +279,7 @@ bc..
         </property>
     </bean>
     
+
 h3. JDBC Connection Pool Tuning
 
 Cf. "@c3p0@ configuration properties":http://www.mchange.com/projects/c3p0/#configuration_properties for a list of all available configuration properties.
