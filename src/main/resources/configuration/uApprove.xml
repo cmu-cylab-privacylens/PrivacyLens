@@ -41,7 +41,7 @@
     <bean id="uApprove.dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close" depends-on="shibboleth.LogbackLogging"
         p:driverClass="${database.driver}" p:jdbcUrl="${database.url}"
         p:user="${database.username}" p:password="${database.password}"
-        p:preferredTestQuery="select 1;" p:idleConnectionTestPeriod="200"/>
+        p:idleConnectionTestPeriod="300" />
 
     <bean id="uApprove.viewHelper" class="ch.SWITCH.aai.uApprove.ViewHelper" init-method="initialize"
         p:defaultLocale="${view.defaultLocale}" p:forceDefaultLocale="${view.forceDefaultLocale}"

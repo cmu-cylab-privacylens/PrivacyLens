@@ -56,13 +56,25 @@
                 <exclude>*.textile</exclude>
             </excludes>
         </fileSet>
+        
         <fileSet>
             <outputDirectory>/manual/storage</outputDirectory>
             <directory>src/main/resources/storage</directory>
         </fileSet>
+        
         <fileSet>
             <outputDirectory>/manual/configuration</outputDirectory>
             <directory>src/main/resources/configuration</directory>
+        </fileSet>
+        
+        <fileSet>
+            <outputDirectory>/manual/examples</outputDirectory>
+            <directory>src/main/resources/examples</directory>
+        </fileSet>
+        
+        <fileSet>
+            <outputDirectory>/manual/examples/messages</outputDirectory>
+            <directory>src/main/resources/messages</directory>
         </fileSet>
         
         <fileSet>

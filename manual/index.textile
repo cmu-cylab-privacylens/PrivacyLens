@@ -61,7 +61,7 @@ bc..
 
     <context-param>
         <param-name>contextConfigLocation</param-name>
-        <param-value>$IDP_HOME$/conf/internal.xml; $IDP_HOME$/conf/service.xml; $IDP_HOME$/conf/uApprove.xml</param-value>
+        <param-value>file:$IDP_HOME$/conf/internal.xml; file:$IDP_HOME$/conf/service.xml; file:/$IDP_HOME$/conf/uApprove.xml</param-value>
     </context-param>
 
     <!-- IdP Listeners, Filters and Servlets -->
@@ -282,15 +282,14 @@ bc..
 
 h3. JDBC Connection Pool Tuning
 
-Cf. "@c3p0@ configuration properties":http://www.mchange.com/projects/c3p0/#configuration_properties for a list of all available configuration properties.
+Cf. "@c3p0@ configuration":http://www.mchange.com/projects/c3p0/#configuration for further details on configuration options.
 
 The settings are defined in @$IDP_HOME$/conf/uApprove.xml@:
 
 bc. 
     <bean id="uApprove.dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" ...
         ...
-        p:preferredTestQuery="select 1;" p:idleConnectionTestPeriod="200"
-        p:minPoolSize="3" p:maxPoolSize="15"/>
+        p:idleConnectionTestPeriod="300" ... />
         
 N.B. You are free to use another JDBC connection pooling library (e.g., "BoneCP":http://jolbox.com/). Just provide the right data source class name in the bean definition as well the required libraries in the classpath.
 
@@ -334,12 +333,12 @@ h2. 4.4 Localization
 
 h3. Custom Messages
 
-You might adjust/extend the "contained":https://subversion.switch.ch/svn/general/aai/uApprove/trunk/src/main/resources/messages/ resource bundles and place them in the IdPs classpath (e.g., @$IDP_INSTALL$/src/main/webapp/WEB-INF/classes/uApproveMessages@).
+You might adjust/extend the "provided":examples/messages/ resource bundles and copy them in the IdPs classpath (e.g., @$IDP_INSTALL$/src/main/webapp/WEB-INF/classes/uApprove/messages@).
 Specify your bundles base in @$IDP_HOME$/conf/uApprove.xml@:
 
 bc. 
     <bean id="uApprove.viewHelper" class="ch.SWITCH.aai.uApprove.ViewHelper" ...
-        p:messagesBase="uApproveMessages" />
+        p:messagesBase="uApprove.messages" />
 
 h3. Attribute Names and Descriptions
 
