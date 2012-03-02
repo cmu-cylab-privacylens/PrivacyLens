@@ -1,5 +1,7 @@
-Release 2.4.1 2012-03-xx
+Release 2.4.1 2012-03-02
 ------------------------
+#1263 - Oracle 10g SQL statement compatibility.
+#1278 - Handle DB failure/unavailability gracefully.
 #1302 - Spring security patch release (SEC03).
 #1305 - Typo in TRACE level log.
 #1342 - Change default MYSQL connection configuration (c3p0, connection testing).
@@ -7,6 +9,7 @@ Release 2.4.1 2012-03-xx
 
       - Manual corrections and improvements.
         - Added connection testing example in connection pool tuning part.
+        - Added example internationalization properties files and documented customization.
 
 Release 2.4.0 2012-01-24
 ------------------------
