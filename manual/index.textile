@@ -278,7 +278,6 @@ bc..
                p:graceful="true" ... />
         </property>
     </bean>
-    
 
 h3. JDBC Connection Pool Tuning
 
@@ -333,7 +332,7 @@ h2. 4.4 Localization
 
 h3. Custom Messages
 
-You might adjust/extend the "provided":examples/messages/ resource bundles and copy them in the IdPs classpath (e.g., @$IDP_INSTALL$/src/main/webapp/WEB-INF/classes/uApprove/messages@).
+You might adjust/extend the provided resource bundles in "(file)$UAPPROVE_INSTALL$/manual/examples/messages":examples/messages and copy them into the IdPs classpath (e.g., @$IDP_INSTALL$/src/main/webapp/WEB-INF/classes/uApprove/messages@).
 Specify your bundles base in @$IDP_HOME$/conf/uApprove.xml@:
 
 bc. 
@@ -342,7 +341,7 @@ bc.
 
 h3. Attribute Names and Descriptions
 
-See "(file)attribute-descriptions.xml":examples/attribute-descriptions.xml for an example how to configure the localized attribute names and descriptions.
+See "(file)$UAPPROVE_INSTALL$/manual/examples/attribute-descriptions.xml":examples/attribute-descriptions.xml for an example how to configure the localized attribute names and descriptions.
 
 h3. Relying Party Names and Descriptions
 
