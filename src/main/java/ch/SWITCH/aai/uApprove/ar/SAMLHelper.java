@@ -203,6 +203,19 @@ public class SAMLHelper {
             throw new IllegalStateException(e);
         }
 
+        if (localEntityMetadata == null) {
+            final String logMessage =
+                    "No metadata available for Identity Provider. Please ensure that the Identity Provider ("
+                            + providerId + ") has configured its own metadata";
+            logger.error(logMessage);
+            throw new IllegalStateException(logMessage);
+        }
+
+        if (peerEntityMetadata == null) {
+            final String logMessage = "No metadata available for relying party " + relyingPartyId;
+            logger.warn(logMessage);
+        }
+
         @SuppressWarnings("rawtypes") final BaseSAMLProfileRequestContext<?, ?, ?, ?> requestCtx =
                 new BaseSAMLProfileRequestContext();
         requestCtx.setRelyingPartyConfiguration(relyingPartyConfiguration);
