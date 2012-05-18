@@ -49,7 +49,8 @@
 	                    <div style="float:left;">
 				        <c:if test="${allowGeneralConsent}">
 				            <input id="generalConsent" type="checkbox" name="generalConsent" value="true" />
-				            <label for="generalConsent"><fmt:message key="generalConsent"/></label>
+				            <label for="generalConsent"><fmt:message key="generalConsent"> <fmt:param value="${relyingParty.name}"/> </fmt:message></label>
+				            
 				        </c:if>
 	                    </div>
 	                    <div style="float:right;">
