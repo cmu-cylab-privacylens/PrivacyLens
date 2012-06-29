@@ -64,7 +64,7 @@
         <resolver:DisplayDescription xml:lang="de">Kategorie der Heimorganisation</resolver:DisplayDescription>
         <resolver:DisplayDescription xml:lang="fr">Type d'organisation: university, uas, vho, others, ...</resolver:DisplayDescription>
         <resolver:DisplayDescription xml:lang="it">Tipo di Home Organization: Il tipo di Home Organization. Esempio: università, vho,...</resolver:DisplayDescription>
-        <resolver:DisplayDescription xml:lang="en">Tipo de Instituição de origem: Representa o tipo de Instituição de origem</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="pt">Tipo de Instituição de origem: Representa o tipo de Instituição de origem</resolver:DisplayDescription>
         <resolver:DisplayDescription xml:lang="sv">Typ av hemorganisation: Vilken organisationstyp hemorganisationen är.</resolver:DisplayDescription>
         <resolver:AttributeEncoder xsi:type="SAML1String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:mace:switch.ch:attribute-def:swissEduPersonHomeOrganizationType" />
         <resolver:AttributeEncoder xsi:type="SAML2String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:oid:2.16.756.1.2.5.1.1.5" friendlyName="swissEduPersonHomeOrganizationType" />
@@ -284,7 +284,7 @@
         <resolver:DisplayDescription xml:lang="de">Geburtsdatum (siehe RFC 3339)</resolver:DisplayDescription>
         <resolver:DisplayDescription xml:lang="fr">Exemple: 20060219 pour 19 février 2006 (voir RFC3339)</resolver:DisplayDescription>
         <resolver:DisplayDescription xml:lang="it">Data di nascita: La data di nascita della persona (cfr. RFC 3339)</resolver:DisplayDescription>
-        <resolver:DisplayDescription xml:lang="it">Data de nascimento do utilizador (cfr. RFC 3339)</resolver:DisplayDescription>
+        <resolver:DisplayDescription xml:lang="pt">Data de nascimento do utilizador (cfr. RFC 3339)</resolver:DisplayDescription>
         <resolver:DisplayDescription xml:lang="sv">Födelsedata: Födelsedata för en person (see RFC 3339).</resolver:DisplayDescription>
         <resolver:AttributeEncoder xsi:type="SAML1String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:mace:switch.ch:attribute-def:swissEduPersonDateOfBirth" />
         <resolver:AttributeEncoder xsi:type="SAML2String" xmlns="urn:mace:shibboleth:2.0:attribute:encoder" name="urn:oid:2.16.756.1.2.5.1.1.2" friendlyName="swissEduPersonDateOfBirth" />
@@ -379,7 +379,7 @@
         <resolver:DisplayName xml:lang="fr">Numéro de Mobile</resolver:DisplayName>
         <resolver:DisplayName xml:lang="it">Numero di celluluare</resolver:DisplayName>
         <resolver:DisplayName xml:lang="pt">Número de telemóvel</resolver:DisplayName>
-        <resolver:DisplayName xml:lang="en">Telefonnummer (mobil)</resolver:DisplayName>
+        <resolver:DisplayName xml:lang="sv">Telefonnummer (mobil)</resolver:DisplayName>
         <resolver:DisplayDescription xml:lang="en">Mobile phone number</resolver:DisplayDescription>
         <resolver:DisplayDescription xml:lang="de">Mobile Telefonnummer</resolver:DisplayDescription>
         <resolver:DisplayDescription xml:lang="fr">Numéro de teléphone mobile: +41 79 111 222333</resolver:DisplayDescription>
