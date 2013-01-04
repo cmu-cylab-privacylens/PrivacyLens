@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, SWITCH
+ * Copyright (c) 2013 SWITCH
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -193,7 +193,7 @@ public class AttributeReleaseModule {
                 storage.readAttributeReleaseConsents(principalName, relyingPartyId);
         if (AttributeReleaseHelper.approvedAttributes(attributes, attributeReleaseConsents, compareAttributeValues)) {
             logger.debug("User {} has already approved attributes {} for relying party {}.", new Object[] {
-                    principalName, relyingPartyId, attributes,});
+                    principalName, attributes, relyingPartyId});
             return false;
         }
 
