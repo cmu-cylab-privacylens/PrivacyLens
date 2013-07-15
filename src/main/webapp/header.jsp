@@ -84,10 +84,12 @@
 <!DOCTYPE html>
 <html>
 
-	<head>
-	    <fmt:setLocale value="${locale}"/>
-	    <fmt:setBundle basename="${bundle}"/>
-	    
-	    <link rel="stylesheet" type="text/css" href="<%= request.getContextPath()%>/uApprove/styles.css"/>
-	    <title><fmt:message key="title"/></title>
-	</head>
+    <head>
+        <fmt:setLocale value="${locale}"/>
+        <fmt:setBundle basename="${bundle}"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+        <link rel="stylesheet" type="text/css" href="<%= request.getContextPath()%>/uApprove/styles.css"/>
+        <title><fmt:message key="title"/></title>
+
+    </head>

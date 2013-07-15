@@ -1,7 +1,7 @@
 .box {
     width:600px;
     margin-left: auto;
-    margin-right: auto; 
+    margin-right: auto;
     margin-top: 50px;
     background-color: white;
    -webkit-box-shadow: 1px 1px 15px #999999;
@@ -38,13 +38,18 @@ a:focus, a:hover, a:active {
     color: #F39800;
     text-decoration: underline;
 }
-    
+
 #tou-content {
+    font-family:monospace;
     width: 95%;
     border: solid 1px #666;
     margin: 4px;
     padding: 10px;
     overflow: hidden;
+}
+
+#tou-content li{
+    margin-bottom:10px;
 }
 
 #tou-acceptance {
@@ -57,7 +62,18 @@ a:focus, a:hover, a:active {
     overflow: hidden;
 }
 
-#attributeRelease-consent {   
+.service_name {
+    font-weight: bold;
+}
+
+.service_description {
+    font-style: italic;
+}
+
+.organization_name {
+}
+
+#attributeRelease-consent {
     width: 95%;
     border: solid 1px #666;
     background-color: #F0F0F0;
@@ -89,4 +105,35 @@ a:focus, a:hover, a:active {
     padding: 5px 7px;
     background-color:#00247D;
     color: white;
+}
+
+.federation_logo
+{
+    float: left;
+    padding-top: 35px;
+    border: 0;
+}
+.organization_logo
+{
+    float: right;
+    border: 0;
+}
+
+/* Device specific styles */
+@media only screen and (max-device-width: 721px){
+  .box {
+      width: auto;
+      box-shadow: none;
+      border-radius: 0;
+      -webkit-box-shadow: none;
+      -webkit-border-radius: 0;
+      -moz-box-shadow: none;
+      -moz-border-radius: 0;
+      padding: 0;
+      margin-top:0;
+  }
+  #tou-content, #tou-acceptance{
+    /*width:87%;*/
+    width:auto;
+  }
 }
