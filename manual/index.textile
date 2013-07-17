@@ -1,5 +1,16 @@
+This document contains the uApprove deployment guide and the general manual.
 
-This document contains the uApprove deployment guide.
+uApprove is an extension for the Shibboleth Identity Provider 2.x. It allows to make users authenticating at an Identity Provider to accept terms of use and to give attribute release consent. "More information about the concept of uApprove":http://www.switch.ch/aai/support/tools/uApprove.html.
+
+Notes about this guide:
+* This guide assumes that uApprove is installed on a Linux system. It's also possible to install it on a different operating system, like Windows. In this case, you may need to adapt some paths and commands accordingly.
+* The guide shows paths and commands using variables like, e.g, @$IDP_INSTALL$@, @$_IDP_HOME$@ or @$UAPPROVE_INSTALL$@. You need to substitute these variables by the real paths, except where it is explicitly stated that you don't need to substitute them.
+
+h1. Assumptions
+
+* The Shibboleth Identity Provider is unpacked at @$IDP_INSTALL$@ (e.g., @/usr/local/src/shibboleth-identity-provider-#version#@).
+* The Shibboleth Identity Provider is installed at @$IDP_HOME$@ (e.g., @/opt/shibboleth-idp@).
+* "uApprove":http://www.switch.ch/aai/uApprove is downloaded and unpacked at @$UAPPROVE_INSTALL$@ (e.g., @/usr/local/src/uApprove-#version#@).
 
 h1. 1 Installation
 
@@ -8,13 +19,8 @@ h2. 1.1 Prerequisites
 * Shibboleth Identity Provider 2.3 or greater.
 * Database which supports JDBC.
 
-h2. 1.2 Assumptions
 
-* The Shibboleth Identity Provider is unpacked at @$IDP_INSTALL$@ (e.g., @/opt/shibboleth-identity-provider-#version#@).
-* The Shibboleth Identity Provider is installed at @$IDP_HOME$@ (e.g., @/opt/shibboleth-idp@).
-* "uApprove":http://www.switch.ch/aai/uApprove is downloaded and unpacked at @$UAPPROVE_INSTALL$@ (e.g., @/tmp/uApprove-#version#@).
-
-h2. 1.3 Library Installation
+h2. 1.2 Library Installation
 
 Copying the libraries to the IdPs library directory:
 
@@ -24,26 +30,26 @@ Copying the libraries to the IdPs library directory:
 
 bq(note). Assure that only one version of each library is present in @$IDP_INSTALL$/lib@.
 
-h2. 1.4 Configuration Template
+h2. 1.3 Configuration Template
 
 Copying the configuration template to the IdPs configuration directory:
 
 * @cp@ "(file)$UAPPROVE_INSTALL$/manual/configuration/uApprove.properties":configuration/uApprove.properties @$IDP_HOME$/conf@
 * @cp@ "(file)$UAPPROVE_INSTALL$/manual/configuration/uApprove.xml":configuration/uApprove.xml @$IDP_HOME$/conf@
 
-h2. 1.5 Webapp files
+h2. 1.4 Webapp files
 
 Copying of the web application files like the JSP(Java Server Pages)s, CSS(Cascading Style Sheet) files and images to the IdPs webapp directory:
 
 * @mkdir $IDP_INSTALL$/src/main/webapp/uApprove@
 * @cp $UAPPROVE_INSTALL$/webapp/* $IDP_INSTALL$/src/main/webapp/uApprove@
 
-h2. 1.6 Database Preparation
+h2. 1.5 Database Preparation
 
-bq(note). The following database parameters are examples.
+bq(note). The following database parameters are examples. Adapt the values as required. Especially, choose a secure password.
 
 * Create a database with the name "uApprove".
-* Create a database user with the username "uApprove" and password "uApprove".
+* Create a database user with the username "uApprove" and password "secret".
 * Grant @INSERT, SELECT, UPDATE, DELETE@ rights for the user.
 * Create the initial table structures using the schemas:
 ** "(file)$UAPPROVE_INSTALL$/manual/storage/terms-of-use-schema.sql":storage/terms-of-use-schema.sql.
@@ -53,7 +59,9 @@ h1. 2 Basic Deployment
 
 h2. 2.1 Web Application Deployment Descriptor
 
-Extend the IdP web application deployment descriptor (@$IDP_INSTALL$/src/main/webapp/WEB-INF/web.xml@):
+Extend the IdP web application deployment descriptor (@$IDP_INSTALL$/src/main/webapp/WEB-INF/web.xml@). Adapt your existing file as shown below.
+* Add @$IDP_HOME$/conf/uApprove.xml@ to the @contextConfigLocation@ context parameter. Keep the @$IDP_HOME$@ variables. They will be replaced during the re-deployment of the IdP in a later step.
+* Add the required filters and servlets as shown.
 
 bc.. 
 
@@ -61,7 +69,7 @@ bc..
 
     <context-param>
         <param-name>contextConfigLocation</param-name>
-        <param-value>file:$IDP_HOME$/conf/internal.xml; file:$IDP_HOME$/conf/service.xml; file:/$IDP_HOME$/conf/uApprove.xml</param-value>
+        <param-value>$IDP_HOME$/conf/internal.xml; $IDP_HOME$/conf/service.xml; $IDP_HOME$/conf/uApprove.xml</param-value>
     </context-param>
 
     <!-- IdP Listeners, Filters and Servlets -->
@@ -120,44 +128,35 @@ to:
 bc. 
 <context:property-placeholder location="file:$IDP_HOME$/conf/uApprove.properties" />
 
-Customize @$IDP_HOME$/conf/uApprove.properties@ according your database environment and required features. See "inline documentation":configuration/uApprove.properties for configuration options.
+Replace the varialbe $IDP_HOME$ by the correct path, e.g. @/opt/shibboleth-idp@ (so that the whole value looks like @file:/opt/shibboleth-idp/conf/uApprove.properties@ for example).
 
+Customize @$IDP_HOME$/conf/uApprove.properties@ according your database environment and required features. See inline documentation of "uApprove.properties":configuration/uApprove.properties for configuration options.
 
-h2. 2.3 Deployment
+h2. 2.3 Custom Templates
+
+In case you want to customize the templates, follow section "Custom View Templates":#CustomViewTemplates.
+
+At least, you should copy your organization's logo to the file @$IDP_INSTALL$/src/main/webapp/uApprove/logo.png@, since a placeholder logo is installed by default.
+You may also want to put your federation's logo to the file @$IDP_INSTALL$/src/main/webapp/uApprove/federation-logo.png@ (which is an empty placeholder logo by default).
+_(For the SWITCHaai federation, the logo is available at "http://www.switch.ch/aai/design/images/switchaai-logo.png":http://www.switch.ch/aai/design/images/switchaai-logo.png.)_
+
+h2. 2.4 Deployment
 
 To activate uApprove the IdP must be re-deployed:
 
-bc. $IDP_INSTALL$/install.sh
+bc. cd $IDP_INSTALL$
+./install.sh
 
+You also need to restart your Java web application server (e.g. Tomcat or Jetty).
 
 h1. 3 Upgrade 
 
-bq(warn). If your upgrading from uApprove < 2.3 please read the according "upgrade information":#a3.1UpgradefromuApprove2.3 and
-follow the "installation instructions":#a1Installation.
-
-* @rm $IDP_INSTALL$/lib/uApprove-#old-version#.jar@
-* @cp $UAPPROVE_INSTALL$/lib/uApprove-#new-version#.jar $IDP_INSTALL$/lib@
-
-Optionally update the JDBC dependencies:
-
-* @cp $UAPPROVE_INSTALL$/lib/jdbc/*.jar $IDP_INSTALL$/lib@
-
-Optionally update the JDBC connector for your database. You might use one of the provided MySQL or HSQL JDBC connector:
-
-* @cp $UAPPROVE_INSTALL$/lib/jdbc/optional/#jdbc-connector#.jar $IDP_INSTALL$/lib@
-
-
-bq(warn). Verify that only one version of each library is present in @$IDP_INSTALL$/lib@.
-
-
-bq(note). Optionally update the web application and configuration files if you do not have any customizations.
-It is recommended to backup the old files first.
-
-To finish the upgrade of uApprove the IdP must be re-deployed:
-
-bc. $IDP_INSTALL$/install.sh
+There are different update procedures depending on the version that is updated.
 
 h2. 3.1 Upgrade from uApprove < 2.3
+
+bq(warning). If your upgrading from uApprove < 2.3 you have to completly remove this old version first and perform a clean install.
+Please have a look at the "installation instructions":#a1Installation above for further information on how to install uApprove.
 
 * Legacy uApprove (< 2.3) deployment: Please remove it.
 * Configuration files: Please use the new configuration file and tailor them to your needs. Note: The new ToU is an HTML file, which you can customize, just copy the content from your lecacy ToU XML to a plain HTML file.
@@ -179,6 +178,81 @@ h2. 3.2 Upgrade from uApprove 2.3 to 2.4
 
 * In version 2.4 "@c3p0@":http://www.mchange.com/projects/c3p0/ is used as the connection pooling library (instead of @boneCP@ in uApprove 2.3). The reason was, that some deployers reported connection repairing issues with remote databases. @c3p0@ offers also an easier deployment, because this library is used by the IdP as well. Please assure following upgrade steps:
 ** Adjust the @uApprove.dataSource@ bean in @$IDP_HOME$/conf/uApprove.xml@ (i.e., replace the @bonecp.BoneCPDataSource@ with the @c3p0.ComboPooledDataSource@, see "(file)$UAPPROVE_INSTALL$/manual/configuration/uApprove.xml":configuration/uApprove.xml). Please refer to "JDBC Connection Pool Tuning":#JDBCConnectionPoolTuning for advanced configuration properties.
+
+h2. 3.3 Upgrade from uApprove 2.4 to 2.5
+
+uApprove version 2.5 mainly introduces support for interfederation, besides some fixes and other minor features.
+You should upgrade to uApprove 2.5 in case you participate in interfederation. If you don't participate in
+interfederation, you are not required to do the upgrade, but the upgrade is still recommended.
+
+In version 2.5, the web templates (JSP files, CSS files, images) have been adapted to support the legal requirements of interfederation
+(see "Legal Templates for SWITCHaai":http://www.switch.ch/aai/support/documents/legaltemplates.html).
+This means that you also need to update the web application files in @$IDP_INSTALL$/src/main/webapp/uApprove@.
+Because the text translations are contained in the library file, keeping the old web application files would
+mean that some texts are not shown anymore. In case you have customized the old web application files
+of uApprove, you should install the new web application files and re-apply your customizations.
+
+The upgrade procedure is:
+
+* @rm $IDP_INSTALL$/lib/uApprove-#old-version#.jar@
+* @cp $UAPPROVE_INSTALL$/lib/uApprove-#new-version#.jar $IDP_INSTALL$/lib@
+
+Optionally update the JDBC dependencies:
+
+* @cp $UAPPROVE_INSTALL$/lib/jdbc/*.jar $IDP_INSTALL$/lib@
+
+Optionally update the JDBC connector for your database. You might use one of the provided MySQL or HSQL JDBC connector:
+
+* @cp $UAPPROVE_INSTALL$/lib/jdbc/optional/#jdbc-connector#.jar $IDP_INSTALL$/lib@<br /><br />Verify that only one version of each library is present in @$IDP_INSTALL$/lib@.
+
+Update the web application files in @$IDP_INSTALL$/src/main/webapp/uApprove@. If you have done any customizations
+of these files, do a backup of the old files first, and then re-apply the customizations after having updated
+these files
+
+* Optionally backup the existing web application files in @$IDP_INSTALL$/src/main/webapp/uApprove@
+* @rm $IDP_INSTALL$/src/main/webapp/uApprove/*@
+* @cp $UAPPROVE_INSTALL$/webapp/* $IDP_INSTALL$/src/main/webapp/uApprove@
+* Optionally re-apply customizations.
+** At least, you should restore your organization's logo (file @$IDP_INSTALL$/src/main/webapp/uApprove/logo.png@), since a placeholder logo is installed by default. You may also want to put your federation's logo to the file @$IDP_INSTALL$/src/main/webapp/uApprove/federation-logo.png@ (which is an empty placeholder logo by default). _(For the SWITCHaai federation, the logo is available at "http://www.switch.ch/aai/design/images/switchaai-logo.png":http://www.switch.ch/aai/design/images/switchaai-logo.png.)_
+
+In case you want to adapt the text translations, see section "4.4 Localization":#a4.4Localization below.
+
+Adapt some values in @$IDP_HOME$/conf/uApprove.properties$@:
+
+* At @database.url@, append @?autoReconnect=true@ to the JDBC URL (e.g. @database.url = jdbc:mysql://localhost:3306/uApprove?autoReconnect=true@).
+* At @ar.attributes.blacklist@, add the attribute @eduPersonTargetedID@.
+
+To finish the upgrade of uApprove the IdP must be re-deployed:
+
+bc. cd $IDP_INSTALL$
+./install.sh
+
+You also need to restart your Java web application server (e.g. Tomcat or Jetty).
+
+h2. 3.4 Upgrade from uApprove >= 2.5
+
+The general upgrade procedure unless otherwise mentioned above is:
+
+* @rm $IDP_INSTALL$/lib/uApprove-#old-version#.jar@
+* @cp $UAPPROVE_INSTALL$/lib/uApprove-#new-version#.jar $IDP_INSTALL$/lib@
+
+Optionally update the JDBC dependencies:
+
+* @cp $UAPPROVE_INSTALL$/lib/jdbc/*.jar $IDP_INSTALL$/lib@
+
+Optionally update the JDBC connector for your database. You might use one of the provided MySQL or HSQL JDBC connector:
+
+* @cp $UAPPROVE_INSTALL$/lib/jdbc/optional/#jdbc-connector#.jar $IDP_INSTALL$/lib@<br /><br />Verify that only one version of each library is present in @$IDP_INSTALL$/lib@.
+
+Optionally update the web application and configuration files if you do not have any customizations.
+It is recommended to backup the old files first.
+
+To finish the upgrade of uApprove the IdP must be re-deployed:
+
+bc. cd $IDP_INSTALL$
+./install.sh
+
+You also need to restart your Java web application server (e.g. Tomcat or Jetty).
 
 h1. 4 Advanced Deployment
 
@@ -325,7 +399,7 @@ h2. 4.3 Templates
 
 h3. Custom View Templates
 
-Feel free to customize the JSP(JavaServer Pages), CSS(Cascading Style Sheets) and image files located in @$UAPPROVE_INSTALL$/webapp/@.
+Feel free to customize the JSP(JavaServer Pages), CSS(Cascading Style Sheets) and image files located in @$DP_INSTALL$/src/main/webapp/uApprove/@.
 For convienience the JSTL(JavaServer Pages Standard Tag Library) is used, cf. "JSTL reference":http://java.sun.com/products/jsp/jstl/reference/docs/index.html.
 
 h2. 4.4 Localization
@@ -345,7 +419,7 @@ See "(file)$UAPPROVE_INSTALL$/manual/examples/attribute-descriptions.xml":exampl
 
 h3. Relying Party Names and Descriptions
 
-Currently only the attribute consumin service descriptors in metadata are supported, toe retrieve localized relying arty names and descriptions.
+Currently only the attribute consuming service descriptors in metadata are supported, to retrieve localized relying party names and descriptions.
 For providing such names and descriptions extend the metadata for the SP like:
 
 bc. 
@@ -361,6 +435,9 @@ bc.
         </AttributeConsumingService>
     </SPSSODescriptor>
 </EntityDescriptor>
+
+Note:
+* The metadata of the SWITCHaai federation contain these information.
 
 h2. 4.5 Strict Comparison
 
@@ -424,7 +501,7 @@ Please be aware of the following:
 
 h4. Define the Namespace
 
-In you attribute filter policy file you'll need to add the namespace declaration for this plugin. To do this:
+In your attribute filter policy file you'll need to add the namespace declaration for this plugin. To do this:
 
 * Add the attribute @xmlns:ua="http://www.switch.ch/aai/idp/uApprove/mf"@ before the @xmlns:xsi@ attribute on the root @<AttributeFilterPolicyGroup>@ element.
 * Add the following at the end of the whitespace delimited list of values for the @xsi:schemaLocation@ attribute: @http://www.switch.ch/aai/idp/uApprove/mf classpath:/schema/uApprove-mf.xsd@.
