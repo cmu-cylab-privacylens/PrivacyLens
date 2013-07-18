@@ -1,3 +1,25 @@
+Release 2.5.0 2013-07-18
+------------------------
+
+#1769 - Improve error messages when metadata is not found
+#1770 - Adapt text for global consent
+#1797 - uApprove.properties: Description of usage of services list as whitelist/blacklist is not clear enough
+#1823 - Documentation: Add "?autoReconnect=true" to "database.url" parameter
+#1826 - Minor corrections in attribute-descriptions.xml (some corrections of language types)
+#1908 - ID-Card: Add "Decline" and possibly additional corresponding page
+#2404 - Make uApprove support MDUI information
+#2430 - Log message typo
+
+      - Manual corrections and improvements.
+        - uApprove.properties: Added eduPersonTargetedID to ar.attributes.blacklist
+        - Added taglib support
+
+Support for interfederation / changed templates
+- We have updated the web templates to meet the requirements for eduGain.
+  This means that the identifiers of the translation texts have changed.
+  In case you don't want to use the new web templates, you would need to re-activate the
+  old messages files. See the manual for details.
+
 Release 2.4.1 2012-03-02
 ------------------------
 #1263 - Oracle 10g SQL statement compatibility.
