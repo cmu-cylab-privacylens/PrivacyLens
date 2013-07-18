@@ -128,9 +128,23 @@ to:
 bc. 
 <context:property-placeholder location="file:$IDP_HOME$/conf/uApprove.properties" />
 
-Replace the varialbe $IDP_HOME$ by the correct path, e.g. @/opt/shibboleth-idp@ (so that the whole value looks like @file:/opt/shibboleth-idp/conf/uApprove.properties@ for example).
+Replace the variable $IDP_HOME$ by the correct path, e.g. @/opt/shibboleth-idp@ (so that the whole value looks like @file:/opt/shibboleth-idp/conf/uApprove.properties@ for example).
 
 Customize @$IDP_HOME$/conf/uApprove.properties@ according your database environment and required features. See inline documentation of "uApprove.properties":configuration/uApprove.properties for configuration options.
+
+In case you enable the 'Terms of Use' module (enabled by default), you need to provide an appropriate text
+suitable for your organization.
+
+An example 'Terms Of Use' HTML file can be found in @$UAPPROVE_INSTALL$/manual/examples/terms-of-use.html@.
+
+* Copy @$UAPPROVE_INSTALL$/manual/examples/terms-of-use.html@ to @$IDP_HOME$/conf/terms-of-use.html@.
+
+bc. cp $UAPPROVE_INSTALL$/manual/examples/terms-of-use.html $IDP_HOME$/conf/terms-of-use.html
+
+* Adapt @$IDP_HOME$/conf/terms-of-use.html@ as required.
+* Adapt the value of @tou.resource@ in @$IDP_HOME$/conf/uApprove.properties@ accordingly.
+
+bc. tou.resource = file:$IDP_HOME$/conf/terms-of-use.html
 
 h2. 2.3 Custom Templates
 
