@@ -243,31 +243,6 @@ bc. cd $IDP_INSTALL$
 
 You also need to restart your Java web application server (e.g. Tomcat or Jetty).
 
-h2. 3.4 Upgrade from uApprove >= 2.5
-
-The general upgrade procedure unless otherwise mentioned above is:
-
-* @rm $IDP_INSTALL$/lib/uApprove-#old-version#.jar@
-* @cp $UAPPROVE_INSTALL$/lib/uApprove-#new-version#.jar $IDP_INSTALL$/lib@
-
-Optionally update the JDBC dependencies:
-
-* @cp $UAPPROVE_INSTALL$/lib/jdbc/*.jar $IDP_INSTALL$/lib@
-
-Optionally update the JDBC connector for your database. You might use one of the provided MySQL or HSQL JDBC connector:
-
-* @cp $UAPPROVE_INSTALL$/lib/jdbc/optional/#jdbc-connector#.jar $IDP_INSTALL$/lib@<br /><br />Verify that only one version of each library is present in @$IDP_INSTALL$/lib@.
-
-Optionally update the web application and configuration files if you do not have any customizations.
-It is recommended to backup the old files first.
-
-To finish the upgrade of uApprove the IdP must be re-deployed:
-
-bc. cd $IDP_INSTALL$
-./install.sh
-
-You also need to restart your Java web application server (e.g. Tomcat or Jetty).
-
 h1. 4 Advanced Deployment
 
 This sections contains advanced configuration topics.
