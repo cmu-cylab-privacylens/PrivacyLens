@@ -1,16 +1,16 @@
-This document contains the uApprove deployment guide and the general manual.
+This document contains the PrivacyLens deployment guide and the general manual.
 
-uApprove is an extension for the Shibboleth Identity Provider 2.x. It allows to make users authenticating at an Identity Provider to accept terms of use and to give attribute release consent. "More information about the concept of uApprove":http://www.switch.ch/aai/support/tools/uApprove.html.
+PrivacyLens is an extension for the Shibboleth Identity Provider 2.x. It allows to make users authenticating at an Identity Provider to accept terms of use and to give attribute release consent. "More information about the concept of PrivacyLens":https://github.com/cmu-cylab-privacylens/PrivacyLens.
 
 Notes about this guide:
-* This guide assumes that uApprove is installed on a Linux system. It's also possible to install it on a different operating system, like Windows. In this case, you may need to adapt some paths and commands accordingly.
+* This guide assumes that PrivacyLens is installed on a Linux system. It's also possible to install it on a different operating system, like Windows. In this case, you may need to adapt some paths and commands accordingly.
 * The guide shows paths and commands using variables like, e.g, @$IDP_INSTALL$@, @$_IDP_HOME$@ or @$UAPPROVE_INSTALL$@. You need to substitute these variables by the real paths, except where it is explicitly stated that you don't need to substitute them.
 
 h1. Assumptions
 
 * The Shibboleth Identity Provider is unpacked at @$IDP_INSTALL$@ (e.g., @/usr/local/src/shibboleth-identity-provider-#version#@).
 * The Shibboleth Identity Provider is installed at @$IDP_HOME$@ (e.g., @/opt/shibboleth-idp@).
-* "uApprove":http://www.switch.ch/aai/uApprove is downloaded and unpacked at @$UAPPROVE_INSTALL$@ (e.g., @/usr/local/src/uApprove-#version#@).
+* "PrivacyLens":https://github.com/cmu-cylab-privacylens/PrivacyLens is downloaded and unpacked at @$UAPPROVE_INSTALL$@ (e.g., @/usr/local/src/uApprove-#version#@).
 
 h1. 1 Installation
 
@@ -115,6 +115,36 @@ bc..
         <url-pattern>/uApprove/AttributeRelease</url-pattern>
     </servlet-mapping>
 
+<servlet>
+<servlet-name>PrivacyLens - AR Admin</servlet-name>
+<servlet-class>ch.SWITCH.aai.uApprove.ar.AdminServlet</servlet-class>
+</servlet>
+
+<servlet-mapping>
+<servlet-name>PrivacyLens - AR Admin</servlet-name>
+<url-pattern>/uApprove/AdminServlet</url-pattern>
+</servlet-mapping>
+
+<servlet>
+<servlet-name>PrivacyLens - AR AJAX</servlet-name>
+<servlet-class>ch.SWITCH.aai.uApprove.ar.AttributeReleaseAjaxServlet</servlet-class>
+</servlet>
+
+<servlet-mapping>
+<servlet-name>PrivacyLens - AR AJAX</servlet-name>
+<url-pattern>/uApprove/AttributeReleaseAjaxServlet</url-pattern>
+</servlet-mapping>
+
+<servlet>
+<servlet-name>PrivacyLens - Debug</servlet-name>
+<servlet-class>ch.SWITCH.aai.uApprove.DebugViewServlet</servlet-class>
+</servlet>
+
+<servlet-mapping>
+<servlet-name>PrivacyLens - Debug</servlet-name>
+<url-pattern>/uApprove/DebugView</url-pattern>
+</servlet-mapping>
+
 </web-app>
 h2. 2.2 Custom Configuration
 
@@ -156,7 +186,7 @@ _(For the SWITCHaai federation, the logo is available at "http://www.switch.ch/a
 
 h2. 2.4 Deployment
 
-To activate uApprove the IdP must be re-deployed:
+To activate PrivacyLens the IdP must be re-deployed:
 
 bc. cd $IDP_INSTALL$
 ./install.sh
@@ -170,7 +200,7 @@ There are different update procedures depending on the version that is updated.
 h2. 3.1 Upgrade from uApprove < 2.3
 
 bq(warning). If your upgrading from uApprove < 2.3 you have to completly remove this old version first and perform a clean install.
-Please have a look at the "installation instructions":#a1Installation above for further information on how to install uApprove.
+Please have a look at the "installation instructions":#a1Installation above for further information on how to install PrivacyLens.
 
 * Legacy uApprove (< 2.3) deployment: Please remove it.
 * Configuration files: Please use the new configuration file and tailor them to your needs. Note: The new ToU is an HTML file, which you can customize, just copy the content from your lecacy ToU XML to a plain HTML file.
@@ -526,7 +556,7 @@ bc. <logger name="ch.SWITCH.aai.uApprove" level="DEBUG"/>
 
 h1. 6 Feedback
 
-Send general questions and comments to "aai@switch.ch":mailto:aai@switch.ch. For bug reports, please use our "issue tracking":http://forge.switch.ch/redmine/projects/uapprove.
+Send general questions and comments to "privacylens@ece.cmu.edu":mailto:privacylens@ece.cmu.edu. For bug reports, please use our "issue tracking":https://github.com/cmu-cylab-privacylens/PrivacyLens/issues.
 
 
 fn1. Clear means to delete general consent if it was given as well delete as all attribute release consents for the accessed relying party.

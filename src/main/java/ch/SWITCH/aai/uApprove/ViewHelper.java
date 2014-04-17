@@ -38,6 +38,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import edu.cmu.ece.PrivacyLens.config.General;
+
 /**
  * View Helper.
  */
@@ -126,16 +128,20 @@ public class ViewHelper {
     public void showView(final ServletContext servletContext, final HttpServletRequest request,
             final HttpServletResponse response, final String viewName, final Map<String, ?> viewContext) {
 
+        logger.trace("entered showView viewName: {}", viewName);
         request.setAttribute("view", viewName);
         request.setAttribute("bundle", String.format("%s.%s", messagesBase, viewName));
         request.setAttribute("locale", selectLocale(request));
+        request.setAttribute("general", General.getInstance());
 
         for (final Entry<String, ?> entry : viewContext.entrySet()) {
-            request.setAttribute(entry.getKey(), entry.getValue());
+            final String key = entry.getKey();
+            final Object value = entry.getValue();
+            logger.trace("Setting context {} -> {}", key, value);
+            request.setAttribute(key, value);
         }
 
         final String jsp = String.format("/uApprove/%s.jsp", viewName);
-        logger.trace("Show view {}.", jsp);
         try {
             request.getRequestDispatcher(jsp).forward(request, response);
         } catch (final Exception e) {

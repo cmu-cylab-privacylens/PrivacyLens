@@ -9,6 +9,9 @@
 
     <context:property-placeholder location="classpath:/configuration/uApprove.properties" />
 
+  <bean id="uApprove.Oracle" class="edu.cmu.ece.PrivacyLens.Oracle" init-method="initialize" factory-method="getInstance" p:config="classpath:/configuration/spsetup.json" />
+
+  <bean id="uApprove.config.General" class="edu.cmu.ece.PrivacyLens.config.General" init-method="initialize" factory-method="getInstance" p:idpName="${general.IdPName}" p:adminUrl="${general.adminUrl}" p:adminMail="${general.adminMail}" p:credits="${general.credits}" />
 
     <bean id="uApprove.touModule" class="ch.SWITCH.aai.uApprove.tou.ToUModule" init-method="initialize"
         p:enabled="${tou.enabled}" p:auditLogEnabled="false" p:compareContent="false">
@@ -48,7 +51,7 @@
         p:messagesBase="messages" />
 
     <bean id="uApprove.samlHelper" class="ch.SWITCH.aai.uApprove.ar.SAMLHelper" init-method="initialize"
-        p:attributeAuthority-ref="shibboleth.SAML2AttributeAuthority" p:relyingPartyConfigurationManager-ref="shibboleth.RelyingPartyConfigurationManager">
+        p:attributeAuthority-ref="shibboleth.SAML2AttributeAuthority" p:relyingPartyConfigurationManager-ref="shibboleth.RelyingPartyConfigurationManager" p:attributeResolver-ref="shibboleth.AttributeResolver" >
         <property name="attributeProcessor">
             <bean class="ch.SWITCH.aai.uApprove.ar.AttributeProcessor"
                 p:blacklist="${ar.attributes.blacklist}" p:order="${ar.attributes.order}" />

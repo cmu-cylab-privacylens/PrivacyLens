@@ -29,6 +29,7 @@ package ch.SWITCH.aai.uApprove;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -43,6 +44,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.SWITCH.aai.uApprove.ar.Attribute;
+import ch.SWITCH.aai.uApprove.ar.AttributeReleaseModule;
+import edu.internet2.middleware.shibboleth.common.attribute.BaseAttribute;
+import edu.internet2.middleware.shibboleth.common.attribute.filtering.provider.ShibbolethFilteringContext;
 import edu.internet2.middleware.shibboleth.common.log.AuditLogEntry;
 import edu.internet2.middleware.shibboleth.common.profile.AbstractErrorHandler;
 import edu.internet2.middleware.shibboleth.common.session.Session;
@@ -58,6 +62,8 @@ public final class IdPHelper {
     /** Class logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(IdPHelper.class);
 
+    public static AttributeReleaseModule attributeReleaseModule;
+
     /** Default constructor for utility classes is private. */
     private IdPHelper() {
     }
@@ -72,6 +78,7 @@ public final class IdPHelper {
      */
     private static LoginContext getLoginContext(final ServletContext servletContext, final HttpServletRequest request,
             final boolean required) {
+        LOGGER.trace("[IdPHelper] getLoginContext");
         final LoginContext loginContext =
                 HttpServletHelper.getLoginContext(HttpServletHelper.getStorageService(servletContext), servletContext,
                         request);
@@ -89,6 +96,7 @@ public final class IdPHelper {
      * @return Returns the authentication context class reference.
      */
     public static String getAuthContextClassRef(final ServletContext servletContext, final HttpServletRequest request) {
+        LOGGER.trace("[IdPHelper] getAuthContextClassRef");
         final LoginContext loginContext = getLoginContext(servletContext, request, false);
         return loginContext != null ? loginContext.getAuthenticationMethod() : null;
     }
@@ -100,6 +108,7 @@ public final class IdPHelper {
      * @return Returns the session.
      */
     public static Session getSession(final HttpServletRequest request) {
+        LOGGER.trace("[IdPHelper] getSession");
         return HttpServletHelper.getUserSession(request);
     }
 
@@ -113,6 +122,7 @@ public final class IdPHelper {
      */
     public static boolean isAuthenticated(final ServletContext servletContext, final HttpServletRequest request,
             final HttpServletResponse response) {
+        LOGGER.trace("[IdPHelper] isAuthenticated");
         final LoginContext loginContext = getLoginContext(servletContext, request, false);
 
         if (loginContext == null) {
@@ -146,6 +156,7 @@ public final class IdPHelper {
      * @return Returns the principal Name.
      */
     public static String getPrincipalName(final ServletContext servletContext, final HttpServletRequest request) {
+        LOGGER.trace("[IdPHelper] getPrincipalName");
         final String principalName = getLoginContext(servletContext, request, true).getPrincipalName();
         LOGGER.trace("Principal name is {}.", principalName);
         return principalName;
@@ -159,6 +170,7 @@ public final class IdPHelper {
      * @return Returns the relying party id.
      */
     public static String getRelyingPartyId(final ServletContext servletContext, final HttpServletRequest request) {
+        LOGGER.trace("[IdPHelper] getRelyingPartyId");
         final String relyingPartyId = getLoginContext(servletContext, request, true).getRelyingPartyId();
         LOGGER.trace("Relying party id is {}.", relyingPartyId);
         return relyingPartyId;
@@ -172,6 +184,7 @@ public final class IdPHelper {
      * @return Returns whether the request is passive or not.
      */
     public static boolean isPassiveRequest(final ServletContext servletContext, final HttpServletRequest request) {
+        LOGGER.trace("[IdPHelper] isPassiveRequest");
         final boolean isPassive = getLoginContext(servletContext, request, true).isPassiveAuthRequired();
         LOGGER.trace("Request is {} passive.", isPassive ? "" : "not");
         return isPassive;
@@ -186,6 +199,7 @@ public final class IdPHelper {
      */
     public static void returnToIdP(final ServletContext servletContext, final HttpServletRequest request,
             final HttpServletResponse response) {
+        LOGGER.trace("[IdPHelper] returnToIdP");
         final LoginContext loginContext = getLoginContext(servletContext, request, true);
         final String profileUrl =
                 HttpServletHelper.getContextRelativeUrl(request, loginContext.getProfileHandlerURL()).buildURL();
@@ -199,6 +213,28 @@ public final class IdPHelper {
     }
 
     /**
+     * Redirects to a url.
+     * 
+     * @param servletContext The servlet context.
+     * @param request The HTTP request.
+     * @param response The HTTP response.
+     * @param servletPath The servlet path.
+     */
+    public static void redirectToUrl(final ServletContext servletContext, final HttpServletRequest request,
+            final HttpServletResponse response, final String servletPath) {
+        LOGGER.trace("[IdPHelper] redirectToUrl");
+        final String servletUrl = servletPath;
+        try {
+            LOGGER.trace("Redirect to {}.", servletUrl);
+            response.sendRedirect(servletUrl);
+        } catch (final IOException e) {
+            LOGGER.error("Error redirecting to servlet at {}.", servletUrl, e);
+            handleException(servletContext, request, response, e);
+        }
+
+    }
+
+    /**
      * Redirects to a servlet.
      * 
      * @param servletContext The servlet context.
@@ -208,6 +244,7 @@ public final class IdPHelper {
      */
     public static void redirectToServlet(final ServletContext servletContext, final HttpServletRequest request,
             final HttpServletResponse response, final String servletPath) {
+        LOGGER.trace("[IdPHelper] redirectToServlet");
         final String servletUrl = HttpServletHelper.getContextRelativeUrl(request, servletPath).buildURL();
         try {
             LOGGER.trace("Redirect to {}.", servletUrl);
@@ -227,6 +264,7 @@ public final class IdPHelper {
      */
     public static void setConsentRevocationRequested(final ServletContext servletContext,
             final HttpServletRequest request) {
+        LOGGER.trace("[IdPHelper] setConsentRevocationRequested");
         final boolean consentRevocation = BooleanUtils.toBoolean(request.getParameter("uApprove.consent-revocation"));
         LOGGER.trace("Consent revocation is {} set.", consentRevocation ? "" : "not");
         if (consentRevocation) {
@@ -244,6 +282,7 @@ public final class IdPHelper {
      */
     public static boolean isConsentRevocationRequested(final ServletContext servletContext,
             final HttpServletRequest request) {
+        LOGGER.trace("[IdPHelper] isConsentRevocationRequested");
         final LoginContext loginContext = getLoginContext(servletContext, request, true);
         final Object consentRevocation = loginContext.getProperty("uApprove.consentRevocationRequested");
         if (consentRevocation instanceof Boolean) {
@@ -262,6 +301,7 @@ public final class IdPHelper {
      */
     public static void setAttributes(final ServletContext servletContext, final HttpServletRequest request,
             final List<Attribute> attributes) {
+        LOGGER.trace("[IdPHelper] setAttributes");
         final LoginContext loginContext = getLoginContext(servletContext, request, true);
         loginContext.setProperty("uApprove.attributes", (Serializable) attributes);
     }
@@ -274,6 +314,7 @@ public final class IdPHelper {
      * @return Returns the attributes.
      */
     public static List<Attribute> getAttributes(final ServletContext servletContext, final HttpServletRequest request) {
+        LOGGER.trace("[IdPHelper] getAttributes");
         final LoginContext loginContext = getLoginContext(servletContext, request, true);
         @SuppressWarnings("unchecked") final List<Attribute> attributes =
                 (List<Attribute>) loginContext.getProperty("uApprove.attributes");
@@ -287,6 +328,7 @@ public final class IdPHelper {
      * @param request The HTTP request.
      */
     public static void setToUAccepted(final ServletContext servletContext, final HttpServletRequest request) {
+        LOGGER.trace("[IdPHelper] setToUAccepted");
         final LoginContext loginContext = getLoginContext(servletContext, request, true);
         loginContext.setProperty("uApprove.touAccepted", true);
     }
@@ -299,6 +341,7 @@ public final class IdPHelper {
      * @return Returns true if ToU is accepted.
      */
     public static boolean isToUAccepted(final ServletContext servletContext, final HttpServletRequest request) {
+        LOGGER.trace("[IdPHelper] isToUAccepted");
         final LoginContext loginContext = getLoginContext(servletContext, request, true);
         final Object touAccepted = loginContext.getProperty("uApprove.touAccepted");
         if (touAccepted instanceof Boolean) {
@@ -309,13 +352,15 @@ public final class IdPHelper {
     }
 
     /**
-     * Sets attribute release consented.
+     * Sets attribute release consented. It doesn't look like having any effect on IdP XXXstroucki but it has an effect
+     * on Intercepter/handleAttributeRelease
      * 
      * @param servletContext The servlet context.
      * @param request The HTTP request.
      */
     public static void setAttributeReleaseConsented(final ServletContext servletContext,
             final HttpServletRequest request) {
+        LOGGER.trace("[IdPHelper] setAttributeReleaseConsented");
         final LoginContext loginContext = getLoginContext(servletContext, request, true);
         loginContext.setProperty("uApprove.attributeReleaseConsented", true);
     }
@@ -329,6 +374,7 @@ public final class IdPHelper {
      */
     public static boolean isAttributeReleaseConsented(final ServletContext servletContext,
             final HttpServletRequest request) {
+        LOGGER.trace("[IdPHelper] isAttributeReleaseConsented");
         final LoginContext loginContext = getLoginContext(servletContext, request, true);
         final Object attributeReleaseConsented = loginContext.getProperty("uApprove.attributeReleaseConsented");
         if (attributeReleaseConsented instanceof Boolean) {
@@ -348,6 +394,7 @@ public final class IdPHelper {
      */
     public static void handleException(final ServletContext servletContext, final HttpServletRequest request,
             final HttpServletResponse response, final Throwable t) {
+        LOGGER.trace("[IdPHelper] handleException");
         request.setAttribute(AbstractErrorHandler.ERROR_KEY, t);
         HttpServletHelper
                 .getProfileHandlerManager(servletContext)
@@ -365,6 +412,7 @@ public final class IdPHelper {
      */
     public static void setAuthenticationFailure(final ServletContext servletContext, final HttpServletRequest request,
             final AuthenticationException e) {
+        LOGGER.trace("[IdPHelper] setAuthenticationFailure");
         getLoginContext(servletContext, request, true).setAuthenticationFailure(e);
     }
 
@@ -378,6 +426,7 @@ public final class IdPHelper {
      */
     public static void writeAuditLog(final String event, final String principalName, final String relyingPartyId,
             final List<String> data) {
+        LOGGER.trace("[IdPHelper] writeAuditLog");
 
         final AuditLogEntry auditLogEntry = new AuditLogEntry();
         auditLogEntry.setRequestBinding("ch.SWITCH.aai.uApprove");
@@ -388,5 +437,56 @@ public final class IdPHelper {
 
         final Logger logger = LoggerFactory.getLogger(AuditLogEntry.AUDIT_LOGGER_NAME);
         logger.info(auditLogEntry.toString());
+    }
+
+    public static boolean strouckiFilter(final ShibbolethFilteringContext filterContext, final String attributeId,
+            final String attributeValue) {
+        // This is the part that does the actual filtering right now.
+        LOGGER.trace("strouckiFilter attributeId: {} attributeValue: {}", attributeId, attributeValue);
+        // edu.internet2.middleware.shibboleth.common.attribute.BaseAttribute foo =
+        // filterContext.getUnfilteredAttributes().get(attributeId);
+        final Session session = filterContext.getAttributeRequestContext().getUserSession();
+        final java.util.Map<String, BaseAttribute> bla = filterContext.getUnfilteredAttributes();
+        for (final java.util.Map.Entry<String, BaseAttribute> item : bla.entrySet()) {
+            LOGGER.trace("attribute " + item.getKey() + " value " + item.getValue().getValues());
+
+        }
+        String principal = null;
+        String rpid = null;
+        try {
+            principal = filterContext.getAttributeRequestContext().getPrincipalName();
+            LOGGER.trace("principal is " + principal);
+            // http://shibboleth.net/pipermail/users/2011-September/000903.html
+            rpid = filterContext.getAttributeRequestContext().getPeerEntityId();
+            // rpid = filterContext.getAttributeRequestContext().getRelyingPartyConfiguration().
+            LOGGER.trace("rpid is " + rpid);
+        } catch (final Exception e) {
+            LOGGER.error("strouckiFilter caught {}", e);
+        }
+
+        if (attributeReleaseModule == null) {
+            LOGGER.error("attributeReleaseModule is null");
+            return false;
+        }
+
+        final Attribute uaAttribute = new Attribute(attributeId, Arrays.asList(attributeValue));
+        final List<Attribute> attributeList = Arrays.asList(uaAttribute);
+        final boolean consentRequired = attributeReleaseModule.requiresConsent(principal, rpid, attributeList);
+
+        LOGGER.trace("strouckiFilter attributeID: {} consentRequired: {}", attributeId, consentRequired);
+        return !consentRequired;
+        /*
+         * filterContext.getServletContext().; ServletConfig servletConfig = new ServletConfig();
+         * 
+         * ServletContext servletContext; servletContext = javax.servlet.ServletConfig.getServletContext(); final
+         * WebApplicationContext appContext =
+         * WebApplicationContextUtils.getRequiredWebApplicationContext(filterConfig.getServletContext());
+         * AttributeReleaseModule attributeReleaseModule; attributeReleaseModule = (AttributeReleaseModule)
+         * org.springframework.web.context.WebApplicationContext.getBean("uApprove.attributeReleaseModule",
+         * AttributeReleaseModule.class);
+         * 
+         * return false;
+         */
+
     }
 }

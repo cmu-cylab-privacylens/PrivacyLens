@@ -1,25 +1,28 @@
-uApprove
+PrivacyLens
   Terms Of Use & Attribute Release Consent
-  for the Shibboleth Identity Provider 2
+  for the Shibboleth Identity Provider 2.
+  PrivacyLens derives from uApprove, available at
+  http://www.switch.ch/aai/uApprove
 
 License
-  uApprove is licensed under the BSD license
+  PrivacyLens is licensed under the BSD license
   which is provided in the LICENSE file.
 
 Download
-  http://www.switch.ch/aai/uApprove
+  http://(not defined yet)
+  Get it via GitHub!
   
 Manual
-  http://www.switch.ch/aai/uApprove
+  http://(not defined yet)
   or in the manual directory.
   
 Issue Tracking
-  http://forge.switch.ch/redmine/projects/uapprove
+  https://github.com/organizations/cmu-cylab-privacylens/PrivacyLens/issues
     You may create and view issues anonymously or
     register to track issues.
   
-Source Access (Subversion)
-  https://subversion.switch.ch/svn/general/aai/uApprove/
+Source Access (GitHub)
+  https://github.com/cmu-cylab-privacylens/PrivacyLens.git
 
 Comments & Questions
-  aai@switch.ch
+  privacylens@ece.cmu.edu

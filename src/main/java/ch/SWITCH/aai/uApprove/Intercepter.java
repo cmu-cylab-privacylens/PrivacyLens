@@ -135,27 +135,36 @@ public class Intercepter implements Filter {
             intercept(final HttpServletRequest request, final HttpServletResponse response, final FilterChain chain)
                     throws IOException, ServletException {
 
+        logger.trace("Entered intercept from URL {}", request.getPathInfo());
+
         if (authnContextClassRef != null
                 && !StringUtils.equals(authnContextClassRef, IdPHelper.getAuthContextClassRef(servletContext, request))) {
+            logger.trace("Intercept sending to filter after something with authnContextClassRef {}",
+                    authnContextClassRef);
             chain.doFilter(request, response);
             return;
         }
 
+        // is this how it requests revocation of consent?
         if (!IdPHelper.isAuthenticated(servletContext, request, response)) {
             logger.trace("Request is not authenticated.");
             IdPHelper.setConsentRevocationRequested(servletContext, request);
+            logger.trace("Intercept sending to filter at request not authenticated");
             chain.doFilter(request, response);
             return;
         }
 
         if (handleTermsOfUse(request, response)) {
+            logger.trace("Intercept after TOU was handled");
             return;
         }
 
         if (handleAttributeRelease(request, response)) {
+            logger.trace("Intercept after AR was handled");
             return;
         }
 
+        logger.trace("Intercept sending to filter at end");
         chain.doFilter(request, response);
         return;
     }
@@ -217,11 +226,11 @@ public class Intercepter implements Filter {
                         IdPHelper.getSession(request));
 
         if (IdPHelper.isConsentRevocationRequested(servletContext, request)) {
-            logger.debug("Consent revovation requested. Clear consent.");
-            attributeReleaseModule.clearConsent(principalName, relyingPartyId);
+            logger.debug("Consent revocation requested. Clear consent.");
+            attributeReleaseModule.clearChoice(principalName, relyingPartyId);
         }
 
-        if (attributeReleaseModule.requiresConsent(principalName, relyingPartyId, attributes)) {
+        if (true || attributeReleaseModule.requiresConsent(principalName, relyingPartyId, attributes)) {
             IdPHelper.setAttributes(servletContext, request, attributes);
 
             if (IdPHelper.isPassiveRequest(servletContext, request)) {
@@ -229,6 +238,8 @@ public class Intercepter implements Filter {
                 return false;
             }
 
+            // don't carry in a view attribute
+            request.getSession().removeAttribute("view");
             IdPHelper.redirectToServlet(servletContext, request, response, "/uApprove/AttributeRelease");
             return true;
         }
@@ -238,6 +249,7 @@ public class Intercepter implements Filter {
 
     /** {@inheritDoc} */
     public void destroy() {
+        // we seem to have leakage issues with tomcat. or is it shibboleth?
         logger.debug("uApprove destroyed.");
     }
 

@@ -29,7 +29,6 @@ package ch.SWITCH.aai.uApprove.ar;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -37,15 +36,19 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import ch.SWITCH.aai.uApprove.IdPHelper;
+import ch.SWITCH.aai.uApprove.Util;
 import ch.SWITCH.aai.uApprove.ViewHelper;
+import edu.cmu.ece.PrivacyLens.Action;
+import edu.cmu.ece.PrivacyLens.Oracle;
+import edu.cmu.ece.PrivacyLens.config.General;
 
 /**
  * Attribute Release Servlet.
@@ -75,6 +78,8 @@ public class AttributeReleaseServlet extends HttpServlet {
         try {
             super.init();
             servletContext = getServletContext();
+            Util.servletContext = servletContext;
+
             final WebApplicationContext appContext =
                     WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
             attributeReleaseModule =
@@ -89,45 +94,76 @@ public class AttributeReleaseServlet extends HttpServlet {
     }
 
     /** {@inheritDoc} */
-    protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException,
-            IOException {
+    protected void service(final HttpServletRequest request, final HttpServletResponse response)
+            throws ServletException, IOException {
         try {
-            final String relyingPartyId = IdPHelper.getRelyingPartyId(servletContext, req);
-            final List<Attribute> attributes = IdPHelper.getAttributes(servletContext, req);
-            final Map<String, Object> context = new HashMap<String, Object>();
-            context.put("relyingParty", samlHelper.readRelyingParty(relyingPartyId, viewHelper.selectLocale(req)));
-            context.put("attributes", attributes);
-            context.put("allowGeneralConsent", attributeReleaseModule.isAllowGeneralConsent());
-            viewHelper.showView(servletContext, req, resp, "attribute-release", context);
-        } catch (final Throwable t) {
-            logger.error("Error while GET Attribute Release Servlet.", t);
-            IdPHelper.handleException(servletContext, req, resp, t);
-        }
-    }
+            logger.trace("Incoming signal");
+            final Action action = ActionFactory.getAction(request);
+            final String view = action.execute(request, response);
+            logger.trace("Business logic completed, next view: {}", view);
 
-    /** {@inheritDoc} */
-    protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException,
-            IOException {
-        try {
-            final boolean generalConsent =
-                    attributeReleaseModule.isAllowGeneralConsent()
-                            && BooleanUtils.toBoolean(req.getParameter("generalConsent"));
-            final String principalName = IdPHelper.getPrincipalName(servletContext, req);
-            final String relyingPartyId = IdPHelper.getRelyingPartyId(servletContext, req);
-            final List<Attribute> attributes = IdPHelper.getAttributes(servletContext, req);
-
-            if (generalConsent) {
-                logger.debug("Create general consent for {}", principalName);
-                attributeReleaseModule.consentGeneralAttributeRelease(principalName);
-            } else {
-                logger.debug("Create consent for user {} to {}.", principalName, relyingPartyId);
-                attributeReleaseModule.consentAttributeRelease(principalName, relyingPartyId, attributes);
+            // save our destination view in the session so that ActionFactory can tell where we came from
+            final HttpSession session = request.getSession(false);
+            if (session != null) {
+                session.setAttribute("view", view);
             }
-            IdPHelper.setAttributeReleaseConsented(servletContext, req);
-            IdPHelper.returnToIdP(servletContext, req, resp);
-        } catch (final Throwable t) {
-            logger.error("Error while POST Attribute Release Servlet.", t);
-            IdPHelper.handleException(servletContext, req, resp, t);
+
+            final String relyingPartyId = IdPHelper.getRelyingPartyId(servletContext, request);
+            final Map<String, Object> context = new HashMap<String, Object>();
+            final Oracle oracle = Oracle.getInstance();
+            // may be done in SourceAction already
+            oracle.setUserName(IdPHelper.getPrincipalName(servletContext, request));
+            oracle.setRelyingPartyId(relyingPartyId);
+            context.put("service", oracle.getServiceName());
+            context.put("adminUrl", General.getInstance().getAdminUrl());
+            context.put("adminMail", General.getInstance().getAdminMail());
+
+            context.put("idpOrganization", General.getInstance().getOrganizationName());
+
+            final Map<String, String> attributeReason = oracle.getAttributeReason(relyingPartyId);
+            final Map<String, String> attributePrivacy = oracle.getAttributePrivacy(relyingPartyId);
+            final Map<String, Boolean> attributeRequired = oracle.getAttributeRequired(relyingPartyId);
+
+            //context.put("remoteAttributeReason", attributeReason);
+            //context.put("remoteAttributePrivacy", attributePrivacy);
+            //context.put("remoteAttributeRequired", attributeRequired);
+
+            context.put(
+                    "requirementStatement",
+                    "Use the toggle switches to select the items that will be sent to "
+                            + (String) context.get("service")
+                            + ". Items marked with * are required to access and personalize the calendar and cannot be unselected.");
+            context.put("relyingParty", samlHelper.readRelyingParty(relyingPartyId, viewHelper.selectLocale(request)));
+            context.put("allowDenyRequired", false);
+
+            if (view.equals("reminder")) {
+                viewHelper.showView(servletContext, request, response, "attribute-reminder", context);
+                return;
+            } else if (view.equals("admin")) {
+                // don't carry in a view attribute as we send the user to a new app
+                request.getSession().removeAttribute("view");
+                IdPHelper.redirectToUrl(servletContext, request, response, (String) context.get("adminUrl"));
+                return;
+            } else if (view.equals("sink")) {
+                IdPHelper.setAttributeReleaseConsented(servletContext, request);
+                IdPHelper.returnToIdP(servletContext, request, response);
+            } else {
+                if (!view.equals("entry")) {
+                    logger.error("Fell through when setting up view {}", view);
+                }
+                // default and entry point
+                context.put("allowGeneralConsent", attributeReleaseModule.isAllowGeneralConsent());
+                viewHelper.showView(servletContext, request, response, "attribute-detail", context);
+                return;
+            }
+
+            /*
+             * if (view.equals(request.getPathInfo().substring(1)) { request.getRequestDispatcher("/WEB-INF/" + view +
+             * ".jsp").forward(request, response); } else { response.sendRedirect(view); // We'd like to fire redirect
+             * in case of a view change as result of the action (PRG pattern). }
+             */
+        } catch (final Exception e) {
+            throw new ServletException("Executing action failed.", e);
         }
     }
 }

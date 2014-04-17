@@ -58,28 +58,28 @@ fromSql.eachRow('SELECT auUserName, auLastTermsVersion, auFirstAccess FROM ArpUs
 }
 
 
-println "Attribute Release Consent Migration"
-def attributeReleaseConsent = toSql.dataSet("AttributeReleaseConsent");
+println "Attribute Release Choice Migration"
+def attributeReleaseChoice = toSql.dataSet("AttributeReleaseChoice");
 fromSql.eachRow('SELECT au.auUserName, sp.spProviderName, ara.araAttributes, ara.araTimeStamp FROM ArpUser au, ShibProvider sp, AttrReleaseApproval ara WHERE ara.araIdxArpUser = au.IdxArpUser AND ara.araIdxShibProvider = sp.IdxShibProvider') {
 
     def userId = it['auUserName']
     def relyingPartyId = it['spProviderName']
     def attributes = it['araAttributes']
-    def consentDate = it['araTimeStamp']
+    def choiceDate = it['araTimeStamp']
 
     if (!relyingPartyId) {
-        println "Migrating general Attribute Release Consent of ${userId}."
+        println "Migrating general Attribute Release Choice of ${userId}."
         try {
-            attributeReleaseConsent.add(userId:userId, relyingPartyId:'*', attributeId:'*', valuesHash:"n/a", consentDate: consentDate);
+            attributeReleaseChoice.add(userId:userId, relyingPartyId:'*', attributeId:'*', valuesHash:"n/a", choiceDate: choiceDate);
         }catch (SQLIntegrityConstraintViolationException) {
             // Ignore, but continue
         }
     } else {
         attributes.split(":").each {
             if (it) {
-                println "Migrating Attribute Release Consent of ${userId} to ${relyingPartyId} for ${it}."
+                println "Migrating Attribute Release Choice of ${userId} to ${relyingPartyId} for ${it}."
                 try {
-                    attributeReleaseConsent.add(userId:userId, relyingPartyId:relyingPartyId, attributeId:it, valuesHash:"n/a", consentDate: consentDate);
+                    attributeReleaseChoice.add(userId:userId, relyingPartyId:relyingPartyId, attributeId:it, valuesHash:"n/a", choiceDate: choiceDate);
                 }catch (SQLIntegrityConstraintViolationException) {
                     // Ignore, but continue
                 }

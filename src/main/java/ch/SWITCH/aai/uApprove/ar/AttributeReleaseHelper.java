@@ -37,6 +37,8 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ch.SWITCH.aai.uApprove.Util;
 
@@ -44,6 +46,8 @@ import ch.SWITCH.aai.uApprove.Util;
  * Attribute Release Helper.
  */
 public final class AttributeReleaseHelper {
+
+    private static final Logger logger = LoggerFactory.getLogger(AttributeReleaseHelper.class);
 
     /** Default constructor for utility classes is private. */
     private AttributeReleaseHelper() {
@@ -56,13 +60,13 @@ public final class AttributeReleaseHelper {
      * @param date The consent date for the attributes.
      * @return Returns a collection of attribute release consents
      */
-    public static Collection<AttributeReleaseConsent> createAttributeReleaseConsents(
+    public static Collection<AttributeReleaseChoice> createAttributeReleaseChoices(
             final Collection<Attribute> attributes, final DateTime date) {
-        final Collection<AttributeReleaseConsent> attributeReleaseConsents = new HashSet<AttributeReleaseConsent>();
+        final Collection<AttributeReleaseChoice> attributeReleaseChoices = new HashSet<AttributeReleaseChoice>();
         for (final Attribute attribute : attributes) {
-            attributeReleaseConsents.add(new AttributeReleaseConsent(attribute, date));
+            attributeReleaseChoices.add(new AttributeReleaseChoice(attribute, date, true));
         }
-        return attributeReleaseConsents;
+        return attributeReleaseChoices;
     }
 
     /**
@@ -91,7 +95,7 @@ public final class AttributeReleaseHelper {
      * @return Returns true if the attribute release contains the attribute.
      */
     public static boolean approvedAttribute(final Attribute attribute,
-            final AttributeReleaseConsent attributeReleaseConsent, final boolean compareAttributeValues) {
+            final AttributeReleaseChoice attributeReleaseConsent, final boolean compareAttributeValues) {
         if (StringUtils.equals(attributeReleaseConsent.getAttributeId(), attribute.getId())) {
             if (compareAttributeValues) {
                 return StringUtils.equals(attributeReleaseConsent.getValuesHash(), hashValues(attribute.getValues()));
@@ -112,10 +116,10 @@ public final class AttributeReleaseHelper {
      * @return Returns true if all attributes are contained in of the attribute releases.
      */
     public static boolean approvedAttributes(final List<Attribute> attributes,
-            final List<AttributeReleaseConsent> attributeReleaseConsents, final boolean compareAttributeValues) {
+            final List<AttributeReleaseChoice> attributeReleaseConsents, final boolean compareAttributeValues) {
         for (final Attribute attribute : attributes) {
             boolean approved = false;
-            for (final AttributeReleaseConsent attributeRelease : attributeReleaseConsents) {
+            for (final AttributeReleaseChoice attributeRelease : attributeReleaseConsents) {
                 if (approvedAttribute(attribute, attributeRelease, compareAttributeValues)) {
                     approved = true;
                     break;

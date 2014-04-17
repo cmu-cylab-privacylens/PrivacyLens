@@ -29,20 +29,71 @@ package ch.SWITCH.aai.uApprove.ar.storage;
 
 import java.util.List;
 
-import ch.SWITCH.aai.uApprove.ar.AttributeReleaseConsent;
+import ch.SWITCH.aai.uApprove.ar.AttributeReleaseChoice;
+import ch.SWITCH.aai.uApprove.ar.LoginEvent;
+import ch.SWITCH.aai.uApprove.ar.LoginEventDetail;
+import ch.SWITCH.aai.uApprove.ar.ReminderInterval;
 
 /** Storage interface for user consent. */
 public interface Storage {
+
+    /**
+     * Creates a login event with associated detail
+     * 
+     * @param loginEvent The login event
+     * @param loginEventDetail The login event detail
+     */
+    public void createLoginEvent(LoginEvent loginEvent, LoginEventDetail loginEventDetail);
+
+    /**
+     * Retrieves login event based on a login event id
+     * 
+     * @param loginEventId The login event
+     */
+    public LoginEvent readLoginEvent(String loginEventId);
+
+    /**
+     * Retrieves login event detail based on a login event
+     * 
+     * @param loginEvent The login event
+     */
+    public LoginEventDetail readLoginEventDetail(LoginEvent loginEvent);
+
+    /**
+     * Deletes a login event with associated detail Should it return something other than void? int/bool?
+     * 
+     * @param loginEvent The login event
+     */
+    public void deleteLoginEvent(LoginEvent loginEvent);
+
+    /**
+     * Retrieve login events based on constraints
+     * 
+     * @param userId The user id
+     * @param relyingPartyId The relying party id
+     * @param limit Limit of how many records to retrieve
+     */
+    public List<LoginEvent> listLoginEvents(String userId, String relyingPartyId, int limit);
+
+    /**
+     * Retrieve service provider list based on constraints
+     * 
+     * @param userId The user id
+     * @param limit Limit of how many records to retrieve
+     */
+    public List<String> listRelyingParties(String userId, int limit);
+
+    // end login events
 
     /**
      * Creates an attribute release consent for a specific user and relying party.
      * 
      * @param userId The user id.
      * @param relyingPartyId The relying party id.
-     * @param attributeReleaseConsent The attribute release consent.
+     * @param attributeReleaseChoice The attribute release consent.
      */
-    public void createAttributeReleaseConsent(final String userId, final String relyingPartyId,
-            final AttributeReleaseConsent attributeReleaseConsent);
+    public void createAttributeReleaseChoice(final String userId, final String relyingPartyId,
+            final AttributeReleaseChoice attributeReleaseChoice);
 
     /**
      * Reads the attribute release consents from the storage for a specific user and relying party.
@@ -51,7 +102,7 @@ public interface Storage {
      * @param relyingPartyId The relying party id.
      * @return Returns a collection of attribute release consents, might be empty but never null.
      */
-    public List<AttributeReleaseConsent> readAttributeReleaseConsents(final String userId, final String relyingPartyId);
+    public List<AttributeReleaseChoice> readAttributeReleaseChoices(final String userId, final String relyingPartyId);
 
     /**
      * Updates the attribute release consent for a specific user and relying party.
@@ -60,8 +111,8 @@ public interface Storage {
      * @param relyingPartyId The relying party id.
      * @param attributeReleaseConsent The attribute release consent.
      */
-    public void updateAttributeReleaseConsent(final String userId, String relyingPartyId,
-            final AttributeReleaseConsent attributeReleaseConsent);
+    public void updateAttributeReleaseChoice(final String userId, String relyingPartyId,
+            final AttributeReleaseChoice attributeReleaseChoice);
 
     /**
      * Deletes the attribute release consents from the storage for a specific user and relying party.
@@ -69,7 +120,9 @@ public interface Storage {
      * @param userId The user id.
      * @param relyingPartyId The relying party id.
      */
-    public void deleteAttributeReleaseConsents(final String userId, final String relyingPartyId);
+    public void deleteAttributeReleaseChoices(final String userId, final String relyingPartyId);
+
+    // should provide for deleting single consents
 
     /**
      * Checks if the storage contains attribute release consent for a specific user, relying party and attribute.
@@ -77,9 +130,76 @@ public interface Storage {
      * @param userId The user id.
      * @param relyingPartyId The relying party id.
      * @param attributeId The attribute id.
-     * @return Returns true if the storage contains attribute release consent, false otherwise.
+     * @return Returns true if the storage contains attribute release choice, false otherwise.
      */
-    public boolean containsAttributeReleaseConsent(final String userId, final String relyingPartyId,
+    public boolean containsAttributeReleaseChoice(final String userId, final String relyingPartyId,
             final String attributeId);
+
+    /**
+     * Create a record of {user, sp} -> show interface
+     * 
+     * @param userId The user id.
+     * @param relyingPartyId The relying party id.
+     * @param forceShow Flag whether to show interface
+     */
+    public void createForceShowInterface(final String userId, final String relyingPartyId, boolean forceShow);
+
+    /**
+     * Checks if user should be presented with the interface
+     * 
+     * @param userId The user id.
+     * @param relyingPartyId The relying party id.
+     * @param attributeId The attribute id.
+     * @return Should the user be presented with the interface
+     */
+    public boolean readForceShowInterface(final String userId, final String relyingPartyId);
+
+    /**
+     * Update whether user should be presented with the interface
+     * 
+     * @param userId The user id.
+     * @param relyingPartyId The relying party id.
+     * @param forceShow Flag whether to show interface
+     */
+    public void updateForceShowInterface(final String userId, final String relyingPartyId, final boolean forceShow);
+
+    /**
+     * Delete whether user should be presented with the interface
+     * 
+     * @param userId The user id.
+     * @param relyingPartyId The relying party id.
+     */
+    //public boolean deleteForceShowInterface(final String userId, final String relyingPartyId);
+
+    /**
+     * Create a record of {user, sp} -> show interface
+     * 
+     * @param reminderInterval TODO
+     */
+    public void createReminderInterval(ReminderInterval reminderInterval);
+
+    /**
+     * Checks if user should be presented with the interface
+     * 
+     * @param userId The user id.
+     * @param relyingPartyId The relying party id.
+     * @param attributeId The attribute id.
+     * @return The Reminder Interval object
+     */
+    public ReminderInterval readReminderInterval(final String userId, final String relyingPartyId);
+
+    /**
+     * Update whether user should be presented with the interface
+     * @param reminderInterval TODO
+     */
+    public void updateReminderInterval(ReminderInterval reminderInterval);
+
+    /**
+     * Delete whether user should be presented with the interface
+     * 
+     * @param userId The user id.
+     * @param relyingPartyId The relying party id.
+     */
+    //public boolean deleteReminderInterval(ReminderInterval reminderInterval);
 
 }

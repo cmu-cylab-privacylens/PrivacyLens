@@ -28,6 +28,8 @@
 package ch.SWITCH.aai.uApprove.ar;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -46,10 +48,12 @@ import org.opensaml.saml2.metadata.provider.MetadataProviderException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import edu.cmu.ece.PrivacyLens.AttributeUtils;
 import edu.internet2.middleware.shibboleth.common.attribute.AttributeRequestException;
 import edu.internet2.middleware.shibboleth.common.attribute.BaseAttribute;
 import edu.internet2.middleware.shibboleth.common.attribute.provider.SAML2AttributeAuthority;
 import edu.internet2.middleware.shibboleth.common.attribute.provider.ScopedAttributeValue;
+import edu.internet2.middleware.shibboleth.common.attribute.resolver.AttributeResolver;
 import edu.internet2.middleware.shibboleth.common.profile.provider.BaseSAMLProfileRequestContext;
 import edu.internet2.middleware.shibboleth.common.relyingparty.RelyingPartyConfiguration;
 import edu.internet2.middleware.shibboleth.common.relyingparty.provider.SAMLMDRelyingPartyConfigurationManager;
@@ -74,6 +78,9 @@ public class SAMLHelper {
 
     /** The attribute processor. */
     private AttributeProcessor attributeProcessor;
+
+    /** The attribute resolver. */
+    private AttributeResolver attributeResolver;
 
     /**
      * Sets the attribute authority.
@@ -104,10 +111,20 @@ public class SAMLHelper {
     }
 
     /**
+     * Sets the attribute resolver.
+     * 
+     * @param attributeResolver The attributeResolver to set.
+     */
+    public void setAttributeResolver(final AttributeResolver attributeResolver) {
+        this.attributeResolver = attributeResolver;
+    }
+
+    /**
      * Initializes the SAML helper.
      */
     public void initialize() {
         Validate.notNull(attributeAuthority, "Attribute Authority not set.");
+        Validate.notNull(attributeResolver, "Attribute Resolver not set.");
         Validate.notNull(relyingPartyConfigurationManager, "Relying Party Configuration Manager not set.");
         metadataProvider = relyingPartyConfigurationManager.getMetadataProvider();
         Validate.notNull(metadataProvider, "Metadata Provider not set.");
@@ -125,12 +142,24 @@ public class SAMLHelper {
      */
     public List<Attribute> resolveAttributes(final String principalName, final String relyingPartyId,
             final Locale locale, final Session session) {
+        logger.trace("[SAMLHelper] resolveAttributes");
         @SuppressWarnings("rawtypes") final BaseSAMLProfileRequestContext requestCtx =
                 buildRequestContext(principalName, relyingPartyId, session);
 
+        Collection<?> requestedAttributes = requestCtx.getRequestedAttributesIds();
+        if (requestedAttributes == null || requestedAttributes.isEmpty()) {
+            logger.trace("No attributes are requested, but IdP is making all available");
+            // let requestedAttributes not be null
+            requestedAttributes = new ArrayList();
+        } else {
+            requestedAttributes = Arrays.asList(requestedAttributes);
+        }
+
         @SuppressWarnings("rawtypes") Map<String, BaseAttribute> baseAttributes = null;
         try {
-            baseAttributes = attributeAuthority.getAttributes(requestCtx);
+            baseAttributes = attributeResolver.resolveAttributes(requestCtx);
+            // getting attributes from the attribute authority means pulling them through the filter
+            // baseAttributes = attributeAuthority.getAttributes(requestCtx);
         } catch (final AttributeRequestException e) {
             logger.error("Error while retrieving attributes for {}.", principalName, e);
             throw new IllegalStateException(e);
@@ -138,6 +167,15 @@ public class SAMLHelper {
 
         final List<Attribute> attributes = new ArrayList<Attribute>();
         for (final BaseAttribute<?> baseAttribute : baseAttributes.values()) {
+
+            // consider requested == required
+            boolean required = requestedAttributes.contains(baseAttribute.getId());
+
+            // XXX demo make eppn required
+            if (baseAttribute.getId().equals("eduPersonPrincipalName")) {
+                required = true;
+            }
+
             final List<String> attributeValues = new ArrayList<String>();
             for (final Object valueObj : baseAttribute.getValues()) {
                 if (valueObj instanceof NameID) {
@@ -150,11 +188,36 @@ public class SAMLHelper {
                     attributeValues.add(String.valueOf(valueObj));
                 }
             }
+
             logger.trace("Attribute: {} {}, localized names {}, localized descriptions {}.", new Object[] {
                     baseAttribute.getId(), attributeValues, baseAttribute.getDisplayNames().keySet(),
                     baseAttribute.getDisplayDescriptions().keySet(),});
-            attributes.add(new Attribute(baseAttribute.getId(), baseAttribute.getDisplayNames().get(locale),
-                    baseAttribute.getDisplayDescriptions().get(locale), attributeValues));
+
+            final String id = baseAttribute.getId();
+            String name = baseAttribute.getDisplayNames().get(locale);
+            String description = baseAttribute.getDisplayDescriptions().get(locale);
+
+            // check for unset values
+            // in ShibbolethAttributeResolver around line 258, if the SP doesn't request attributes, all will be
+            // selected for handing out.
+            // apparently the descriptions of the attribute are to be provided by an (optional)
+            // AttributeConsumingService on
+            // the SP (?)
+            // but if it is not there, then the descriptions will be null.
+            // check if attributes are requested:
+            // resolutionContext.getAttributeRequestContext.getRequestedAttributeIds == null || isEmpty
+
+            if (name == null || name.isEmpty()) {
+                name = AttributeUtils.getName(id);
+            }
+
+            if (description == null || description.isEmpty()) {
+                description = AttributeUtils.getDescription(id);
+            }
+
+            attributes.add(new Attribute(id, name, description, attributeValues, required));
+
+            // attributes.add(AttributeUtils.genAttribute(baseAttribute, locale));
         }
 
         logger.trace("{} attributes resolved.", attributes.size());
@@ -182,6 +245,7 @@ public class SAMLHelper {
      */
     private BaseSAMLProfileRequestContext<?, ?, ?, ?> buildRequestContext(final String principalName,
             final String relyingPartyId, final Session session) {
+        logger.trace("[SAMLHelper] buildRequestContext");
 
         final RelyingPartyConfiguration relyingPartyConfiguration =
                 relyingPartyConfigurationManager.getRelyingPartyConfiguration(relyingPartyId);
@@ -235,13 +299,16 @@ public class SAMLHelper {
     }
 
     /**
-     * Reads the relying party.
+     * Reads the relying party. Apparently the (optional?) AttributeConsumingService can specify descriptions and
+     * required attribute information
+     * 
      * 
      * @param relyingPartyId The relying party id.
      * @param locale The locale.
      * @return Returns a relying party.
      */
     public RelyingParty readRelyingParty(final String relyingPartyId, final Locale locale) {
+        logger.trace("[SAMLHelper] readRelyingParty");
         EntityDescriptor entityDescriptor = null;
         try {
             entityDescriptor = metadataProvider.getEntityDescriptor(relyingPartyId);
@@ -253,16 +320,16 @@ public class SAMLHelper {
             logger.error("Error while retrieving metadata descriptor for {}.", relyingPartyId, e);
             throw new IllegalStateException(e);
         }
-        final AttributeConsumingService attrService = getAttributeConsumingService(entityDescriptor);
-        if (attrService == null) {
+        final AttributeConsumingService attributeConsumingService = getAttributeConsumingService(entityDescriptor);
+        if (attributeConsumingService == null) {
             logger.trace("No attribute consuming service found for entityId {}.", relyingPartyId);
             return new RelyingParty(relyingPartyId);
         } else {
             logger.trace("Relying party: {}, localized names {}, localized descriptions {}.", new Object[] {
-                    relyingPartyId, attrService.getNames(), attrService.getDescriptions(),});
+                    relyingPartyId, attributeConsumingService.getNames(), attributeConsumingService.getDescriptions(),});
 
             String localizedName = null;
-            for (final ServiceName element : attrService.getNames()) {
+            for (final ServiceName element : attributeConsumingService.getNames()) {
                 if (StringUtils.equals(element.getName().getLanguage(), locale.getLanguage())) {
                     localizedName = element.getName().getLocalString();
                     break;
@@ -270,7 +337,7 @@ public class SAMLHelper {
             }
 
             String localizedDescription = null;
-            for (final ServiceDescription element : attrService.getDescriptions()) {
+            for (final ServiceDescription element : attributeConsumingService.getDescriptions()) {
                 if (StringUtils.equals(element.getDescription().getLanguage(), locale.getLanguage())) {
                     localizedDescription = element.getDescription().getLocalString();
                     break;
@@ -288,6 +355,7 @@ public class SAMLHelper {
      * @return Returns the attribute consuming service
      */
     private AttributeConsumingService getAttributeConsumingService(final EntityDescriptor entityDescriptor) {
+        logger.trace("[SAMLHelper] getAttributeConsumingService");
         final String[] protocols = {SAMLConstants.SAML20P_NS, SAMLConstants.SAML11P_NS, SAMLConstants.SAML10P_NS};
         AttributeConsumingService result = null;
         List<AttributeConsumingService> list;

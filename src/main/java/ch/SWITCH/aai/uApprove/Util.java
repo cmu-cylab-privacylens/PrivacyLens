@@ -30,13 +30,13 @@ package ch.SWITCH.aai.uApprove;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.codec.binary.Hex;
+import javax.servlet.ServletContext;
+
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,17 +50,7 @@ public final class Util {
     /** Class logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(Util.class);
 
-    /** The message digest. */
-    private static MessageDigest sha256;
-
-    static {
-        try {
-            sha256 = MessageDigest.getInstance("SHA-256");
-        } catch (final NoSuchAlgorithmException e) {
-            LOGGER.error("Error getting message digest instance.", e);
-            throw new IllegalStateException(e);
-        }
-    }
+    public static ServletContext servletContext;
 
     /** Default constructor for utility classes is private. */
     private Util() {
@@ -92,8 +82,7 @@ public final class Util {
      * @return Returns a fingerprint.
      */
     public static String hash(final String input) {
-        final byte[] digest = sha256.digest(input.getBytes());
-        return Hex.encodeHexString(digest);
+        return DigestUtils.sha256Hex(input);
     }
 
     /**

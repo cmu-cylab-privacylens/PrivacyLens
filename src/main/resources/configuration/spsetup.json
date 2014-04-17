@@ -1,0 +1,68 @@
+{
+  "attrs":[
+    {
+      "id":"eduPersonPrincipalName",
+      "desc":"Andrew ID"
+    },
+    {
+      "id":"eduPersonPrimaryAffiliation",
+      "desc":"CMU affiliation"
+    },
+    {
+      "id":"eduPersonEntitlement",
+      "desc":"credentials to access CMU services"
+    },
+    {
+      "id":"sn",
+      "desc":"surname"
+    },
+    {
+      "id":"cn",
+      "desc":"full name"
+    }
+  ],
+  "SPs":[
+    {
+      "name":"CMU's Calendar",
+      "id":"https://scalepriv.ece.cmu.edu/shibboleth",
+      "attrGroups":[
+        {
+          "id":"GroupName",
+          "description":"name",
+          "reason":"CMU's Calendar is asking for your <b>name</b> in order to personalize your calendar.",
+          "privpolicy":"CMU's Calendar will not use your name for any other purpose, and will not keep this information after you close the calendar window."
+        }
+      ],
+      "attrs":[
+        {
+          "id":"eduPersonPrincipalName",
+          "reason":"CMU's Calendar needs your <b>Andrew ID</b> in order to display the correct calendar information. CMU's Calendar cannot function properly if an Andrew ID is not supplied.",
+          "privpolicy":"CMU's Calendar will not use your Andrew ID for any other purpose, and will not keep this information after you close the calendar window.",
+          "required":"true"
+        },
+        {
+          "id":"eduPersonEntitlement",
+          "reason":"CMU's Calendar is asking for your <b>credentials to access CMU services</b>. This information is not necessary for CMU's Calendar to function, and CMU does not know whether or how it will be used.",
+          "privpolicy":"CMU does not know how long CMU's Calendar will keep this information."
+        },
+        {
+          "id":"eduPersonPrimaryAffiliation",
+          "reason":"CMU's Calendar is asking for your <b>CMU affiliation</b>. This information is not necessary for CMU's Calendar to function, and CMU does not know whether or how it will be used.",
+          "privpolicy":"CMU does not know how long CMU's Calendar will keep this information."
+        },
+        {
+          "id":"sn",
+          "reason":"CMU's Calendar is asking for your <b>surname</b> in order to personalize your calendar.",
+          "privpolicy":"CMU's Calendar will not use your surname for any other purpose, and will not keep this information after you close the calendar window.",
+          "group":"GroupName"
+        },
+        {
+          "id":"cn",
+          "reason":"CMU's Calendar is asking for your <b>full name</b> in order to personalize your calendar.",
+          "privpolicy":"CMU's Calendar will not use your full name for any other purpose, and will not keep this information after you close the calendar window.",
+          "group":"GroupName"
+        }
+      ]
+    }
+  ]
+}

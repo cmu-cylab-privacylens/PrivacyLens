@@ -13,6 +13,8 @@
             <includes>
                 <include>ch.SWITCH.aai:uApprove</include>
                 <include>javax.servlet:jstl</include>
+                <include>joda-time:joda-time-jsptags</include>
+                <include>com.google.code.gson:gson</include>
             </includes>
         </dependencySet>
         <dependencySet>

@@ -91,7 +91,7 @@ public class AttributeReleaseHelperTest {
     /** Test. */
     @Test
     public void testApprovedAttribute() {
-        final AttributeReleaseConsent attributeRelease = new AttributeReleaseConsent(attribute1a, new DateTime());
+        final AttributeReleaseChoice attributeRelease = new AttributeReleaseChoice(attribute1a, new DateTime(), true);
 
         Assert.assertTrue(AttributeReleaseHelper.approvedAttribute(attribute1a, attributeRelease, false));
         Assert.assertTrue(AttributeReleaseHelper.approvedAttribute(attribute1a, attributeRelease, true));
@@ -106,20 +106,20 @@ public class AttributeReleaseHelperTest {
     @Test
     public void testApprovedAttributes() {
         Assert.assertTrue(AttributeReleaseHelper.approvedAttributes(Collections.<Attribute> emptyList(),
-                Collections.<AttributeReleaseConsent> emptyList(), true));
+                Collections.<AttributeReleaseChoice> emptyList(), true));
 
         final List<Attribute> attributes = Arrays.asList(new Attribute[] {attribute1a, attribute1b, attribute2});
 
         Assert.assertFalse(AttributeReleaseHelper.approvedAttributes(attributes,
-                Collections.<AttributeReleaseConsent> emptyList(), true));
+                Collections.<AttributeReleaseChoice> emptyList(), true));
 
-        final List<AttributeReleaseConsent> attributeReleases = new ArrayList<AttributeReleaseConsent>();
-        attributeReleases.add(new AttributeReleaseConsent(attribute1a, new DateTime()));
-        attributeReleases.add(new AttributeReleaseConsent(attribute1b, new DateTime()));
+        final List<AttributeReleaseChoice> attributeReleases = new ArrayList<AttributeReleaseChoice>();
+        attributeReleases.add(new AttributeReleaseChoice(attribute1a, new DateTime(), true));
+        attributeReleases.add(new AttributeReleaseChoice(attribute1b, new DateTime(), true));
 
         Assert.assertFalse(AttributeReleaseHelper.approvedAttributes(attributes, attributeReleases, true));
 
-        attributeReleases.add(new AttributeReleaseConsent(attribute2, new DateTime()));
+        attributeReleases.add(new AttributeReleaseChoice(attribute2, new DateTime(), true));
         Assert.assertTrue(AttributeReleaseHelper.approvedAttributes(attributes, attributeReleases, true));
 
         Assert.assertTrue(AttributeReleaseHelper.approvedAttributes(Collections.<Attribute> emptyList(),

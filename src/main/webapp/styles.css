@@ -1,3 +1,6 @@
+/* override jquery-ui */
+.ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset { text-align: center; float: none; }
+
 .box {
     width:600px;
     margin-left: auto;
@@ -62,15 +65,47 @@ a:focus, a:hover, a:active {
     overflow: hidden;
 }
 
-.service_name {
-    font-weight: bold;
-}
+#.service_name {
+#    font-weight: bold;
+#}
 
 .service_description {
     font-style: italic;
 }
 
 .organization_name {
+}
+
+#btn {
+background-color: transparent;
+text-decoration: underline;
+border: none;
+color: blue;
+cursor: pointer;
+font-family:Verdana, Geneva, sans-serif;
+font-size: 10px;
+}
+
+#recentLogins {
+}
+
+#recentLoginsList {
+    margin-left: 1em;
+}
+
+#loginEventDetail {
+    margin-left: 1em;
+}
+
+#attributeDetail {
+    margin-left: 1em;
+}
+
+#servicesUsed {
+}
+
+#servicesUsedList {
+  margin-left: 1em;
 }
 
 #attributeRelease-consent {
@@ -83,9 +118,71 @@ a:focus, a:hover, a:active {
 
 #attributeRelease {
     width: 95%;
-    margin: 4px;
-    border: solid 1px black;
-    overflow: hidden;
+    margin: 0px;
+}
+
+#attributeReleaseAttributeList {
+  width: 80%;
+  float: left;
+}
+
+#attributeReleaseAttribute {
+  width: 50%;
+  float: left;
+  padding-top: 1%;
+  padding-bottom: 1%;
+  vertical-align: middle;
+}
+
+#attributeReleaseInformation {
+  width: 20%;
+  float: right;
+}
+
+#attributeReleaseControl {
+  width: 50%;
+  float: left;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  vertical-align: middle;
+}
+
+#servicesLink {
+background-color: transparent;
+text-decoration: underline;
+border: none;
+color: blue;
+cursor: pointer;
+font-family:Verdana, Geneva, sans-serif;
+}
+
+#lastLoginLink {
+background-color: transparent;
+text-decoration: underline;
+border: none;
+color: blue;
+cursor: pointer;
+font-family:Verdana, Geneva, sans-serif;
+}
+
+#settingsLink {
+background-color: transparent;
+text-decoration: underline;
+border: none;
+color: blue;
+cursor: pointer;
+font-family:Verdana, Geneva, sans-serif;
+font-size: 10px;
+}
+
+#explainLink {
+background-color: transparent;
+text-decoration: underline;
+border: none;
+color: blue;
+cursor: pointer;
+font-family:Verdana, Geneva, sans-serif;
+font-size: 10px;
 }
 
 #attributeRelease table {
@@ -105,6 +202,11 @@ a:focus, a:hover, a:active {
     padding: 5px 7px;
     background-color:#00247D;
     color: white;
+}
+
+#divRequiredAttributes {
+  width: 100%;
+  clear: both;
 }
 
 .federation_logo

@@ -29,8 +29,8 @@ package ch.SWITCH.aai.uApprove.ar;
 
 import org.joda.time.DateTime;
 
-/** Represents an attribute release consent. */
-public class AttributeReleaseConsent {
+/** Represents an attribute release choice. */
+public class AttributeReleaseChoice {
 
     /** The attribute id. */
     private final String attributeId;
@@ -39,31 +39,37 @@ public class AttributeReleaseConsent {
     private final String valuesHash;
 
     /** A timestamp when consent for this attribute release was given. */
-    private final DateTime consentDate;
+    private final DateTime choiceDate;
+
+    /** True if consent, false if denial */
+    private final boolean isConsented;
 
     /**
      * Constructs a @see AttributeReleaseConsent.
      * 
      * @param attributeId The id of the attribute.
      * @param valuesHash The hashed values.
-     * @param consentDate The timestamp for this @see AttributeRelease.
+     * @param choiceDate The timestamp for this @see AttributeRelease.
      */
-    public AttributeReleaseConsent(final String attributeId, final String valuesHash, final DateTime consentDate) {
+    public AttributeReleaseChoice(final String attributeId, final String valuesHash, final DateTime choiceDate,
+            final boolean isConsented) {
         this.attributeId = attributeId;
         this.valuesHash = valuesHash;
-        this.consentDate = consentDate;
+        this.choiceDate = choiceDate;
+        this.isConsented = isConsented;
     }
 
     /**
      * Constructs a @see AttributeReleaseConsent.
      * 
      * @param attribute The @see Attribute.
-     * @param consentDate The timestamp for this @see AttributeRelease.
+     * @param choiceDate The timestamp for this @see AttributeRelease.
      */
-    public AttributeReleaseConsent(final Attribute attribute, final DateTime consentDate) {
+    public AttributeReleaseChoice(final Attribute attribute, final DateTime choiceDate, final boolean isConsented) {
         this.attributeId = attribute.getId();
         this.valuesHash = AttributeReleaseHelper.hashValues(attribute.getValues());
-        this.consentDate = consentDate;
+        this.choiceDate = choiceDate;
+        this.isConsented = isConsented;
     }
 
     /**
@@ -90,7 +96,17 @@ public class AttributeReleaseConsent {
      * @return Returns the date.
      */
     public DateTime getDate() {
-        return consentDate;
+        return choiceDate;
+    }
+
+    /**
+     * Gets whether this choice is a consent or denial.
+     * 
+     * @return Returns true if consent, false if denial
+     */
+
+    public boolean isConsented() {
+        return isConsented;
     }
 
 }

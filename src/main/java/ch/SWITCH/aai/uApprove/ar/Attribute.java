@@ -30,18 +30,28 @@ package ch.SWITCH.aai.uApprove.ar;
 import java.util.Collections;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Attribute.
  */
 public class Attribute {
+    /** Class logger. */
+    // if this is not static, Gson will barf on this.
+    private static final Logger logger = LoggerFactory.getLogger(Attribute.class);
 
     /** The id. */
     private final String id;
 
-    /** The name. */
+    /**
+     * The name. a short name
+     */
     private final String name;
 
-    /** The description. */
+    /**
+     * The description. a longer description.
+     */
     private final String description;
 
     /** The values. */
@@ -54,7 +64,7 @@ public class Attribute {
      * @param values The values.
      */
     public Attribute(final String id, final List<String> values) {
-        this(id, null, null, values);
+        this(id, null, null, values, false);
     }
 
     /**
@@ -64,8 +74,12 @@ public class Attribute {
      * @param name The name.
      * @param description The description.
      * @param values The values.
+     * @param required Is attribute required.
      */
-    public Attribute(final String id, final String name, final String description, final List<String> values) {
+    public Attribute(final String id, final String name, final String description, final List<String> values,
+            final boolean required) {
+        logger.trace("Attribute construction id: {} name: {} description: {} values: {} required: {}", new Object[] {
+                id, name, description, values, required});
         this.id = id;
         if (name != null) {
             this.name = name;
@@ -78,6 +92,67 @@ public class Attribute {
         } else {
             this.values = Collections.emptyList();
         }
+        //this.required = required;
+    }
+
+    /** {@inheritDoc} */
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((description == null) ? 0 : description.hashCode());
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        //result = prime * result + (required ? 1231 : 1237);
+        result = prime * result + ((values == null) ? 0 : values.hashCode());
+        return result;
+    }
+
+    /** {@inheritDoc} */
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof Attribute)) {
+            return false;
+        }
+        final Attribute other = (Attribute) obj;
+        if (description == null) {
+            if (other.description != null) {
+                return false;
+            }
+        } else if (!description.equals(other.description)) {
+            return false;
+        }
+        if (id == null) {
+            if (other.id != null) {
+                return false;
+            }
+        } else if (!id.equals(other.id)) {
+            return false;
+        }
+        if (name == null) {
+            if (other.name != null) {
+                return false;
+            }
+        } else if (!name.equals(other.name)) {
+            return false;
+        }
+        /*
+        if (required != other.required) {
+            return false;
+        }
+        */
+        if (values == null) {
+            if (other.values != null) {
+                return false;
+            }
+        } else if (!values.equals(other.values)) {
+            return false;
+        }
+        return true;
     }
 
     /**

@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2011, SWITCH
+ * COPYRIGHT_BOILERPLATE
+ * Copyright (c) 2013 Carnegie Mellon University
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -27,27 +28,46 @@
 
 package ch.SWITCH.aai.uApprove.ar;
 
-import java.util.Arrays;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.joda.time.DateTime;
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.gson.Gson;
 
 /**
- * Attribute Release Consent Test.
+ * This is an AJAX handler stub servlet
  */
+public class AttributeReleaseAjaxServlet extends HttpServlet {
 
-public class AttributeReleaseConsentTest {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
 
-    /** Test. */
-    @Test
-    public void testCreateAttributeReleaseConsents() {
-        final Attribute attribute = new Attribute("id", Arrays.asList(new String[] {"value1", "value2"}));
-        final DateTime consentDate = new DateTime();
-        final AttributeReleaseConsent attributeReleaseConsent = new AttributeReleaseConsent(attribute, consentDate);
-        Assert.assertEquals(attributeReleaseConsent.getAttributeId(), attribute.getId());
-        Assert.assertEquals(attributeReleaseConsent.getValuesHash(),
-                AttributeReleaseHelper.hashValues(attribute.getValues()));
-        Assert.assertEquals(attributeReleaseConsent.getDate(), consentDate);
+    /** Class logger. */
+    private final Logger logger = LoggerFactory.getLogger(AttributeReleaseAjaxServlet.class);
+
+    @Override
+    protected void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException,
+            IOException {
+        logger.trace("AJAX handler entered");
+        final List<String> list = new ArrayList<String>();
+        list.add("item1");
+        list.add("item2");
+        list.add("item3");
+        final String json = new Gson().toJson(list);
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(json);
     }
+
 }

@@ -33,7 +33,10 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.SWITCH.aai.uApprove.ar.AttributeReleaseConsent;
+import ch.SWITCH.aai.uApprove.ar.AttributeReleaseChoice;
+import ch.SWITCH.aai.uApprove.ar.LoginEvent;
+import ch.SWITCH.aai.uApprove.ar.LoginEventDetail;
+import ch.SWITCH.aai.uApprove.ar.ReminderInterval;
 
 /**
  * No operation implementation of the attribute release consent storage interface. I.e., this implementation will not
@@ -46,31 +49,104 @@ public class NOPStorage implements Storage {
     private final Logger logger = LoggerFactory.getLogger(NOPStorage.class);
 
     /** {@inheritDoc} */
-    public void createAttributeReleaseConsent(final String userId, final String relyingPartyId,
-            final AttributeReleaseConsent attributeReleaseConsent) {
+    public void createAttributeReleaseChoice(final String userId, final String relyingPartyId,
+            final AttributeReleaseChoice attributeReleaseConsent) {
         return;
     }
 
     /** {@inheritDoc} */
-    public List<AttributeReleaseConsent> readAttributeReleaseConsents(final String userId, final String relyingPartyId) {
+    public List<AttributeReleaseChoice> readAttributeReleaseChoices(final String userId, final String relyingPartyId) {
         return Collections.emptyList();
     }
 
     /** {@inheritDoc} */
-    public void updateAttributeReleaseConsent(final String userId, final String relyingPartyId,
-            final AttributeReleaseConsent attributeReleaseConsent) {
+    public void updateAttributeReleaseChoice(final String userId, final String relyingPartyId,
+            final AttributeReleaseChoice attributeReleaseConsent) {
         return;
     }
 
     /** {@inheritDoc} */
-    public void deleteAttributeReleaseConsents(final String userId, final String relyingPartyId) {
+    public void deleteAttributeReleaseChoices(final String userId, final String relyingPartyId) {
         return;
     }
 
     /** {@inheritDoc} */
-    public boolean containsAttributeReleaseConsent(final String userId, final String relyingPartyId,
+    public boolean containsAttributeReleaseChoice(final String userId, final String relyingPartyId,
             final String attributeId) {
         return false;
+    }
+
+    /** {@inheritDoc} */
+    public void createLoginEvent(final LoginEvent loginEvent, final LoginEventDetail loginEventDetail) {
+        // TODO Auto-generated method stub
+
+    }
+
+    /** {@inheritDoc} */
+    public LoginEvent readLoginEvent(final String loginEventId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    public LoginEventDetail readLoginEventDetail(final LoginEvent loginEvent) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    public void deleteLoginEvent(final LoginEvent loginEvent) {
+        // TODO Auto-generated method stub
+
+    }
+
+    /** {@inheritDoc} */
+    public List<LoginEvent> listLoginEvents(final String userId, final String relyingPartyId, final int limit) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    public List<String> listRelyingParties(final String userId, final int limit) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    public void
+            createForceShowInterface(final String userId, final String relyingPartyId, final boolean forceShow) {
+        // TODO Auto-generated method stub
+
+    }
+
+    /** {@inheritDoc} */
+    public boolean readForceShowInterface(final String userId, final String relyingPartyId) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    /** {@inheritDoc} */
+    public void updateForceShowInterface(final String userId, final String relyingPartyId, final boolean forceShow) {
+        // TODO Auto-generated method stub
+
+    }
+
+    /** {@inheritDoc} */
+    public void createReminderInterval(ReminderInterval reminderInterval) {
+        // TODO Auto-generated method stub
+
+    }
+
+    /** {@inheritDoc} */
+    public ReminderInterval readReminderInterval(final String userId, final String relyingPartyId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    public void updateReminderInterval(ReminderInterval reminderInterval) {
+        // TODO Auto-generated method stub
+
     }
 
 }

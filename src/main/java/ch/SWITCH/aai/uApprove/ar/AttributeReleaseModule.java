@@ -30,16 +30,22 @@ package ch.SWITCH.aai.uApprove.ar;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
 
+import ch.SWITCH.aai.uApprove.IdPHelper;
 import ch.SWITCH.aai.uApprove.Util;
 import ch.SWITCH.aai.uApprove.ar.storage.Storage;
+
+// XXX revisit attribute choices
 
 /**
  * The Attribute Release Module.
@@ -79,6 +85,7 @@ public class AttributeReleaseModule {
         allowGeneralConsent = false;
         enabledRelyingParties = Collections.emptyList();
         compareAttributeValues = true;
+        IdPHelper.attributeReleaseModule = this;
     }
 
     /**
@@ -184,14 +191,14 @@ public class AttributeReleaseModule {
             return false;
         }
 
-        if (storage.containsAttributeReleaseConsent(principalName, WILDCARD, WILDCARD)) {
-            logger.debug("User {} has given gerneral consent.", principalName);
+        if (storage.containsAttributeReleaseChoice(principalName, WILDCARD, WILDCARD)) {
+            logger.debug("User {} has given general consent.", principalName);
             return false;
         }
 
-        final List<AttributeReleaseConsent> attributeReleaseConsents =
-                storage.readAttributeReleaseConsents(principalName, relyingPartyId);
-        if (AttributeReleaseHelper.approvedAttributes(attributes, attributeReleaseConsents, compareAttributeValues)) {
+        final List<AttributeReleaseChoice> attributeReleaseChoices =
+                storage.readAttributeReleaseChoices(principalName, relyingPartyId);
+        if (AttributeReleaseHelper.approvedAttributes(attributes, attributeReleaseChoices, compareAttributeValues)) {
             logger.debug("User {} has already approved attributes {} for relying party {}.", new Object[] {
                     principalName, attributes, relyingPartyId});
             return false;
@@ -208,14 +215,67 @@ public class AttributeReleaseModule {
      * @param principalName The principal Name.
      * @param relyingPartyId The relying party id.
      */
-    public void clearConsent(final String principalName, final String relyingPartyId) {
+    public void clearChoice(final String principalName, final String relyingPartyId) {
+        // XXXstroucki do something about this to either be general or specific
         logger.info("Clear user consent for {}.", principalName);
-        storage.deleteAttributeReleaseConsents(principalName, WILDCARD);
-        storage.deleteAttributeReleaseConsents(principalName, relyingPartyId);
+        storage.deleteAttributeReleaseChoices(principalName, WILDCARD);
+        storage.deleteAttributeReleaseChoices(principalName, relyingPartyId);
 
         if (auditLogEnabled) {
             Util.auditLog("ar.clearConsent", principalName, relyingPartyId, Arrays.asList(new String[] {}));
         }
+    }
+
+    /**
+     * Gets list of consented attributes XXX test this
+     */
+    public Map<String, Boolean> getAttributeConsent(final String principalName, final String relyingPartyId,
+            final List<Attribute> attributes) {
+        final Map<String, Boolean> out = new HashMap<String, Boolean>();
+        for (final Attribute attribute : attributes) {
+            final boolean choice =
+                    storage.containsAttributeReleaseChoice(principalName, relyingPartyId, attribute.getId());
+            out.put(attribute.getId(), choice);
+        }
+        return out;
+
+    }
+
+    /**
+     * Removes attribute release consent.
+     * 
+     * @param principalName The principal name.
+     * @param relyingPartyId The relying party id.
+     * @param attributes The attributes.
+     */
+    public void denyAttributeRelease(final String principalName, final String relyingPartyId,
+            final List<Attribute> attributes) {
+        logger.info("Remove user consent for {} attributes from {} to {}.", new Object[] {attributes.size(),
+                principalName, relyingPartyId,});
+        // remove all attrib consents for now, but should be done by attribute.
+        clearChoice(principalName, relyingPartyId);
+        /*
+        final DateTime choiceDate = new DateTime();
+        for (final Attribute attribute : attributes) {
+            final AttributeReleaseConsent attributeReleaseConsent = new AttributeReleaseConsent(attribute, choiceDate);
+            if (storage.containsAttributeReleaseConsent(principalName, relyingPartyId, attribute.getId())) {
+                logger.debug("Delete existing Attribute Release consent for user {}, relying party {} and attribute {}.",
+                        new Object[] {principalName, relyingPartyId, attribute.getId()});
+                storage.deleteAttributeReleaseConsent(principalName, relyingPartyId, attributeReleaseConsent);
+            } else {
+                logger.debug("Deny Attribute Release consent for user {}, relying party {} and attribute {}.",
+                        new Object[] {principalName, relyingPartyId, attribute.getId()});
+            }
+        }
+
+        if (auditLogEnabled) {
+            final List<String> attributeIds = new ArrayList<String>();
+            for (final Attribute attribute : attributes) {
+                attributeIds.add(attribute.getId());
+            }
+            Util.auditLog("ar.consent", principalName, relyingPartyId, attributeIds);
+        }
+        */
     }
 
     /**
@@ -229,17 +289,18 @@ public class AttributeReleaseModule {
             final List<Attribute> attributes) {
         logger.info("Create user consent for {} attributes from {} to {}.", new Object[] {attributes.size(),
                 principalName, relyingPartyId,});
-        final DateTime consenDate = new DateTime();
+        final DateTime choiceDate = new DateTime();
         for (final Attribute attribute : attributes) {
-            final AttributeReleaseConsent attributeReleaseConsent = new AttributeReleaseConsent(attribute, consenDate);
-            if (storage.containsAttributeReleaseConsent(principalName, relyingPartyId, attribute.getId())) {
+            final AttributeReleaseChoice attributeReleaseConsent =
+                    new AttributeReleaseChoice(attribute, choiceDate, true);
+            if (storage.containsAttributeReleaseChoice(principalName, relyingPartyId, attribute.getId())) {
                 logger.debug("Update Attribute Release consent for user {}, relying party {} and attribute {}.",
                         new Object[] {principalName, relyingPartyId, attribute.getId()});
-                storage.updateAttributeReleaseConsent(principalName, relyingPartyId, attributeReleaseConsent);
+                storage.updateAttributeReleaseChoice(principalName, relyingPartyId, attributeReleaseConsent);
             } else {
                 logger.debug("Create Attribute Release consent for user {}, relying party {} and attribute {}.",
                         new Object[] {principalName, relyingPartyId, attribute.getId()});
-                storage.createAttributeReleaseConsent(principalName, relyingPartyId, attributeReleaseConsent);
+                storage.createAttributeReleaseChoice(principalName, relyingPartyId, attributeReleaseConsent);
             }
         }
 
@@ -259,12 +320,87 @@ public class AttributeReleaseModule {
      */
     public void consentGeneralAttributeRelease(final String principalName) {
         logger.info("Create general consent for {}.", principalName);
-        final AttributeReleaseConsent attributeRelease =
-                new AttributeReleaseConsent(WILDCARD, WILDCARD, new DateTime());
-        storage.createAttributeReleaseConsent(principalName, WILDCARD, attributeRelease);
+        final AttributeReleaseChoice attributeRelease =
+                new AttributeReleaseChoice(WILDCARD, WILDCARD, new DateTime(), true);
+        storage.createAttributeReleaseChoice(principalName, WILDCARD, attributeRelease);
 
         if (auditLogEnabled) {
             Util.auditLog("ar.generalConsent", principalName, StringUtils.EMPTY, Arrays.asList(new String[] {}));
+        }
+    }
+
+    /**
+     * Makes entry in login table
+     * 
+     * @param principalName
+     * @param relyingPartyId
+     * @param timestamp
+     * @param attributes
+     */
+    public void addLogin(final String principalName, final String serviceName, final String serviceUrl,
+            final DateTime timestamp, final List<Attribute> attributes) {
+        final LoginEvent loginEvent = new LoginEvent(principalName, serviceName, serviceUrl, timestamp);
+        final LoginEventDetail loginEventDetail = new LoginEventDetail(loginEvent.getEventDetailHash(), attributes);
+        storage.createLoginEvent(loginEvent, loginEventDetail);
+        if (auditLogEnabled) {
+            Util.auditLog("ar.loginTableEntry", principalName, serviceName,
+                    Arrays.asList(new String[] {serviceUrl, timestamp.toString()}));
+        }
+    }
+
+    public LoginEvent readLoginEvent(final String loginEventId) {
+        return storage.readLoginEvent(loginEventId);
+    }
+
+    public LoginEventDetail readLoginEventDetail(final LoginEvent loginEvent) {
+        return storage.readLoginEventDetail(loginEvent);
+    }
+
+    public List<LoginEvent> listLoginEvents(final String userId, final String relyingPartyId, final int limit) {
+        return storage.listLoginEvents(userId, relyingPartyId, limit);
+    }
+
+    public List<String> listRelyingParties(final String userId, final int limit) {
+        return storage.listRelyingParties(userId, limit);
+    }
+
+    public boolean isForceShowInterface(final String userId, final String relyingPartyId) {
+        return storage.readForceShowInterface(userId, relyingPartyId);
+    }
+
+    public void setForceShowInterface(final String userId, final String relyingPartyId, final boolean forceShow) {
+        logger.debug("setForceShowInterface userid: {} rpid: {}", userId, relyingPartyId);
+        logger.debug("setForceShowInterface yesno: {}", (forceShow ? "yes" : "no"));
+        try {
+            storage.createForceShowInterface(userId, relyingPartyId, forceShow);
+        } catch (final DataAccessException x) {
+            storage.updateForceShowInterface(userId, relyingPartyId, forceShow);
+        }
+    }
+
+    public ReminderInterval getReminderInterval(final String userId, final String relyingPartyId) {
+        ReminderInterval reminderInterval = null;
+        try {
+            reminderInterval = storage.readReminderInterval(userId, relyingPartyId);
+        } catch (final DataAccessException x) {
+        }
+
+        if (reminderInterval == null) {
+            reminderInterval = new ReminderInterval(userId, relyingPartyId, 1, 0);
+            storage.createReminderInterval(reminderInterval);
+        }
+        return reminderInterval;
+    }
+
+    public void updateReminderInterval(final ReminderInterval reminderInterval) {
+        logger.debug("setForceShowInterface userid: {} rpid: {}", reminderInterval.getUserId(),
+                reminderInterval.getRelyingPartyId());
+        logger.debug("setForceShowInterface remindAfter: {} current: {}", reminderInterval.getRemindAfter(),
+                reminderInterval.getCurrentCount());
+        try {
+            storage.updateReminderInterval(reminderInterval);
+        } catch (final DataAccessException x) {
+            storage.createReminderInterval(reminderInterval);
         }
     }
 }

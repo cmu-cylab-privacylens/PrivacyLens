@@ -2,11 +2,17 @@
 <suite name="uApprove" verbose="2">
     
     <test name="uApprove" enabled="true">  
-        <packages>       
+        <packages>
             <package name="ch.SWITCH.aai.uApprove" />
         </packages>
     </test>
-    
+
+    <test name="PrivacyLens" enabled="true">
+        <packages>
+            <package name="edu.cmu.ece.PrivacyLens" />
+        </packages>
+    </test>
+
     <test name="uApprove.tou" enabled="true">  
         <packages>       
             <package name="ch.SWITCH.aai.uApprove.tou"></package>

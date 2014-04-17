@@ -35,6 +35,13 @@
 
     <dependencies>
         <!-- Compile dependencies -->
+    <!--  Gson: Java to Json conversion -->
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>2.2.4</version>
+      <scope>compile</scope>
+    </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
@@ -76,6 +83,13 @@
         </dependency>
         
         <!-- Runtime dependencies -->
+  <!-- joda templates -->
+<dependency>
+	<groupId>joda-time</groupId>
+	<artifactId>joda-time-jsptags</artifactId>
+	<version>1.1.1</version>
+</dependency>
+
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>jstl</artifactId>
