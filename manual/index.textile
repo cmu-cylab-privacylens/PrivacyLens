@@ -4,13 +4,13 @@ PrivacyLens is an extension for the Shibboleth Identity Provider 2.x. It allows 
 
 Notes about this guide:
 * This guide assumes that PrivacyLens is installed on a Linux system. It's also possible to install it on a different operating system, like Windows. In this case, you may need to adapt some paths and commands accordingly.
-* The guide shows paths and commands using variables like, e.g, @$IDP_INSTALL$@, @$_IDP_HOME$@ or @$UAPPROVE_INSTALL$@. You need to substitute these variables by the real paths, except where it is explicitly stated that you don't need to substitute them.
+* The guide shows paths and commands using variables like, e.g, @$IDP_INSTALL$@, @$_IDP_HOME$@ or @$PLENS_INSTALL$@. You need to substitute these variables by the real paths, except where it is explicitly stated that you don't need to substitute them.
 
 h1. Assumptions
 
 * The Shibboleth Identity Provider is unpacked at @$IDP_INSTALL$@ (e.g., @/usr/local/src/shibboleth-identity-provider-#version#@).
 * The Shibboleth Identity Provider is installed at @$IDP_HOME$@ (e.g., @/opt/shibboleth-idp@).
-* "PrivacyLens":https://github.com/cmu-cylab-privacylens/PrivacyLens is downloaded and unpacked at @$UAPPROVE_INSTALL$@ (e.g., @/usr/local/src/uApprove-#version#@).
+* "PrivacyLens":https://github.com/cmu-cylab-privacylens/PrivacyLens is built and its zipfile unpacked at @$PLENS_INSTALL$@ (e.g., @/usr/local/src/uApprove-#version#@).
 
 h1. 1 Installation
 
@@ -22,11 +22,14 @@ h2. 1.1 Prerequisites
 
 h2. 1.2 Library Installation
 
+If building from source, unpack the sources and build them with Maven
+(mvn install) to obtain the PrivacyLens zipfile.
+
 Copying the libraries to the IdPs library directory:
 
-* @cp $UAPPROVE_INSTALL$/lib/*.jar $IDP_INSTALL$/lib@
-* @cp $UAPPROVE_INSTALL$/lib/jdbc/*.jar $IDP_INSTALL$/lib@
-* Provide the JDBC connector for your database to the classpath of the IdP. You might use one of the provided MySQL or HSQL JDBC connector: <br /> @cp $UAPPROVE_INSTALL$/lib/jdbc/optional/#jdbc-connector#.jar $IDP_INSTALL$/lib@
+* @cp $PLENS_INSTALL$/lib/*.jar $IDP_INSTALL$/lib@
+* @cp $PLENS_INSTALL$/lib/jdbc/*.jar $IDP_INSTALL$/lib@
+* Provide the JDBC connector for your database to the classpath of the IdP. You might use one of the provided MySQL or HSQL JDBC connector: <br /> @cp $PLENS_INSTALL$/lib/jdbc/optional/#jdbc-connector#.jar $IDP_INSTALL$/lib@
 
 bq(note). Assure that only one version of each library is present in @$IDP_INSTALL$/lib@.
 
@@ -34,15 +37,15 @@ h2. 1.3 Configuration Template
 
 Copying the configuration template to the IdPs configuration directory:
 
-* @cp@ "(file)$UAPPROVE_INSTALL$/manual/configuration/uApprove.properties":configuration/uApprove.properties @$IDP_HOME$/conf@
-* @cp@ "(file)$UAPPROVE_INSTALL$/manual/configuration/uApprove.xml":configuration/uApprove.xml @$IDP_HOME$/conf@
+* @cp@ "(file)$PLENS_INSTALL$/manual/configuration/uApprove.properties":configuration/uApprove.properties @$IDP_HOME$/conf@
+* @cp@ "(file)$PLENS_INSTALL$/manual/configuration/uApprove.xml":configuration/uApprove.xml @$IDP_HOME$/conf@
 
 h2. 1.4 Webapp files
 
 Copying of the web application files like the JSP(Java Server Pages)s, CSS(Cascading Style Sheet) files and images to the IdPs webapp directory:
 
 * @mkdir $IDP_INSTALL$/src/main/webapp/uApprove@
-* @cp $UAPPROVE_INSTALL$/webapp/* $IDP_INSTALL$/src/main/webapp/uApprove@
+* @cp $PLENS_INSTALL$/webapp/* $IDP_INSTALL$/src/main/webapp/uApprove@
 
 h2. 1.5 Database Preparation
 
@@ -52,8 +55,8 @@ bq(note). The following database parameters are examples. Adapt the values as re
 * Create a database user with the username "uApprove" and password "secret".
 * Grant @INSERT, SELECT, UPDATE, DELETE@ rights for the user.
 * Create the initial table structures using the schemas:
-** "(file)$UAPPROVE_INSTALL$/manual/storage/terms-of-use-schema.sql":storage/terms-of-use-schema.sql.
-** "(file)$UAPPROVE_INSTALL$/manual/storage/attribute-release-schema.sql":storage/attribute-release-schema.sql.
+** "(file)$PLENS_INSTALL$/manual/storage/terms-of-use-schema.sql":storage/terms-of-use-schema.sql.
+** "(file)$PLENS_INSTALL$/manual/storage/attribute-release-schema.sql":storage/attribute-release-schema.sql.
 
 h1. 2 Basic Deployment
 
@@ -165,11 +168,11 @@ Customize @$IDP_HOME$/conf/uApprove.properties@ according your database environm
 In case you enable the 'Terms of Use' module (enabled by default), you need to provide an appropriate text
 suitable for your organization.
 
-An example 'Terms Of Use' HTML file can be found in @$UAPPROVE_INSTALL$/manual/examples/terms-of-use.html@.
+An example 'Terms Of Use' HTML file can be found in @$PLENS_INSTALL$/manual/examples/terms-of-use.html@.
 
-* Copy @$UAPPROVE_INSTALL$/manual/examples/terms-of-use.html@ to @$IDP_HOME$/conf/terms-of-use.html@.
+* Copy @$PLENS_INSTALL$/manual/examples/terms-of-use.html@ to @$IDP_HOME$/conf/terms-of-use.html@.
 
-bc. cp $UAPPROVE_INSTALL$/manual/examples/terms-of-use.html $IDP_HOME$/conf/terms-of-use.html
+bc. cp $PLENS_INSTALL$/manual/examples/terms-of-use.html $IDP_HOME$/conf/terms-of-use.html
 
 * Adapt @$IDP_HOME$/conf/terms-of-use.html@ as required.
 * Adapt the value of @tou.resource@ in @$IDP_HOME$/conf/uApprove.properties@ accordingly.
@@ -215,13 +218,13 @@ h3. Database Migration
 Migrate lecacy database to the new database:
 
 bc. 
-java -cp "$UAPPROVE_INSTALL$/scripts/lib/*.jar:$UAPPROVE_INSTALL$/lib/jdbc/optional/*.jar" groovy.ui.GroovyMain \
-  $UAPPROVE_INSTALL$/scripts/StorageMigration.groovy /opt/uApprove/conf/database.properties $IDP_HOME$/conf/uApprove.properties
+java -cp "$PLENS_INSTALL$/scripts/lib/*.jar:$PLENS_INSTALL$/lib/jdbc/optional/*.jar" groovy.ui.GroovyMain \
+  $PLENS_INSTALL$/scripts/StorageMigration.groovy /opt/uApprove/conf/database.properties $IDP_HOME$/conf/uApprove.properties
 
 h2. 3.2 Upgrade from uApprove 2.3 to 2.4
 
 * In version 2.4 "@c3p0@":http://www.mchange.com/projects/c3p0/ is used as the connection pooling library (instead of @boneCP@ in uApprove 2.3). The reason was, that some deployers reported connection repairing issues with remote databases. @c3p0@ offers also an easier deployment, because this library is used by the IdP as well. Please assure following upgrade steps:
-** Adjust the @uApprove.dataSource@ bean in @$IDP_HOME$/conf/uApprove.xml@ (i.e., replace the @bonecp.BoneCPDataSource@ with the @c3p0.ComboPooledDataSource@, see "(file)$UAPPROVE_INSTALL$/manual/configuration/uApprove.xml":configuration/uApprove.xml). Please refer to "JDBC Connection Pool Tuning":#JDBCConnectionPoolTuning for advanced configuration properties.
+** Adjust the @uApprove.dataSource@ bean in @$IDP_HOME$/conf/uApprove.xml@ (i.e., replace the @bonecp.BoneCPDataSource@ with the @c3p0.ComboPooledDataSource@, see "(file)$PLENS_INSTALL$/manual/configuration/uApprove.xml":configuration/uApprove.xml). Please refer to "JDBC Connection Pool Tuning":#JDBCConnectionPoolTuning for advanced configuration properties.
 
 h2. 3.3 Upgrade from uApprove 2.4 to 2.5
 
@@ -239,15 +242,15 @@ of uApprove, you should install the new web application files and re-apply your 
 The upgrade procedure is:
 
 * @rm $IDP_INSTALL$/lib/uApprove-#old-version#.jar@
-* @cp $UAPPROVE_INSTALL$/lib/uApprove-#new-version#.jar $IDP_INSTALL$/lib@
+* @cp $PLENS_INSTALL$/lib/uApprove-#new-version#.jar $IDP_INSTALL$/lib@
 
 Optionally update the JDBC dependencies:
 
-* @cp $UAPPROVE_INSTALL$/lib/jdbc/*.jar $IDP_INSTALL$/lib@
+* @cp $PLENS_INSTALL$/lib/jdbc/*.jar $IDP_INSTALL$/lib@
 
 Optionally update the JDBC connector for your database. You might use one of the provided MySQL or HSQL JDBC connector:
 
-* @cp $UAPPROVE_INSTALL$/lib/jdbc/optional/#jdbc-connector#.jar $IDP_INSTALL$/lib@<br /><br />Verify that only one version of each library is present in @$IDP_INSTALL$/lib@.
+* @cp $PLENS_INSTALL$/lib/jdbc/optional/#jdbc-connector#.jar $IDP_INSTALL$/lib@<br /><br />Verify that only one version of each library is present in @$IDP_INSTALL$/lib@.
 
 Update the web application files in @$IDP_INSTALL$/src/main/webapp/uApprove@. If you have done any customizations
 of these files, do a backup of the old files first, and then re-apply the customizations after having updated
@@ -255,7 +258,7 @@ these files
 
 * Optionally backup the existing web application files in @$IDP_INSTALL$/src/main/webapp/uApprove@
 * @rm $IDP_INSTALL$/src/main/webapp/uApprove/*@
-* @cp $UAPPROVE_INSTALL$/webapp/* $IDP_INSTALL$/src/main/webapp/uApprove@
+* @cp $PLENS_INSTALL$/webapp/* $IDP_INSTALL$/src/main/webapp/uApprove@
 * Optionally re-apply customizations.
 ** At least, you should restore your organization's logo (file @$IDP_INSTALL$/src/main/webapp/uApprove/logo.png@), since a placeholder logo is installed by default. You may also want to put your federation's logo to the file @$IDP_INSTALL$/src/main/webapp/uApprove/federation-logo.png@ (which is an empty placeholder logo by default). _(For the SWITCHaai federation, the logo is available at "http://www.switch.ch/aai/design/images/switchaai-logo.png":http://www.switch.ch/aai/design/images/switchaai-logo.png.)_
 
@@ -309,10 +312,10 @@ bc.
 echo "SHUTDOWN;" > /tmp/shutdown
 java -jar $HSQLDB_HOME$/lib/sqltool.jar \
   --inlineRC=url=jdbc:hsqldb:file:/var/opt/uApprove/hsql.db,user=SA,password= \
-  $UAPPROVE_INSTALL$/manual/storage/terms-of-use-schema.sql /tmp/shutdown
+  $PLENS_INSTALL$/manual/storage/terms-of-use-schema.sql /tmp/shutdown
 java -jar $HSQLDB_HOME$/lib/sqltool.jar \
   --inlineRC=url=jdbc:hsqldb:file:/var/opt/uApprove/hsql.db,user=SA,password= \
-  $UAPPROVE_INSTALL$/manual/storage/attribute-relase-schema.sql /tmp/shutdown
+  $PLENS_INSTALL$/manual/storage/attribute-relase-schema.sql /tmp/shutdown
   
   
 bq(note). @$HSQLDB_HOME$@ defines the location where the downloaded "HSQL distribution":http://hsqldb.org/ is extracted.
@@ -321,7 +324,7 @@ bq(note). Assure that the user running the container (e.g., Jetty) has write per
 
 h3. Custom SQL Statements
 
-# Copy the provided "(file)$UAPPROVE_INSTALL$/manual/storage/sql-statements.properties":storage/sql-statements.properties to @$IDP_HOME$/conf/uApprove.sql-statements.properties@.
+# Copy the provided "(file)$PLENS_INSTALL$/manual/storage/sql-statements.properties":storage/sql-statements.properties to @$IDP_HOME$/conf/uApprove.sql-statements.properties@.
 # Adjust @$IDP_HOME$/conf/uApprove.sql-statements.properties@ according your needs.
 # Enable your custom @sql-statements.properties@ in @$IDP_HOME$/conf/uApprove.xml@:
 
@@ -425,7 +428,7 @@ h2. 4.4 Localization
 
 h3. Custom Messages
 
-You might adjust/extend the provided resource bundles in "(file)$UAPPROVE_INSTALL$/manual/examples/messages":examples/messages and copy them into the IdPs classpath (e.g., @$IDP_INSTALL$/src/main/webapp/WEB-INF/classes/uApprove/messages@).
+You might adjust/extend the provided resource bundles in "(file)$PLENS_INSTALL$/manual/examples/messages":examples/messages and copy them into the IdPs classpath (e.g., @$IDP_INSTALL$/src/main/webapp/WEB-INF/classes/uApprove/messages@).
 Specify your bundles base in @$IDP_HOME$/conf/uApprove.xml@:
 
 bc. 
@@ -434,7 +437,7 @@ bc.
 
 h3. Attribute Names and Descriptions
 
-See "(file)$UAPPROVE_INSTALL$/manual/examples/attribute-descriptions.xml":examples/attribute-descriptions.xml for an example how to configure the localized attribute names and descriptions.
+See "(file)$PLENS_INSTALL$/manual/examples/attribute-descriptions.xml":examples/attribute-descriptions.xml for an example how to configure the localized attribute names and descriptions.
 
 h3. Relying Party Names and Descriptions
 
