@@ -1,6 +1,9 @@
 PrivacyLens
   Terms Of Use & Attribute Release Consent
   for the Shibboleth Identity Provider 2.
+  Allows users of the Identity Provider to control the
+  release of attributes that would normally be sent
+  directly to a Service Provider.
   PrivacyLens derives from uApprove, available at
   http://www.switch.ch/aai/uApprove
 
@@ -10,11 +13,11 @@ License
 
 Download
   http://(not defined yet)
-  Get it via GitHub!
+  Get it via GitHub, then build with Maven to obtain the jar file.
   
 Manual and Installation
-  http://(not defined yet)
-  or in the manual directory.
+  https://github.com/cmu-cylab-privacylens/PrivacyLens/blob/master/manual/index.textile
+  or in the manual directory once the tool has been compiled.
   
 Issue Tracking
   https://github.com/organizations/cmu-cylab-privacylens/PrivacyLens/issues
