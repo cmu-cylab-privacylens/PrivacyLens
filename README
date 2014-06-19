@@ -12,17 +12,15 @@ License
   which is provided in the LICENSE file.
 
 Download
-  http://(not defined yet)
-  Get it via GitHub, then build with Maven to obtain the jar file.
+  No binary distribution site yet.
+  Get it via GitHub, then build with Maven to obtain installation files.
   
 Manual and Installation
   https://github.com/cmu-cylab-privacylens/PrivacyLens/blob/master/manual/index.textile
   or in the manual directory once the tool has been compiled.
   
 Issue Tracking
-  https://github.com/organizations/cmu-cylab-privacylens/PrivacyLens/issues
-    You may create and view issues anonymously or
-    register to track issues.
+  https://github.com/cmu-cylab-privacylens/PrivacyLens/issues
   
 Source Access (GitHub)
   https://github.com/cmu-cylab-privacylens/PrivacyLens.git

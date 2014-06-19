@@ -3,21 +3,21 @@ This document contains the PrivacyLens deployment guide and the general manual.
 PrivacyLens is an extension for the Shibboleth Identity Provider 2.x. It allows to make users authenticating at an Identity Provider to accept terms of use and to give attribute release consent. "More information about the concept of PrivacyLens":https://github.com/cmu-cylab-privacylens/PrivacyLens.
 
 Notes about this guide:
-* This guide assumes that PrivacyLens is installed on a Linux system. It's also possible to install it on a different operating system, like Windows. In this case, you may need to adapt some paths and commands accordingly.
+* This guide assumes that PrivacyLens will be installed on a Linux system. It's also possible to install it on a different operating system, like Windows. In this case, you may need to adapt some paths and commands accordingly.
 * The guide shows paths and commands using variables like, e.g, @$IDP_INSTALL$@, @$_IDP_HOME$@ or @$PLENS_INSTALL$@. You need to substitute these variables by the real paths, except where it is explicitly stated that you don't need to substitute them.
 
 h1. Assumptions
 
-* The Shibboleth Identity Provider is unpacked at @$IDP_INSTALL$@ (e.g., @/usr/local/src/shibboleth-identity-provider-#version#@).
+* The "Shibboleth Identity Provider":http://shibboleth.net/ is unpacked at @$IDP_INSTALL$@ (e.g., @/usr/local/src/shibboleth-identity-provider-#version#@).
 * The Shibboleth Identity Provider is installed at @$IDP_HOME$@ (e.g., @/opt/shibboleth-idp@).
-* "PrivacyLens":https://github.com/cmu-cylab-privacylens/PrivacyLens is built and its zipfile unpacked at @$PLENS_INSTALL$@ (e.g., @/usr/local/src/uApprove-#version#@).
+* "PrivacyLens":https://github.com/cmu-cylab-privacylens/PrivacyLens is built and its zipfile unpacked at @$PLENS_INSTALL$@ (e.g., @/usr/local/src/PrivacyLens-#version#@).
 
 h1. 1 Installation
 
 h2. 1.1 Prerequisites
 
 * Shibboleth Identity Provider 2.3 or greater.
-* Database which supports JDBC.
+* Database which supports JDBC(Java Database Connectivity).
 
 
 h2. 1.2 Library Installation

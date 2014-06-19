@@ -4,15 +4,20 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>ch.SWITCH.aai</groupId>
-    <artifactId>uApprove</artifactId>
+    <groupId>edu.cmu.ece</groupId>
+    <artifactId>PrivacyLens</artifactId>
     <version>2.5.0</version>
     <packaging>jar</packaging>
 
-    <name>uApprove</name>
+    <name>PrivacyLens</name>
     <description>
         Terms of Use and Attribute Release Consent Module
         for the Shibboleth Identity Provider.
+        Allows users of the Identity Provider to control the
+        release of attributes that would normally be sent
+        directly to a Service Provider.
+        PrivacyLens derives from uApprove, available at
+        http://www.switch.ch/aai/uApprove
     </description>
 
     <properties>
@@ -230,7 +235,7 @@
     </build>
 
     <!-- Project Metadata -->
-    <url>http://www.switch.ch/aai/uApprove</url>
+    <url>http://www.privacylens.org</url>
 
     <inceptionYear>2011</inceptionYear>
 
@@ -242,21 +247,21 @@
     </licenses>
 
     <issueManagement>
-        <system>Redmine</system>
-        <url>https://forge.switch.ch/redmine/projects/uapprove/issues</url>
+        <system>GitHub</system>
+        <url>https://github.com/organizations/cmu-cylab-privacylens/PrivacyLens/issues</url>
     </issueManagement>
 
     <scm>
-        <url>https://subversion.switch.ch/svn/general/aai/uApprove/</url>
+        <url>https://github.com/cmu-cylab-privacylens/PrivacyLens.git</url>
     </scm>
 
     <developers>
         <developer>
-            <id>reusser</id>
-            <name>Halm Ruesser</name>
-            <organization>SWITCH</organization>
-            <organizationUrl>http://switch.ch</organizationUrl>
-            <timezone>+1</timezone>
+            <id>stroucki</id>
+            <name>Michael Stroucken</name>
+            <organization>CMU Cylab</organization>
+            <organizationUrl>http://www.cylab.cmu.edu/</organizationUrl>
+            <timezone>-5</timezone>
         </developer>
     </developers>
 
