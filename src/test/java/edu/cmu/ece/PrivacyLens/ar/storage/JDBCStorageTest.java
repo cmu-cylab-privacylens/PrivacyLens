@@ -139,16 +139,16 @@ public class JDBCStorageTest extends AbstractTransactionalTestNGSpringContextTes
                 new ReminderInterval(userId, relyingPartyId, remindAfter, currentCount);
 
         storage.createReminderInterval(reminderInterval);
-        ReminderInterval blorf = storage.readReminderInterval(userId, relyingPartyId);
-        Assert.assertEquals(blorf.getRemindAfter(), remindAfter);
-        Assert.assertEquals(blorf.getCurrentCount(), currentCount);
+        ReminderInterval reminderInterval2 = storage.readReminderInterval(userId, relyingPartyId);
+        Assert.assertEquals(reminderInterval2.getRemindAfter(), remindAfter);
+        Assert.assertEquals(reminderInterval2.getCurrentCount(), currentCount);
 
         reminderInterval.setCurrentCount(currentCount + 1);
         storage.updateReminderInterval(reminderInterval);
 
-        blorf = storage.readReminderInterval(userId, relyingPartyId);
-        Assert.assertEquals(blorf.getRemindAfter(), remindAfter);
-        Assert.assertEquals(blorf.getCurrentCount(), currentCount + 1);
+        reminderInterval2 = storage.readReminderInterval(userId, relyingPartyId);
+        Assert.assertEquals(reminderInterval2.getRemindAfter(), remindAfter);
+        Assert.assertEquals(reminderInterval2.getCurrentCount(), currentCount + 1);
 
         // deletion
     }

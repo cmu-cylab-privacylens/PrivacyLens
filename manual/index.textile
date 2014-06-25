@@ -331,7 +331,7 @@ h3. Custom SQL Statements
 # Enable your custom @sql-statements.properties@ in @$IDP_HOME$/conf/PrivacyLens.xml@:
 
 bc.. 
-    <bean id="PrivacyLens.touModule" class="ch.SWITCH.aai.uApprove.tou.ToUModule" ...>
+    <bean id="uApprove.touModule" class="ch.SWITCH.aai.uApprove.tou.ToUModule" ...>
         <!-- ... -->
         <property name="storage">
             <bean class="ch.SWITCH.aai.uApprove.tou.storage.JDBCStorage" ...
@@ -359,7 +359,7 @@ N.B. It might make sense to set "checkoutTimeout":http://www.mchange.com/project
 The settings are defined in @$IDP_HOME$/conf/PrivacyLens.xml@:
 
 bc.. 
-    <bean id="PrivacyLens.touModule" class="ch.SWITCH.aai.uApprove.tou.ToUModule" ...>
+    <bean id="uApprove.touModule" class="ch.SWITCH.aai.uApprove.tou.ToUModule" ...>
         <!-- ... -->
         <property name="storage">
             <bean class="ch.SWITCH.aai.uApprove.tou.storage.JDBCStorage" ...
@@ -398,7 +398,7 @@ This implies _alwaysRequireToUAcceptance_ and/or _alwaysRequireConsent_.
 You might enable NOP(No Operation) storage for the ToU and/or attribute release module in @$IDP_HOME$/conf/PrivacyLens.xml@:
 
 bc. 
-    <bean id="PrivacyLens.touModule" ...
+    <bean id="uApprove.touModule" ...
         ...
         <property name="storage">
             <bean class="ch.SWITCH.aai.uApprove.tou.storage.NOPStorage" />
@@ -469,7 +469,7 @@ h3. Terms Of Use Content Comparison
 
 In the default configuration, only the ToU version is compared to evaluate if a user accepted the ToU. You might enable that the ToU content is compared too in @$IDP_HOME$/conf/PrivacyLens.xml@: 
 
-bc. <bean id="PrivacyLens.touModule" ... p:compareContent="true" ...
+bc. <bean id="uApprove.touModule" ... p:compareContent="true" ...
 
 h3. Attribute Value(s) Comparison
 
@@ -486,7 +486,7 @@ h3. Enable Terms Of Use Audit Log
 
 You might enable ToU audit log in in @$IDP_HOME$/conf/PrivacyLens.xml@: 
 
-bc. <bean id="PrivacyLens.touModule" ... p:auditLogEnabled="true" ...
+bc. <bean id="uApprove.touModule" ... p:auditLogEnabled="true" ...
 
 Example:
 
@@ -506,6 +506,7 @@ bc.
 20120101T010000Z|edu.cmu.ece.PrivacyLens|||ar.generalConsent|null|null|null|student1|||
 
 h2. 4.7 Attribute In Attribute Requester's Metadata Plugin
+
 XXXstroucki look at this
 
 h3. Installation
@@ -559,7 +560,7 @@ h2. Debugging
 Enabling @DEBUG@ or @TRACE@ log level for PrivacyLens in @$IDP_HOME$/conf/logging.xml@:
 
 bc. <logger name="ch.SWITCH.aai.uApprove" level="DEBUG"/>
-bc. <logger name="edu.cmu.ece.PrivacyLens" level="DEBUG"/>
+<logger name="edu.cmu.ece.PrivacyLens" level="DEBUG"/>
 
 h1. 6 Feedback
 
