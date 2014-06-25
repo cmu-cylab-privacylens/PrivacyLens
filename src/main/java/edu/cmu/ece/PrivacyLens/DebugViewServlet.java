@@ -45,12 +45,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import ch.SWITCH.aai.uApprove.IdPHelper;
-import ch.SWITCH.aai.uApprove.ViewHelper;
-import ch.SWITCH.aai.uApprove.ar.Attribute;
-import ch.SWITCH.aai.uApprove.ar.AttributeReleaseModule;
-import ch.SWITCH.aai.uApprove.ar.RelyingParty;
-import ch.SWITCH.aai.uApprove.ar.SAMLHelper;
+import edu.cmu.ece.PrivacyLens.ar.Attribute;
+import edu.cmu.ece.PrivacyLens.ar.AttributeReleaseModule;
+import edu.cmu.ece.PrivacyLens.ar.RelyingParty;
+import edu.cmu.ece.PrivacyLens.ar.SAMLHelper;
 
 /**
  * Debug view Servlet. I used this to test the layout, but haven't looked at it in a while.
@@ -85,11 +83,11 @@ public class DebugViewServlet extends HttpServlet {
                     WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
 
             attributeReleaseModule =
-                    (AttributeReleaseModule) appContext.getBean("uApprove.attributeReleaseModule",
+                    (AttributeReleaseModule) appContext.getBean("PrivacyLens.attributeReleaseModule",
                             AttributeReleaseModule.class);
-            samlHelper = (SAMLHelper) appContext.getBean("uApprove.samlHelper", SAMLHelper.class);
+            samlHelper = (SAMLHelper) appContext.getBean("PrivacyLens.samlHelper", SAMLHelper.class);
 
-            viewHelper = (ViewHelper) appContext.getBean("uApprove.viewHelper", ViewHelper.class);
+            viewHelper = (ViewHelper) appContext.getBean("PrivacyLens.viewHelper", ViewHelper.class);
         } catch (final Throwable t) {
             logger.error("Error while initializing Debug View Servlet.", t);
             throw new ServletException(t);

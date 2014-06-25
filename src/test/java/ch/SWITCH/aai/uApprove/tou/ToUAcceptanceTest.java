@@ -33,7 +33,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import ch.SWITCH.aai.uApprove.Util;
+import edu.cmu.ece.PrivacyLens.Util;
 
 /**
  * Tests ToUAcceptance.

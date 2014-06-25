@@ -4,8 +4,8 @@
         <div style="float:right;">
         </div>
         <div class="box_header">
-            <img src="<%= request.getContextPath()%>/uApprove/federation-logo.png" alt="" class="federation_logo" >
-            <img src="<%= request.getContextPath()%>/uApprove/logo.png" alt="" class="organization_logo">
+            <img src="<%= request.getContextPath()%>/PrivacyLens/federation-logo.png" alt="" class="federation_logo" >
+            <img src="<%= request.getContextPath()%>/PrivacyLens/logo.png" alt="" class="organization_logo">
         </div>
         <div style="float:left;">
             <h1> <fmt:message key="title"/> </h1> 

@@ -29,7 +29,7 @@ package ch.SWITCH.aai.uApprove.tou;
 
 import org.apache.commons.lang.StringUtils;
 
-import ch.SWITCH.aai.uApprove.Util;
+import edu.cmu.ece.PrivacyLens.Util;
 
 /**
  * ToU Helper.

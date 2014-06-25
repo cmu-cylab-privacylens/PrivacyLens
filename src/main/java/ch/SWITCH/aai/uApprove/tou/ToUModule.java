@@ -36,8 +36,8 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.SWITCH.aai.uApprove.Util;
 import ch.SWITCH.aai.uApprove.tou.storage.Storage;
+import edu.cmu.ece.PrivacyLens.Util;
 
 /**
  * The Terms of Use Module.

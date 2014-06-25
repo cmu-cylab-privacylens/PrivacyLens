@@ -29,7 +29,7 @@ package ch.SWITCH.aai.uApprove.tou;
 
 import org.joda.time.DateTime;
 
-import ch.SWITCH.aai.uApprove.Util;
+import edu.cmu.ece.PrivacyLens.Util;
 
 /** Represents a terms of use acceptance. */
 

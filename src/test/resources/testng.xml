@@ -20,10 +20,10 @@
         </packages>
     </test>
     
-    <test name="uApprove.ar" enabled="true">  
+    <test name="PrivacyLens.ar" enabled="true">  
         <packages>       
-            <package name="ch.SWITCH.aai.uApprove.ar"></package>
-            <package name="ch.SWITCH.aai.uApprove.ar.storage"></package>
+            <package name="edu.cmu.ece.PrivacyLens.ar"></package>
+            <package name="edu.cmu.ece.PrivacyLens.ar.storage"></package>
         </packages>
     </test>
 </suite>

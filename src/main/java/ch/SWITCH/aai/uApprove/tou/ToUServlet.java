@@ -43,8 +43,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import ch.SWITCH.aai.uApprove.IdPHelper;
-import ch.SWITCH.aai.uApprove.ViewHelper;
+import edu.cmu.ece.PrivacyLens.IdPHelper;
+import edu.cmu.ece.PrivacyLens.ViewHelper;
 
 /**
  * ToU Servlet.
@@ -74,7 +74,7 @@ public class ToUServlet extends HttpServlet {
             final WebApplicationContext appContext =
                     WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
             touModule = (ToUModule) appContext.getBean("uApprove.touModule", ToUModule.class);
-            viewHelper = (ViewHelper) appContext.getBean("uApprove.viewHelper", ViewHelper.class);
+            viewHelper = (ViewHelper) appContext.getBean("PrivacyLens.viewHelper", ViewHelper.class);
         } catch (final Throwable t) {
             logger.error("Error while initializing Terms of Use Servlet.", t);
             throw new ServletException(t);

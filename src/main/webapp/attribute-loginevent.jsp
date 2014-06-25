@@ -7,7 +7,7 @@
 <script>
 function handleConsentButton(id) {
 /*
-$.get('<%= request.getContextPath() %>/uApprove/AttributeReleaseAjaxServlet',function(responseJson) {
+$.get('<%= request.getContextPath() %>/PrivacyLens/AttributeReleaseAjaxServlet',function(responseJson) {
 });
 */
 var select = $('#item'+id);
@@ -17,7 +17,7 @@ var span = $('#span'+id);
 var newState = !(input.attr("value") == 1);
 span.css("text-decoration", (newState ? "none" : "line-through"));
 input.attr("value", newState ? "1" : "0");
-select.attr("src","<%= request.getContextPath() %>/uApprove/" + (newState ? "" : "not_") + "sending.png");
+select.attr("src","<%= request.getContextPath() %>/PrivacyLens/" + (newState ? "" : "not_") + "sending.png");
  }
 
  </script>
@@ -31,8 +31,8 @@ function formSubmit(section, choice) {
 </script>
     <div class="box">
             <div class="box_header">
-                <img src="<%= request.getContextPath()%>/uApprove/federation-logo.png" alt="" class="federation_logo" >
-                <img src="<%= request.getContextPath()%>/uApprove/logo.png" alt="" class="organization_logo">
+                <img src="<%= request.getContextPath()%>/PrivacyLens/federation-logo.png" alt="" class="federation_logo" >
+                <img src="<%= request.getContextPath()%>/PrivacyLens/logo.png" alt="" class="organization_logo">
             </div>
 <p style="margin-top: 70px;">
 <span class="service_name">

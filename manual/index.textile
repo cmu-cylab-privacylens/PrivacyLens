@@ -6,6 +6,8 @@ Notes about this guide:
 * This guide assumes that PrivacyLens will be installed on a Linux system. It's also possible to install it on a different operating system, like Windows. In this case, you may need to adapt some paths and commands accordingly.
 * The guide shows paths and commands using variables like, e.g, @$IDP_INSTALL$@, @$_IDP_HOME$@ or @$PLENS_INSTALL$@. You need to substitute these variables by the real paths, except where it is explicitly stated that you don't need to substitute them.
 
+{toc}
+
 h1. Assumptions
 
 * The "Shibboleth Identity Provider":http://shibboleth.net/ is unpacked at @$IDP_INSTALL$@ (e.g., @/usr/local/src/shibboleth-identity-provider-#version#@).
@@ -37,22 +39,22 @@ h2. 1.3 Configuration Template
 
 Copying the configuration template to the IdPs configuration directory:
 
-* @cp@ "(file)$PLENS_INSTALL$/manual/configuration/uApprove.properties":configuration/uApprove.properties @$IDP_HOME$/conf@
-* @cp@ "(file)$PLENS_INSTALL$/manual/configuration/uApprove.xml":configuration/uApprove.xml @$IDP_HOME$/conf@
+* @cp@ "(file)$PLENS_INSTALL$/manual/configuration/PrivacyLens.properties":configuration/PrivacyLens.properties @$IDP_HOME$/conf@
+* @cp@ "(file)$PLENS_INSTALL$/manual/configuration/PrivacyLens.xml":configuration/PrivacyLens.xml @$IDP_HOME$/conf@
 
 h2. 1.4 Webapp files
 
 Copying of the web application files like the JSP(Java Server Pages)s, CSS(Cascading Style Sheet) files and images to the IdPs webapp directory:
 
-* @mkdir $IDP_INSTALL$/src/main/webapp/uApprove@
-* @cp $PLENS_INSTALL$/webapp/* $IDP_INSTALL$/src/main/webapp/uApprove@
+* @mkdir $IDP_INSTALL$/src/main/webapp/PrivacyLens@
+* @cp $PLENS_INSTALL$/webapp/* $IDP_INSTALL$/src/main/webapp/PrivacyLens@
 
 h2. 1.5 Database Preparation
 
 bq(note). The following database parameters are examples. Adapt the values as required. Especially, choose a secure password.
 
-* Create a database with the name "uApprove".
-* Create a database user with the username "uApprove" and password "secret".
+* Create a database with the name "PrivacyLens".
+* Create a database user with the username "PrivacyLens" and password "secret".
 * Grant @INSERT, SELECT, UPDATE, DELETE@ rights for the user.
 * Create the initial table structures using the schemas:
 ** "(file)$PLENS_INSTALL$/manual/storage/terms-of-use-schema.sql":storage/terms-of-use-schema.sql.
@@ -63,7 +65,7 @@ h1. 2 Basic Deployment
 h2. 2.1 Web Application Deployment Descriptor
 
 Extend the IdP web application deployment descriptor (@$IDP_INSTALL$/src/main/webapp/WEB-INF/web.xml@). Adapt your existing file as shown below.
-* Add @$IDP_HOME$/conf/uApprove.xml@ to the @contextConfigLocation@ context parameter. Keep the @$IDP_HOME$@ variables. They will be replaced during the re-deployment of the IdP in a later step.
+* Add @$IDP_HOME$/conf/PrivacyLens.xml@ to the @contextConfigLocation@ context parameter. Keep the @$IDP_HOME$@ variables. They will be replaced during the re-deployment of the IdP in a later step.
 * Add the required filters and servlets as shown.
 
 bc.. 
@@ -72,22 +74,22 @@ bc..
 
     <context-param>
         <param-name>contextConfigLocation</param-name>
-        <param-value>$IDP_HOME$/conf/internal.xml; $IDP_HOME$/conf/service.xml; $IDP_HOME$/conf/uApprove.xml</param-value>
+        <param-value>$IDP_HOME$/conf/internal.xml; $IDP_HOME$/conf/service.xml; $IDP_HOME$/conf/PrivacyLens.xml</param-value>
     </context-param>
 
     <!-- IdP Listeners, Filters and Servlets -->
     <!-- ...                                 -->
     
     
-    <!-- uApprove Filter and Servlets -->
+    <!-- PrivacyLens Filter and Servlets -->
     
     <filter>
-        <filter-name>uApprove</filter-name>
-        <filter-class>ch.SWITCH.aai.uApprove.Intercepter</filter-class>
+        <filter-name>PrivacyLens</filter-name>
+        <filter-class>cmu.edu.ece.PrivacyLens.Intercepter</filter-class>
     </filter>
 
     <filter-mapping>
-        <filter-name>uApprove</filter-name>
+        <filter-name>PrivacyLens</filter-name>
         <url-pattern>/profile/Shibboleth/SSO</url-pattern>
         <url-pattern>/profile/SAML1/SOAP/AttributeQuery</url-pattern>
         <url-pattern>/profile/SAML1/SOAP/ArtifactResolution</url-pattern>
@@ -99,73 +101,73 @@ bc..
     </filter-mapping>
 
     <servlet>
-        <servlet-name>uApprove - Terms Of Use</servlet-name>
+        <servlet-name>PrivacyLens - Terms Of Use</servlet-name>
         <servlet-class>ch.SWITCH.aai.uApprove.tou.ToUServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>uApprove - Terms Of Use</servlet-name>
-        <url-pattern>/uApprove/TermsOfUse</url-pattern>
+        <servlet-name>PrivacyLens - Terms Of Use</servlet-name>
+        <url-pattern>/PrivacyLens/TermsOfUse</url-pattern>
     </servlet-mapping>
 
     <servlet>
-        <servlet-name>uApprove - Attribute Release</servlet-name>
-        <servlet-class>ch.SWITCH.aai.uApprove.ar.AttributeReleaseServlet</servlet-class>
+        <servlet-name>PrivacyLens - Attribute Release</servlet-name>
+        <servlet-class>edu.cmu.ece.PrivacyLens.ar.AttributeReleaseServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>uApprove - Attribute Release</servlet-name>
-        <url-pattern>/uApprove/AttributeRelease</url-pattern>
+        <servlet-name>PrivacyLens - Attribute Release</servlet-name>
+        <url-pattern>/PrivacyLens/AttributeRelease</url-pattern>
     </servlet-mapping>
 
 <servlet>
 <servlet-name>PrivacyLens - AR Admin</servlet-name>
-<servlet-class>ch.SWITCH.aai.uApprove.ar.AdminServlet</servlet-class>
+<servlet-class>edu.cmu.ece.PrivacyLens.ar.AdminServlet</servlet-class>
 </servlet>
 
 <servlet-mapping>
 <servlet-name>PrivacyLens - AR Admin</servlet-name>
-<url-pattern>/uApprove/AdminServlet</url-pattern>
+<url-pattern>/PrivacyLens/AdminServlet</url-pattern>
 </servlet-mapping>
 
 <servlet>
 <servlet-name>PrivacyLens - AR AJAX</servlet-name>
-<servlet-class>ch.SWITCH.aai.uApprove.ar.AttributeReleaseAjaxServlet</servlet-class>
+<servlet-class>edu.cmu.ece.PrivacyLens.ar.AttributeReleaseAjaxServlet</servlet-class>
 </servlet>
 
 <servlet-mapping>
 <servlet-name>PrivacyLens - AR AJAX</servlet-name>
-<url-pattern>/uApprove/AttributeReleaseAjaxServlet</url-pattern>
+<url-pattern>/PrivacyLens/AttributeReleaseAjaxServlet</url-pattern>
 </servlet-mapping>
 
 <servlet>
 <servlet-name>PrivacyLens - Debug</servlet-name>
-<servlet-class>ch.SWITCH.aai.uApprove.DebugViewServlet</servlet-class>
+<servlet-class>edu.cmu.ece.PrivacyLens.DebugViewServlet</servlet-class>
 </servlet>
 
 <servlet-mapping>
 <servlet-name>PrivacyLens - Debug</servlet-name>
-<url-pattern>/uApprove/DebugView</url-pattern>
+<url-pattern>/PrivacyLens/DebugView</url-pattern>
 </servlet-mapping>
 
 </web-app>
 h2. 2.2 Custom Configuration
 
-In @$IDP_HOME$/conf/uApprove.xml@ change:
+In @$IDP_HOME$/conf/PrivacyLens.xml@ change:
 
 bc. 
-<context:property-placeholder location="classpath:/configuration/uApprove.properties" />
+<context:property-placeholder location="classpath:/configuration/PrivacyLens.properties" />
 
 to:
 
 bc. 
-<context:property-placeholder location="file:$IDP_HOME$/conf/uApprove.properties" />
+<context:property-placeholder location="file:$IDP_HOME$/conf/PrivacyLens.properties" />
 
-Replace the variable $IDP_HOME$ by the correct path, e.g. @/opt/shibboleth-idp@ (so that the whole value looks like @file:/opt/shibboleth-idp/conf/uApprove.properties@ for example).
+Replace the variable $IDP_HOME$ by the correct path, e.g. @/opt/shibboleth-idp@ (so that the whole value looks like @file:/opt/shibboleth-idp/conf/PrivacyLens.properties@ for example).
 
-Customize @$IDP_HOME$/conf/uApprove.properties@ according your database environment and required features. See inline documentation of "uApprove.properties":configuration/uApprove.properties for configuration options.
+Customize @$IDP_HOME$/conf/PrivacyLens.properties@ according your database environment and required features. See inline documentation of "PrivacyLens.properties":configuration/PrivacyLens.properties for configuration options.
 
-In case you enable the 'Terms of Use' module (enabled by default), you need to provide an appropriate text
+In case you enable the 'Terms of Use' module (disabled by default), you need to provide an appropriate text
 suitable for your organization.
 
 An example 'Terms Of Use' HTML file can be found in @$PLENS_INSTALL$/manual/examples/terms-of-use.html@.
@@ -175,7 +177,7 @@ An example 'Terms Of Use' HTML file can be found in @$PLENS_INSTALL$/manual/exam
 bc. cp $PLENS_INSTALL$/manual/examples/terms-of-use.html $IDP_HOME$/conf/terms-of-use.html
 
 * Adapt @$IDP_HOME$/conf/terms-of-use.html@ as required.
-* Adapt the value of @tou.resource@ in @$IDP_HOME$/conf/uApprove.properties@ accordingly.
+* Adapt the value of @tou.resource@ in @$IDP_HOME$/conf/PrivacyLens.properties@ accordingly.
 
 bc. tou.resource = file:$IDP_HOME$/conf/terms-of-use.html
 
@@ -183,8 +185,8 @@ h2. 2.3 Custom Templates
 
 In case you want to customize the templates, follow section "Custom View Templates":#CustomViewTemplates.
 
-At least, you should copy your organization's logo to the file @$IDP_INSTALL$/src/main/webapp/uApprove/logo.png@, since a placeholder logo is installed by default.
-You may also want to put your federation's logo to the file @$IDP_INSTALL$/src/main/webapp/uApprove/federation-logo.png@ (which is an empty placeholder logo by default).
+At least, you should copy your organization's logo to the file @$IDP_INSTALL$/src/main/webapp/PrivacyLens/logo.png@, since a placeholder logo is installed by default.
+You may also want to put your federation's logo to the file @$IDP_INSTALL$/src/main/webapp/PrivacyLens/federation-logo.png@ (which is an empty placeholder logo by default).
 _(For the SWITCHaai federation, the logo is available at "http://www.switch.ch/aai/design/images/switchaai-logo.png":http://www.switch.ch/aai/design/images/switchaai-logo.png.)_
 
 h2. 2.4 Deployment
@@ -219,12 +221,12 @@ Migrate lecacy database to the new database:
 
 bc. 
 java -cp "$PLENS_INSTALL$/scripts/lib/*.jar:$PLENS_INSTALL$/lib/jdbc/optional/*.jar" groovy.ui.GroovyMain \
-  $PLENS_INSTALL$/scripts/StorageMigration.groovy /opt/uApprove/conf/database.properties $IDP_HOME$/conf/uApprove.properties
+  $PLENS_INSTALL$/scripts/StorageMigration.groovy /opt/PrivacyLens/conf/database.properties $IDP_HOME$/conf/PrivacyLens.properties
 
 h2. 3.2 Upgrade from uApprove 2.3 to 2.4
 
 * In version 2.4 "@c3p0@":http://www.mchange.com/projects/c3p0/ is used as the connection pooling library (instead of @boneCP@ in uApprove 2.3). The reason was, that some deployers reported connection repairing issues with remote databases. @c3p0@ offers also an easier deployment, because this library is used by the IdP as well. Please assure following upgrade steps:
-** Adjust the @uApprove.dataSource@ bean in @$IDP_HOME$/conf/uApprove.xml@ (i.e., replace the @bonecp.BoneCPDataSource@ with the @c3p0.ComboPooledDataSource@, see "(file)$PLENS_INSTALL$/manual/configuration/uApprove.xml":configuration/uApprove.xml). Please refer to "JDBC Connection Pool Tuning":#JDBCConnectionPoolTuning for advanced configuration properties.
+** Adjust the @PrivacyLens.dataSource@ bean in @$IDP_HOME$/conf/PrivacyLens.xml@ (i.e., replace the @bonecp.BoneCPDataSource@ with the @c3p0.ComboPooledDataSource@, see "(file)$PLENS_INSTALL$/manual/configuration/PrivacyLens.xml":configuration/PrivacyLens.xml). Please refer to "JDBC Connection Pool Tuning":#JDBCConnectionPoolTuning for advanced configuration properties.
 
 h2. 3.3 Upgrade from uApprove 2.4 to 2.5
 
@@ -234,7 +236,7 @@ interfederation, you are not required to do the upgrade, but the upgrade is stil
 
 In version 2.5, the web templates (JSP files, CSS files, images) have been adapted to support the legal requirements of interfederation
 (see "Legal Templates for SWITCHaai":http://www.switch.ch/aai/support/documents/legaltemplates.html).
-This means that you also need to update the web application files in @$IDP_INSTALL$/src/main/webapp/uApprove@.
+This means that you also need to update the web application files in @$IDP_INSTALL$/src/main/webapp/PrivacyLens@.
 Because the text translations are contained in the library file, keeping the old web application files would
 mean that some texts are not shown anymore. In case you have customized the old web application files
 of uApprove, you should install the new web application files and re-apply your customizations.
@@ -242,7 +244,7 @@ of uApprove, you should install the new web application files and re-apply your 
 The upgrade procedure is:
 
 * @rm $IDP_INSTALL$/lib/uApprove-#old-version#.jar@
-* @cp $PLENS_INSTALL$/lib/uApprove-#new-version#.jar $IDP_INSTALL$/lib@
+* @cp $PLENS_INSTALL$/lib/PrivacyLens-#new-version#.jar $IDP_INSTALL$/lib@
 
 Optionally update the JDBC dependencies:
 
@@ -252,24 +254,24 @@ Optionally update the JDBC connector for your database. You might use one of the
 
 * @cp $PLENS_INSTALL$/lib/jdbc/optional/#jdbc-connector#.jar $IDP_INSTALL$/lib@<br /><br />Verify that only one version of each library is present in @$IDP_INSTALL$/lib@.
 
-Update the web application files in @$IDP_INSTALL$/src/main/webapp/uApprove@. If you have done any customizations
+Update the web application files in @$IDP_INSTALL$/src/main/webapp/PrivacyLens@. If you have done any customizations
 of these files, do a backup of the old files first, and then re-apply the customizations after having updated
 these files
 
-* Optionally backup the existing web application files in @$IDP_INSTALL$/src/main/webapp/uApprove@
+* Optionally backup the existing web application files in @$IDP_INSTALL$/src/main/webapp/PrivacyLens@
 * @rm $IDP_INSTALL$/src/main/webapp/uApprove/*@
-* @cp $PLENS_INSTALL$/webapp/* $IDP_INSTALL$/src/main/webapp/uApprove@
+* @cp $PLENS_INSTALL$/webapp/* $IDP_INSTALL$/src/main/webapp/PrivacyLens@
 * Optionally re-apply customizations.
-** At least, you should restore your organization's logo (file @$IDP_INSTALL$/src/main/webapp/uApprove/logo.png@), since a placeholder logo is installed by default. You may also want to put your federation's logo to the file @$IDP_INSTALL$/src/main/webapp/uApprove/federation-logo.png@ (which is an empty placeholder logo by default). _(For the SWITCHaai federation, the logo is available at "http://www.switch.ch/aai/design/images/switchaai-logo.png":http://www.switch.ch/aai/design/images/switchaai-logo.png.)_
+** At least, you should restore your organization's logo (file @$IDP_INSTALL$/src/main/webapp/PrivacyLens/logo.png@), since a placeholder logo is installed by default. You may also want to put your federation's logo to the file @$IDP_INSTALL$/src/main/webapp/PrivacyLens/federation-logo.png@ (which is an empty placeholder logo by default). _(For the SWITCHaai federation, the logo is available at "http://www.switch.ch/aai/design/images/switchaai-logo.png":http://www.switch.ch/aai/design/images/switchaai-logo.png.)_
 
 In case you want to adapt the text translations, see section "4.4 Localization":#a4.4Localization below.
 
-Adapt some values in @$IDP_HOME$/conf/uApprove.properties$@:
+Adapt some values in @$IDP_HOME$/conf/PrivacyLens.properties$@:
 
-* At @database.url@, append @?autoReconnect=true@ to the JDBC URL (e.g. @database.url = jdbc:mysql://localhost:3306/uApprove?autoReconnect=true@).
+* At @database.url@, append @?autoReconnect=true@ to the JDBC URL (e.g. @database.url = jdbc:mysql://localhost:3306/PrivacyLens?autoReconnect=true@).
 * At @ar.attributes.blacklist@, add the attribute @eduPersonTargetedID@.
 
-To finish the upgrade of uApprove the IdP must be re-deployed:
+To finish the upgrade of PrivacyLens the IdP must be re-deployed:
 
 bc. cd $IDP_INSTALL$
 ./install.sh
@@ -298,11 +300,11 @@ h2. 4.2 Storage
 h3. File-only
 
 For a simple deployment a file only database can be used. HSQL provides such an option.
-Define the according database properties in @uApprove.properties@:
+Define the according database properties in @PrivacyLens.properties@:
 
 bc. 
 database.driver             = org.hsqldb.jdbcDriver
-database.url                = jdbc:hsqldb:file:/var/opt/uApprove/hsql.db
+database.url                = jdbc:hsqldb:file:/var/opt/PrivacyLens/hsql.db
 database.username           = SA
 database.password           = 
  
@@ -311,10 +313,10 @@ Initializing the database with the provided schemas:
 bc. 
 echo "SHUTDOWN;" > /tmp/shutdown
 java -jar $HSQLDB_HOME$/lib/sqltool.jar \
-  --inlineRC=url=jdbc:hsqldb:file:/var/opt/uApprove/hsql.db,user=SA,password= \
+  --inlineRC=url=jdbc:hsqldb:file:/var/opt/PrivacyLens/hsql.db,user=SA,password= \
   $PLENS_INSTALL$/manual/storage/terms-of-use-schema.sql /tmp/shutdown
 java -jar $HSQLDB_HOME$/lib/sqltool.jar \
-  --inlineRC=url=jdbc:hsqldb:file:/var/opt/uApprove/hsql.db,user=SA,password= \
+  --inlineRC=url=jdbc:hsqldb:file:/var/opt/PrivacyLens/hsql.db,user=SA,password= \
   $PLENS_INSTALL$/manual/storage/attribute-relase-schema.sql /tmp/shutdown
   
   
@@ -324,26 +326,26 @@ bq(note). Assure that the user running the container (e.g., Jetty) has write per
 
 h3. Custom SQL Statements
 
-# Copy the provided "(file)$PLENS_INSTALL$/manual/storage/sql-statements.properties":storage/sql-statements.properties to @$IDP_HOME$/conf/uApprove.sql-statements.properties@.
-# Adjust @$IDP_HOME$/conf/uApprove.sql-statements.properties@ according your needs.
-# Enable your custom @sql-statements.properties@ in @$IDP_HOME$/conf/uApprove.xml@:
+# Copy the provided "(file)$PLENS_INSTALL$/manual/storage/sql-statements.properties":storage/sql-statements.properties to @$IDP_HOME$/conf/PrivacyLens.sql-statements.properties@.
+# Adjust @$IDP_HOME$/conf/PrivacyLens.sql-statements.properties@ according your needs.
+# Enable your custom @sql-statements.properties@ in @$IDP_HOME$/conf/PrivacyLens.xml@:
 
 bc.. 
-    <bean id="uApprove.touModule" class="ch.SWITCH.aai.uApprove.tou.ToUModule" ...>
+    <bean id="PrivacyLens.touModule" class="ch.SWITCH.aai.uApprove.tou.ToUModule" ...>
         <!-- ... -->
         <property name="storage">
             <bean class="ch.SWITCH.aai.uApprove.tou.storage.JDBCStorage" ...
-                p:sqlStatements="file:/$IDP_HOME$/conf/uApprove.sql-statements.properties" ... />
+                p:sqlStatements="file:/$IDP_HOME$/conf/PrivacyLens.sql-statements.properties" ... />
         </property>
     </bean>
     
     <!-- ... -->
     
-    <bean id="uApprove.attributeReleaseModule" class="ch.SWITCH.aai.uApprove.ar.AttributeReleaseModule" ...>
+    <bean id="PrivacyLens.attributeReleaseModule" class="ch.SWITCH.aai.uApprove.ar.AttributeReleaseModule" ...>
         <!-- ... -->
         <property name="storage">
             <bean class="ch.SWITCH.aai.uApprove.ar.storage.JDBCStorage" ...
-               p:sqlStatements="file:/$IDP_HOME$/conf/uApprove.sql-statements.properties" ... />
+               p:sqlStatements="file:/$IDP_HOME$/conf/PrivacyLens.sql-statements.properties" ... />
         </property>
     </bean>
     
@@ -354,10 +356,10 @@ This implies that the users, idenpently of former ToU accetances and/or attribut
 
 N.B. It might make sense to set "checkoutTimeout":http://www.mchange.com/projects/c3p0/#checkoutTimeout to an appropiate low value - so as the user has not bothersome latency.
 
-The settings are defined in @$IDP_HOME$/conf/uApprove.xml@:
+The settings are defined in @$IDP_HOME$/conf/PrivacyLens.xml@:
 
 bc.. 
-    <bean id="uApprove.touModule" class="ch.SWITCH.aai.uApprove.tou.ToUModule" ...>
+    <bean id="PrivacyLens.touModule" class="ch.SWITCH.aai.uApprove.tou.ToUModule" ...>
         <!-- ... -->
         <property name="storage">
             <bean class="ch.SWITCH.aai.uApprove.tou.storage.JDBCStorage" ...
@@ -367,7 +369,7 @@ bc..
     
     <!-- ... -->
     
-    <bean id="uApprove.attributeReleaseModule" class="ch.SWITCH.aai.uApprove.ar.AttributeReleaseModule" ...>
+    <bean id="PrivacyLens.attributeReleaseModule" class="ch.SWITCH.aai.uApprove.ar.AttributeReleaseModule" ...>
         <!-- ... -->
         <property name="storage">
             <bean class="ch.SWITCH.aai.uApprove.ar.storage.JDBCStorage" ...
@@ -379,10 +381,10 @@ h3. JDBC Connection Pool Tuning
 
 Cf. "@c3p0@ configuration":http://www.mchange.com/projects/c3p0/#configuration for further details on configuration options.
 
-The settings are defined in @$IDP_HOME$/conf/uApprove.xml@:
+The settings are defined in @$IDP_HOME$/conf/PrivacyLens.xml@:
 
 bc. 
-    <bean id="uApprove.dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" ...
+    <bean id="PrivacyLens.dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" ...
         ...
         p:idleConnectionTestPeriod="300" ... />
         
@@ -393,10 +395,10 @@ h3. NOP Storage
 The NOP(No Operation) storage basically retrieves users ToU acceptance and/or attribute release consent without requiring any JDBC storage.
 This implies _alwaysRequireToUAcceptance_ and/or _alwaysRequireConsent_.
 
-You might enable NOP(No Operation) storage for the ToU and/or attribute release module in @$IDP_HOME$/conf/uApprove.xml@:
+You might enable NOP(No Operation) storage for the ToU and/or attribute release module in @$IDP_HOME$/conf/PrivacyLens.xml@:
 
 bc. 
-    <bean id="uApprove.touModule" ...
+    <bean id="PrivacyLens.touModule" ...
         ...
         <property name="storage">
             <bean class="ch.SWITCH.aai.uApprove.tou.storage.NOPStorage" />
@@ -404,7 +406,7 @@ bc.
     </bean>
 
 bc. 
-    <bean id="uApprove.uApprove.attributeReleaseModule" ...
+    <bean id="PrivacyLens.attributeReleaseModule" ...
         ...
         <property name="storage">
             <bean class="ch.SWITCH.aai.uApprove.ar.storage.NOPStorage" />
@@ -421,19 +423,19 @@ h2. 4.3 Templates
 
 h3. Custom View Templates
 
-Feel free to customize the JSP(JavaServer Pages), CSS(Cascading Style Sheets) and image files located in @$DP_INSTALL$/src/main/webapp/uApprove/@.
+Feel free to customize the JSP(JavaServer Pages), CSS(Cascading Style Sheets) and image files located in @$DP_INSTALL$/src/main/webapp/PrivacyLens/@.
 For convienience the JSTL(JavaServer Pages Standard Tag Library) is used, cf. "JSTL reference":http://java.sun.com/products/jsp/jstl/reference/docs/index.html.
 
 h2. 4.4 Localization
 
 h3. Custom Messages
 
-You might adjust/extend the provided resource bundles in "(file)$PLENS_INSTALL$/manual/examples/messages":examples/messages and copy them into the IdPs classpath (e.g., @$IDP_INSTALL$/src/main/webapp/WEB-INF/classes/uApprove/messages@).
-Specify your bundles base in @$IDP_HOME$/conf/uApprove.xml@:
+You might adjust/extend the provided resource bundles in "(file)$PLENS_INSTALL$/manual/examples/messages":examples/messages and copy them into the IdPs classpath (e.g., @$IDP_INSTALL$/src/main/webapp/WEB-INF/classes/PrivacyLens/messages@).
+Specify your bundles base in @$IDP_HOME$/conf/PrivacyLens.xml@:
 
 bc. 
-    <bean id="uApprove.viewHelper" class="ch.SWITCH.aai.uApprove.ViewHelper" ...
-        p:messagesBase="uApprove.messages" />
+    <bean id="PrivacyLens.viewHelper" class="ch.SWITCH.aai.uApprove.ViewHelper" ...
+        p:messagesBase="PrivacyLens.messages" />
 
 h3. Attribute Names and Descriptions
 
@@ -465,49 +467,50 @@ h2. 4.5 Strict Comparison
 
 h3. Terms Of Use Content Comparison
 
-In the default configuration, only the ToU version is compared to evaluate if a user accepted the ToU. You might enable that the ToU content is compared too in @$IDP_HOME$/conf/uApprove.xml@: 
+In the default configuration, only the ToU version is compared to evaluate if a user accepted the ToU. You might enable that the ToU content is compared too in @$IDP_HOME$/conf/PrivacyLens.xml@: 
 
-bc. <bean id="uApprove.touModule" ... p:compareContent="true" ...
+bc. <bean id="PrivacyLens.touModule" ... p:compareContent="true" ...
 
 h3. Attribute Value(s) Comparison
 
-In the default configuration, only the attribute ID is compared to evaluate if a user consented attibute release. You might enable that attribute value(s) are compared too in @$IDP_HOME$/conf/uApprove.xml@: 
+In the default configuration, only the attribute ID is compared to evaluate if a user consented attibute release. You might enable that attribute value(s) are compared too in @$IDP_HOME$/conf/PrivacyLens.xml@: 
 
-bc. <bean id="uApprove.attributeReleaseModule" ... p:compareAttributeValues="true" ...
+bc. <bean id="PrivacyLens.attributeReleaseModule" ... p:compareAttributeValues="true" ...
 
 
 h2. 4.6 Audit Logging
 
-uApprove allows (faciliating the IDP's audit log) to enable audit logging to @$IDP_HOME$/logs/idp-audit.log@.
+PrivacyLens allows (faciliating the IDP's audit log) to enable audit logging to @$IDP_HOME$/logs/idp-audit.log@.
 
 h3. Enable Terms Of Use Audit Log
 
-You might enable ToU audit log in in @$IDP_HOME$/conf/uApprove.xml@: 
+You might enable ToU audit log in in @$IDP_HOME$/conf/PrivacyLens.xml@: 
 
-bc. <bean id="uApprove.touModule" ... p:auditLogEnabled="true" ...
+bc. <bean id="PrivacyLens.touModule" ... p:auditLogEnabled="true" ...
 
 Example:
 
-bc. 20120101T010000Z|ch.SWITCH.aai.uApprove|||tou.acceptance|null|null|null|student1||1.0,5b2ee897c08c79a09cd57e8602d605bf8c52db17de9793677c36b5c78644b2b3,|
+bc. 20120101T010000Z|edu.cmu.ece.PrivacyLens|||tou.acceptance|null|null|null|student1||1.0,5b2ee897c08c79a09cd57e8602d605bf8c52db17de9793677c36b5c78644b2b3,|
 
 h3. Enable Attribute Release Audit Log
 
-You might enable attribute release audit log in in @$IDP_HOME$/conf/uApprove.xml@:
+You might enable attribute release audit log in in @$IDP_HOME$/conf/PrivacyLens.xml@:
 
-bc. <bean id="uApprove.attributeReleaseModule" ... p:auditLogEnabled="true" ...
+bc. <bean id="PrivacyLens.attributeReleaseModule" ... p:auditLogEnabled="true" ...
 
 Examples:
 
 bc. 
-20120101T010000Z|ch.SWITCH.aai.uApprove||https://sp.example.org/shibboleth|ar.consent|null|null|null|student1||uid,surname,givenName,|
-20120101T010000Z|ch.SWITCH.aai.uApprove||https://sp.example.org/shibboleth|ar.clearConsent|null|null|null|student1|||
-20120101T010000Z|ch.SWITCH.aai.uApprove|||ar.generalConsent|null|null|null|student1|||
+20120101T010000Z|edu.cmu.ece.PrivacyLens||https://sp.example.org/shibboleth|ar.consent|null|null|null|student1||uid,surname,givenName,|
+20120101T010000Z|edu.cmu.ece.PrivacyLens||https://sp.example.org/shibboleth|ar.clearConsent|null|null|null|student1|||
+20120101T010000Z|edu.cmu.ece.PrivacyLens|||ar.generalConsent|null|null|null|student1|||
 
 h2. 4.7 Attribute In Attribute Requester's Metadata Plugin
+XXXstroucki look at this
 
 h3. Installation
 
-The plugin is installed by default with uApprove (@uApprove-#version#.jar@). 
+The plugin is installed by default with PrivacyLens (@PrivacyLens-#version#.jar@). 
 
 h3. Configuration Attribute In Requester's Metadata Matching Rule
 
@@ -525,8 +528,8 @@ h4. Define the Namespace
 
 In your attribute filter policy file you'll need to add the namespace declaration for this plugin. To do this:
 
-* Add the attribute @xmlns:ua="http://www.switch.ch/aai/idp/uApprove/mf"@ before the @xmlns:xsi@ attribute on the root @<AttributeFilterPolicyGroup>@ element.
-* Add the following at the end of the whitespace delimited list of values for the @xsi:schemaLocation@ attribute: @http://www.switch.ch/aai/idp/uApprove/mf classpath:/schema/uApprove-mf.xsd@.
+* Add the attribute @xmlns:ua="http://www.switch.ch/aai/idp/PrivacyLens/mf"@ before the @xmlns:xsi@ attribute on the root @<AttributeFilterPolicyGroup>@ element.
+* Add the following at the end of the whitespace delimited list of values for the @xsi:schemaLocation@ attribute: @http://www.switch.ch/aai/idp/PrivacyLens/mf classpath:/schema/PrivacyLens-mf.xsd@.
 
 h4. Define the Rule
 
@@ -553,9 +556,10 @@ h1. 5 Troubleshooting
 
 h2. Debugging
 
-Enabling @DEBUG@ or @TRACE@ log level for uApprove in @$IDP_HOME$/conf/logging.xml@:
+Enabling @DEBUG@ or @TRACE@ log level for PrivacyLens in @$IDP_HOME$/conf/logging.xml@:
 
 bc. <logger name="ch.SWITCH.aai.uApprove" level="DEBUG"/>
+bc. <logger name="edu.cmu.ece.PrivacyLens" level="DEBUG"/>
 
 h1. 6 Feedback
 
@@ -564,4 +568,6 @@ Send general questions and comments to "privacylens@ece.cmu.edu":mailto:privacyl
 
 fn1. Clear means to delete general consent if it was given as well delete as all attribute release consents for the accessed relying party.
 
+h1. 7 Definitions
 
+{glossary}

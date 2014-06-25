@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, SWITCH
+ * Copyright (c) 2013, Carnegie Mellon University
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -25,59 +25,31 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.SWITCH.aai.uApprove;
+package edu.cmu.ece.PrivacyLens.ar;
 
-import java.util.ArrayList;
-import java.util.regex.Pattern;
+import java.util.Arrays;
 
-import edu.cmu.ece.PrivacyLens.Util;
+import org.joda.time.DateTime;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 /**
- * Relying Party List.
+ * Attribute Release Consent Test.
  */
-public class RelyingPartyList extends ArrayList<String> {
 
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
+public class AttributeReleaseChoiceTest {
 
-    /** Indicates whether the list is a black- or whitelist. */
-    private boolean isBlacklist;
-
-    /** Default constructor. */
-    public RelyingPartyList() {
-        super();
-        isBlacklist = true;
+    /** Test. */
+    @Test
+    public void testCreateAttributeReleaseConsents() {
+        final Attribute attribute = new Attribute("id", Arrays.asList(new String[] {"value1", "value2"}));
+        final DateTime consentDate = new DateTime();
+        final boolean isConsented = false;
+        final AttributeReleaseChoice attributeReleaseConsent =
+                new AttributeReleaseChoice(attribute, consentDate, isConsented);
+        Assert.assertEquals(attributeReleaseConsent.getAttributeId(), attribute.getId());
+        Assert.assertEquals(attributeReleaseConsent.getValuesHash(),
+                AttributeReleaseHelper.hashValues(attribute.getValues()));
+        Assert.assertEquals(attributeReleaseConsent.getDate(), consentDate);
     }
-
-    /**
-     * Sets the regular expressions.
-     * 
-     * @param expressions The regular expressions (whitespace delimited).
-     */
-    public void setRegularExpressions(final String expressions) {
-        super.addAll(Util.stringToList(expressions));
-    }
-
-    /**
-     * Sets whether the list should be interpreted as blacklist or whitelist.
-     * 
-     * @param isBlacklist The isBlacklist to set.
-     */
-    public void setBlacklist(final boolean isBlacklist) {
-        this.isBlacklist = isBlacklist;
-    }
-
-    /** {@inheritDoc} */
-    public boolean contains(final Object o) {
-        boolean found = false;
-        for (final String serviceRegEx : this) {
-            final Pattern pattern = Pattern.compile(serviceRegEx);
-            if (pattern.matcher(String.valueOf(o)).find()) {
-                found = true;
-                break;
-            }
-        }
-        return isBlacklist ? !found : found;
-    }
-
 }

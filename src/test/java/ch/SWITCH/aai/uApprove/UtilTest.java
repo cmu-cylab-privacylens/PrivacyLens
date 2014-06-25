@@ -34,6 +34,8 @@ import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import edu.cmu.ece.PrivacyLens.Util;
+
 /**
  * Util test.
  */

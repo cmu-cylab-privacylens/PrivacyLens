@@ -25,59 +25,73 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.SWITCH.aai.uApprove;
-
-import java.util.ArrayList;
-import java.util.regex.Pattern;
-
-import edu.cmu.ece.PrivacyLens.Util;
+package edu.cmu.ece.PrivacyLens.ar;
 
 /**
- * Relying Party List.
+ * Relying Party.
  */
-public class RelyingPartyList extends ArrayList<String> {
+public class RelyingParty {
 
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
+    /** The relying party id. */
+    private final String id;
 
-    /** Indicates whether the list is a black- or whitelist. */
-    private boolean isBlacklist;
+    /** The name of the relying party. */
+    private final String name;
 
-    /** Default constructor. */
-    public RelyingPartyList() {
-        super();
-        isBlacklist = true;
+    /** The description of the relying party. */
+    private final String description;
+
+    /**
+     * Constructor.
+     * 
+     * @param id The id.
+     */
+    public RelyingParty(final String id) {
+        this(id, null, null);
     }
 
     /**
-     * Sets the regular expressions.
+     * Constructor.
      * 
-     * @param expressions The regular expressions (whitespace delimited).
+     * @param id The id.
+     * @param name The name.
+     * @param description The description.
      */
-    public void setRegularExpressions(final String expressions) {
-        super.addAll(Util.stringToList(expressions));
-    }
-
-    /**
-     * Sets whether the list should be interpreted as blacklist or whitelist.
-     * 
-     * @param isBlacklist The isBlacklist to set.
-     */
-    public void setBlacklist(final boolean isBlacklist) {
-        this.isBlacklist = isBlacklist;
-    }
-
-    /** {@inheritDoc} */
-    public boolean contains(final Object o) {
-        boolean found = false;
-        for (final String serviceRegEx : this) {
-            final Pattern pattern = Pattern.compile(serviceRegEx);
-            if (pattern.matcher(String.valueOf(o)).find()) {
-                found = true;
-                break;
-            }
+    public RelyingParty(final String id, final String name, final String description) {
+        this.id = id;
+        if (name != null) {
+            this.name = name;
+        } else {
+            this.name = AttributeReleaseHelper.resolveFqdn(id);
         }
-        return isBlacklist ? !found : found;
+        this.description = description;
+    }
+
+    /**
+     * Gets the id.
+     * 
+     * @return Returns the id.
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * Gets the name.
+     * 
+     * @return Returns the name.
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Gets the description.
+     * 
+     * @return Returns the description.
+     */
+    public String getDescription() {
+        return description;
     }
 
 }

@@ -3,8 +3,8 @@
 <form method="post" style="padding:10px">
     <div class="box">
             <div class="box_header">
-                <img src="<%= request.getContextPath()%>/uApprove/federation-logo.png" alt="" class="federation_logo" >
-                <img src="<%= request.getContextPath()%>/uApprove/logo.png" alt="" class="organization_logo">
+                <img src="<%= request.getContextPath()%>/PrivacyLens/federation-logo.png" alt="" class="federation_logo" >
+                <img src="<%= request.getContextPath()%>/PrivacyLens/logo.png" alt="" class="organization_logo">
             </div>
             <p style="margin-top: 70px;">
                 <span class="service_name">

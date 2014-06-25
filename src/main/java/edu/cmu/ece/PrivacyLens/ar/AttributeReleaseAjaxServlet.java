@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2011, SWITCH
+ * COPYRIGHT_BOILERPLATE
+ * Copyright (c) 2013 Carnegie Mellon University
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -25,59 +26,48 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.SWITCH.aai.uApprove;
+package edu.cmu.ece.PrivacyLens.ar;
 
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.regex.Pattern;
+import java.util.List;
 
-import edu.cmu.ece.PrivacyLens.Util;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.gson.Gson;
 
 /**
- * Relying Party List.
+ * This is an AJAX handler stub servlet
  */
-public class RelyingPartyList extends ArrayList<String> {
+public class AttributeReleaseAjaxServlet extends HttpServlet {
 
-    /** Serial version UID. */
+    /**
+     * 
+     */
     private static final long serialVersionUID = 1L;
 
-    /** Indicates whether the list is a black- or whitelist. */
-    private boolean isBlacklist;
+    /** Class logger. */
+    private final Logger logger = LoggerFactory.getLogger(AttributeReleaseAjaxServlet.class);
 
-    /** Default constructor. */
-    public RelyingPartyList() {
-        super();
-        isBlacklist = true;
-    }
+    @Override
+    protected void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException,
+            IOException {
+        logger.trace("AJAX handler entered");
+        final List<String> list = new ArrayList<String>();
+        list.add("item1");
+        list.add("item2");
+        list.add("item3");
+        final String json = new Gson().toJson(list);
 
-    /**
-     * Sets the regular expressions.
-     * 
-     * @param expressions The regular expressions (whitespace delimited).
-     */
-    public void setRegularExpressions(final String expressions) {
-        super.addAll(Util.stringToList(expressions));
-    }
-
-    /**
-     * Sets whether the list should be interpreted as blacklist or whitelist.
-     * 
-     * @param isBlacklist The isBlacklist to set.
-     */
-    public void setBlacklist(final boolean isBlacklist) {
-        this.isBlacklist = isBlacklist;
-    }
-
-    /** {@inheritDoc} */
-    public boolean contains(final Object o) {
-        boolean found = false;
-        for (final String serviceRegEx : this) {
-            final Pattern pattern = Pattern.compile(serviceRegEx);
-            if (pattern.matcher(String.valueOf(o)).find()) {
-                found = true;
-                break;
-            }
-        }
-        return isBlacklist ? !found : found;
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(json);
     }
 
 }

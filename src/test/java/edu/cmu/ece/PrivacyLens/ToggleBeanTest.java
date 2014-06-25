@@ -33,8 +33,6 @@ import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import ch.SWITCH.aai.uApprove.Util;
-
 /**
  * I'm using a comparison to the output hash, which has to be regenerated whenever the ToggleBean generates different
  * output. I would like to use an html snippet validator. Where is one?

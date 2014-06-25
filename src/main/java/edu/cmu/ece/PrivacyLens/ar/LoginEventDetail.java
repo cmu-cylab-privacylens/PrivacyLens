@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2011, SWITCH
+ * COPYRIGHT_BOILERPLATE
+ * Copyright (c) 2013 Carnegie Mellon University
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -25,59 +26,48 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.SWITCH.aai.uApprove;
+package edu.cmu.ece.PrivacyLens.ar;
 
-import java.util.ArrayList;
-import java.util.regex.Pattern;
+import java.util.List;
 
-import edu.cmu.ece.PrivacyLens.Util;
+/** Represents a login event. */
+public class LoginEventDetail {
 
-/**
- * Relying Party List.
- */
-public class RelyingPartyList extends ArrayList<String> {
+    /** attribute list */
+    private final List<Attribute> attributes;
 
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
+    /** event detail hash */
+    private final String eventDetailHash;
 
-    /** Indicates whether the list is a black- or whitelist. */
-    private boolean isBlacklist;
-
-    /** Default constructor. */
-    public RelyingPartyList() {
-        super();
-        isBlacklist = true;
+    /**
+     * Constructs a @see LoginEventDetail.
+     * 
+     * @param userId The user id.
+     * @param relyingPartyId The relying party id.
+     * @param eventDate The timestamp for this @see LoginEvent.
+     * @param eventDetailHash The event detail hash for this
+     */
+    public LoginEventDetail(final String eventDetailHash, final List<Attribute> attributes) {
+        this.eventDetailHash = eventDetailHash;
+        this.attributes = attributes;
     }
 
     /**
-     * Sets the regular expressions.
+     * Gets the user id.
      * 
-     * @param expressions The regular expressions (whitespace delimited).
+     * @return Returns the user id.
      */
-    public void setRegularExpressions(final String expressions) {
-        super.addAll(Util.stringToList(expressions));
+    public List<Attribute> getAttributes() {
+        return attributes;
     }
 
     /**
-     * Sets whether the list should be interpreted as blacklist or whitelist.
+     * Gets the login event detail hash.
      * 
-     * @param isBlacklist The isBlacklist to set.
+     * @return Returns the event detail hash.
      */
-    public void setBlacklist(final boolean isBlacklist) {
-        this.isBlacklist = isBlacklist;
-    }
-
-    /** {@inheritDoc} */
-    public boolean contains(final Object o) {
-        boolean found = false;
-        for (final String serviceRegEx : this) {
-            final Pattern pattern = Pattern.compile(serviceRegEx);
-            if (pattern.matcher(String.valueOf(o)).find()) {
-                found = true;
-                break;
-            }
-        }
-        return isBlacklist ? !found : found;
+    public String getEventDetailHash() {
+        return eventDetailHash;
     }
 
 }
