@@ -8,17 +8,16 @@
 	<body>
 		<p>This document contains the PrivacyLens deployment guide and the general manual.</p>
 		<p>PrivacyLens is an extension for the Shibboleth Identity Provider 2.x. It provides an interface to allow users to review the personal information that will be sent to a requesting web site, and to opt in or out of disclosing it. PrivacyLens grew out of 
-			<a href="http://www.switch.ch/aai/uApprove">uApprove</a>, and its module to present a Terms of Use page has been kept. PrivacyLens' web page is at
-			<br/>
+			<a href="http://www.switch.ch/aai/uApprove">uApprove</a>, and its module to present a Terms of Use page has been kept. PrivacyLens' web page is at 
 			<a href="http://www.privacylens.org/">www.privacylens.org</a>
 		</p>
 		<p>Notes about this guide:</p>
 		<ul>
-			<li>This guide assumes that PrivacyLens will be installed on a Linux system. It&#8217;s also possible to install it on a different operating system, like Windows. In this case, you may need to adapt some paths and commands accordingly.</li>
+			<li>This guide assumes that PrivacyLens will be installed on a Linux system. It&#8217;s also possible to install it on a different operating system. In this case, you may need to adapt some paths and commands accordingly.</li>
 			<li>The guide shows paths and commands using variables like, e.g, 
 				<code>$SHIB_DIST$</code>, 
 				<code>$SHIB_INSTALL$</code> or 
-				<code>$PLENS_DIST$</code>. You need to substitute these variables by the real paths, except where it is explicitly stated that you don&#8217;t need to substitute them.
+				<code>$PLENS_DIST$</code>. You need to expand these variables to the real paths, except where it is explicitly stated that you don&#8217;t need to expand them.
 			</li>
 		</ul>
 		<ol style="list-style: none;">
@@ -149,39 +148,40 @@
 		</ul>
 		<h2 id="a1.2BuildingPrivacyLensfromsource">1.2 Building PrivacyLens from source</h2>
 		<p>If you are not using a downloaded binary package of PrivacyLens, create
-			<br/>it using Maven with the command 
+			<br/>one using Maven with the command 
 			<code>mvn install</code>. This will create a binary
 			<br/>package ZIP file in the 
 			<code>target/</code> directory.
 		</p>
 		<h2 id="a1.3LibraryInstallation">1.3 Library Installation</h2>
-		<p>If the Shibboleth Identity Provider is not yet installed, proceed with a normal installation of Shibboleth. Make a note of the directory you unpacked the
+		<p>If the Shibboleth Identity Provider has not yet been installed, proceed with a normal installation of Shibboleth. Make a note of the directory you unpacked the
 			<br/>source to (@$SHIB_DIST$, e.g. 
 			<code>/usr/local/src/shibboleth-identity-provider-#version#</code>), and the directory the web application was installed into (@$SHIB_INSTALL$, e.g. 
 			<code>/opt/shibboleth-idp</code>).
 		</p>
 		<p>Ensure your installation of Shibboleth is working correctly.</p>
-		<p>Unpack the binary package ZIP file in 
-			<code>$PLENS_DIST$</code> (e.g., 
-			<code>/usr/local/src/PrivacyLens-#version#</code>).
-			<br/>Copying the libraries to Shibboleth&#8217;s library directory:
-		</p>
 		<ul>
-			<li>
-				<code>cp $PLENS_DIST$/lib/*.jar $SHIB_DIST$/lib</code>
+			<li>Unpack the binary package ZIP file in 
+				<code>$PLENS_DIST$</code> (e.g., 
+				<code>/usr/local/src/PrivacyLens-#version#</code>).
 			</li>
-			<li>
-				<code>cp $PLENS_DIST$/lib/jdbc/*.jar $SHIB_DIST$/lib</code>
+			<li>Copy the jar files to Shibboleth&#8217;s library directory:
+				<ul>
+					<li>
+						<code>cp $PLENS_DIST$/lib/*.jar $SHIB_DIST$/lib</code>
+					</li>
+					<li>
+						<code>cp $PLENS_DIST$/lib/jdbc/*.jar $SHIB_DIST$/lib</code>
+					</li>
+				</ul>
 			</li>
 			<li>Copy the JDBC connector for your database to Shibboleth&#8217;s classpath. PrivacyLens itself already provides MySQL or HSQL JDBC connectors: <br /> 
 				<code>cp $PLENS_DIST$/lib/jdbc/optional/#jdbc-connector#.jar $SHIB_DIST$/lib</code>
 			</li>
 		</ul>
-		<blockquote class="note">
-			<p>Assure that only one version of each library is present in 
-				<code>$SHIB_DIST$/lib</code>.
-			</p>
-		</blockquote>
+		<p>Ensure that only one version of each jar file is present in 
+			<code>$SHIB_DIST$/lib</code>.
+		</p>
 		<h2 id="a1.4ConfigurationTemplate">1.4 Configuration Template</h2>
 		<p>Copy the configuration template to Shibboleth&#8217;s configuration directory:</p>
 		<ul>
@@ -235,7 +235,7 @@
 			<li>Add 
 				<code>$SHIB_INSTALL$/conf/PrivacyLens.xml</code> to the 
 				<code>contextConfigLocation</code> context parameter. Do not expand the 
-				<code>$SHIB_INSTALL$</code> variables. They will later be replaced during the re-deployment of Shibboleth.
+				<code>$IDP_HOME$</code> variables here. They are handled by Shibboleth&#8217;s install script.
 			</li>
 			<li>Add the required filters and servlets as shown.</li>
 		</ul>
@@ -244,7 +244,7 @@
 
     &lt;context-param>
         &lt;param-name>contextConfigLocation&lt;/param-name>
-        &lt;param-value>$SHIB_INSTALL$/conf/internal.xml; $SHIB_INSTALL$/conf/service.xml; $SHIB_INSTALL$/conf/PrivacyLens.xml&lt;/param-value>
+        &lt;param-value>$IDP_HOME$/conf/internal.xml; $IDP_HOME$/conf/service.xml; $IDP_HOME$/conf/PrivacyLens.xml&lt;/param-value>
     &lt;/context-param>
 
     &lt;!-- IdP Listeners, Filters and Servlets -->
@@ -331,7 +331,7 @@
 		<p>to:</p>
 		<pre><pre>&lt;context:property-placeholder location="file:$SHIB_INSTALL$/conf/PrivacyLens.properties" />
 </pre></pre>
-		<p>Do expand the variable $SHIB_INSTALL$ (so that the location value looks like e.g. 
+		<p>Do expand the variable $SHIB_INSTALL$ here (so that the location value looks like e.g. 
 			<code>file:/opt/shibboleth-idp/conf/PrivacyLens.properties</code>).
 		</p>
 		<p>Customize 
