@@ -3,18 +3,12 @@ package edu.cmu.ece.PrivacyLens;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Random;
 
 import javax.servlet.http.HttpServletRequest;
-
-import bmsi.util.Diff;
-import bmsi.util.DiffPrint.Base;
-import bmsi.util.DiffPrint.ContextPrint;
 
 public class StrouckiUtils {
     private static Random randomObject = new Random();
@@ -141,6 +135,7 @@ public class StrouckiUtils {
      * @param after
      * @return String containing diff
      */
+    /*
     public static String diff(final String[] before, final String[] after) {
         final Diff d = new Diff(before, after);
         final Base p = new ContextPrint(before, after);
@@ -156,6 +151,7 @@ public class StrouckiUtils {
         pw.close();
         return sw.toString();
     }
+    */
 
     /**
      * Convert a @see HttpServletRequest to a human interpretable string

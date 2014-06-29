@@ -178,7 +178,7 @@
                             <tasks>
                                 <taskdef classpathref="maven.plugin.classpath" resource="wikitexttasks.properties" />    
                                 <wikitext-to-html markupLanguage="Textile"
-                                    file="${basedir}/manual/index.textile" htmlFilenameFormat="$1.html"
+                                    file="${basedir}/manual/manual.textile" htmlFilenameFormat="$1.html"
                                     formatOutput="true" emitDoctype="false" title="${project.name}-${project.version}">
                                     <stylesheet url="style.css" />
                                 </wikitext-to-html>
