@@ -43,7 +43,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import edu.cmu.ece.PrivacyLens.StrouckiUtils;
+import edu.cmu.ece.PrivacyLens.Util;
 import edu.cmu.ece.PrivacyLens.ar.Attribute;
 import edu.cmu.ece.PrivacyLens.ar.AttributeReleaseChoice;
 import edu.cmu.ece.PrivacyLens.ar.LoginEvent;
@@ -115,7 +115,7 @@ public class JDBCStorageTest extends AbstractTransactionalTestNGSpringContextTes
         // new state
         final String userId = "userId";
         final String relyingPartyId = "relyingPartyId";
-        final boolean isForceShow = StrouckiUtils.getRandomBoolean();
+        final boolean isForceShow = Util.getRandomBoolean();
 
         storage.createForceShowInterface(userId, relyingPartyId, isForceShow);
         Assert.assertTrue(storage.readForceShowInterface(userId, relyingPartyId) == isForceShow);
@@ -132,8 +132,8 @@ public class JDBCStorageTest extends AbstractTransactionalTestNGSpringContextTes
         // new state
         final String userId = "userId";
         final String relyingPartyId = "relyingPartyId";
-        final int currentCount = StrouckiUtils.getRandomRange(1, 10);
-        final int remindAfter = StrouckiUtils.getRandomRange(1, 10);
+        final int currentCount = Util.getRandomRange(1, 10);
+        final int remindAfter = Util.getRandomRange(1, 10);
 
         final ReminderInterval reminderInterval =
                 new ReminderInterval(userId, relyingPartyId, remindAfter, currentCount);

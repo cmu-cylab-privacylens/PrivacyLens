@@ -97,16 +97,16 @@ public class DebugViewServlet extends HttpServlet {
     private List<Attribute> genFakeAttributes() {
         final List<Attribute> attributes = new ArrayList<Attribute>();
         List<String> valuesSample;
-        final int nAttributes = StrouckiUtils.getRandomRange(1, 5);
+        final int nAttributes = Util.getRandomRange(1, 5);
         for (int attribute = 0; attribute < nAttributes; attribute++) {
             valuesSample = new ArrayList<String>();
 
-            final int nValues = StrouckiUtils.getRandomRange(1, 3);
+            final int nValues = Util.getRandomRange(1, 3);
             for (int value = 0; value < nValues; value++) {
                 valuesSample.add("Attribute#" + attribute + "V#" + value);
             }
 
-            final boolean required = StrouckiUtils.getRandomBoolean();
+            final boolean required = Util.getRandomBoolean();
             attributes.add(new Attribute("AttributeID#" + attribute, "AttributeName#" + attribute,
                     "AttributeDescription#" + attribute, valuesSample, required));
         }
@@ -198,7 +198,7 @@ public class DebugViewServlet extends HttpServlet {
         logger.trace("entered doShowMenu");
         final java.io.PrintWriter out = resp.getWriter();
         out.println("<html><head><title>View test page</title><body>");
-        out.println(edu.cmu.ece.PrivacyLens.StrouckiUtils.request2string(req).replace('<', '[').replace('>', ']') + "<br/>");
+        out.println(edu.cmu.ece.PrivacyLens.Util.request2string(req).replace('<', '[').replace('>', ']') + "<br/>");
 
         out.println("<form action=\"DebugView\" method=\"POST\">");
         out.println("<input type=\"radio\" name=\"state\" value=\"ShowAttributes\"> Show attributes</input><br/>");

@@ -44,7 +44,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import edu.cmu.ece.PrivacyLens.Action;
 import edu.cmu.ece.PrivacyLens.IdPHelper;
 import edu.cmu.ece.PrivacyLens.Oracle;
-import edu.cmu.ece.PrivacyLens.StrouckiHTMLUtils;
+import edu.cmu.ece.PrivacyLens.HTMLUtils;
 import edu.cmu.ece.PrivacyLens.ToggleBean;
 import edu.cmu.ece.PrivacyLens.Util;
 import edu.cmu.ece.PrivacyLens.config.General;
@@ -63,7 +63,7 @@ public class AdminServiceLoginAction implements Action {
 
     private Oracle oracle;
 
-    private final String emailAdminBoilerText = StrouckiHTMLUtils.getEmailAdminBoilerText(General.getInstance()
+    private final String emailAdminBoilerText = HTMLUtils.getEmailAdminBoilerText(General.getInstance()
             .getAdminMail());
 
     /** Class logger. */

@@ -3,7 +3,7 @@ package edu.cmu.ece.PrivacyLens;
 
 import org.apache.commons.lang.StringEscapeUtils;
 
-public class StrouckiHTMLUtils {
+public class HTMLUtils {
     /**
      * Escape a string for a javascript environment
      * 

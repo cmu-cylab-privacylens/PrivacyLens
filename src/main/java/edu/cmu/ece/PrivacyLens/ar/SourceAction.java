@@ -44,8 +44,7 @@ import org.slf4j.LoggerFactory;
 import edu.cmu.ece.PrivacyLens.Action;
 import edu.cmu.ece.PrivacyLens.IdPHelper;
 import edu.cmu.ece.PrivacyLens.Oracle;
-import edu.cmu.ece.PrivacyLens.StrouckiHTMLUtils;
-import edu.cmu.ece.PrivacyLens.StrouckiUtils;
+import edu.cmu.ece.PrivacyLens.HTMLUtils;
 import edu.cmu.ece.PrivacyLens.ToggleBean;
 import edu.cmu.ece.PrivacyLens.Util;
 import edu.cmu.ece.PrivacyLens.config.General;
@@ -57,7 +56,7 @@ public class SourceAction implements Action {
     /** Class logger. */
     private final Logger logger = LoggerFactory.getLogger(SourceAction.class);
 
-    private final String emailAdminBoilerText = StrouckiHTMLUtils.getEmailAdminBoilerText(General.getInstance()
+    private final String emailAdminBoilerText = HTMLUtils.getEmailAdminBoilerText(General.getInstance()
             .getAdminMail());
 
     private String requestContextPath;
@@ -374,7 +373,7 @@ public class SourceAction implements Action {
             }
             list.add(sb.toString());
         }
-        final String out = StrouckiUtils.listToString(list);
+        final String out = Util.listToString(list);
         return out;
     }
 }

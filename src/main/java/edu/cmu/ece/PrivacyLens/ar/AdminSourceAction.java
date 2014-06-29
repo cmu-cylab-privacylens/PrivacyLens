@@ -46,7 +46,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import edu.cmu.ece.PrivacyLens.Action;
 import edu.cmu.ece.PrivacyLens.IdPHelper;
 import edu.cmu.ece.PrivacyLens.Oracle;
-import edu.cmu.ece.PrivacyLens.StrouckiUtils;
 import edu.cmu.ece.PrivacyLens.Util;
 import edu.cmu.ece.PrivacyLens.config.General;
 
@@ -81,7 +80,7 @@ public class AdminSourceAction implements Action {
             final DateTime loginEventDate = loginEvent.getDate();
             final DateTime now = new DateTime();
             final long relativeTime = now.getMillis() - loginEventDate.getMillis();
-            final String dateTimeString = StrouckiUtils.millisToDuration(relativeTime);
+            final String dateTimeString = Util.millisToDuration(relativeTime);
             final String serviceString = loginEvent.getServiceName();
             final String loginEventId = loginEvent.getEventDetailHash();
             final Map<String, Object> map = new HashMap<String, Object>();

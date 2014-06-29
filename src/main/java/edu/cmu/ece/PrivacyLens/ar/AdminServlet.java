@@ -98,7 +98,7 @@ public class AdminServlet extends HttpServlet {
         logger.trace("entered doShowMenu");
         final java.io.PrintWriter out = resp.getWriter();
         out.println("<html><head><title>View test page</title><body>");
-        out.println(edu.cmu.ece.PrivacyLens.StrouckiUtils.request2string(req).replace('<', '[').replace('>', ']') + "<br/>");
+        out.println(edu.cmu.ece.PrivacyLens.Util.request2string(req).replace('<', '[').replace('>', ']') + "<br/>");
 
         out.println("<form action=\"DebugView\" method=\"POST\">");
         out.println("<input type=\"radio\" name=\"state\" value=\"ShowAttributes\"> Show attributes</input><br/>");
