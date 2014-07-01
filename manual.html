@@ -130,7 +130,7 @@
 				<a href="manual.html#a6Feedback">6 Feedback</a>
 			</li>
 			<li>
-				<a href="manual.html#a7Definitions">7 Definitions</a>
+				<a href="manual.html#a7Abbreviations">7 Abbreviations</a>
 			</li>
 		</ol>
 		<h1 id="a1Installation">1 Installation</h1>
@@ -177,8 +177,14 @@
 					</li>
 				</ul>
 			</li>
-			<li>Copy the JDBC connector for your database to Shibboleth&#8217;s classpath. PrivacyLens itself already provides MySQL or HSQL JDBC connectors: <br /> 
-				<code>cp $PLENS_DIST$/lib/jdbc/optional/#jdbc-connector#.jar $SHIB_DIST$/lib</code>
+			<li>Copy the JDBC connector for your database to Shibboleth&#8217;s classpath. PrivacyLens itself already provides 
+				<a href="http://mysql.com">MySQL</a> or 
+				<a href="http://hsqldb.org">HSQL</a> JDBC connectors:
+				<ul>
+					<li>
+						<code>cp $PLENS_DIST$/lib/jdbc/optional/#jdbc-connector#.jar $SHIB_DIST$/lib</code>
+					</li>
+				</ul>
 			</li>
 		</ul>
 		<p>Ensure that only one version of each jar file is present in 
@@ -212,10 +218,10 @@
 			<p>The following database parameters are examples. Adapt the values as necessary. Choose a secure password.</p>
 		</blockquote>
 		<ul>
-			<li>Create a database with the name &#8222;PrivacyLens&#8221;.</li>
-			<li>Create a database user with the username &#8222;PrivacyLens&#8221; and password &#8222;secret&#8221;.</li>
+			<li>Create a database with the name &#8220;PrivacyLens&#8221;.</li>
+			<li>Create a database user with the username &#8220;PrivacyLens&#8221; and password &#8220;secret&#8221;.</li>
 			<li>Grant 
-				<code>INSERT, SELECT, UPDATE, DELETE</code> rights to user &#8222;PrivacyLens&#8221;.
+				<code>INSERT, SELECT, UPDATE, DELETE</code> rights to user &#8220;PrivacyLens&#8221;.
 			</li>
 			<li>Create the initial table structures using the schemas:
 				<ul>
@@ -339,10 +345,10 @@
 		<p>Customize 
 			<code>$SHIB_INSTALL$/conf/PrivacyLens.properties</code> according your database environment and required features. See inline documentation of PrivacyLens.properties for configuration options.
 		</p>
-		<p>In case you enable the &#8218;Terms of Use&#8217; module (disabled by default), you need to provide an appropriate text
+		<p>In case you enable the &#8216;Terms of Use&#8217; module (disabled by default), you need to provide an appropriate text
 			<br/>suitable for your organization.
 		</p>
-		<p>An example &#8218;Terms Of Use&#8217; HTML file can be found in 
+		<p>An example &#8216;Terms Of Use&#8217; HTML file can be found in 
 			<code>$PLENS_DIST$/manual/examples/terms-of-use.html</code>.
 		</p>
 		<ul>
@@ -482,7 +488,7 @@
 		<pre><pre>&lt;bean id="uApprove.touModule" ... p:compareContent="true" ...
 </pre></pre>
 		<h2 id="a4.6AuditLogging">4.6 Audit Logging</h2>
-		<p>PrivacyLens allows (faciliating the IDP&#8217;s audit log) to enable audit logging to 
+		<p>PrivacyLens can write into Shibboleth&#8217;s audit log at 
 			<code>$SHIB_INSTALL$/logs/idp-audit.log</code>.
 		</p>
 		<h3 id="EnableTermsOfUseAuditLog">Enable Terms Of Use Audit Log</h3>
@@ -530,7 +536,7 @@
 			<a href="mailto:privacylens@ece.cmu.edu">privacylens@ece.cmu.edu</a>. For bug reports, please use our 
 			<a href="https://github.com/cmu-cylab-privacylens/PrivacyLens/issues">issue tracking</a>.
 		</p>
-		<h1 id="a7Definitions">7 Definitions</h1>
+		<h1 id="a7Abbreviations">7 Abbreviations</h1>
 		<dl>
 			<dt>CSS</dt>
 			<dd>Cascading Style Sheet</dd>
