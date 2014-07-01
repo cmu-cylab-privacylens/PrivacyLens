@@ -180,6 +180,7 @@
                                 <wikitext-to-html markupLanguage="Textile"
                                     file="${basedir}/manual/manual.textile" htmlFilenameFormat="$1.html"
                                     formatOutput="true" emitDoctype="false" title="${project.name}-${project.version}">
+<markupLanguageConfiguration locale="en"/>
                                     <stylesheet url="style.css" />
                                 </wikitext-to-html>
                             </tasks>
