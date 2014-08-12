@@ -440,10 +440,10 @@ public final class IdPHelper {
         logger.info(auditLogEntry.toString());
     }
 
-    public static boolean strouckiFilter(final ShibbolethFilteringContext filterContext, final String attributeId,
+    public static boolean releaseFilter(final ShibbolethFilteringContext filterContext, final String attributeId,
             final String attributeValue) {
         // This is the part that does the actual filtering right now.
-        LOGGER.trace("strouckiFilter attributeId: {} attributeValue: {}", attributeId, attributeValue);
+        LOGGER.trace("releaseFilter attributeId: {} attributeValue: {}", attributeId, attributeValue);
         // edu.internet2.middleware.shibboleth.common.attribute.BaseAttribute foo =
         // filterContext.getUnfilteredAttributes().get(attributeId);
         final Session session = filterContext.getAttributeRequestContext().getUserSession();
@@ -462,7 +462,7 @@ public final class IdPHelper {
             // rpid = filterContext.getAttributeRequestContext().getRelyingPartyConfiguration().
             LOGGER.trace("rpid is " + rpid);
         } catch (final Exception e) {
-            LOGGER.error("strouckiFilter caught {}", e);
+            LOGGER.error("releaseFilter caught {}", e);
         }
 
         if (attributeReleaseModule == null) {
@@ -474,7 +474,7 @@ public final class IdPHelper {
         final List<Attribute> attributeList = Arrays.asList(uaAttribute);
         final boolean consentRequired = attributeReleaseModule.requiresConsent(principal, rpid, attributeList);
 
-        LOGGER.trace("strouckiFilter attributeID: {} consentRequired: {}", attributeId, consentRequired);
+        LOGGER.trace("releaseFilter attributeID: {} consentRequired: {}", attributeId, consentRequired);
         return !consentRequired;
         /*
          * filterContext.getServletContext().; ServletConfig servletConfig = new ServletConfig();
