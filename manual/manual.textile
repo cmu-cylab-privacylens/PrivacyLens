@@ -33,8 +33,7 @@ Ensure your installation of Shibboleth is working correctly.
 * Copy the jar files to Shibboleth's library directory:
 ** @cp $PLENS_DIST$/lib/*.jar $SHIB_DIST$/lib@
 ** @cp $PLENS_DIST$/lib/jdbc/*.jar $SHIB_DIST$/lib@
-* Copy the JDBC connector for your database to Shibboleth's classpath. PrivacyLens itself already provides "MySQL":http://mysql.com or "HSQL":http://hsqldb.org JDBC connectors:
-** @cp $PLENS_DIST$/lib/jdbc/optional/#jdbc-connector#.jar $SHIB_DIST$/lib@
+* Copy the JDBC connector for your database to Shibboleth's classpath. PrivacyLens itself already provides MySQL or HSQL JDBC connectors: <br /> @cp $PLENS_DIST$/lib/jdbc/optional/#jdbc-connector#.jar $SHIB_DIST$/lib@
 
 Ensure that only one version of each jar file is present in @$SHIB_DIST$/lib@.
 
@@ -44,6 +43,7 @@ Copy the configuration template to Shibboleth's configuration directory:
 
 * @cp $PLENS_DIST$/manual/configuration/PrivacyLens.properties $SHIB_INSTALL$/conf@
 * @cp $PLENS_DIST$/manual/configuration/PrivacyLens.xml $SHIB_INSTALL$/conf@
+* @cp $PLENS_DIST$/manual/configuration/spsetup.json $SHIB_INSTALL$/conf@
 
 h2. 1.5 PrivacyLens view templates
 
@@ -192,13 +192,69 @@ You should at the least copy your organization's logo to the file @$SHIB_DIST$/s
 You may also want to put your federation's logo to the file @$SHIB_DIST$/src/main/webapp/PrivacyLens/federation-logo.png@ (which is an empty placeholder logo by default).
 _(For the SWITCHaai federation, the logo is available at "http://www.switch.ch/aai/design/images/switchaai-logo.png":http://www.switch.ch/aai/design/images/switchaai-logo.png.)_
 
-h2. 2.4 Forcing Shibboleth to honor choices
+h2. 2.4 Configure Shibboleth to honor PrivacyLens choices
 
-XXXstroucki add this
+Configure the Identity Provider to query PrivacyLens for attribute release
+choices. Edit the file @$SHIB_INSTALL$/conf/attribute-filter.xml@ and make
+each AttributeFilterPolicy contain a PermitValueRule that will query
+PrivacyLens. The language used for the script is Javascript:
 
-h2. 2.5 Configuring the oracle
+bc.. <afp:PermitValueRule xsi:type="basic:Script" >
+    <basic:Script>
+        <![CDATA[
+            importPackage(Packages.edu.cmu.ece.PrivacyLens);
+            IdPHelper.releaseFilter(filterContext, attributeId, attributeValue);
+        ]]>
+    </basic:Script>
+</afp:PermitValueRule>
 
-XXXstroucki add this
+p. The return value of the last function called will determine the outcome
+of this rule. If the return value is true, the attribute will be released
+by the Identity Provider.
+
+h2. 2.5 Configuring the Oracle
+
+As there is currently no reliable transmission of requested and required
+attributes from a Service Provider when it refers a user to his home
+Identity Provider, PrivacyLens is currently referring to a configuration
+file to provide these details. Adjust @$SHIB_INSTALL$/conf/spsetup.json@
+to fit your environment. The file is in JSON(Javascript Object Notation)
+format.
+
+bc.. {
+  "attrs":[
+    {
+      "id":Attribute identifier within Shibboleth,
+      "desc":Human readable description of attribute
+    },
+    ...
+  ],
+  "SPs":[
+    {
+      "name":Human readable name of the Service Provider,
+      "id":Service Provider identifier within Shibboleth,
+      "attrGroups":[
+        {
+          "id":Attribute group identifier,
+          "description":Human readable description of attribute group,
+          "reason":HTML text describing reason for requesting the attribute group,
+          "privpolicy":HTML text with privacy policy for attribute group data
+        },
+        ...
+      ],
+      "attrs":[
+        {
+          "id":Attribute identifier within Shibboleth,
+          "reason":HTML text describing reason for requesting this attribute,
+          "privpolicy":HTML text with privacy policy for this attribute,
+          "required":Does the Service Provider require this attribute (true/false),
+          "group":Group this attribute with others by this attribute group identifier
+        },
+        ...
+      ]
+    }
+  ]
+}
 
 h2. 2.5 Deployment
 
