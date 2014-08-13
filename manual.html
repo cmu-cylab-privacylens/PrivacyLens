@@ -57,10 +57,10 @@
 						<a href="manual.html#a2.3CustomTemplates">2.3 Custom Templates</a>
 					</li>
 					<li>
-						<a href="manual.html#a2.4ForcingShibbolethtohonorchoices">2.4 Forcing Shibboleth to honor choices</a>
+						<a href="manual.html#a2.4ConfigureShibbolethtohonorPrivacyLenschoices">2.4 Configure Shibboleth to honor PrivacyLens choices</a>
 					</li>
 					<li>
-						<a href="manual.html#a2.5Configuringtheoracle">2.5 Configuring the oracle</a>
+						<a href="manual.html#a2.5ConfiguringtheOracle">2.5 Configuring the Oracle</a>
 					</li>
 					<li>
 						<a href="manual.html#a2.5Deployment">2.5 Deployment</a>
@@ -179,12 +179,8 @@
 			</li>
 			<li>Copy the JDBC connector for your database to Shibboleth&#8217;s classpath. PrivacyLens itself already provides 
 				<a href="http://mysql.com">MySQL</a> or 
-				<a href="http://hsqldb.org">HSQL</a> JDBC connectors:
-				<ul>
-					<li>
-						<code>cp $PLENS_DIST$/lib/jdbc/optional/#jdbc-connector#.jar $SHIB_DIST$/lib</code>
-					</li>
-				</ul>
+				<a href="http://hsqldb.org">HSQL</a> JDBC connectors: <br /> 
+				<code>cp $PLENS_DIST$/lib/jdbc/optional/#jdbc-connector#.jar $SHIB_DIST$/lib</code>
 			</li>
 		</ul>
 		<p>Ensure that only one version of each jar file is present in 
@@ -198,6 +194,9 @@
 			</li>
 			<li>
 				<code>cp $PLENS_DIST$/manual/configuration/PrivacyLens.xml $SHIB_INSTALL$/conf</code>
+			</li>
+			<li>
+				<code>cp $PLENS_DIST$/manual/configuration/spsetup.json $SHIB_INSTALL$/conf</code>
 			</li>
 		</ul>
 		<h2 id="a1.5PrivacyLensviewtemplates">1.5 PrivacyLens view templates</h2>
@@ -383,10 +382,73 @@
 				<a href="http://www.switch.ch/aai/design/images/switchaai-logo.png">http://www.switch.ch/aai/design/images/switchaai-logo.png</a>.)
 			</em>
 		</p>
-		<h2 id="a2.4ForcingShibbolethtohonorchoices">2.4 Forcing Shibboleth to honor choices</h2>
-		<p>XXXstroucki add this</p>
-		<h2 id="a2.5Configuringtheoracle">2.5 Configuring the oracle</h2>
-		<p>XXXstroucki add this</p>
+		<h2 id="a2.4ConfigureShibbolethtohonorPrivacyLenschoices">2.4 Configure Shibboleth to honor PrivacyLens choices</h2>
+		<p>Configure the Identity Provider to query PrivacyLens for attribute release
+			<br/>choices. Edit the file 
+			<code>$SHIB_INSTALL$/conf/attribute-filter.xml</code> and make
+			<br/>each AttributeFilterPolicy contain a PermitValueRule that will query
+			<br/>PrivacyLens. The language used for the script is Javascript:
+		</p>
+		<pre><pre>&lt;afp:PermitValueRule xsi:type="basic:Script" >
+    &lt;basic:Script>
+        &lt;![CDATA[
+            importPackage(Packages.edu.cmu.ece.PrivacyLens);
+            IdPHelper.releaseFilter(filterContext, attributeId, attributeValue);
+        ]]>
+    &lt;/basic:Script>
+&lt;/afp:PermitValueRule>
+
+</pre></pre>
+		<p>The return value of the last function called will determine the outcome
+			<br/>of this rule. If the return value is true, the attribute will be released
+			<br/>by the Identity Provider.
+		</p>
+		<h2 id="a2.5ConfiguringtheOracle">2.5 Configuring the Oracle</h2>
+		<p>As there is currently no reliable transmission of requested and required
+			<br/>attributes from a Service Provider when it refers a user to his home
+			<br/>Identity Provider, PrivacyLens is currently referring to a configuration
+			<br/>file to provide these details. Adjust 
+			<code>$SHIB_INSTALL$/conf/spsetup.json</code>
+			<br/>to fit your environment. The file is in 
+			<acronym title="Javascript Object Notation">JSON</acronym>
+			<br/>format.
+		</p>
+		<pre><pre>{
+  "attrs":[
+    {
+      "id":Attribute identifier within Shibboleth,
+      "desc":Human readable description of attribute
+    },
+    ...
+  ],
+  "SPs":[
+    {
+      "name":Human readable name of the Service Provider,
+      "id":Service Provider identifier within Shibboleth,
+      "attrGroups":[
+        {
+          "id":Attribute group identifier,
+          "description":Human readable description of attribute group,
+          "reason":HTML text describing reason for requesting the attribute group,
+          "privpolicy":HTML text with privacy policy for attribute group data
+        },
+        ...
+      ],
+      "attrs":[
+        {
+          "id":Attribute identifier within Shibboleth,
+          "reason":HTML text describing reason for requesting this attribute,
+          "privpolicy":HTML text with privacy policy for this attribute,
+          "required":Does the Service Provider require this attribute (true/false),
+          "group":Group this attribute with others by this attribute group identifier
+        },
+        ...
+      ]
+    }
+  ]
+}
+
+</pre></pre>
 		<h2 id="a2.5Deployment">2.5 Deployment</h2>
 		<p>To activate PrivacyLens, Shibboleth must be re-deployed:</p>
 		<pre><pre>cd $SHIB_DIST$
@@ -542,6 +604,8 @@
 			<dd>Cascading Style Sheet</dd>
 			<dt>JDBC</dt>
 			<dd>Java Database Connectivity</dd>
+			<dt>JSON</dt>
+			<dd>Javascript Object Notation</dd>
 			<dt>JSP</dt>
 			<dd>Java Server Pages</dd>
 		</dl>
