@@ -33,7 +33,7 @@ Ensure your installation of Shibboleth is working correctly.
 * Copy the jar files to Shibboleth's library directory:
 ** @cp $PLENS_DIST$/lib/*.jar $SHIB_DIST$/lib@
 ** @cp $PLENS_DIST$/lib/jdbc/*.jar $SHIB_DIST$/lib@
-* Copy the JDBC connector for your database to Shibboleth's classpath. PrivacyLens itself already provides MySQL or HSQL JDBC connectors: <br /> @cp $PLENS_DIST$/lib/jdbc/optional/#jdbc-connector#.jar $SHIB_DIST$/lib@
+* Copy the JDBC connector for your database to Shibboleth's classpath. PrivacyLens itself already provides "MySQL":http://mysql.com or "HSQL":http://hsqldb.org JDBC connectors: <br /> @cp $PLENS_DIST$/lib/jdbc/optional/#jdbc-connector#.jar $SHIB_DIST$/lib@
 
 Ensure that only one version of each jar file is present in @$SHIB_DIST$/lib@.
 
