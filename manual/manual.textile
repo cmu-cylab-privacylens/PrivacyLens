@@ -88,7 +88,7 @@ bc..
     
     <filter>
         <filter-name>PrivacyLens</filter-name>
-        <filter-class>cmu.edu.ece.PrivacyLens.Intercepter</filter-class>
+        <filter-class>edu.cmu.ece.PrivacyLens.Intercepter</filter-class>
     </filter>
 
     <filter-mapping>
