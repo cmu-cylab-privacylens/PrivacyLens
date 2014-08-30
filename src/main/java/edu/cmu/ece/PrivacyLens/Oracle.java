@@ -117,7 +117,7 @@ public class Oracle {
                             if (name1.equals("name") || name1.equals("id")) {
                                 final String value = reader.nextString();
                                 spmap.put(name1, value);
-                                logger.debug("SP map {} -> {}", name1, value);
+                                logger.debug("SP map {} -> {}.", name1, value);
                             }
                             if (name1.equals("attrGroups")) {
                                 final List<Map> grouplist1 = new ArrayList<Map>();
