@@ -108,8 +108,9 @@ public class Oracle {
 
                 if (name.equals("SPs")) {
                     reader.beginArray();
-                    final Map<String, Object> spmap = new HashMap<String, Object>();
+                    Map<String, Object> spmap;
                     while (reader.hasNext()) {
+                        spmap = new HashMap<String, Object>();
                         reader.beginObject();
                         while (reader.hasNext()) {
                             final String name1 = reader.nextName();
@@ -214,7 +215,7 @@ public class Oracle {
             }
 
         }
-        logger.warn("No service provider known by id {}", url);
+        logger.warn("No service provider known by id {}.", url);
         return "UNKNOWN";
     }
 
