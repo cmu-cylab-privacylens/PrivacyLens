@@ -56,7 +56,7 @@ public class ToggleBeanTest {
         return bean;
     }
 
-    /** Test. */
+    /** Test whether a toggle set to true works */
     @Test
     public void testTrue() {
         final ToggleBean bean = buildBase();
@@ -74,7 +74,7 @@ public class ToggleBeanTest {
         }
     }
 
-    /** Test. */
+    /** Test whether a toggle set to false works */
     @Test
     public void testFalse() {
         final ToggleBean bean = buildBase();
@@ -92,7 +92,7 @@ public class ToggleBeanTest {
         }
     }
 
-    /** Test. */
+    /** Test whether an immutable toggle set to true works. */
     @Test
     public void testImmuTrue() {
         final ToggleBean bean = buildBase();
@@ -109,7 +109,7 @@ public class ToggleBeanTest {
         }
     }
 
-    /** Test. */
+    /** Test whether an immutable toggle set to false works. */
     @Test
     public void testImmuFalse() {
         final ToggleBean bean = buildBase();
