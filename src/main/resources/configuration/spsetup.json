@@ -1,68 +1,140 @@
 {
-  "attrs":[
-    {
-      "id":"eduPersonPrincipalName",
-      "desc":"Andrew ID"
-    },
-    {
-      "id":"eduPersonPrimaryAffiliation",
-      "desc":"CMU affiliation"
-    },
-    {
-      "id":"eduPersonEntitlement",
-      "desc":"credentials to access CMU services"
-    },
-    {
-      "id":"sn",
-      "desc":"surname"
-    },
-    {
-      "id":"cn",
-      "desc":"full name"
-    }
-  ],
-  "SPs":[
-    {
-      "name":"CMU's Calendar",
-      "id":"https://scalepriv.ece.cmu.edu/shibboleth",
-      "attrGroups":[
-        {
-          "id":"GroupName",
-          "description":"name",
-          "reason":"CMU's Calendar is asking for your <b>name</b> in order to personalize your calendar.",
-          "privpolicy":"CMU's Calendar will not use your name for any other purpose, and will not keep this information after you close the calendar window."
-        }
-      ],
-      "attrs":[
-        {
-          "id":"eduPersonPrincipalName",
-          "reason":"CMU's Calendar needs your <b>Andrew ID</b> in order to display the correct calendar information. CMU's Calendar cannot function properly if an Andrew ID is not supplied.",
-          "privpolicy":"CMU's Calendar will not use your Andrew ID for any other purpose, and will not keep this information after you close the calendar window.",
-          "required":"true"
-        },
-        {
-          "id":"eduPersonEntitlement",
-          "reason":"CMU's Calendar is asking for your <b>credentials to access CMU services</b>. This information is not necessary for CMU's Calendar to function, and CMU does not know whether or how it will be used.",
-          "privpolicy":"CMU does not know how long CMU's Calendar will keep this information."
-        },
-        {
-          "id":"eduPersonPrimaryAffiliation",
-          "reason":"CMU's Calendar is asking for your <b>CMU affiliation</b>. This information is not necessary for CMU's Calendar to function, and CMU does not know whether or how it will be used.",
-          "privpolicy":"CMU does not know how long CMU's Calendar will keep this information."
-        },
-        {
-          "id":"sn",
-          "reason":"CMU's Calendar is asking for your <b>surname</b> in order to personalize your calendar.",
-          "privpolicy":"CMU's Calendar will not use your surname for any other purpose, and will not keep this information after you close the calendar window.",
-          "group":"GroupName"
-        },
-        {
-          "id":"cn",
-          "reason":"CMU's Calendar is asking for your <b>full name</b> in order to personalize your calendar.",
-          "privpolicy":"CMU's Calendar will not use your full name for any other purpose, and will not keep this information after you close the calendar window.",
-          "group":"GroupName"
-        }
-      ]
-    }
-  ]
+   "SPs" : [
+      {
+         "attrGroups" : [
+            {
+               "id" : "GroupName",
+               "privpolicy" : "CMU's Calendar will not use your name for any other purpose, and will not keep this information after you close the calendar window.",
+               "reason" : "CMU's Calendar is asking for your <b>name</b> in order to personalize your calendar.",
+               "description" : "name"
+            }
+         ],
+         "attrs" : [
+            {
+               "privpolicy" : "CMU's Calendar will not use your Andrew ID for any other purpose, and will not keep this information after you close the calendar window.",
+               "required" : "true",
+               "id" : "eduPersonPrincipalName",
+               "reason" : "CMU's Calendar needs your <b>Andrew ID</b> in order to display the correct calendar information. CMU's Calendar cannot function properly if an Andrew ID is not supplied."
+            },
+            {
+               "reason" : "CMU's Calendar is asking for your <b>credentials to access CMU services</b>. This information is not necessary for CMU's Calendar to function, and CMU does not know whether or how it will be used.",
+               "privpolicy" : "CMU does not know how long CMU's Calendar will keep this information.",
+               "id" : "eduPersonEntitlement"
+            },
+            {
+               "privpolicy" : "CMU does not know how long CMU's Calendar will keep this information.",
+               "id" : "mail",
+               "reason" : "CMU's Calendar is asking for your <b>email address</b>. This information is not necessary for CMU's Calendar to function, and CMU does not know whether or how it will be used."
+            },
+            {
+               "reason" : "CMU's Calendar is asking for your <b>CMU affiliation</b>. This information is not necessary for CMU's Calendar to function, and CMU does not know whether or how it will be used.",
+               "privpolicy" : "CMU does not know how long CMU's Calendar will keep this information.",
+               "id" : "eduPersonScopedAffiliation"
+            },
+            {
+               "reason" : "CMU's Calendar is asking for your <b>surname</b> in order to personalize your calendar.",
+               "group" : "GroupName",
+               "privpolicy" : "CMU's Calendar will not use your surname for any other purpose, and will not keep this information after you close the calendar window.",
+               "id" : "sn"
+            },
+            {
+               "reason" : "CMU's Calendar is asking for your <b>given name</b> in order to personalize your calendar.",
+               "group" : "GroupName",
+               "privpolicy" : "CMU's Calendar will not use your given name for any other purpose, and will not keep this information after you close the calendar window.",
+               "id" : "givenName"
+            },
+            {
+               "id" : "displayName",
+               "privpolicy" : "CMU's Calendar will not use your full name for any other purpose, and will not keep this information after you close the calendar window.",
+               "group" : "GroupName",
+               "reason" : "CMU's Calendar is asking for your <b>full name</b> in order to personalize your calendar."
+            }
+         ],
+         "name" : "CMU's Calendar",
+         "id" : "https://scalepriv.ece.cmu.edu/shibboleth"
+      },
+      {
+         "name" : "CMU's Calendar",
+         "id" : "DEFAULT",
+         "attrGroups" : [
+            {
+               "description" : "name",
+               "reason" : "The site is asking for your <b>name</b>.",
+               "id" : "GroupName",
+               "privpolicy" : "The site's privacy policy is unknown."
+            }
+         ],
+         "attrs" : [
+            {
+               "reason" : "The site is asking for your <b>Andrew ID</b>. The site cannot function properly if an Andrew ID is not supplied.",
+               "id" : "eduPersonPrincipalName",
+               "required" : "true",
+               "privpolicy" : "The site's privacy policy is unknown."
+            },
+            {
+               "reason" : "The site is asking for your <b>credentials to access CMU services</b>. This information is not necessary for the site to function, and CMU does not know whether or how it will be used.",
+               "privpolicy" : "The site's privacy policy is unknown.",
+               "id" : "eduPersonEntitlement"
+            },
+            {
+               "id" : "mail",
+               "privpolicy" : "The site's privacy policy is unknown.",
+               "reason" : "The site is asking for your <b>email address</b>. This information is not necessary for the site to function, and CMU does not know whether or how it will be used."
+            },
+            {
+               "privpolicy" : "The site's privacy policy is unknown.",
+               "id" : "eduPersonScopedAffiliation",
+               "reason" : "The site is asking for your <b>CMU affiliation</b>. This information is not necessary for the site to function, and CMU does not know whether or how it will be used."
+            },
+            {
+               "reason" : "The site is asking for your <b>surname</b>.",
+               "group" : "GroupName",
+               "id" : "sn",
+               "privpolicy" : "The site's privacy policy is unknown."
+            },
+            {
+               "id" : "givenName",
+               "privpolicy" : "The site's privacy policy is unknown.",
+               "group" : "GroupName",
+               "reason" : "The site is asking for your <b>given name</b>."
+            },
+            {
+               "privpolicy" : "The site's privacy policy is unknown.",
+               "id" : "displayName",
+               "group" : "GroupName",
+               "reason" : "The site is asking for your <b>full name</b>."
+            }
+         ]
+      }
+   ],
+   "attrs" : [
+      {
+         "desc" : "Andrew ID",
+         "id" : "eduPersonPrincipalName"
+      },
+      {
+         "id" : "sn",
+         "desc" : "surname"
+      },
+      {
+         "desc" : "given name",
+         "id" : "givenName"
+      },
+      {
+         "desc" : "full name",
+         "id" : "displayName"
+      },
+      {
+         "desc" : "email address",
+         "id" : "mail"
+      },
+      {
+         "id" : "eduPersonScopedAffiliation",
+         "desc" : "CMU affiliation"
+      },
+      {
+         "desc" : "credentials to access CMU services",
+         "id" : "eduPersonEntitlement"
+      }
+   ]
 }
