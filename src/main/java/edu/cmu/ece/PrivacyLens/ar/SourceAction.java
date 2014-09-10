@@ -40,7 +40,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 
 import edu.cmu.ece.PrivacyLens.Action;
 import edu.cmu.ece.PrivacyLens.HTMLUtils;
@@ -216,8 +215,7 @@ public class SourceAction implements Action {
                 }
             }
 
-            final String subValuesText = StringUtils.collectionToDelimitedString(subValues, ", ");
-
+            final String subValuesText = Util.listToString(subValues);
             stringBuilder.append("Your " + description + " includes the items (");
             stringBuilder.append(subValuesText);
             stringBuilder.append("). ");
