@@ -170,12 +170,14 @@ public class SAMLHelper {
         for (final BaseAttribute<?> baseAttribute : baseAttributes.values()) {
 
             // consider requested == required
-            boolean required = requestedAttributes.contains(baseAttribute.getId());
+            final boolean required = requestedAttributes.contains(baseAttribute.getId());
 
             // XXX demo make eppn required
+            /*
             if (baseAttribute.getId().equals("eduPersonPrincipalName")) {
                 required = true;
             }
+            */
 
             final List<String> attributeValues = new ArrayList<String>();
             for (final Object valueObj : baseAttribute.getValues()) {
