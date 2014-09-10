@@ -326,7 +326,7 @@ public final class Util {
             return "(nothing)";
         }
         if (size == 1) {
-            return in.get(1);
+            return in.get(0);
         }
 
         final String lastItem = in.remove(size - 1);
