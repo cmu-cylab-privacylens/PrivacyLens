@@ -46,7 +46,7 @@ import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 
 /**
- *
+ * This class holds a lot of unchanging data, perhaps some of it should be cached.
  */
 public class Oracle {
 
@@ -219,6 +219,42 @@ public class Oracle {
         return "UNKNOWN";
     }
 
+    /**
+     * @param spId Service Provider ID
+     * @param in candidate Group ID
+     * @return whether the candidate ID identifies a group.
+     */
+    public boolean isAttrGroup(final String spId, final String in) {
+        final Map<String, Map> map = getAttributeGroupRequested(spId);
+        if (map.get(in) != null) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @param spId Service Provider ID
+     * @param groupId Attribute Group ID
+     * @return list of attribute ids
+     */
+    public List<String> getAttributeGroupMembers(final String spId, final String groupId) {
+        // isAttrGroup?
+        final List<String> out = new ArrayList();
+        for (final Map<String, Object> sp : spList) {
+            if (sp.get("id").equals(spId)) {
+                final List<Map> attrGroupList = (List<Map>) sp.get("attrGroups");
+                for (final Map<String, String> attrmap : attrGroupList) {
+                    out.add(attrmap.get("id"));
+                }
+            }
+        }
+        return out;
+    }
+
+    /**
+     * @param spId Service Provider ID
+     * @return map of group id -> (map of k -> v))
+     */
     public Map<String, Map> getAttributeGroupRequested(final String spId) {
         final Map<String, Map> out = new HashMap();
         for (final Map<String, Object> sp : spList) {
@@ -232,6 +268,10 @@ public class Oracle {
         return out;
     }
 
+    /**
+     * @param spId Service Provider ID
+     * @return map of attribute id -> (map of k -> v))
+     */
     public Map<String, Map> getAttributeRequested(final String spId) {
         final Map<String, Map> out = new HashMap();
         for (final Map<String, Object> sp : spList) {
@@ -245,6 +285,10 @@ public class Oracle {
         return out;
     }
 
+    /**
+     * @param spId Service Provider ID
+     * @return map of attribute id -> whether attribute is required
+     */
     public Map<String, Boolean> getAttributeRequired(final String spId) {
         final Map<String, Boolean> out = new HashMap();
         for (final Map<String, Object> sp : spList) {
@@ -258,13 +302,18 @@ public class Oracle {
                     if (!(required.equals("true") || required.equals("false"))) {
                         logger.error("Interpreting {} as false", required);
                     }
-                    out.put(attrmap.get("id"), required.equals("true"));
+                    final boolean isRequired = required.equals("true");
+                    out.put(attrmap.get("id"), isRequired);
                 }
             }
         }
         return out;
     }
 
+    /**
+     * @param spId Service Provider ID
+     * @return map of attribute id -> privacy policy
+     */
     public Map<String, String> getAttributePrivacy(final String spId) {
         final Map<String, String> out = new HashMap();
         for (final Map<String, Object> sp : spList) {
@@ -278,6 +327,10 @@ public class Oracle {
         return out;
     }
 
+    /**
+     * @param spId Service Provider ID
+     * @return map of attribute id -> request reason
+     */
     public Map<String, String> getAttributeReason(final String spId) {
         final Map<String, String> out = new HashMap();
         for (final Map<String, Object> sp : spList) {
@@ -292,14 +345,14 @@ public class Oracle {
     }
 
     /**
-     * @return
+     * @return IdP user name
      */
     public String getUserName() {
         return userName;
     }
 
     /**
-     * @param relyingPartyId
+     * @param relyingPartyId Service Provider ID
      */
     public void setRelyingPartyId(final String relyingPartyId) {
         logger.debug("setRelyingPartyId: {}", relyingPartyId);
@@ -307,7 +360,7 @@ public class Oracle {
     }
 
     /**
-     * @param userName
+     * @param userName IdP user name
      */
     public void setUserName(final String userName) {
         logger.debug("setUserName: {}", userName);

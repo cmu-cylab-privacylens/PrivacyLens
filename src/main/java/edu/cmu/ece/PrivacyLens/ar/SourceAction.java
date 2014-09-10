@@ -40,11 +40,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 import edu.cmu.ece.PrivacyLens.Action;
+import edu.cmu.ece.PrivacyLens.HTMLUtils;
 import edu.cmu.ece.PrivacyLens.IdPHelper;
 import edu.cmu.ece.PrivacyLens.Oracle;
-import edu.cmu.ece.PrivacyLens.HTMLUtils;
 import edu.cmu.ece.PrivacyLens.ToggleBean;
 import edu.cmu.ece.PrivacyLens.Util;
 import edu.cmu.ece.PrivacyLens.config.General;
@@ -56,8 +57,7 @@ public class SourceAction implements Action {
     /** Class logger. */
     private final Logger logger = LoggerFactory.getLogger(SourceAction.class);
 
-    private final String emailAdminBoilerText = HTMLUtils.getEmailAdminBoilerText(General.getInstance()
-            .getAdminMail());
+    private final String emailAdminBoilerText = HTMLUtils.getEmailAdminBoilerText(General.getInstance().getAdminMail());
 
     private String requestContextPath;
 
@@ -197,25 +197,31 @@ public class SourceAction implements Action {
                 stringBuilder.append("Your " + attribute.getDescription() + " is " + '"' + attribute.getValues().get(0)
                         + "\". ");
             }
-            */
-            // XXX bad hardcode
-            String cn = "unset";
-            String sn = "unset";
-            if (groupId.equals("GroupName")) {
+             */
+            final List<String> subValues = new ArrayList<String>();
+
+            // this is annoying. we have attribute definitions from the oracle
+            // but we have to look through the actual attribute values.
+
+            for (final String attrName : attrList) {
                 for (final Attribute attr : attributes) {
-                    if (attr.getId().equals("cn")) {
-                        cn = attr.getValues().get(0);
-                    }
-                    if (attr.getId().equals("sn")) {
-                        sn = attr.getValues().get(0);
+                    if (attr.getId().equals(attrName)) {
+                        try {
+                            final String attrValue = attr.getValues().get(0);
+                            subValues.add(attr.getValues().get(0));
+                        } catch (final IndexOutOfBoundsException x) {
+                            subValues.add("[blank]");
+                        }
                     }
                 }
-                stringBuilder.append("Your " + description + " includes your full name (");
-                stringBuilder.append(cn);
-                stringBuilder.append(") and surname (");
-                stringBuilder.append(sn);
-                stringBuilder.append("). ");
             }
+
+            final String subValuesText = StringUtils.collectionToDelimitedString(subValues, ", ");
+
+            stringBuilder.append("Your " + description + " includes the items (");
+            stringBuilder.append(subValuesText);
+            stringBuilder.append("). ");
+
             stringBuilder.append("If you continue to " + oracle.getServiceName() + ", your " + description + " will ");
             stringBuilder.append(value ? "" : "not");
             stringBuilder.append(" be sent to it. Use the toggle switch to change this setting.");
@@ -238,13 +244,11 @@ public class SourceAction implements Action {
                 stringBuilder.append(attribute.getValues().get(0));
                 stringBuilder.append("</b>)");
             }
-            */
-            // XXX bad hardcode
-            if (groupId.equals("GroupName")) {
-                stringBuilder.append(" (<b>");
-                stringBuilder.append(cn);
-                stringBuilder.append("</b>)");
-            }
+             */
+
+            stringBuilder.append(" (<b>");
+            stringBuilder.append(subValuesText);
+            stringBuilder.append("</b>)");
 
             if (required) {
                 stringBuilder.append('*');
@@ -333,9 +337,8 @@ public class SourceAction implements Action {
                 logger.debug("No reminder due");
                 // make entry in login database
                 final Oracle oracle = Oracle.getInstance();
-                // XXX bad hardcode
-                attributeReleaseModule.addLogin(principalName, oracle.getServiceName(),
-                        "https://scalepriv.ece.cmu.edu/shibboleth", timestamp, attributes);
+                attributeReleaseModule.addLogin(principalName, oracle.getServiceName(), relyingPartyId, timestamp,
+                        attributes);
                 return "sink";
             }
 

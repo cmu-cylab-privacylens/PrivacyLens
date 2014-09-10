@@ -81,6 +81,9 @@ public class EntryAction implements Action {
         final String relyingPartyId = IdPHelper.getRelyingPartyId(servletContext, request);
         final List<Attribute> attributes = IdPHelper.getAttributes(servletContext, request);
 
+        final Oracle oracle = Oracle.getInstance();
+        final Map<String, Map> attrGroups = oracle.getAttributeGroupRequested(relyingPartyId);
+
         final boolean generalConsent = attributeReleaseModule.isAllowGeneralConsent();
 
         // if (allowAlwaysButton && generalConsent) {
@@ -98,15 +101,15 @@ public class EntryAction implements Action {
             final String param = (String) e.nextElement();
             if (param.startsWith("input-")) {
                 logger.debug("Processing parameter {}", param);
-                final String attributeName = (param.split("^input-"))[1];
+                final String inputName = (param.split("^input-"))[1];
                 final boolean setting = request.getParameter(param).equals("1") ? true : false;
-                // XXX bad hardcode
-                // for (attribute : group)
-                if (attributeName.equals("GroupName")) {
-                    consentByAttribute.put("cn", setting);
-                    consentByAttribute.put("sn", setting);
+                if (oracle.isAttrGroup(relyingPartyId, inputName)) {
+                    final List<String> groupMembers = oracle.getAttributeGroupMembers(relyingPartyId, inputName);
+                    for (final String group : groupMembers) {
+                        consentByAttribute.put(group, setting);
+                    }
                 } else {
-                    consentByAttribute.put(attributeName, setting);
+                    consentByAttribute.put(inputName, setting);
                 }
             }
         }
@@ -130,10 +133,8 @@ public class EntryAction implements Action {
             attributeReleaseModule.consentAttributeRelease(principalName, relyingPartyId, attributes);
 
             // make entry in login database
-            final Oracle oracle = Oracle.getInstance();
-            // XXX bad hardcode
-            attributeReleaseModule.addLogin(principalName, oracle.getServiceName(),
-                    "https://scalepriv.ece.cmu.edu/shibboleth", timestamp, attributes);
+            attributeReleaseModule.addLogin(principalName, oracle.getServiceName(), relyingPartyId, timestamp,
+                    attributes);
             return "sink";
         }
 

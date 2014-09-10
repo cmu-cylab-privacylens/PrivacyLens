@@ -62,6 +62,8 @@ public class ReminderAction implements Action {
         final ServletContext servletContext = Util.servletContext;
         final AttributeReleaseModule attributeReleaseModule = IdPHelper.attributeReleaseModule;
         final String principalName = IdPHelper.getPrincipalName(servletContext, request);
+        final String relyingPartyId = IdPHelper.getRelyingPartyId(servletContext, request);
+
         // this timestamp will describe this transaction
         final DateTime timestamp = new DateTime();
 
@@ -75,9 +77,8 @@ public class ReminderAction implements Action {
         if (yesButton) {
             // make entry in login database
             final Oracle oracle = Oracle.getInstance();
-            // XXX bad hardcode
-            attributeReleaseModule.addLogin(principalName, oracle.getServiceName(),
-                    "https://scalepriv.ece.cmu.edu/shibboleth", timestamp, attributes);
+            attributeReleaseModule.addLogin(principalName, oracle.getServiceName(), relyingPartyId, timestamp,
+                    attributes);
             return "sink";
         }
 
