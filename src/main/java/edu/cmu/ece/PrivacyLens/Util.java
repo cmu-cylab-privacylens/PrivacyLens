@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -96,7 +97,7 @@ public final class Util {
      * Converts a whitespace separated list into a list of Strings.
      * 
      * @param string The list.
-     * @return Returns a list of Strings.
+     * @return Returns an _unmodifiable_ list of Strings.
      */
     public static List<String> stringToList(final String string) {
         final String input = StringUtils.trimToEmpty(string);
@@ -320,20 +321,22 @@ public final class Util {
      * @return String
      */
     public static String listToString(final List<String> in) {
-        final int size = in.size();
+        // Don't modify the list provided, create new one
+        final List<String> list = new LinkedList<String>(in);
+        final int size = list.size();
 
         if (size == 0) {
             return "(nothing)";
         }
         if (size == 1) {
-            return in.get(0);
+            return list.get(0);
         }
 
-        final String lastItem = in.remove(size - 1);
+        final String lastItem = list.remove(size - 1);
 
         final StringBuilder sb = new StringBuilder();
         String delim = "";
-        for (final String i : in) {
+        for (final String i : list) {
             sb.append(delim).append(i);
             delim = ", ";
         }
