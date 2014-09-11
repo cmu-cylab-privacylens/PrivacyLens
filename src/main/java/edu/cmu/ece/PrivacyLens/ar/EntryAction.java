@@ -106,6 +106,7 @@ public class EntryAction implements Action {
                 if (oracle.isAttrGroup(relyingPartyId, inputName)) {
                     final List<String> groupMembers = oracle.getAttributeGroupMembers(relyingPartyId, inputName);
                     for (final String group : groupMembers) {
+                        logger.debug("Group member {} setting {}", group, setting);
                         consentByAttribute.put(group, setting);
                     }
                 } else {
