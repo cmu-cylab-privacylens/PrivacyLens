@@ -240,14 +240,34 @@ public class Oracle {
     public List<String> getAttributeGroupMembers(final String spId, final String groupId) {
         // isAttrGroup?
         final List<String> out = new ArrayList();
+        if (!isAttrGroup(spId, groupId)) {
+            return out;
+        }
+
+        Map<String, Object> spData = null;
         for (final Map<String, Object> sp : spList) {
+            logger.trace("sp id: {}", sp.get("id"));
             if (sp.get("id").equals(spId)) {
-                final List<Map> attrGroupList = (List<Map>) sp.get("attrGroups");
-                for (final Map<String, String> attrmap : attrGroupList) {
-                    out.add(attrmap.get("id"));
-                }
+                spData = sp;
+                break;
             }
         }
+
+        if (spData == null) {
+            return out;
+        }
+
+        final List<Map> attrList = (List<Map>) spData.get("attrs");
+        for (final Map<String, String> attrMap : attrList) {
+            final String thisGroupId = attrMap.get("group");
+            logger.trace("checking id: {}", attrMap.get("id"));
+            if (thisGroupId == null || !thisGroupId.equals(groupId)) {
+                continue;
+            }
+            logger.trace("attr id: {} is member of: {}", attrMap.get("id"), groupId);
+            out.add(attrMap.get("id"));
+        }
+
         return out;
     }
 
