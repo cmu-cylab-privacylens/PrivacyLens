@@ -115,7 +115,6 @@ public class AttributeReleaseServlet extends HttpServlet {
             // may be done in SourceAction already
             oracle.setUserName(IdPHelper.getPrincipalName(servletContext, request));
             oracle.setRelyingPartyId(relyingPartyId);
-            context.put("service", oracle.getServiceName());
             context.put("adminUrl", General.getInstance().getAdminUrl());
             context.put("adminMail", General.getInstance().getAdminMail());
 
@@ -124,16 +123,15 @@ public class AttributeReleaseServlet extends HttpServlet {
             final Map<String, String> attributeReason = oracle.getAttributeReason(relyingPartyId);
             final Map<String, String> attributePrivacy = oracle.getAttributePrivacy(relyingPartyId);
             final Map<String, Boolean> attributeRequired = oracle.getAttributeRequired(relyingPartyId);
+            final String serviceName = oracle.getServiceName();
 
             //context.put("remoteAttributeReason", attributeReason);
             //context.put("remoteAttributePrivacy", attributePrivacy);
             //context.put("remoteAttributeRequired", attributeRequired);
 
-            context.put(
-                    "requirementStatement",
-                    "Use the toggle switches to select the items that will be sent to "
-                            + (String) context.get("service")
-                            + ". Items marked with * are required to access and personalize the calendar and cannot be unselected.");
+            context.put("requirementStatement", "Use the toggle switches to select the items that will be sent to "
+                    + serviceName + ". Items marked with * are required to access and personalize " + serviceName
+                    + " and cannot be unselected.");
             context.put("relyingParty", samlHelper.readRelyingParty(relyingPartyId, viewHelper.selectLocale(request)));
             context.put("allowDenyRequired", false);
 
