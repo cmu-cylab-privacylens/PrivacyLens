@@ -66,6 +66,100 @@ public class Oracle {
 
     private List<Map> groupList;
 
+    private class OracleData {
+        private ServiceProviderData[] SPs;
+
+        private OracleData() {
+        }
+
+        public OracleData(final ServiceProviderData[] SPs) {
+            this.SPs = SPs;
+        }
+    }
+
+    private class ServiceProviderData {
+        private AttributeData[] attrs;
+
+        private AttributeGroupData[] attrGroups;
+
+        private String name;
+
+        private String id;
+
+        private transient boolean hasAttrGroups;
+
+        private ServiceProviderData() {
+        }
+
+        public ServiceProviderData(final String id, final String name, final AttributeData[] attrs) {
+            this.id = id;
+            this.name = name;
+            this.attrs = attrs;
+            this.hasAttrGroups = false;
+        }
+
+        public ServiceProviderData(final String id, final String name, final AttributeData[] attrs,
+                final AttributeGroupData[] attrGroups) {
+            this.id = id;
+            this.name = name;
+            this.attrs = attrs;
+            this.attrGroups = attrGroups;
+            this.hasAttrGroups = true;
+        }
+
+    }
+
+    private class AttributeData {
+        private String reason;
+
+        private String privpolicy;
+
+        private String group;
+
+        private String id;
+
+        private transient boolean hasGroup;
+
+        private AttributeData() {
+        }
+
+        public AttributeData(final String id, final String reason, final String privpolicy) {
+            this.id = id;
+            this.reason = reason;
+            this.privpolicy = privpolicy;
+            hasGroup = false;
+        }
+
+        public AttributeData(final String id, final String reason, final String privpolicy, final String group) {
+            this.id = id;
+            this.reason = reason;
+            this.privpolicy = privpolicy;
+            this.group = group;
+            hasGroup = true;
+        }
+    }
+
+    private class AttributeGroupData {
+        private String reason;
+
+        private String description;
+
+        private String privpolicy;
+
+        private String id;
+
+        private AttributeGroupData() {
+        }
+
+        public AttributeGroupData(final String id, final String description, final String reason,
+                final String privpolicy) {
+            this.id = id;
+            this.description = description;
+            this.reason = reason;
+            this.privpolicy = privpolicy;
+        }
+    }
+
     /**
      * Constructor, make singleton
      */
@@ -100,7 +194,14 @@ public class Oracle {
 
         try {
             final InputStream in = configResource.getInputStream();
+            in.mark(Integer.MAX_VALUE);
+            final JsonReader readerTest = new JsonReader(new InputStreamReader(in, "UTF-8"));
+            final OracleData x = gson.fromJson(readerTest, OracleData.class);
+            //readerTest.close();
+            logger.debug("OracleData JSON: {}", gson.toJson(x));
+            in.reset();
             final JsonReader reader = new JsonReader(new InputStreamReader(in, "UTF-8"));
+
             final Map<String, Object> elements = new HashMap<String, Object>();
             reader.beginObject();
             while (reader.hasNext()) {
