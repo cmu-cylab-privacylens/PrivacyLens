@@ -231,7 +231,7 @@ public class Intercepter implements Filter {
             attributeReleaseModule.clearChoice(principalName, relyingPartyId);
         }
 
-        if (true || attributeReleaseModule.requiresConsent(principalName, relyingPartyId, attributes)) {
+        if (attributeReleaseModule.requiresConsent(principalName, relyingPartyId, attributes)) {
             IdPHelper.setAttributes(servletContext, request, attributes);
 
             if (IdPHelper.isPassiveRequest(servletContext, request)) {
@@ -250,7 +250,8 @@ public class Intercepter implements Filter {
 
     /** {@inheritDoc} */
     public void destroy() {
-        // we seem to have leakage issues with tomcat. or is it shibboleth?
+        // we seem to have leakage issues with shibboleth:
+        // WARNING: The web application [/idp] appears to have started a thread named [Resource Destroyer in BasicResourcePool.close()] but has failed to stop it. This is very likely to create a memory leak.
         logger.debug("PrivacyLens destroyed.");
     }
 
