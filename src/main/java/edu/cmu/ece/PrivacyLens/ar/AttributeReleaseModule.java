@@ -70,7 +70,11 @@ public class AttributeReleaseModule {
     /** General Consent allowed. */
     private boolean allowGeneralConsent;
 
-    /** List of enabled relying parties. */
+    /**
+     * List of enabled relying parties. enabledRelyingParties generally is instance of RelyingPartyList, which extends
+     * ArrayList by modifying the contains(x) function to consider x a regexp, and return true if x matches an element
+     * in the list xored with the blacklist attribute being false.
+     */
     private List<String> enabledRelyingParties;
 
     /** Compare attribute values. */
@@ -79,7 +83,9 @@ public class AttributeReleaseModule {
     /** Storage. */
     private Storage storage;
 
-    /** Default constructor. */
+    /**
+     * Default constructor.
+     */
     public AttributeReleaseModule() {
         enabled = false;
         auditLogEnabled = false;
@@ -169,7 +175,7 @@ public class AttributeReleaseModule {
             Validate.notNull(storage, "Storage is not set.");
             logger.trace("Attribute Release initialized with storage type {}.", storage.getClass().getSimpleName());
             logger.debug(
-                    "Attribute Release Module initialzed with {} general consent. Attribute values are{}compared.",
+                    "Attribute Release Module initialized with {} general consent. Attribute values are{}compared.",
                     isAllowGeneralConsent() ? "enabled" : "disabled", compareAttributeValues ? " " : " not ");
         } else {
             logger.debug("Attribute Release Module is not enabled.");
@@ -177,7 +183,7 @@ public class AttributeReleaseModule {
     }
 
     /**
-     * Determine if consent is required.
+     * Determine if consent is required. This controls whether the attribute release interface is presented to the user.
      * 
      * @param principalName The principal name.
      * @param relyingPartyId The relying party id.
@@ -188,7 +194,7 @@ public class AttributeReleaseModule {
             final List<Attribute> attributes) {
 
         if (!enabledRelyingParties.contains(relyingPartyId)) {
-            logger.debug("Skip relying party {}.", relyingPartyId);
+            logger.debug("Relying party {} is listed for general consent.", relyingPartyId);
             return false;
         }
 
