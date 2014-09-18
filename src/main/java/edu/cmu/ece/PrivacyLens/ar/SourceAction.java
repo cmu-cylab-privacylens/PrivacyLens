@@ -108,8 +108,8 @@ public class SourceAction implements Action {
             stringBuilder.append("<p>" + attrReason + "</p><p>" + attrPrivacy + "</p>");
             stringBuilder.append("<p>");
 
-            // eduPersonEntitlement is meaningless to the end user
-            if (!attributeId.equals("eduPersonEntitlement")) {
+            // don't present values of machine readable attributes
+            if (!attribute.isMachineReadable()) {
                 stringBuilder.append("Your " + attribute.getDescription() + " is " + '"' + attribute.getValues().get(0)
                         + "\". ");
             }
@@ -129,8 +129,8 @@ public class SourceAction implements Action {
 
             stringBuilder.setLength(0);
             stringBuilder.append(attribute.getDescription());
-            // eduPersonEntitlement is meaningless to the end user
-            if (!attributeId.equals("eduPersonEntitlement")) {
+            // don't present values of machine readable attributes
+            if (!attribute.isMachineReadable()) {
                 stringBuilder.append(" (<b>");
                 stringBuilder.append(attribute.getValues().get(0));
                 stringBuilder.append("</b>)");
@@ -190,13 +190,6 @@ public class SourceAction implements Action {
             stringBuilder.append("<p>" + attrReason + "</p><p>" + attrPrivacy + "</p>");
             stringBuilder.append("<p>");
 
-            // eduPersonEntitlement is meaningless to the end user
-            /*
-            if (!attributeId.equals("eduPersonEntitlement")) {
-                stringBuilder.append("Your " + attribute.getDescription() + " is " + '"' + attribute.getValues().get(0)
-                        + "\". ");
-            }
-             */
             final List<String> subValues = new ArrayList<String>();
 
             // this is annoying. we have attribute definitions from the oracle
@@ -235,14 +228,6 @@ public class SourceAction implements Action {
 
             stringBuilder.setLength(0);
             stringBuilder.append(description);
-            // eduPersonEntitlement is meaningless to the end user
-            /*
-            if (!attributeId.equals("eduPersonEntitlement")) {
-                stringBuilder.append(" (<b>");
-                stringBuilder.append(attribute.getValues().get(0));
-                stringBuilder.append("</b>)");
-            }
-             */
 
             stringBuilder.append(" (<b>");
             stringBuilder.append(subValuesText);
@@ -365,8 +350,8 @@ public class SourceAction implements Action {
                 continue;
             }
             sb.append(attr.getDescription());
-            // eduPersonEntitlement is meaningless to end user
-            if (!attr.getId().equals("eduPersonEntitlement")) {
+            // don't present values of machine readable attributes
+            if (!attr.isMachineReadable()) {
                 sb.append(" (<strong>");
                 // XXX multiple values?
                 sb.append(attr.getValues().get(0));

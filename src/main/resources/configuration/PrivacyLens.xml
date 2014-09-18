@@ -54,6 +54,7 @@
         p:attributeAuthority-ref="shibboleth.SAML2AttributeAuthority" p:relyingPartyConfigurationManager-ref="shibboleth.RelyingPartyConfigurationManager" p:attributeResolver-ref="shibboleth.AttributeResolver" >
         <property name="attributeProcessor">
             <bean class="edu.cmu.ece.PrivacyLens.ar.AttributeProcessor"
+                p:machinereadable="${ar.attributes.machinereadable}"
                 p:blacklist="${ar.attributes.blacklist}" p:order="${ar.attributes.order}" />
         </property>
     </bean>

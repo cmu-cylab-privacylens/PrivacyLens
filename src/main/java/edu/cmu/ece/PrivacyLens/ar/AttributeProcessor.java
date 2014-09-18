@@ -56,6 +56,11 @@ public class AttributeProcessor {
     /** The ordering of the attributes. */
     private List<String> order;
 
+    /**
+     * List of attributes that are machine readable
+     */
+    private List<String> machinereadable;
+
     /** Default constructor. */
     public AttributeProcessor() {
         blacklist = Collections.emptyList();
@@ -81,6 +86,13 @@ public class AttributeProcessor {
     }
 
     /**
+     * @param machinereadable The list of machine readable attributes to set.
+     */
+    public void setMachinereadable(final List<String> machinereadable) {
+        this.machinereadable = machinereadable;
+    }
+
+    /**
      * Removes the blacklisted attributes from the list.
      * 
      * @param attributes The attributes.
@@ -92,6 +104,17 @@ public class AttributeProcessor {
                 iterator.remove();
             }
         }
+    }
+
+    public void markMachineReadableAttributes(final List<Attribute> attributes) {
+        final Iterator<Attribute> iterator = attributes.iterator();
+        while (iterator.hasNext()) {
+            final Attribute attribute = iterator.next();
+            if (machinereadable.contains(attribute.getId())) {
+                attribute.setMachineReadable(true);
+            }
+        }
+
     }
 
     /**

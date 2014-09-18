@@ -234,6 +234,8 @@ public class SAMLHelper {
         }
         attributeProcessor.removeEmptyAttributes(attributes);
         logger.trace("{} attributes retained after removing empty attributes.", attributes.size());
+        attributeProcessor.markMachineReadableAttributes(attributes);
+        logger.trace("Marked machine readable attributes");
         attributeProcessor.sortAttributes(attributes);
         return attributes;
     }

@@ -44,9 +44,9 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import edu.cmu.ece.PrivacyLens.Action;
+import edu.cmu.ece.PrivacyLens.HTMLUtils;
 import edu.cmu.ece.PrivacyLens.IdPHelper;
 import edu.cmu.ece.PrivacyLens.Oracle;
-import edu.cmu.ece.PrivacyLens.HTMLUtils;
 import edu.cmu.ece.PrivacyLens.ToggleBean;
 import edu.cmu.ece.PrivacyLens.Util;
 import edu.cmu.ece.PrivacyLens.config.General;
@@ -62,8 +62,7 @@ public class AdminEntryAction implements Action {
     /** Class logger. */
     private final Logger logger = LoggerFactory.getLogger(AdminEntryAction.class);
 
-    private final String emailAdminBoilerText = HTMLUtils.getEmailAdminBoilerText(General.getInstance()
-            .getAdminMail());
+    private final String emailAdminBoilerText = HTMLUtils.getEmailAdminBoilerText(General.getInstance().getAdminMail());
 
     private String relyingPartyId;
 
@@ -143,8 +142,8 @@ public class AdminEntryAction implements Action {
                     + "</p>");
             stringBuilder.append("<p>");
 
-            // eduPersonEntitlement is meaningless to the end user
-            if (!attributeId.equals("eduPersonEntitlement")) {
+            // don't present values of machine readable attributes
+            if (!attribute.isMachineReadable()) {
                 stringBuilder.append("Your " + attribute.getDescription() + " is " + '"' + attribute.getValues().get(0)
                         + "\". ");
             }
@@ -164,8 +163,8 @@ public class AdminEntryAction implements Action {
 
             stringBuilder.setLength(0);
             stringBuilder.append(attribute.getDescription());
-            // eduPersonEntitlement is meaningless to the end user
-            if (!attributeId.equals("eduPersonEntitlement")) {
+            // don't present values of machine readable attributes
+            if (!attribute.isMachineReadable()) {
                 stringBuilder.append(" (<b>");
                 stringBuilder.append(attribute.getValues().get(0));
                 stringBuilder.append("</b>)");

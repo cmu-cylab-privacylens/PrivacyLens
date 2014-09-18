@@ -59,6 +59,11 @@ public class Attribute {
     private final List<String> values;
 
     /**
+     * Flag denoting that the attribute value is machine readable, and should not be presented to the user
+     */
+    private boolean machinereadable;
+
+    /**
      * Constructor.
      * 
      * @param id The id.
@@ -190,6 +195,20 @@ public class Attribute {
      */
     public List<String> getValues() {
         return values;
+    }
+
+    /**
+     * @param b the attribute is machine readable and its value should not be presented
+     */
+    public void setMachineReadable(final boolean b) {
+        machinereadable = b;
+    }
+
+    /**
+     * @return whether the attribute is machine readable and its value should not be presented
+     */
+    public boolean isMachineReadable() {
+        return machinereadable;
     }
 
     /** {@inheritDoc} */

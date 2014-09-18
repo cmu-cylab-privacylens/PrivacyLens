@@ -354,7 +354,13 @@ Example output:
 
 bc. 20120101T010000Z|ch.SWITCH.aai.uApprove.PrivacyLens|||tou.acceptance|null|null|null|student1||1.0,5b2ee897c08c79a09cd57e8602d605bf8c52db17de9793677c36b5c78644b2b3,|
 
-h2. 4.7 Black/Whitelisting
+h2. 4.7 Machine readable attributes
+
+PrivacyLens can be configured to not show the value of attributes that
+are intended for data processing, and not human comprehension. In the
+PrivacyLens.properties file, add the desired attributes to "ar.attributes.machinereadable".
+
+h2. 4.8 Black/Whitelisting
 
 PrivacyLens can be configured to show or not show the interface, depending on
 what Service Provider is involved. In the PrivacyLens.properties file,
