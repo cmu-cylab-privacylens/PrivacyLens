@@ -354,6 +354,16 @@ Example output:
 
 bc. 20120101T010000Z|ch.SWITCH.aai.uApprove.PrivacyLens|||tou.acceptance|null|null|null|student1||1.0,5b2ee897c08c79a09cd57e8602d605bf8c52db17de9793677c36b5c78644b2b3,|
 
+h2. 4.7 Black/Whitelisting
+
+PrivacyLens can be configured to show or not show the interface, depending on
+what Service Provider is involved. In the PrivacyLens.properties file,
+regular expressions that the Service Provider will be matched again are
+provided to "services". If "services.blacklist" is true, the user will
+not see the interface for any Service Provider that matches the regular
+expressions. If "services.blacklist" is false, the user will only see the
+interface for Service Providers that match the regular expressions.
+
 h3. Enable Attribute Release Audit Log
 
 You can enable the attribute release module audit log in in @$SHIB_INSTALL$/conf/PrivacyLens.xml@:
