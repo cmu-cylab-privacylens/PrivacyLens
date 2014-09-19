@@ -124,6 +124,7 @@ public class AttributeReleaseServlet extends HttpServlet {
             final Map<String, String> attributePrivacy = oracle.getAttributePrivacy(relyingPartyId);
             final Map<String, Boolean> attributeRequired = oracle.getAttributeRequired(relyingPartyId);
             final String serviceName = oracle.getServiceName();
+            context.put("service", serviceName);
 
             //context.put("remoteAttributeReason", attributeReason);
             //context.put("remoteAttributePrivacy", attributePrivacy);
