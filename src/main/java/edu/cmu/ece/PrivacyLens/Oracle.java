@@ -30,7 +30,6 @@ package edu.cmu.ece.PrivacyLens;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +39,6 @@ import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
@@ -178,15 +176,9 @@ public class Oracle {
         return theInstance;
     }
 
-    public void setConfig(final String configPath) {
+    public void setConfig(final Resource configResource) {
         // really a lot of this stuff should be readable from metadata.
-        Resource configResource;
-        try {
-            configResource = new UrlResource(configPath);
-        } catch (final MalformedURLException x) {
-            logger.error("Malformed URL exception: {}", x);
-            return;
-        }
+
         final Gson gson = new Gson();
         final List<Map> splist = new ArrayList<Map>();
         final List<Map> attrlist = new ArrayList<Map>();

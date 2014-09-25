@@ -30,7 +30,9 @@ package edu.cmu.ece.PrivacyLens;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
@@ -42,6 +44,12 @@ public class OracleTest {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     Oracle oracle = Oracle.getInstance();
+
+    /** Before class. */
+    @BeforeClass
+    public void initialize() {
+        oracle.setConfig(new ClassPathResource("configuration/spsetup.json"));
+    }
 
     /** Test whether the foo function works */
     @Test
@@ -67,7 +75,11 @@ public class OracleTest {
         final String rpid = "plugh";
         oracle.setRelyingPartyId(rpid);
         final String serviceName = oracle.getServiceName();
-        Assert.assertTrue(true);
+        Assert.assertEquals(serviceName, "UNKNOWN");
+        final String rpid2 = "https://scalepriv.ece.cmu.edu/shibboleth";
+        oracle.setRelyingPartyId(rpid2);
+        final String serviceName2 = oracle.getServiceName();
+        Assert.assertEquals(serviceName2, "CMU's Calendar");
     }
 
 }
