@@ -231,6 +231,8 @@ public class Intercepter implements Filter {
             attributeReleaseModule.clearChoice(principalName, relyingPartyId);
         }
 
+        // XXXstroucki handling reminder / no reminder in ar/SourceAction, but
+        // SP whitelisting still happens here
         if (attributeReleaseModule.requiresConsent(principalName, relyingPartyId, attributes)) {
             IdPHelper.setAttributes(servletContext, request, attributes);
 

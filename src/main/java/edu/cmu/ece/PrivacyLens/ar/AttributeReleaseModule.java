@@ -203,6 +203,9 @@ public class AttributeReleaseModule {
             return false;
         }
 
+        // XXXstroucki reminders and previously approved attributes handled from
+        // ar/SourceAction
+        /*
         final List<AttributeReleaseChoice> attributeReleaseChoices =
                 storage.readAttributeReleaseChoices(principalName, relyingPartyId);
         if (AttributeReleaseHelper.approvedAttributes(attributes, attributeReleaseChoices, compareAttributeValues)) {
@@ -210,6 +213,7 @@ public class AttributeReleaseModule {
                     principalName, attributes, relyingPartyId});
             return false;
         }
+        */
 
         logger.debug("Consent is required from user {} for attributes {} releasing to relying party {}.", new Object[] {
                 principalName, relyingPartyId, attributes,});
