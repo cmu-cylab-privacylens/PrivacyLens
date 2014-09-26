@@ -123,23 +123,28 @@ public class AttributeProcessor {
      * @param attributes The attributes.
      */
     public void sortAttributes(final List<Attribute> attributes) {
+
         Collections.sort(attributes, new Comparator<Attribute>() {
             public int compare(final Attribute attribute1, final Attribute attribute2) {
-                int last = order.size();
+                final int last = order.size();
                 int rank1 = order.indexOf(attribute1.getId());
                 int rank2 = order.indexOf(attribute2.getId());
 
+                // put attributes without defined ordering at the end,
+                // but keep them equivalent
+                if (rank1 < 0) {
+                    rank1 = last + 1;
+                }
                 if (rank2 < 0) {
-                    rank2 = last;
-                    last++;
+                    rank2 = last + 1;
                 }
 
-                if (rank1 < 0) {
-                    rank1 = last;
-                }
-                return rank1 - rank2;
+                final int result = Integer.signum(rank1 - rank2);
+
+                return result;
             }
         });
+        logger.debug("sorted list: {}", attributes);
     }
 
     /**
