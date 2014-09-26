@@ -74,8 +74,11 @@ public class SourceAction implements Action {
         final Map<String, List> beanToGroup = new HashMap<String, List>();
 
         final Map<String, ToggleBean> attributeBeans = new HashMap<String, ToggleBean>();
+
         for (final Attribute attribute : attributes) {
             final String attributeId = attribute.getId();
+
+            // skip attribute if not requested
             if (!attrMap.containsKey(attributeId)) {
                 continue;
             }
@@ -86,24 +89,23 @@ public class SourceAction implements Action {
 
             final ToggleBean bean = new ToggleBean();
 
+            // if the attribute is required, set the proper icon and force
+            // the value to true
             final boolean required = attrMap.get(attributeId).get("required") != null;
+            final boolean value = settingsMap.get(attributeId);
 
             if (required) {
+                bean.setValue(true);
                 bean.setImmutable(true);
                 bean.setImageTrue(requestContextPath + "/PrivacyLens/force_sending.png");
             } else {
+                bean.setValue(value);
                 bean.setImmutable(false);
                 bean.setImageFalse(requestContextPath + "/PrivacyLens/not_sending.png");
                 bean.setImageTrue(requestContextPath + "/PrivacyLens/sending.png");
             }
 
-            final boolean value = settingsMap.get(attributeId);
-            if (required) {
-                bean.setValue(true);
-            } else {
-                bean.setValue(value);
-            }
-
+            // set up privacy and request reason text
             final StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("<p>" + attrReason + "</p><p>" + attrPrivacy + "</p>");
             stringBuilder.append("<p>");
@@ -113,6 +115,8 @@ public class SourceAction implements Action {
                 stringBuilder.append("Your " + attribute.getDescription() + " is " + '"' + attribute.getValues().get(0)
                         + "\". ");
             }
+
+            // set up consequence text
             stringBuilder.append("If you continue to " + oracle.getServiceName() + ", your "
                     + attribute.getDescription() + " will ");
             stringBuilder.append(value ? "" : "not");
@@ -127,11 +131,13 @@ public class SourceAction implements Action {
             bean.setImageDiv("attributeReleaseControl");
             bean.setParameter(attributeId);
 
+            // set up first presentation
             stringBuilder.setLength(0);
             stringBuilder.append(attribute.getDescription());
             // don't present values of machine readable attributes
             if (!attribute.isMachineReadable()) {
                 stringBuilder.append(" (<b>");
+                // what about multiple values?
                 stringBuilder.append(attribute.getValues().get(0));
                 stringBuilder.append("</b>)");
             }
@@ -141,20 +147,24 @@ public class SourceAction implements Action {
 
             final String text = stringBuilder.toString();
             bean.setText(text);
+
             if (!bean.validate()) {
                 logger.error("{} did not validate", attribute);
             }
 
+            // if this attribute is part of a group, add it
             if (group != null) {
                 if (!beanToGroup.containsKey(group)) {
                     beanToGroup.put(group, new ArrayList<String>());
                 }
                 beanToGroup.get(group).add(attributeId);
             }
+
             attributeBeans.put(attributeId, bean);
 
         }
 
+        // handle attribute groups
         final Map<String, ToggleBean> groupHandle;
         for (final String groupId : beanToGroup.keySet()) {
 
@@ -166,7 +176,10 @@ public class SourceAction implements Action {
             final boolean required = attrGroups.get(groupId).get("required") != null;
             final String description = (String) attrGroups.get(groupId).get("description");
 
+            // for each group, pick the member attributes out of the map
+            // created before
             final List<String> attrList = beanToGroup.get(groupId);
+            // assign value true, unless the members have different settings
             boolean value = true;
             for (final String attr : attrList) {
                 final ToggleBean memberBean = attributeBeans.get(attr);
@@ -175,17 +188,21 @@ public class SourceAction implements Action {
                 value &= memberBean.isValue();
                 bean.addMember(memberBean);
             }
-            bean.setValue(value);
 
+            // if the attribute is required, set the proper icon and force
+            // the value to true
             if (required) {
+                bean.setValue(true);
                 bean.setImmutable(true);
                 bean.setImageTrue(requestContextPath + "/PrivacyLens/force_sending.png");
             } else {
+                bean.setValue(value);
                 bean.setImmutable(false);
                 bean.setImageFalse(requestContextPath + "/PrivacyLens/not_sending.png");
                 bean.setImageTrue(requestContextPath + "/PrivacyLens/sending.png");
             }
 
+            // set up privacy and request reason text
             final StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("<p>" + attrReason + "</p><p>" + attrPrivacy + "</p>");
             stringBuilder.append("<p>");
@@ -199,6 +216,7 @@ public class SourceAction implements Action {
                 for (final Attribute attr : attributes) {
                     if (attr.getId().equals(attrName)) {
                         try {
+                            // what about multiple values?
                             final String attrValue = attr.getValues().get(0);
                             subValues.add(attr.getValues().get(0));
                         } catch (final IndexOutOfBoundsException x) {
@@ -213,12 +231,14 @@ public class SourceAction implements Action {
             stringBuilder.append(subValuesText);
             stringBuilder.append("). ");
 
+            // set up consequence text
             stringBuilder.append("If you continue to " + oracle.getServiceName() + ", your " + description + " will ");
             stringBuilder.append(value ? "" : "not");
             stringBuilder.append(" be sent to it. Use the toggle switch to change this setting.");
             stringBuilder.append("</p>");
             stringBuilder.append(emailAdminBoilerText);
 
+            // set up first presentation
             final String explanation = stringBuilder.toString();
             bean.setExplanation(explanation);
             bean.setExplanationIcon(requestContextPath + "/PrivacyLens/info.png");
@@ -244,7 +264,7 @@ public class SourceAction implements Action {
                 logger.error("{} did not validate", groupId);
             }
 
-            out.add(bean);
+            attributeBeans.put(groupId, bean);
         }
 
         for (final ToggleBean bean : attributeBeans.values()) {
