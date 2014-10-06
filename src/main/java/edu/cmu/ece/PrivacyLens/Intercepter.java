@@ -231,23 +231,29 @@ public class Intercepter implements Filter {
             attributeReleaseModule.clearChoice(principalName, relyingPartyId);
         }
 
-        // XXXstroucki handling reminder / no reminder in ar/SourceAction, but
-        // SP whitelisting still happens here
-        if (attributeReleaseModule.requiresConsent(principalName, relyingPartyId, attributes)) {
-            IdPHelper.setAttributes(servletContext, request, attributes);
-
-            if (IdPHelper.isPassiveRequest(servletContext, request)) {
-                IdPHelper.setAuthenticationFailure(servletContext, request, new PassiveAuthenticationException());
-                return false;
-            }
-
-            // don't carry in a view attribute
-            request.getSession().removeAttribute("view");
-            IdPHelper.redirectToServlet(servletContext, request, response, "/PrivacyLens/AttributeRelease");
-            return true;
+        // XXXstroucki https://wiki.shibboleth.net/confluence/display/SHIB2/isPassive
+        // but I guess we'll just error anyway
+        if (IdPHelper.isPassiveRequest(servletContext, request)) {
+            IdPHelper.setAuthenticationFailure(servletContext, request, new PassiveAuthenticationException());
+            return false;
         }
 
-        return false;
+        // XXXstroucki handling reminder / no reminder in ar/SourceAction, but
+        // SP whitelisting still happens here
+        if (attributeReleaseModule.checkSPWhitelisted(principalName, relyingPartyId)) {
+            return false;
+        }
+
+        // set up the context
+        // XXXstroucki i see we use different ways of setting attributes here.
+        IdPHelper.setAttributes(servletContext, request, attributes);
+
+        // don't carry in a view attribute
+        // XXXstroucki maybe we should set one?
+        request.getSession().removeAttribute("view");
+        IdPHelper.redirectToServlet(servletContext, request, response, "/PrivacyLens/AttributeRelease");
+        return true;
+
     }
 
     /** {@inheritDoc} */
