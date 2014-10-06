@@ -183,7 +183,7 @@ public class AttributeReleaseModule {
     }
 
     /**
-     * Determine if consent is required. This controls whether the attribute release interface is presented to the user.
+     * Determine if consent is required for <principal, rpid, attributes>
      * 
      * @param principalName The principal name.
      * @param relyingPartyId The relying party id.
@@ -193,19 +193,23 @@ public class AttributeReleaseModule {
     public boolean requiresConsent(final String principalName, final String relyingPartyId,
             final List<Attribute> attributes) {
 
-        if (!enabledRelyingParties.contains(relyingPartyId)) {
-            logger.debug("Relying party {} is listed for general consent.", relyingPartyId);
+        final boolean isSPWhitelisted = checkSPWhitelisted(principalName, relyingPartyId);
+        if (isSPWhitelisted) {
             return false;
         }
 
+        // XXXstroucki what is the state of general consent in PrivacyLens?
+        // do we make it available?
+        /*
         if (storage.containsAttributeReleaseChoice(principalName, WILDCARD, WILDCARD)) {
             logger.debug("User {} has given general consent.", principalName);
             return false;
         }
+        */
 
         // XXXstroucki reminders and previously approved attributes handled from
         // ar/SourceAction
-        /*
+
         final List<AttributeReleaseChoice> attributeReleaseChoices =
                 storage.readAttributeReleaseChoices(principalName, relyingPartyId);
         if (AttributeReleaseHelper.approvedAttributes(attributes, attributeReleaseChoices, compareAttributeValues)) {
@@ -213,11 +217,25 @@ public class AttributeReleaseModule {
                     principalName, attributes, relyingPartyId});
             return false;
         }
-        */
 
         logger.debug("Consent is required from user {} for attributes {} releasing to relying party {}.", new Object[] {
                 principalName, relyingPartyId, attributes,});
         return true;
+    }
+
+    /**
+     * Check whether the SP is whitelisted for no interaction
+     * 
+     * @param principalName The principal name
+     * @param relyingPartyId The service provider id
+     */
+    public boolean checkSPWhitelisted(final String principalName, final String relyingPartyId) {
+        if (!enabledRelyingParties.contains(relyingPartyId)) {
+            logger.debug("Relying party {} is listed for general consent.", relyingPartyId);
+            return true;
+        }
+
+        return false;
     }
 
     /**
