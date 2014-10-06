@@ -58,20 +58,40 @@ public class Oracle {
 
     private boolean configured = false;
 
-    private List<Map> spList;
-
-    private List<Map> attrList;
-
-    private List<Map> groupList;
+    private OracleData data;
 
     private class OracleData {
         private ServiceProviderData[] SPs;
 
+        private LocalizedAttributes[] attrs;
+
         private OracleData() {
         }
 
-        public OracleData(final ServiceProviderData[] SPs) {
+        public OracleData(final ServiceProviderData[] SPs, final LocalizedAttributes[] attrs) {
             this.SPs = SPs;
+            this.attrs = attrs;
+        }
+    }
+
+    private class LocalizedAttributes {
+        private String desc;
+
+        private String id;
+
+        private LocalizedAttributes() {
+        }
+
+        public LocalizedAttributes(final String id, final String desc) {
+            this.id = id;
+            this.desc = desc;
+        }
+
+        public Map<String, String> toMap() {
+            final Map<String, String> out = new HashMap<String, String>();
+            out.put("id", id);
+            out.put("desc", desc);
+            return out;
         }
     }
 
@@ -116,24 +136,38 @@ public class Oracle {
 
         private String id;
 
+        private boolean required;
+
         private transient boolean hasGroup;
 
         private AttributeData() {
         }
 
-        public AttributeData(final String id, final String reason, final String privpolicy) {
+        public AttributeData(final String id, final String reason, final String privpolicy, final String required) {
             this.id = id;
             this.reason = reason;
             this.privpolicy = privpolicy;
+            this.required = required.equals("true");
             hasGroup = false;
         }
 
-        public AttributeData(final String id, final String reason, final String privpolicy, final String group) {
+        public AttributeData(final String id, final String reason, final String privpolicy, final String required,
+                final String group) {
             this.id = id;
             this.reason = reason;
             this.privpolicy = privpolicy;
+            this.required = required.equals("true");
             this.group = group;
             hasGroup = true;
+        }
+
+        public Map<String, String> toMap() {
+            final Map<String, String> out = new HashMap<String, String>();
+            out.put("reason", reason);
+            out.put("group", group);
+            out.put("privpolicy", privpolicy);
+            out.put("id", id);
+            return out;
         }
     }
 
@@ -155,6 +189,15 @@ public class Oracle {
             this.description = description;
             this.reason = reason;
             this.privpolicy = privpolicy;
+        }
+
+        public Map<String, String> toMap() {
+            final Map<String, String> out = new HashMap<String, String>();
+            out.put("reason", reason);
+            out.put("description", description);
+            out.put("privpolicy", privpolicy);
+            out.put("id", id);
+            return out;
         }
     }
 
@@ -180,106 +223,19 @@ public class Oracle {
         // really a lot of this stuff should be readable from metadata.
 
         final Gson gson = new Gson();
-        final List<Map> splist = new ArrayList<Map>();
-        final List<Map> attrlist = new ArrayList<Map>();
-        final List<Map> grouplist = new ArrayList<Map>();
 
         try {
             final InputStream in = configResource.getInputStream();
-            in.mark(Integer.MAX_VALUE);
-            final JsonReader readerTest = new JsonReader(new InputStreamReader(in, "UTF-8"));
-            final OracleData x = gson.fromJson(readerTest, OracleData.class);
-            //readerTest.close();
-            logger.debug("OracleData JSON: {}", gson.toJson(x));
-            in.reset();
             final JsonReader reader = new JsonReader(new InputStreamReader(in, "UTF-8"));
-
-            final Map<String, Object> elements = new HashMap<String, Object>();
-            reader.beginObject();
-            while (reader.hasNext()) {
-                final String name = reader.nextName();
-
-                if (name.equals("SPs")) {
-                    reader.beginArray();
-                    Map<String, Object> spmap;
-                    while (reader.hasNext()) {
-                        spmap = new HashMap<String, Object>();
-                        reader.beginObject();
-                        while (reader.hasNext()) {
-                            final String name1 = reader.nextName();
-                            logger.debug("Reading {}", name1);
-                            if (name1.equals("name") || name1.equals("id")) {
-                                final String value = reader.nextString();
-                                spmap.put(name1, value);
-                                logger.debug("SP map {} -> {}.", name1, value);
-                            }
-                            if (name1.equals("attrGroups")) {
-                                final List<Map> grouplist1 = new ArrayList<Map>();
-                                reader.beginArray();
-                                while (reader.hasNext()) {
-                                    final Map<String, String> attrmap = new HashMap<String, String>();
-                                    reader.beginObject();
-                                    while (reader.hasNext()) {
-                                        attrmap.put(reader.nextName(), reader.nextString());
-                                    }
-                                    reader.endObject();
-                                    grouplist1.add(attrmap);
-                                }
-                                reader.endArray();
-                                spmap.put("attrGroups", grouplist1);
-                            }
-                            if (name1.equals("attrs")) {
-                                final List<Map> attrlist1 = new ArrayList<Map>();
-                                reader.beginArray();
-                                while (reader.hasNext()) {
-                                    final Map<String, String> attrmap = new HashMap<String, String>();
-                                    reader.beginObject();
-                                    while (reader.hasNext()) {
-                                        attrmap.put(reader.nextName(), reader.nextString());
-                                    }
-                                    reader.endObject();
-                                    attrlist1.add(attrmap);
-                                }
-                                reader.endArray();
-                                spmap.put("attrs", attrlist1);
-                            }
-                        }
-                        reader.endObject();
-                        splist.add(spmap);
-                    }
-                    reader.endArray();
-                }
-
-                // these should be handled in config?
-                if (name.equals("attrs")) {
-                    reader.beginArray();
-                    while (reader.hasNext()) {
-
-                        final Map<String, String> attrmap = new HashMap<String, String>();
-                        reader.beginObject();
-                        while (reader.hasNext()) {
-                            attrmap.put(reader.nextName(), reader.nextString());
-                        }
-                        reader.endObject();
-                        attrlist.add(attrmap);
-                    }
-                    reader.endArray();
-                }
-
-            }
-            reader.endObject();
+            data = gson.fromJson(reader, OracleData.class);
             reader.close();
-            in.close();
+            //logger.debug("OracleData JSON: {}", gson.toJson(x));
 
-            // should now have attrlist, grouplist and splist after this
-
-            this.spList = splist;
-            this.attrList = attrlist;
-            this.groupList = grouplist;
-
-            // should be in config?
-            for (final Map<String, String> attr : attrlist) {
-                AttributeUtils.setAttribute(attr.get("id"), attr.get("desc"));
+            // Set localized attribute descriptions
+            // like eduPersonPrincipalName -> Andrew ID
+            // XXXstroucki should be in config?
+            for (final LocalizedAttributes attr : data.attrs) {
+                AttributeUtils.setAttribute(attr.id, attr.desc);
             }
 
             this.configured = true;
@@ -302,9 +258,9 @@ public class Oracle {
         final String url = this.relyingPartyId;
 
         // map this from rp name
-        for (final Map<String, Object> sp : spList) {
-            if (sp.get("id").equals(url)) {
-                return (String) sp.get("name");
+        for (final ServiceProviderData sp : data.SPs) {
+            if (sp.id.equals(url)) {
+                return sp.name;
             }
 
         }
@@ -332,15 +288,15 @@ public class Oracle {
      */
     public List<String> getAttributeGroupMembers(final String spId, final String groupId) {
         // isAttrGroup?
-        final List<String> out = new ArrayList();
+        final List<String> out = new ArrayList<String>();
         if (!isAttrGroup(spId, groupId)) {
             return out;
         }
 
-        Map<String, Object> spData = null;
-        for (final Map<String, Object> sp : spList) {
-            logger.trace("sp id: {}", sp.get("id"));
-            if (sp.get("id").equals(spId)) {
+        ServiceProviderData spData = null;
+        for (final ServiceProviderData sp : data.SPs) {
+            logger.trace("sp id: {}", sp.id);
+            if (sp.id.equals(spId)) {
                 spData = sp;
                 break;
             }
@@ -350,15 +306,14 @@ public class Oracle {
             return out;
         }
 
-        final List<Map> attrList = (List<Map>) spData.get("attrs");
-        for (final Map<String, String> attrMap : attrList) {
-            final String thisGroupId = attrMap.get("group");
-            logger.trace("checking id: {}", attrMap.get("id"));
+        for (final AttributeData attrMap : spData.attrs) {
+            final String thisGroupId = attrMap.group;
+            logger.trace("checking id: {}", attrMap.id);
             if (thisGroupId == null || !thisGroupId.equals(groupId)) {
                 continue;
             }
-            logger.trace("attr id: {} is member of: {}", attrMap.get("id"), groupId);
-            out.add(attrMap.get("id"));
+            logger.trace("attr id: {} is member of: {}", attrMap.id, groupId);
+            out.add(attrMap.id);
         }
 
         return out;
@@ -370,11 +325,10 @@ public class Oracle {
      */
     public Map<String, Map> getAttributeGroupRequested(final String spId) {
         final Map<String, Map> out = new HashMap();
-        for (final Map<String, Object> sp : spList) {
-            if (sp.get("id").equals(spId)) {
-                final List<Map> attrGroupList = (List<Map>) sp.get("attrGroups");
-                for (final Map<String, String> attrmap : attrGroupList) {
-                    out.put(attrmap.get("id"), attrmap);
+        for (final ServiceProviderData sp : data.SPs) {
+            if (sp.id.equals(spId)) {
+                for (final AttributeGroupData attrmap : sp.attrGroups) {
+                    out.put(attrmap.id, attrmap.toMap());
                 }
             }
         }
@@ -387,11 +341,10 @@ public class Oracle {
      */
     public Map<String, Map> getAttributeRequested(final String spId) {
         final Map<String, Map> out = new HashMap();
-        for (final Map<String, Object> sp : spList) {
-            if (sp.get("id").equals(spId)) {
-                final List<Map> attrList = (List<Map>) sp.get("attrs");
-                for (final Map<String, String> attrmap : attrList) {
-                    out.put(attrmap.get("id"), attrmap);
+        for (final ServiceProviderData sp : data.SPs) {
+            if (sp.id.equals(spId)) {
+                for (final AttributeData attrmap : sp.attrs) {
+                    out.put(attrmap.id, attrmap.toMap());
                 }
             }
         }
@@ -404,19 +357,10 @@ public class Oracle {
      */
     public Map<String, Boolean> getAttributeRequired(final String spId) {
         final Map<String, Boolean> out = new HashMap();
-        for (final Map<String, Object> sp : spList) {
-            if (sp.get("id").equals(spId)) {
-                final List<Map> attrList = (List<Map>) sp.get("attrs");
-                for (final Map<String, String> attrmap : attrList) {
-                    String required = attrmap.get("required");
-                    if (required == null) {
-                        required = "false";
-                    }
-                    if (!(required.equals("true") || required.equals("false"))) {
-                        logger.error("Interpreting {} as false", required);
-                    }
-                    final boolean isRequired = required.equals("true");
-                    out.put(attrmap.get("id"), isRequired);
+        for (final ServiceProviderData sp : data.SPs) {
+            if (sp.id.equals(spId)) {
+                for (final AttributeData attrmap : sp.attrs) {
+                    out.put(attrmap.id, attrmap.required);
                 }
             }
         }
@@ -429,11 +373,10 @@ public class Oracle {
      */
     public Map<String, String> getAttributePrivacy(final String spId) {
         final Map<String, String> out = new HashMap();
-        for (final Map<String, Object> sp : spList) {
-            if (sp.get("id").equals(spId)) {
-                final List<Map> attrList = (List<Map>) sp.get("attrs");
-                for (final Map<String, String> attrmap : attrList) {
-                    out.put(attrmap.get("id"), attrmap.get("privpolicy"));
+        for (final ServiceProviderData sp : data.SPs) {
+            if (sp.id.equals(spId)) {
+                for (final AttributeData attrmap : sp.attrs) {
+                    out.put(attrmap.id, attrmap.privpolicy);
                 }
             }
         }
@@ -446,11 +389,10 @@ public class Oracle {
      */
     public Map<String, String> getAttributeReason(final String spId) {
         final Map<String, String> out = new HashMap();
-        for (final Map<String, Object> sp : spList) {
-            if (sp.get("id").equals(spId)) {
-                final List<Map> attrList = (List<Map>) sp.get("attrs");
-                for (final Map<String, String> attrmap : attrList) {
-                    out.put(attrmap.get("id"), attrmap.get("reason"));
+        for (final ServiceProviderData sp : data.SPs) {
+            if (sp.id.equals(spId)) {
+                for (final AttributeData attrmap : sp.attrs) {
+                    out.put(attrmap.id, attrmap.reason);
                 }
             }
         }
