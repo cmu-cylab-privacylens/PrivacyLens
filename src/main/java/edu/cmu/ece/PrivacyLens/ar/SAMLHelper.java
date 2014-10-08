@@ -112,6 +112,13 @@ public class SAMLHelper {
     }
 
     /**
+     * @return Returns the attributeProcessor.
+     */
+    public AttributeProcessor getAttributeProcessor() {
+        return attributeProcessor;
+    }
+
+    /**
      * Sets the attribute resolver.
      * 
      * @param attributeResolver The attributeResolver to set.
