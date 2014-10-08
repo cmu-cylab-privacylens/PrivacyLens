@@ -111,6 +111,14 @@
 							<li>
 								<a href="manual.html#EnableTermsOfUseAuditLog">Enable Terms Of Use Audit Log</a>
 							</li>
+						</ol>
+					</li>
+					<li>
+						<a href="manual.html#a4.7Machinereadableattributes">4.7 Machine readable attributes</a>
+					</li>
+					<li>
+						<a href="manual.html#a4.8BlackWhitelisting">4.8 Black/Whitelisting</a>
+						<ol style="list-style: none;">
 							<li>
 								<a href="manual.html#EnableAttributeReleaseAuditLog">Enable Attribute Release Audit Log</a>
 							</li>
@@ -562,6 +570,20 @@
 		<p>Example output:</p>
 		<pre><pre>20120101T010000Z|ch.SWITCH.aai.uApprove.PrivacyLens|||tou.acceptance|null|null|null|student1||1.0,5b2ee897c08c79a09cd57e8602d605bf8c52db17de9793677c36b5c78644b2b3,|
 </pre></pre>
+		<h2 id="a4.7Machinereadableattributes">4.7 Machine readable attributes</h2>
+		<p>PrivacyLens can be configured to not show the value of attributes that
+			<br/>are intended for data processing, and not human comprehension. In the
+			<br/>PrivacyLens.properties file, add the desired attributes to &#8220;ar.attributes.machinereadable&#8221;.
+		</p>
+		<h2 id="a4.8BlackWhitelisting">4.8 Black/Whitelisting</h2>
+		<p>PrivacyLens can be configured to show or not show the interface, depending on
+			<br/>what Service Provider is involved. In the PrivacyLens.properties file,
+			<br/>regular expressions that the Service Provider will be matched again are
+			<br/>provided to &#8220;services&#8221;. If &#8220;services.blacklist&#8221; is true, the user will
+			<br/>not see the interface for any Service Provider that matches the regular
+			<br/>expressions. If &#8220;services.blacklist&#8221; is false, the user will only see the
+			<br/>interface for Service Providers that match the regular expressions.
+		</p>
 		<h3 id="EnableAttributeReleaseAuditLog">Enable Attribute Release Audit Log</h3>
 		<p>You can enable the attribute release module audit log in in 
 			<code>$SHIB_INSTALL$/conf/PrivacyLens.xml</code>:
