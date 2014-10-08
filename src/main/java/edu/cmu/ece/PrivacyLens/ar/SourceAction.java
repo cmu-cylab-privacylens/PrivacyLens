@@ -40,6 +40,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import edu.cmu.ece.PrivacyLens.Action;
 import edu.cmu.ece.PrivacyLens.HTMLUtils;
@@ -71,9 +73,9 @@ public class SourceAction implements Action {
         final Map<String, Map> attrMap = oracle.getAttributeRequested(relyingPartyId);
         final Map<String, Map> attrGroups = oracle.getAttributeGroupRequested(relyingPartyId);
 
-        final Map<String, List> beanToGroup = new HashMap<String, List>();
+        final Map<String, List<Attribute>> beanToGroup = new HashMap<String, List<Attribute>>();
 
-        final Map<String, ToggleBean> attributeBeans = new HashMap<String, ToggleBean>();
+        final Map<Attribute, ToggleBean> attributeBeans = new HashMap<Attribute, ToggleBean>();
 
         for (final Attribute attribute : attributes) {
             final String attributeId = attribute.getId();
@@ -155,12 +157,12 @@ public class SourceAction implements Action {
             // if this attribute is part of a group, add it
             if (group != null) {
                 if (!beanToGroup.containsKey(group)) {
-                    beanToGroup.put(group, new ArrayList<String>());
+                    beanToGroup.put(group, new ArrayList<Attribute>());
                 }
-                beanToGroup.get(group).add(attributeId);
+                beanToGroup.get(group).add(attribute);
             }
 
-            attributeBeans.put(attributeId, bean);
+            attributeBeans.put(attribute, bean);
 
         }
 
@@ -178,10 +180,10 @@ public class SourceAction implements Action {
 
             // for each group, pick the member attributes out of the map
             // created before
-            final List<String> attrList = beanToGroup.get(groupId);
+            final List<Attribute> attrList = beanToGroup.get(groupId);
             // assign value true, unless the members have different settings
             boolean value = true;
-            for (final String attr : attrList) {
+            for (final Attribute attr : attrList) {
                 final ToggleBean memberBean = attributeBeans.get(attr);
                 attributeBeans.remove(attr);
                 // XXX mixed values?
@@ -212,17 +214,13 @@ public class SourceAction implements Action {
             // this is annoying. we have attribute definitions from the oracle
             // but we have to look through the actual attribute values.
 
-            for (final String attrName : attrList) {
-                for (final Attribute attr : attributes) {
-                    if (attr.getId().equals(attrName)) {
-                        try {
-                            // what about multiple values?
-                            final String attrValue = attr.getValues().get(0);
-                            subValues.add(attr.getValues().get(0));
-                        } catch (final IndexOutOfBoundsException x) {
-                            subValues.add("[blank]");
-                        }
-                    }
+            for (final Attribute attr : attrList) {
+                try {
+                    // what about multiple values?
+                    final String attrValue = attr.getValues().get(0);
+                    subValues.add(attrValue);
+                } catch (final IndexOutOfBoundsException x) {
+                    subValues.add("[blank]");
                 }
             }
 
@@ -264,11 +262,22 @@ public class SourceAction implements Action {
                 logger.error("{} did not validate", groupId);
             }
 
-            attributeBeans.put(groupId, bean);
+            // XXXstroucki should we do a super attribute which can be sorted?
+            final Attribute fakeAttribute = new Attribute(groupId, null);
+            attributeBeans.put(fakeAttribute, bean);
         }
 
-        for (final ToggleBean bean : attributeBeans.values()) {
-            out.add(bean);
+        // now sort this based on preference in config
+        // XXXstroucki really complex.
+        final ServletContext servletContext = Util.servletContext;
+        final WebApplicationContext appContext =
+                WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+        final SAMLHelper samlHelper = (SAMLHelper) appContext.getBean("PrivacyLens.samlHelper", SAMLHelper.class);
+        final AttributeProcessor attributeProcessor = samlHelper.getAttributeProcessor();
+        final List<Attribute> attributeKeys = new ArrayList<Attribute>(attributeBeans.keySet());
+        attributeProcessor.sortAttributes(attributeKeys);
+        for (final Attribute attribute : attributeKeys) {
+            out.add(attributeBeans.get(attribute));
         }
 
         return out;
