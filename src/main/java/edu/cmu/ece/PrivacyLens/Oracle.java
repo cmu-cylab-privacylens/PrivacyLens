@@ -30,6 +30,8 @@ package edu.cmu.ece.PrivacyLens;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,6 +55,9 @@ public class Oracle {
     private String relyingPartyId = "unset";
 
     private final Logger logger = LoggerFactory.getLogger(Oracle.class);
+
+    // match SP urls on just the host name
+    private static boolean fuzzyMatch = false;
 
     private String userName = "unset";
 
@@ -123,6 +128,28 @@ public class Oracle {
             this.attrs = attrs;
             this.attrGroups = attrGroups;
             this.hasAttrGroups = true;
+        }
+
+        public boolean match(final String target) {
+            boolean out;
+
+            if (fuzzyMatch) {
+                try {
+                    final URL mine = new URL(id);
+                    final URL yours = new URL(target);
+                    final String myHost = mine.getHost();
+                    final String yourHost = yours.getHost();
+                    // substring comparison?
+                    out = (myHost.equals(yourHost));
+                } catch (final MalformedURLException e) {
+                    logger.warn("URL processing failed: {}", e);
+                    out = false;
+                }
+            } else {
+                out = (id.equals(target));
+            }
+
+            return out;
         }
 
     }
@@ -251,6 +278,20 @@ public class Oracle {
     }
 
     /**
+     * @return Returns whether SP matching is fuzzy.
+     */
+    public static boolean isFuzzyMatch() {
+        return fuzzyMatch;
+    }
+
+    /**
+     * @param fuzzyMatch Whether SP matching should be fuzzy.
+     */
+    public static void setFuzzyMatch(final boolean fuzzyMatch) {
+        Oracle.fuzzyMatch = fuzzyMatch;
+    }
+
+    /**
      * @return human readable service provider name
      */
     public String getServiceName() {
@@ -259,7 +300,7 @@ public class Oracle {
 
         // map this from rp name
         for (final ServiceProviderData sp : data.SPs) {
-            if (sp.id.equals(url)) {
+            if (sp.match(url)) {
                 return sp.name;
             }
 
@@ -296,7 +337,7 @@ public class Oracle {
         ServiceProviderData spData = null;
         for (final ServiceProviderData sp : data.SPs) {
             logger.trace("sp id: {}", sp.id);
-            if (sp.id.equals(spId)) {
+            if (sp.match(spId)) {
                 spData = sp;
                 break;
             }
@@ -326,7 +367,7 @@ public class Oracle {
     public Map<String, Map> getAttributeGroupRequested(final String spId) {
         final Map<String, Map> out = new HashMap();
         for (final ServiceProviderData sp : data.SPs) {
-            if (sp.id.equals(spId)) {
+            if (sp.match(spId)) {
                 for (final AttributeGroupData attrmap : sp.attrGroups) {
                     out.put(attrmap.id, attrmap.toMap());
                 }
@@ -342,7 +383,7 @@ public class Oracle {
     public Map<String, Map> getAttributeRequested(final String spId) {
         final Map<String, Map> out = new HashMap();
         for (final ServiceProviderData sp : data.SPs) {
-            if (sp.id.equals(spId)) {
+            if (sp.match(spId)) {
                 for (final AttributeData attrmap : sp.attrs) {
                     out.put(attrmap.id, attrmap.toMap());
                 }
@@ -358,7 +399,7 @@ public class Oracle {
     public Map<String, Boolean> getAttributeRequired(final String spId) {
         final Map<String, Boolean> out = new HashMap();
         for (final ServiceProviderData sp : data.SPs) {
-            if (sp.id.equals(spId)) {
+            if (sp.match(spId)) {
                 for (final AttributeData attrmap : sp.attrs) {
                     out.put(attrmap.id, attrmap.required);
                 }
@@ -374,7 +415,7 @@ public class Oracle {
     public Map<String, String> getAttributePrivacy(final String spId) {
         final Map<String, String> out = new HashMap();
         for (final ServiceProviderData sp : data.SPs) {
-            if (sp.id.equals(spId)) {
+            if (sp.match(spId)) {
                 for (final AttributeData attrmap : sp.attrs) {
                     out.put(attrmap.id, attrmap.privpolicy);
                 }
@@ -390,7 +431,7 @@ public class Oracle {
     public Map<String, String> getAttributeReason(final String spId) {
         final Map<String, String> out = new HashMap();
         for (final ServiceProviderData sp : data.SPs) {
-            if (sp.id.equals(spId)) {
+            if (sp.match(spId)) {
                 for (final AttributeData attrmap : sp.attrs) {
                     out.put(attrmap.id, attrmap.reason);
                 }

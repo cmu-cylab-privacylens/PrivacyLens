@@ -82,4 +82,27 @@ public class OracleTest {
         Assert.assertEquals(serviceName2, "CMU's Calendar");
     }
 
+    /** Test whether matching url to service provider works */
+    @Test
+    public void testGetRelyingParty() {
+        final String rpid = "https://scalepriv.ece.cmu.edu/shibboleth";
+        oracle.setRelyingPartyId(rpid);
+        String serviceName = oracle.getServiceName();
+        Assert.assertEquals(serviceName, "CMU's Calendar");
+
+        Oracle.setFuzzyMatch(true);
+        serviceName = oracle.getServiceName();
+        Assert.assertEquals(serviceName, "CMU's Calendar");
+
+        final String rpid2 = "https://scalepriv.ece.cmu.edu/foobar";
+        oracle.setRelyingPartyId(rpid2);
+        serviceName = oracle.getServiceName();
+        Assert.assertEquals(serviceName, "CMU's Calendar");
+
+        Oracle.setFuzzyMatch(false);
+        serviceName = oracle.getServiceName();
+        Assert.assertEquals(serviceName, "UNKNOWN");
+
+    }
+
 }
