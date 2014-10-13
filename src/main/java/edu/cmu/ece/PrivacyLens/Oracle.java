@@ -30,12 +30,12 @@ package edu.cmu.ece.PrivacyLens;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
@@ -56,8 +56,8 @@ public class Oracle {
 
     private final Logger logger = LoggerFactory.getLogger(Oracle.class);
 
-    // match SP urls on just the host name
-    private static boolean fuzzyMatch = false;
+    // Interpret ServiceProviderData URLs as regular expressions
+    private static boolean regexpMatch = true;
 
     private String userName = "unset";
 
@@ -111,6 +111,8 @@ public class Oracle {
 
         private transient boolean hasAttrGroups;
 
+        private transient Pattern matchPattern;
+
         private ServiceProviderData() {
         }
 
@@ -131,20 +133,25 @@ public class Oracle {
         }
 
         public boolean match(final String target) {
+            // XXXstroucki oracle data is currently unsorted. that makes
+            // it difficult to structure regexps from specific to general.
             boolean out;
 
-            if (fuzzyMatch) {
-                try {
-                    final URL mine = new URL(id);
-                    final URL yours = new URL(target);
-                    final String myHost = mine.getHost();
-                    final String yourHost = yours.getHost();
-                    // substring comparison?
-                    out = (myHost.equals(yourHost));
-                } catch (final MalformedURLException e) {
-                    logger.warn("URL processing failed: {}", e);
+            if (regexpMatch) {
+                if (matchPattern == null) {
+                    matchPattern = Pattern.compile(id);
+                    // handle default id
+                    if (id.equals("DEFAULT")) {
+                        matchPattern = Pattern.compile("");
+                    }
+                }
+                final Matcher matcher = matchPattern.matcher(target);
+                if (matcher.find()) {
+                    out = true;
+                } else {
                     out = false;
                 }
+
             } else {
                 out = (id.equals(target));
             }
@@ -278,17 +285,17 @@ public class Oracle {
     }
 
     /**
-     * @return Returns whether SP matching is fuzzy.
+     * @return Returns whether SP matching is done by regular expressions.
      */
-    public static boolean isFuzzyMatch() {
-        return fuzzyMatch;
+    public static boolean isRegexpMatch() {
+        return regexpMatch;
     }
 
     /**
-     * @param fuzzyMatch Whether SP matching should be fuzzy.
+     * @param regexpMatch Whether SP matching should be done with regular expressions.
      */
-    public static void setFuzzyMatch(final boolean fuzzyMatch) {
-        Oracle.fuzzyMatch = fuzzyMatch;
+    public static void setRegexpMatch(final boolean regexpMatch) {
+        Oracle.regexpMatch = regexpMatch;
     }
 
     /**

@@ -72,6 +72,7 @@ public class OracleTest {
     /** Test whether the setRelyingPartyId function works */
     @Test
     public void testSetRelyingPartyId() {
+        Oracle.setRegexpMatch(false);
         final String rpid = "plugh";
         oracle.setRelyingPartyId(rpid);
         final String serviceName = oracle.getServiceName();
@@ -86,20 +87,22 @@ public class OracleTest {
     @Test
     public void testGetRelyingParty() {
         final String rpid = "https://scalepriv.ece.cmu.edu/shibboleth";
+        Oracle.setRegexpMatch(false);
+
         oracle.setRelyingPartyId(rpid);
         String serviceName = oracle.getServiceName();
         Assert.assertEquals(serviceName, "CMU's Calendar");
 
-        Oracle.setFuzzyMatch(true);
+        Oracle.setRegexpMatch(true);
         serviceName = oracle.getServiceName();
         Assert.assertEquals(serviceName, "CMU's Calendar");
 
         final String rpid2 = "https://scalepriv.ece.cmu.edu/foobar";
         oracle.setRelyingPartyId(rpid2);
         serviceName = oracle.getServiceName();
-        Assert.assertEquals(serviceName, "CMU's Calendar");
+        Assert.assertEquals(serviceName, "The site");
 
-        Oracle.setFuzzyMatch(false);
+        Oracle.setRegexpMatch(false);
         serviceName = oracle.getServiceName();
         Assert.assertEquals(serviceName, "UNKNOWN");
 
