@@ -114,8 +114,8 @@ public class SourceAction implements Action {
 
             // don't present values of machine readable attributes
             if (!attribute.isMachineReadable()) {
-                stringBuilder.append("Your " + attribute.getDescription() + " is " + '"' + attribute.getValues().get(0)
-                        + "\". ");
+                stringBuilder.append("Your " + attribute.getDescription() + " is " + '"'
+                        + Util.listToString(attribute.getValues()) + "\". ");
             }
 
             // set up consequence text
@@ -139,8 +139,7 @@ public class SourceAction implements Action {
             // don't present values of machine readable attributes
             if (!attribute.isMachineReadable()) {
                 stringBuilder.append(" (<b>");
-                // what about multiple values?
-                stringBuilder.append(attribute.getValues().get(0));
+                stringBuilder.append(Util.listToString(attribute.getValues()));
                 stringBuilder.append("</b>)");
             }
             if (required) {
@@ -216,8 +215,7 @@ public class SourceAction implements Action {
 
             for (final Attribute attr : attrList) {
                 try {
-                    // what about multiple values?
-                    final String attrValue = attr.getValues().get(0);
+                    final String attrValue = Util.listToString(attr.getValues());
                     subValues.add(attrValue);
                 } catch (final IndexOutOfBoundsException x) {
                     subValues.add("[blank]");
@@ -382,8 +380,7 @@ public class SourceAction implements Action {
             // don't present values of machine readable attributes
             if (!attr.isMachineReadable()) {
                 sb.append(" (<strong>");
-                // XXX multiple values?
-                sb.append(attr.getValues().get(0));
+                sb.append(Util.listToString(attr.getValues()));
                 sb.append("</strong>)");
             }
             list.add(sb.toString());
