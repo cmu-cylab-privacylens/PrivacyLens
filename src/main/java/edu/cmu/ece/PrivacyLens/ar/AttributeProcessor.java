@@ -28,12 +28,18 @@
 
 package edu.cmu.ece.PrivacyLens.ar;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -45,6 +51,63 @@ import edu.cmu.ece.PrivacyLens.Util;
  * Attribute Processor.
  */
 public class AttributeProcessor {
+
+    private class EntitlementDescriptions {
+        private final Logger logger = LoggerFactory.getLogger(EntitlementDescriptions.class);
+
+        private final Map<String, String> map = new HashMap<String, String>();
+
+        private EntitlementDescriptions(final String data) {
+            // data format should be q("original","new" "original2","new2" ...)
+            // using perl terminology
+            final List<String> tuples = new ArrayList<String>();
+            // itemPattern: extract tuples into "first" and "rest" lists -
+            // it would be better if the properties could already have been
+            // segmented
+            final Pattern itemPattern = Pattern.compile("^(\".+?\",\".+?\")\\s*(.*)$");
+            boolean stop = false;
+            String nextData = data;
+            while (!stop) {
+                final Matcher matcher = itemPattern.matcher(nextData);
+                if (!matcher.find()) {
+                    throw new InternalError("Entitlement description format is incorrect");
+                }
+                final String first = matcher.group(1);
+                final String rest = matcher.group(2);
+                tuples.add(first);
+                nextData = rest;
+                if (nextData.length() == 0) {
+                    stop = true;
+                }
+            }
+            // tuplePattern: extract the two strings
+            final Pattern tuplePattern = Pattern.compile("^\"(.+)\",\"(.+)\"$");
+            for (final String tuple : tuples) {
+                final Matcher matcher = tuplePattern.matcher(tuple);
+                if (!matcher.find()) {
+                    throw new InternalError("Entitlement description format is incorrect");
+                }
+                final String key = matcher.group(1);
+                final String value = matcher.group(2);
+
+                map.put(key, value);
+            }
+
+        }
+
+        /**
+         * @param key the string to find a description for
+         * @return the configured description
+         */
+        private String get(final String key) {
+            final String out = map.get(key);
+            if (out == null) {
+                // log?
+            }
+            return out;
+        }
+
+    }
 
     /** Class logger. */
     @SuppressWarnings("unused")
@@ -60,6 +123,11 @@ public class AttributeProcessor {
      * List of attributes that are machine readable
      */
     private List<String> machinereadable;
+
+    /**
+     * Structure allowing mapping from technical entitlement strings to more user friendly strings
+     */
+    private EntitlementDescriptions entitlementDescriptions;
 
     /** Default constructor. */
     public AttributeProcessor() {
@@ -88,8 +156,15 @@ public class AttributeProcessor {
     /**
      * @param machinereadable The list of machine readable attributes to set.
      */
-    public void setMachinereadable(final List<String> machinereadable) {
-        this.machinereadable = machinereadable;
+    public void setMachinereadable(final String machinereadable) {
+        this.machinereadable = Util.stringToList(machinereadable);
+    }
+
+    /**
+     * @param entitlementdescription The list of comma separated quoted string pairs to decode entitlements.
+     */
+    public void setEntitlementdescription(final String entitlementdescription) {
+        this.entitlementDescriptions = new EntitlementDescriptions(entitlementdescription);
     }
 
     /**
@@ -112,6 +187,19 @@ public class AttributeProcessor {
             final Attribute attribute = iterator.next();
             if (machinereadable.contains(attribute.getId())) {
                 attribute.setMachineReadable(true);
+            }
+        }
+
+    }
+
+    public void processEntitlementDescriptions(final Attribute attribute) {
+        // XXXstroucki check that the attribute is entitlements
+        final ListIterator<String> iterator = attribute.getValues().listIterator();
+        while (iterator.hasNext()) {
+            final String x = iterator.next();
+            final String newValue = entitlementDescriptions.get(x);
+            if (newValue != null) {
+                iterator.set(newValue);
             }
         }
 
