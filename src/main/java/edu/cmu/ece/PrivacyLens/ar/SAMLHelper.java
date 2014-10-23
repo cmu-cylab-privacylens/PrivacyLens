@@ -225,7 +225,12 @@ public class SAMLHelper {
                 description = AttributeUtils.getDescription(id);
             }
 
-            attributes.add(new Attribute(id, name, description, attributeValues, required));
+            final Attribute attribute = new Attribute(id, name, description, attributeValues, required);
+            if (id.equals("eduPersonEntitlement")) {
+                attributeProcessor.processEntitlementDescriptions(attribute);
+                logger.trace("Processed entitlement descriptions");
+            }
+            attributes.add(attribute);
 
             // attributes.add(AttributeUtils.genAttribute(baseAttribute, locale));
         }
