@@ -94,7 +94,7 @@ public final class Util {
     }
 
     /**
-     * Converts a whitespace separated list into a list of Strings.
+     * Converts a whitespace separated list into a list of Strings. Note it doesn't handle quoted text!
      * 
      * @param string The list.
      * @return Returns an _unmodifiable_ list of Strings.
