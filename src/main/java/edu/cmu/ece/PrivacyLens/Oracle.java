@@ -369,16 +369,34 @@ public class Oracle {
 
     /**
      * @param spId Service Provider ID
+     * @return the ServiceProviderData object for a matching service provider (can be null)
+     */
+    private ServiceProviderData getMatchingSP(final String spId) {
+        ServiceProviderData matchedSP = null;
+        for (final ServiceProviderData sp : data.SPs) {
+            logger.trace("XXXtest {} {}", spId, sp.id);
+            if (sp.match(spId)) {
+                matchedSP = sp;
+                break;
+            }
+        }
+
+        return matchedSP;
+    }
+
+    /**
+     * @param spId Service Provider ID
      * @return map of group id -> (map of k -> v))
      */
     public Map<String, Map> getAttributeGroupRequested(final String spId) {
         final Map<String, Map> out = new HashMap();
-        for (final ServiceProviderData sp : data.SPs) {
-            if (sp.match(spId)) {
-                for (final AttributeGroupData attrmap : sp.attrGroups) {
-                    out.put(attrmap.id, attrmap.toMap());
-                }
+        final ServiceProviderData matchedSP = getMatchingSP(spId);
+
+        if (matchedSP != null) {
+            for (final AttributeGroupData attrmap : matchedSP.attrGroups) {
+                out.put(attrmap.id, attrmap.toMap());
             }
+
         }
         return out;
     }
@@ -389,12 +407,13 @@ public class Oracle {
      */
     public Map<String, Map> getAttributeRequested(final String spId) {
         final Map<String, Map> out = new HashMap();
-        for (final ServiceProviderData sp : data.SPs) {
-            if (sp.match(spId)) {
-                for (final AttributeData attrmap : sp.attrs) {
-                    out.put(attrmap.id, attrmap.toMap());
-                }
+        final ServiceProviderData matchedSP = getMatchingSP(spId);
+
+        if (matchedSP != null) {
+            for (final AttributeData attrmap : matchedSP.attrs) {
+                out.put(attrmap.id, attrmap.toMap());
             }
+
         }
         return out;
     }
@@ -405,12 +424,13 @@ public class Oracle {
      */
     public Map<String, Boolean> getAttributeRequired(final String spId) {
         final Map<String, Boolean> out = new HashMap();
-        for (final ServiceProviderData sp : data.SPs) {
-            if (sp.match(spId)) {
-                for (final AttributeData attrmap : sp.attrs) {
-                    out.put(attrmap.id, attrmap.required);
-                }
+        final ServiceProviderData matchedSP = getMatchingSP(spId);
+
+        if (matchedSP != null) {
+            for (final AttributeData attrmap : matchedSP.attrs) {
+                out.put(attrmap.id, attrmap.required);
             }
+
         }
         return out;
     }
@@ -421,12 +441,13 @@ public class Oracle {
      */
     public Map<String, String> getAttributePrivacy(final String spId) {
         final Map<String, String> out = new HashMap();
-        for (final ServiceProviderData sp : data.SPs) {
-            if (sp.match(spId)) {
-                for (final AttributeData attrmap : sp.attrs) {
-                    out.put(attrmap.id, attrmap.privpolicy);
-                }
+        final ServiceProviderData matchedSP = getMatchingSP(spId);
+
+        if (matchedSP != null) {
+            for (final AttributeData attrmap : matchedSP.attrs) {
+                out.put(attrmap.id, attrmap.privpolicy);
             }
+
         }
         return out;
     }
@@ -437,12 +458,13 @@ public class Oracle {
      */
     public Map<String, String> getAttributeReason(final String spId) {
         final Map<String, String> out = new HashMap();
-        for (final ServiceProviderData sp : data.SPs) {
-            if (sp.match(spId)) {
-                for (final AttributeData attrmap : sp.attrs) {
-                    out.put(attrmap.id, attrmap.reason);
-                }
+        final ServiceProviderData matchedSP = getMatchingSP(spId);
+
+        if (matchedSP != null) {
+            for (final AttributeData attrmap : matchedSP.attrs) {
+                out.put(attrmap.id, attrmap.reason);
             }
+
         }
         return out;
     }
