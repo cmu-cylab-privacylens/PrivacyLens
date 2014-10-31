@@ -374,7 +374,6 @@ public class Oracle {
     private ServiceProviderData getMatchingSP(final String spId) {
         ServiceProviderData matchedSP = null;
         for (final ServiceProviderData sp : data.SPs) {
-            logger.trace("XXXtest {} {}", spId, sp.id);
             if (sp.match(spId)) {
                 matchedSP = sp;
                 break;
