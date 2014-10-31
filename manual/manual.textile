@@ -313,13 +313,13 @@ bc..
         </property>
     </bean>
     
-h2. 4.3 Templates
+h2. 4.2 Templates
 
 h3. Custom View Templates
 
 Feel free to customize the PrivacyLens view templates in @$SHIB_DIST$/src/main/webapp/PrivacyLens/@.
 
-h2. 4.4 Localization
+h2. 4.3 Localization
 
 h3. Custom Messages
 
@@ -331,7 +331,7 @@ bc.
     <bean id="PrivacyLens.viewHelper" class="ch.SWITCH.aai.uApprove.ViewHelper" ...
         p:messagesBase="PrivacyLens.messages" />
 
-h2. 4.5 Strict Comparison
+h2. 4.4 Strict Comparison
 
 h3. Terms Of Use Content Comparison
 
@@ -340,7 +340,7 @@ If the Terms of Use module is enabled, by default only the version is compared t
 bc. <bean id="uApprove.touModule" ... p:compareContent="true" ...
 
 
-h2. 4.6 Audit Logging
+h2. 4.5 Audit Logging
 
 PrivacyLens can write into Shibboleth's audit log at @$SHIB_INSTALL$/logs/idp-audit.log@.
 
@@ -354,11 +354,22 @@ Example output:
 
 bc. 20120101T010000Z|ch.SWITCH.aai.uApprove.PrivacyLens|||tou.acceptance|null|null|null|student1||1.0,5b2ee897c08c79a09cd57e8602d605bf8c52db17de9793677c36b5c78644b2b3,|
 
-h2. 4.7 Machine readable attributes
+h2. 4.6 Machine readable attributes
 
 PrivacyLens can be configured to not show the value of attributes that
 are intended for data processing, and not human comprehension. In the
-PrivacyLens.properties file, add the desired attributes to "ar.attributes.machinereadable".
+file @$SHIB_INSTALL$/conf/PrivacyLens.properties@, add the desired attributes to "ar.attributes.machinereadable". For example:
+
+bc. 
+ar.attributes.machinereadable = eduPersonEntitlement
+
+h2. 4.7 Descriptive entitlements
+
+The eduPersonEntitlement attribute is a set of URI(Uniform Resource Indicator)s, each specifying rights to access resources. A glossary of entitlement URIs can be defined in @$SHIB_INSTALL$/conf/PrivacyLens.properties@ with the ar.attributes.entitlement.description property. Each translation is specified with the coded value in quotes, followed by a comma, followed by the translation in quotes. Multiple translations are separated from each others by spaces, as can be seen in the following example:
+
+bc. 
+ar.attributes.entitlement.description = "urn:mace:dir:entitlement:common-lib-terms","Library Resource Access" \
+  "urn:example.org:entitlement:entitlement1","Secpass B"
 
 h2. 4.8 Black/Whitelisting
 
@@ -378,7 +389,7 @@ bc. <bean id="PrivacyLens.attributeReleaseModule" ... p:auditLogEnabled="true" .
 
 Example output:
 
-bc. 
+bc.
 20120101T010000Z|edu.cmu.ece.PrivacyLens||https://sp.example.org/shibboleth|ar.consent|null|null|null|student1||uid,surname,givenName,|
 20120101T010000Z|edu.cmu.ece.PrivacyLens||https://sp.example.org/shibboleth|ar.clearConsent|null|null|null|student1|||
 20120101T010000Z|edu.cmu.ece.PrivacyLens|||ar.generalConsent|null|null|null|student1|||
