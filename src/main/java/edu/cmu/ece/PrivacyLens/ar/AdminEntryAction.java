@@ -144,8 +144,8 @@ public class AdminEntryAction implements Action {
 
             // don't present values of machine readable attributes
             if (!attribute.isMachineReadable()) {
-                stringBuilder.append("Your " + attribute.getDescription() + " is " + '"' + attribute.getValues().get(0)
-                        + "\". ");
+                stringBuilder.append("Your " + attribute.getDescription() + " is " + '"'
+                        + Util.listToString(attribute.getValues()) + "\". ");
             }
             stringBuilder.append("If you continue to " + oracle.getServiceName() + ", your "
                     + attribute.getDescription() + " will ");
@@ -166,7 +166,7 @@ public class AdminEntryAction implements Action {
             // don't present values of machine readable attributes
             if (!attribute.isMachineReadable()) {
                 stringBuilder.append(" (<b>");
-                stringBuilder.append(attribute.getValues().get(0));
+                stringBuilder.append(Util.listToString(attribute.getValues()));
                 stringBuilder.append("</b>)");
             }
             if (required) {
@@ -221,8 +221,18 @@ public class AdminEntryAction implements Action {
             }
 
             final LoginEventDetail loginEventDetail = attributeReleaseModule.readLoginEventDetail(loginEvent);
+            // old
             request.getSession().setAttribute("loginEvent", loginEvent);
             request.getSession().setAttribute("loginEventDetail", loginEventDetail);
+            // new
+            final StringBuffer sentInfoBuffer = new StringBuffer();
+            for (final Attribute attribute : loginEventDetail.getAttributes()) {
+                sentInfoBuffer.append(attribute.getDescription() + ": \"" + Util.listToString(attribute.getValues())
+                        + "\"<br/>");
+            }
+            final String sentInfo = sentInfoBuffer.toString();
+            request.getSession().setAttribute("sentInfo", sentInfo);
+
             relyingPartyId = loginEvent.getServiceUrl();
 
             final List<Attribute> attributes = IdPHelper.getAttributes(servletContext, request);
