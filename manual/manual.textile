@@ -389,7 +389,7 @@ bc. <bean id="PrivacyLens.attributeReleaseModule" ... p:auditLogEnabled="true" .
 
 Example output:
 
-bc.
+bc. 
 20120101T010000Z|edu.cmu.ece.PrivacyLens||https://sp.example.org/shibboleth|ar.consent|null|null|null|student1||uid,surname,givenName,|
 20120101T010000Z|edu.cmu.ece.PrivacyLens||https://sp.example.org/shibboleth|ar.clearConsent|null|null|null|student1|||
 20120101T010000Z|edu.cmu.ece.PrivacyLens|||ar.generalConsent|null|null|null|student1|||
