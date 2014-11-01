@@ -31,7 +31,6 @@ package edu.cmu.ece.PrivacyLens.ar;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -117,21 +116,22 @@ public class EntryAction implements Action {
 
         if (yesButton) {
             logger.debug("Create consent for user {} to {}.", principalName, relyingPartyId);
-            final List<Attribute> filteredAttributes = new ArrayList();
-            final Iterator<Attribute> i = attributes.iterator();
-            while (i.hasNext()) {
-                final Attribute attr = i.next();
-                final Boolean consented = consentByAttribute.get(attr.getId());
+
+            final List<Attribute> deniedAttributes = new ArrayList<Attribute>();
+            final List<Attribute> consentedAttributes = new ArrayList<Attribute>();
+
+            for (final Attribute attribute : attributes) {
+                final Boolean consented = consentByAttribute.get(attribute.getId());
                 if (consented != null && !consented) {
-                    logger.trace("Did not consent for {}", attr.getId());
-                    filteredAttributes.add(attr);
-                    i.remove();
+                    logger.trace("Did not consent for {}", attribute.getId());
+                    deniedAttributes.add(attribute);
+                } else {
+                    logger.trace("Did consent for {}", attribute.getId());
+                    consentedAttributes.add(attribute);
                 }
             }
-
-            // XXX fix the consent db
-            attributeReleaseModule.denyAttributeRelease(principalName, relyingPartyId, filteredAttributes);
-            attributeReleaseModule.consentAttributeRelease(principalName, relyingPartyId, attributes);
+            attributeReleaseModule.denyAttributeRelease(principalName, relyingPartyId, deniedAttributes);
+            attributeReleaseModule.consentAttributeRelease(principalName, relyingPartyId, consentedAttributes);
 
             // make entry in login database
             attributeReleaseModule.addLogin(principalName, oracle.getServiceName(), relyingPartyId, timestamp,

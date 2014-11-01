@@ -31,7 +31,6 @@ package edu.cmu.ece.PrivacyLens.ar;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -113,19 +112,22 @@ public class AdminLoginEventAction implements Action {
                 }
             }
             logger.debug("Create consent for user {} to {}.", userId, relyingPartyId);
-            final List<Attribute> filteredAttributes = new ArrayList();
-            final Iterator<Attribute> i = attributes.iterator();
-            while (i.hasNext()) {
-                final Attribute attr = i.next();
-                final Boolean consented = consentByAttribute.get(attr.getId());
+
+            final List<Attribute> deniedAttributes = new ArrayList<Attribute>();
+            final List<Attribute> consentedAttributes = new ArrayList<Attribute>();
+
+            for (final Attribute attribute : attributes) {
+                final Boolean consented = consentByAttribute.get(attribute.getId());
                 if (consented != null && !consented) {
-                    logger.trace("Did not consent for {}", attr.getId());
-                    filteredAttributes.add(attr);
-                    i.remove();
+                    logger.trace("Did not consent for {}", attribute.getId());
+                    deniedAttributes.add(attribute);
+                } else {
+                    logger.trace("Did consent for {}", attribute.getId());
+                    consentedAttributes.add(attribute);
                 }
             }
-            attributeReleaseModule.denyAttributeRelease(userId, relyingPartyId, filteredAttributes);
-            attributeReleaseModule.consentAttributeRelease(userId, relyingPartyId, attributes);
+            attributeReleaseModule.denyAttributeRelease(userId, relyingPartyId, deniedAttributes);
+            attributeReleaseModule.consentAttributeRelease(userId, relyingPartyId, consentedAttributes);
 
             int remindAfter = 1;
             final String reminderIntervalString = (request.getParameter("reminderInterval"));
