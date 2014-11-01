@@ -203,14 +203,20 @@ public class AdminServiceLoginAction implements Action {
 
             final LoginEventDetail loginEventDetail = attributeReleaseModule.readLoginEventDetail(loginEvent);
 
-            // old
+            // the whole event is given to the jsp since additional text uses
+            // some of the fields
             request.getSession().setAttribute("loginEvent", loginEvent);
             request.getSession().setAttribute("loginEventDetail", loginEventDetail);
-            // new
+
             final StringBuffer sentInfoBuffer = new StringBuffer();
             for (final Attribute attribute : loginEventDetail.getAttributes()) {
-                sentInfoBuffer.append(attribute.getDescription() + ": \"" + Util.listToString(attribute.getValues())
-                        + "\"<br/>");
+                sentInfoBuffer.append(attribute.getDescription());
+                // don't present values of machine readable attributes
+                if (!attribute.isMachineReadable()) {
+                    sentInfoBuffer.append(": \"" + Util.listToString(attribute.getValues()) + "\"");
+                }
+
+                sentInfoBuffer.append("<br/>");
             }
             final String sentInfo = sentInfoBuffer.toString();
             request.getSession().setAttribute("sentInfo", sentInfo);
