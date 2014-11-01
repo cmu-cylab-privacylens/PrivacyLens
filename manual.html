@@ -82,7 +82,7 @@
 						<a href="manual.html#a4.1CustomSQLStatements">4.1 Custom SQL Statements</a>
 					</li>
 					<li>
-						<a href="manual.html#a4.3Templates">4.3 Templates</a>
+						<a href="manual.html#a4.2Templates">4.2 Templates</a>
 						<ol style="list-style: none;">
 							<li>
 								<a href="manual.html#CustomViewTemplates">Custom View Templates</a>
@@ -90,7 +90,7 @@
 						</ol>
 					</li>
 					<li>
-						<a href="manual.html#a4.4Localization">4.4 Localization</a>
+						<a href="manual.html#a4.3Localization">4.3 Localization</a>
 						<ol style="list-style: none;">
 							<li>
 								<a href="manual.html#CustomMessages">Custom Messages</a>
@@ -98,7 +98,7 @@
 						</ol>
 					</li>
 					<li>
-						<a href="manual.html#a4.5StrictComparison">4.5 Strict Comparison</a>
+						<a href="manual.html#a4.4StrictComparison">4.4 Strict Comparison</a>
 						<ol style="list-style: none;">
 							<li>
 								<a href="manual.html#TermsOfUseContentComparison">Terms Of Use Content Comparison</a>
@@ -106,7 +106,7 @@
 						</ol>
 					</li>
 					<li>
-						<a href="manual.html#a4.6AuditLogging">4.6 Audit Logging</a>
+						<a href="manual.html#a4.5AuditLogging">4.5 Audit Logging</a>
 						<ol style="list-style: none;">
 							<li>
 								<a href="manual.html#EnableTermsOfUseAuditLog">Enable Terms Of Use Audit Log</a>
@@ -114,7 +114,10 @@
 						</ol>
 					</li>
 					<li>
-						<a href="manual.html#a4.7Machinereadableattributes">4.7 Machine readable attributes</a>
+						<a href="manual.html#a4.6Machinereadableattributes">4.6 Machine readable attributes</a>
+					</li>
+					<li>
+						<a href="manual.html#a4.7Descriptiveentitlements">4.7 Descriptive entitlements</a>
 					</li>
 					<li>
 						<a href="manual.html#a4.8BlackWhitelisting">4.8 Black/Whitelisting</a>
@@ -533,12 +536,12 @@
     &lt;/bean>
     
 </pre></pre>
-		<h2 id="a4.3Templates">4.3 Templates</h2>
+		<h2 id="a4.2Templates">4.2 Templates</h2>
 		<h3 id="CustomViewTemplates">Custom View Templates</h3>
 		<p>Feel free to customize the PrivacyLens view templates in 
 			<code>$SHIB_DIST$/src/main/webapp/PrivacyLens/</code>.
 		</p>
-		<h2 id="a4.4Localization">4.4 Localization</h2>
+		<h2 id="a4.3Localization">4.3 Localization</h2>
 		<h3 id="CustomMessages">Custom Messages</h3>
 		<p>You may provided custom messages by copying the directory 
 			<code>$PLENS_DIST$/manual/examples/messages</code> to Shibboleth&#8217;s classpath (e.g., 
@@ -550,14 +553,14 @@
 		<pre><pre>    &lt;bean id="PrivacyLens.viewHelper" class="ch.SWITCH.aai.uApprove.ViewHelper" ...
         p:messagesBase="PrivacyLens.messages" />
 </pre></pre>
-		<h2 id="a4.5StrictComparison">4.5 Strict Comparison</h2>
+		<h2 id="a4.4StrictComparison">4.4 Strict Comparison</h2>
 		<h3 id="TermsOfUseContentComparison">Terms Of Use Content Comparison</h3>
 		<p>If the Terms of Use module is enabled, by default only the version is compared to decide whether a user has accepted the terms. You can enable full-text comparison by making the following change in 
 			<code>$SHIB_INSTALL$/conf/PrivacyLens.xml</code>: 
 		</p>
 		<pre><pre>&lt;bean id="uApprove.touModule" ... p:compareContent="true" ...
 </pre></pre>
-		<h2 id="a4.6AuditLogging">4.6 Audit Logging</h2>
+		<h2 id="a4.5AuditLogging">4.5 Audit Logging</h2>
 		<p>PrivacyLens can write into Shibboleth&#8217;s audit log at 
 			<code>$SHIB_INSTALL$/logs/idp-audit.log</code>.
 		</p>
@@ -570,11 +573,22 @@
 		<p>Example output:</p>
 		<pre><pre>20120101T010000Z|ch.SWITCH.aai.uApprove.PrivacyLens|||tou.acceptance|null|null|null|student1||1.0,5b2ee897c08c79a09cd57e8602d605bf8c52db17de9793677c36b5c78644b2b3,|
 </pre></pre>
-		<h2 id="a4.7Machinereadableattributes">4.7 Machine readable attributes</h2>
+		<h2 id="a4.6Machinereadableattributes">4.6 Machine readable attributes</h2>
 		<p>PrivacyLens can be configured to not show the value of attributes that
 			<br/>are intended for data processing, and not human comprehension. In the
-			<br/>PrivacyLens.properties file, add the desired attributes to &#8220;ar.attributes.machinereadable&#8221;.
+			<br/>file 
+			<code>$SHIB_INSTALL$/conf/PrivacyLens.properties</code>, add the desired attributes to &#8220;ar.attributes.machinereadable&#8221;. For example:
 		</p>
+		<pre><pre>ar.attributes.machinereadable = eduPersonEntitlement
+</pre></pre>
+		<h2 id="a4.7Descriptiveentitlements">4.7 Descriptive entitlements</h2>
+		<p>The eduPersonEntitlement attribute is a set of 
+			<acronym title="Uniform Resource Indicator">URI</acronym>s, each specifying rights to access resources. A glossary of entitlement URIs can be defined in 
+			<code>$SHIB_INSTALL$/conf/PrivacyLens.properties</code> with the ar.attributes.entitlement.description property. Each translation is specified with the coded value in quotes, followed by a comma, followed by the translation in quotes. Multiple translations are separated from each others by spaces, as can be seen in the following example:
+		</p>
+		<pre><pre>ar.attributes.entitlement.description = "urn:mace:dir:entitlement:common-lib-terms","Library Resource Access" \
+  "urn:example.org:entitlement:entitlement1","Secpass B"
+</pre></pre>
 		<h2 id="a4.8BlackWhitelisting">4.8 Black/Whitelisting</h2>
 		<p>PrivacyLens can be configured to show or not show the interface, depending on
 			<br/>what Service Provider is involved. In the PrivacyLens.properties file,
@@ -630,6 +644,8 @@
 			<dd>Javascript Object Notation</dd>
 			<dt>JSP</dt>
 			<dd>Java Server Pages</dd>
+			<dt>URI</dt>
+			<dd>Uniform Resource Indicator</dd>
 		</dl>
 	</body>
 </html>
