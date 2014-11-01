@@ -40,6 +40,8 @@ Logged in to <b>${loginEvent.serviceName}</b> on <joda:format value="${loginEven
 </span><br /><br />
 Items sent:<br />
 <div id="loginEventDetail">
+<p>${sentInfo}</p>
+<!--
 <c:forEach var="attribute" items="${loginEventDetail.attributes}" varStatus="status">
 <c:choose>
 <c:when test="${attribute.id == 'eduPersonEntitlement' }">
@@ -54,6 +56,7 @@ ${attribute.description}: "${avString}"<br />
 </c:otherwise>
 </c:choose>
 </c:forEach>
+-->
 <br />
 </div>
 Next time you access ${loginEvent.serviceName}, ${idpOrganization} should:<br/>
