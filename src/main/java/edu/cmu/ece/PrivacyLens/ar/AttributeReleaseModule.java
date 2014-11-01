@@ -266,6 +266,8 @@ public class AttributeReleaseModule {
                     storage.containsAttributeReleaseChoice(principalName, relyingPartyId, attribute.getId());
             out.put(attribute.getId(), choice);
         }
+
+        logger.info("getAttributeConsent returning size: {}", out.size());
         return out;
 
     }
