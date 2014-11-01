@@ -302,7 +302,7 @@ public final class IdPHelper {
      */
     public static void setAttributes(final ServletContext servletContext, final HttpServletRequest request,
             final List<Attribute> attributes) {
-        LOGGER.trace("[IdPHelper] setAttributes");
+        LOGGER.trace("[IdPHelper] setAttributes count: {}", attributes.size());
         final LoginContext loginContext = getLoginContext(servletContext, request, true);
         loginContext.setProperty("PrivacyLens.attributes", (Serializable) attributes);
     }
@@ -319,6 +319,7 @@ public final class IdPHelper {
         final LoginContext loginContext = getLoginContext(servletContext, request, true);
         @SuppressWarnings("unchecked") final List<Attribute> attributes =
                 (List<Attribute>) loginContext.getProperty("PrivacyLens.attributes");
+        LOGGER.trace("[IdPHelper] getAttributes count: {}", attributes.size());
         return attributes;
     }
 
