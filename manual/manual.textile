@@ -221,6 +221,13 @@ file to provide these details. Adjust @$SHIB_INSTALL$/conf/spsetup.json@
 to fit your environment. The file is in JSON(Javascript Object Notation)
 format.
 
+The @id@ field for a Service Provider definition is interpreted as a
+regular expression. By ordering the definitions from specific to general,
+specific information can be shown for some Service Providers, yet
+general information still provided for others. To specify a definition that
+should be matched successfully for all Service Providers, the @id@ field
+can be set to @DEFAULT@.
+
 bc.. {
   "attrs":[
     {
@@ -232,7 +239,7 @@ bc.. {
   "SPs":[
     {
       "name":Human readable name of the Service Provider,
-      "id":Service Provider identifier within Shibboleth,
+      "id":Regular expression to match Service Provider identifier within Shibboleth against,
       "attrGroups":[
         {
           "id":Attribute group identifier,
