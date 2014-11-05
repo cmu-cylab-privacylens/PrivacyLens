@@ -28,7 +28,9 @@
 
 package edu.cmu.ece.PrivacyLens.ar;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -75,10 +77,20 @@ public class ReminderAction implements Action {
         }
 
         if (yesButton) {
-            // make entry in login database
+            // XXX obtain these from user preferences!
+            final Map<String, Boolean> consentByAttribute =
+                    attributeReleaseModule.getAttributeConsent(principalName, relyingPartyId, attributes);
+
+            // make entry in login database, with all consented attributes
+            final List<Attribute> consentedAttributes = new ArrayList<Attribute>();
+            for (final Attribute attribute : attributes) {
+                if (consentByAttribute.get(attribute.getId())) {
+                    consentedAttributes.add(attribute);
+                }
+            }
             final Oracle oracle = Oracle.getInstance();
             attributeReleaseModule.addLogin(principalName, oracle.getServiceName(), relyingPartyId, timestamp,
-                    attributes);
+                    consentedAttributes);
             return "sink";
         }
 

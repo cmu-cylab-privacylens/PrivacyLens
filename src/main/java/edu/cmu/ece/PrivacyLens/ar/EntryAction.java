@@ -133,9 +133,10 @@ public class EntryAction implements Action {
             attributeReleaseModule.denyAttributeRelease(principalName, relyingPartyId, deniedAttributes);
             attributeReleaseModule.consentAttributeRelease(principalName, relyingPartyId, consentedAttributes);
 
-            // make entry in login database
+            // make entry in login database, with all consented attributes
             attributeReleaseModule.addLogin(principalName, oracle.getServiceName(), relyingPartyId, timestamp,
-                    attributes);
+                    consentedAttributes);
+
             return "sink";
         }
 

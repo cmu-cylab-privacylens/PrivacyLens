@@ -345,10 +345,16 @@ public class SourceAction implements Action {
                 return "reminder";
             } else {
                 logger.debug("No reminder due");
-                // make entry in login database
+                // make entry in login database, with all consented attributes
+                final List<Attribute> consentedAttributes = new ArrayList<Attribute>();
+                for (final Attribute attribute : attributes) {
+                    if (consentByAttribute.get(attribute.getId())) {
+                        consentedAttributes.add(attribute);
+                    }
+                }
                 final Oracle oracle = Oracle.getInstance();
                 attributeReleaseModule.addLogin(principalName, oracle.getServiceName(), relyingPartyId, timestamp,
-                        attributes);
+                        consentedAttributes);
                 return "sink";
             }
 
