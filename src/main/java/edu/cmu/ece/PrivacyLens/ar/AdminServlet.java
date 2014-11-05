@@ -148,9 +148,11 @@ public class AdminServlet extends HttpServlet {
                 IdPHelper.setAttributeReleaseConsented(servletContext, request);
                 IdPHelper.returnToIdP(servletContext, request, response);
             } else if (view.equals("loginEvent")) {
+                //AdminViewHelper.setupView(view);
                 viewHelper.showView(servletContext, request, response, "attribute-loginevent", context);
                 logger.trace("loginEvent view finished");
             } else if (view.equals("serviceLogin")) {
+                //AdminViewHelper.setupView(view);
                 viewHelper.showView(servletContext, request, response, "attribute-service", context);
                 logger.trace("serviceLogin view finished");
             } else {
@@ -159,6 +161,7 @@ public class AdminServlet extends HttpServlet {
                 }
                 // default and entry point
                 //context.put("allowGeneralConsent", attributeReleaseModule.isAllowGeneralConsent());
+                AdminViewHelper.setupView("entry", servletContext, request, attributeReleaseModule);
                 viewHelper.showView(servletContext, request, response, "attribute-admin", context);
                 logger.trace("entry view finished");
                 return;

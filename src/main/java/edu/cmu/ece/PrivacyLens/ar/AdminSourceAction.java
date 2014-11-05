@@ -28,26 +28,17 @@
 
 package edu.cmu.ece.PrivacyLens.ar;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import edu.cmu.ece.PrivacyLens.Action;
-import edu.cmu.ece.PrivacyLens.IdPHelper;
-import edu.cmu.ece.PrivacyLens.Oracle;
 import edu.cmu.ece.PrivacyLens.Util;
-import edu.cmu.ece.PrivacyLens.config.General;
 
 /**
  * Causes the controller to go to entry state
@@ -73,61 +64,8 @@ public class AdminSourceAction implements Action {
         logger.trace("AdminSourceAction init end arm: {}", attributeReleaseModule);
     }
 
-    private List<Map> processLoginEvents(final List<LoginEvent> loginEventsList) {
-        final List<Map> foobar = new ArrayList<Map>();
-        for (final LoginEvent loginEvent : loginEventsList) {
-            loginEvent.getEventDetailHash();
-            final DateTime loginEventDate = loginEvent.getDate();
-            final DateTime now = new DateTime();
-            final long relativeTime = now.getMillis() - loginEventDate.getMillis();
-            final String dateTimeString = Util.millisToDuration(relativeTime);
-            final String serviceString = loginEvent.getServiceName();
-            final String loginEventId = loginEvent.getEventDetailHash();
-            final Map<String, Object> map = new HashMap<String, Object>();
-            map.put("dateTimeString", dateTimeString);
-            map.put("service", serviceString);
-            map.put("loginEvent", loginEvent);
-            map.put("loginEventId", loginEventId);
-            foobar.add(map);
-        }
-        return foobar;
-    }
-
     /** {@inheritDoc} */
     public String execute(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
-        //final ServletContext servletContext = Util.servletContext;
-        logger.trace("AdminSourceAction execute sc: {} arm: {}", servletContext, attributeReleaseModule);
-        final String principalName = IdPHelper.getPrincipalName(servletContext, request);
-
-        final int limitLoginEvents = 6;
-        final int limitRelyingPartyList = 6;
-
-        final List<LoginEvent> lastLoginEvents =
-                attributeReleaseModule.listLoginEvents(principalName, "", limitLoginEvents);
-        final List<Map> loginEventList = processLoginEvents(lastLoginEvents);
-        request.getSession().setAttribute("lastLoginEvents", loginEventList);
-        if (loginEventList.size() == limitLoginEvents) {
-            request.getSession().setAttribute("loginEventFull", true);
-        }
-
-        final List<String> servicesList =
-                attributeReleaseModule.listRelyingParties(principalName, limitRelyingPartyList);
-        final Map<String, List> serviceLoginEventMap = new HashMap<String, List>();
-        for (final String service : servicesList) {
-            final List<LoginEvent> serviceLoginEvents =
-                    attributeReleaseModule.listLoginEvents(principalName, service, limitLoginEvents);
-            final List<Map> serviceLoginEventList = processLoginEvents(serviceLoginEvents);
-            serviceLoginEventMap.put(service, serviceLoginEventList);
-        }
-        request.getSession().setAttribute("relyingPartiesList", servicesList);
-        request.getSession().setAttribute("serviceLoginEvents", serviceLoginEventMap);
-        if (servicesList.size() == limitRelyingPartyList) {
-            request.getSession().setAttribute("relyingPartyListFull", true);
-        }
-
-        request.getSession().setAttribute("userName", Oracle.getInstance().getUserName());
-        request.getSession().setAttribute("idpName", General.getInstance().getIdpName());
-
         return "entry";
     }
 }
