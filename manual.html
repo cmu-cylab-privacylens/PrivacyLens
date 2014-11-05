@@ -424,6 +424,16 @@
 			<acronym title="Javascript Object Notation">JSON</acronym>
 			<br/>format.
 		</p>
+		<p>The 
+			<code>id</code> field for a Service Provider definition is interpreted as a
+			<br/>regular expression. By ordering the definitions from specific to general,
+			<br/>specific information can be shown for some Service Providers, yet
+			<br/>general information still provided for others. To specify a definition that
+			<br/>should be matched successfully for all Service Providers, the 
+			<code>id</code> field
+			<br/>can be 
+			<code>DEFAULT</code>.
+		</p>
 		<pre><pre>{
   "attrs":[
     {
@@ -435,7 +445,7 @@
   "SPs":[
     {
       "name":Human readable name of the Service Provider,
-      "id":Service Provider identifier within Shibboleth,
+      "id":Regular expression to match Service Provider identifier within Shibboleth against,
       "attrGroups":[
         {
           "id":Attribute group identifier,
