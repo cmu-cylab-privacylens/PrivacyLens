@@ -587,14 +587,14 @@
 		<p>PrivacyLens can be configured to not show the value of attributes that
 			<br/>are intended for data processing, and not human comprehension. In the
 			<br/>file 
-			<code>$SHIB_INSTALL$/conf/PrivacyLens.properties</code>, add the desired attributes to &#8220;ar.attributes.machinereadable&#8221;. For example:
+			<code>$SHIB_INSTALL$/conf/PrivacyLens.properties</code>, add the desired attributes to &#8220;ar.attributes.machinereadable&#8221;, each separated by a space. For example:
 		</p>
-		<pre><pre>ar.attributes.machinereadable = eduPersonEntitlement
+		<pre><pre>ar.attributes.machinereadable = eduPersonEntitlement anotherAttribute
 </pre></pre>
 		<h2 id="a4.7Descriptiveentitlements">4.7 Descriptive entitlements</h2>
 		<p>The eduPersonEntitlement attribute is a set of 
 			<acronym title="Uniform Resource Indicator">URI</acronym>s, each specifying rights to access resources. A glossary of entitlement URIs can be defined in 
-			<code>$SHIB_INSTALL$/conf/PrivacyLens.properties</code> with the ar.attributes.entitlement.description property. Each translation is specified with the coded value in quotes, followed by a comma, followed by the translation in quotes. Multiple translations are separated from each others by spaces, as can be seen in the following example:
+			<code>$SHIB_INSTALL$/conf/PrivacyLens.properties</code> with the ar.attributes.entitlement.description property. Each translation is specified with the coded value in quotes, followed by a comma, followed by the translation in quotes. Multiple translations are separated from each others by spaces, as can be seen in the following example (line break has been inserted for clarity, but is equivalent to a separating space):
 		</p>
 		<pre><pre>ar.attributes.entitlement.description = "urn:mace:dir:entitlement:common-lib-terms","Library Resource Access" \
   "urn:example.org:entitlement:entitlement1","Secpass B"
