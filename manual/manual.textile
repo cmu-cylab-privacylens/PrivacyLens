@@ -365,14 +365,14 @@ h2. 4.6 Machine readable attributes
 
 PrivacyLens can be configured to not show the value of attributes that
 are intended for data processing, and not human comprehension. In the
-file @$SHIB_INSTALL$/conf/PrivacyLens.properties@, add the desired attributes to "ar.attributes.machinereadable". For example:
+file @$SHIB_INSTALL$/conf/PrivacyLens.properties@, add the desired attributes to "ar.attributes.machinereadable", each separated by a space. For example:
 
 bc. 
-ar.attributes.machinereadable = eduPersonEntitlement
+ar.attributes.machinereadable = eduPersonEntitlement anotherAttribute
 
 h2. 4.7 Descriptive entitlements
 
-The eduPersonEntitlement attribute is a set of URI(Uniform Resource Indicator)s, each specifying rights to access resources. A glossary of entitlement URIs can be defined in @$SHIB_INSTALL$/conf/PrivacyLens.properties@ with the ar.attributes.entitlement.description property. Each translation is specified with the coded value in quotes, followed by a comma, followed by the translation in quotes. Multiple translations are separated from each others by spaces, as can be seen in the following example:
+The eduPersonEntitlement attribute is a set of URI(Uniform Resource Indicator)s, each specifying rights to access resources. A glossary of entitlement URIs can be defined in @$SHIB_INSTALL$/conf/PrivacyLens.properties@ with the ar.attributes.entitlement.description property. Each translation is specified with the coded value in quotes, followed by a comma, followed by the translation in quotes. Multiple translations are separated from each others by spaces, as can be seen in the following example (line break has been inserted for clarity, but is equivalent to a separating space):
 
 bc. 
 ar.attributes.entitlement.description = "urn:mace:dir:entitlement:common-lib-terms","Library Resource Access" \
