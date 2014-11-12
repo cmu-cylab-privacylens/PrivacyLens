@@ -194,6 +194,10 @@ public class AttributeProcessor {
 
     public void processEntitlementDescriptions(final Attribute attribute) {
         // XXXstroucki check that the attribute is entitlements
+        if (entitlementDescriptions == null) {
+            logger.error("entitlementDescriptions is null, can't process");
+            return;
+        }
         final ListIterator<String> iterator = attribute.getValues().listIterator();
         while (iterator.hasNext()) {
             final String x = iterator.next();
