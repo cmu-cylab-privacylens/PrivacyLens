@@ -158,10 +158,8 @@
 			</li>
 		</ul>
 		<h2 id="a1.2BuildingPrivacyLensfromsource">1.2 Building PrivacyLens from source</h2>
-		<p>If you are not using a downloaded binary package of PrivacyLens, create
-			<br/>one using Maven with the command 
-			<code>mvn install</code>. This will create a binary
-			<br/>package ZIP file in the 
+		<p>If you are not using a downloaded binary package of PrivacyLens, create one using Maven with the command 
+			<code>mvn install</code>. This will create a binary package ZIP file in the 
 			<code>target/</code> directory.
 		</p>
 		<h2 id="a1.3LibraryInstallation">1.3 Library Installation</h2>
@@ -355,9 +353,18 @@
 		<p>Customize 
 			<code>$SHIB_INSTALL$/conf/PrivacyLens.properties</code> according your database environment and required features. See inline documentation of PrivacyLens.properties for configuration options.
 		</p>
-		<p>In case you enable the &#8216;Terms of Use&#8217; module (disabled by default), you need to provide an appropriate text
-			<br/>suitable for your organization.
+		<p>In case of database connectivity problems, you may want to set the &#8220;graceful&#8221; property to &#8220;true&#8221; in 
+			<code>$SHIB_INSTALL$/conf/PrivacyLens.xml</code>:
 		</p>
+		<pre><pre>&lt;property name="storage">
+  &lt;bean class="ch.SWITCH.aai.uApprove.tou.storage.JDBCStorage" init-method="initialize"
+  p:dataSource-ref="PrivacyLens.dataSource" p:sqlStatements="classpath:/storage/sql-statements.properties" p:graceful="true" />
+&lt;/property>
+</pre></pre>
+		<p>You may then want to provide an appropriate timeout setting to the database configuration in 
+			<code>$SHIB_INSTALL$/conf/PrivacyLens.properties</code>.
+		</p>
+		<p>In case you enable the &#8216;Terms of Use&#8217; module (disabled by default), you need to provide an appropriate text suitable for your organization.</p>
 		<p>An example &#8216;Terms Of Use&#8217; HTML file can be found in 
 			<code>$PLENS_DIST$/manual/examples/terms-of-use.html</code>.
 		</p>
@@ -394,11 +401,8 @@
 			</em>
 		</p>
 		<h2 id="a2.4ConfigureShibbolethtohonorPrivacyLenschoices">2.4 Configure Shibboleth to honor PrivacyLens choices</h2>
-		<p>Configure the Identity Provider to query PrivacyLens for attribute release
-			<br/>choices. Edit the file 
-			<code>$SHIB_INSTALL$/conf/attribute-filter.xml</code> and make
-			<br/>each AttributeFilterPolicy contain a PermitValueRule that will query
-			<br/>PrivacyLens. The language used for the script is Javascript:
+		<p>Configure the Identity Provider to query PrivacyLens for attribute release choices. Edit the file 
+			<code>$SHIB_INSTALL$/conf/attribute-filter.xml</code> and make each AttributeFilterPolicy contain a PermitValueRule that will query PrivacyLens. The language used for the script is Javascript:
 		</p>
 		<pre><pre>&lt;afp:PermitValueRule xsi:type="basic:Script" >
     &lt;basic:Script>
@@ -409,29 +413,17 @@
     &lt;/basic:Script>
 &lt;/afp:PermitValueRule>
 
+The return value of the last function called will determine the outcome of this rule. If the return value is true, the attribute will be released by the Identity Provider.
+
 </pre></pre>
-		<p>The return value of the last function called will determine the outcome
-			<br/>of this rule. If the return value is true, the attribute will be released
-			<br/>by the Identity Provider.
-		</p>
 		<h2 id="a2.5ConfiguringtheOracle">2.5 Configuring the Oracle</h2>
-		<p>As there is currently no reliable transmission of requested and required
-			<br/>attributes from a Service Provider when it refers a user to his home
-			<br/>Identity Provider, PrivacyLens is currently referring to a configuration
-			<br/>file to provide these details. Adjust 
-			<code>$SHIB_INSTALL$/conf/spsetup.json</code>
-			<br/>to fit your environment. The file is in 
-			<acronym title="Javascript Object Notation">JSON</acronym>
-			<br/>format.
+		<p>As there is currently no reliable transmission of requested and required attributes from a Service Provider when it refers a user to his home Identity Provider, PrivacyLens is currently referring to a configuration file to provide these details. Adjust 
+			<code>$SHIB_INSTALL$/conf/spsetup.json</code> to fit your environment. The file is in 
+			<acronym title="Javascript Object Notation">JSON</acronym> format.
 		</p>
 		<p>The 
-			<code>id</code> field for a Service Provider definition is interpreted as a
-			<br/>regular expression. By ordering the definitions from specific to general,
-			<br/>specific information can be shown for some Service Providers, yet
-			<br/>general information still provided for others. To specify a definition that
-			<br/>should be matched successfully for all Service Providers, the 
-			<code>id</code> field
-			<br/>can be set to 
+			<code>id</code> field for a Service Provider definition is interpreted as a regular expression. By ordering the definitions from specific to general, specific information can be shown for some Service Providers, yet general information still provided for others. To specify a definition that should be matched successfully for all Service Providers, the 
+			<code>id</code> field can be set to 
 			<code>DEFAULT</code>.
 		</p>
 		<pre><pre>{
@@ -600,14 +592,7 @@
   "urn:example.org:entitlement:entitlement1","Secpass B"
 </pre></pre>
 		<h2 id="a4.8BlackWhitelisting">4.8 Black/Whitelisting</h2>
-		<p>PrivacyLens can be configured to show or not show the interface, depending on
-			<br/>what Service Provider is involved. In the PrivacyLens.properties file,
-			<br/>regular expressions that the Service Provider will be matched again are
-			<br/>provided to &#8220;services&#8221;. If &#8220;services.blacklist&#8221; is true, the user will
-			<br/>not see the interface for any Service Provider that matches the regular
-			<br/>expressions. If &#8220;services.blacklist&#8221; is false, the user will only see the
-			<br/>interface for Service Providers that match the regular expressions.
-		</p>
+		<p>PrivacyLens can be configured to show or not show the interface, depending on what Service Provider is involved. In the PrivacyLens.properties file, regular expressions that the Service Provider will be matched again are provided to &#8220;services&#8221;. If &#8220;services.blacklist&#8221; is true, the user will not see the interface for any Service Provider that matches the regular expressions. If &#8220;services.blacklist&#8221; is false, the user will only see the interface for Service Providers that match the regular expressions.</p>
 		<h3 id="EnableAttributeReleaseAuditLog">Enable Attribute Release Audit Log</h3>
 		<p>You can enable the attribute release module audit log in in 
 			<code>$SHIB_INSTALL$/conf/PrivacyLens.xml</code>:
