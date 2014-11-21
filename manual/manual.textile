@@ -18,9 +18,7 @@ h2. 1.1 Prerequisites
 
 h2. 1.2 Building PrivacyLens from source
 
-If you are not using a downloaded binary package of PrivacyLens, create
-one using Maven with the command @mvn install@. This will create a binary
-package ZIP file in the @target/@ directory.
+If you are not using a downloaded binary package of PrivacyLens, create one using Maven with the command @mvn install@. This will create a binary package ZIP file in the @target/@ directory.
 
 h2. 1.3 Library Installation
 
@@ -180,8 +178,7 @@ bc.
 
 You may then want to provide an appropriate timeout setting to the database configuration in @$SHIB_INSTALL$/conf/PrivacyLens.properties@.
 
-In case you enable the 'Terms of Use' module (disabled by default), you need to provide an appropriate text
-suitable for your organization.
+In case you enable the 'Terms of Use' module (disabled by default), you need to provide an appropriate text suitable for your organization.
 
 An example 'Terms Of Use' HTML file can be found in @$PLENS_DIST$/manual/examples/terms-of-use.html@.
 
@@ -204,10 +201,7 @@ _(For the SWITCHaai federation, the logo is available at "http://www.switch.ch/a
 
 h2. 2.4 Configure Shibboleth to honor PrivacyLens choices
 
-Configure the Identity Provider to query PrivacyLens for attribute release
-choices. Edit the file @$SHIB_INSTALL$/conf/attribute-filter.xml@ and make
-each AttributeFilterPolicy contain a PermitValueRule that will query
-PrivacyLens. The language used for the script is Javascript:
+Configure the Identity Provider to query PrivacyLens for attribute release choices. Edit the file @$SHIB_INSTALL$/conf/attribute-filter.xml@ and make each AttributeFilterPolicy contain a PermitValueRule that will query PrivacyLens. The language used for the script is Javascript:
 
 bc.. <afp:PermitValueRule xsi:type="basic:Script" >
     <basic:Script>
@@ -218,25 +212,13 @@ bc.. <afp:PermitValueRule xsi:type="basic:Script" >
     </basic:Script>
 </afp:PermitValueRule>
 
-p. The return value of the last function called will determine the outcome
-of this rule. If the return value is true, the attribute will be released
-by the Identity Provider.
+The return value of the last function called will determine the outcome of this rule. If the return value is true, the attribute will be released by the Identity Provider.
 
 h2. 2.5 Configuring the Oracle
 
-As there is currently no reliable transmission of requested and required
-attributes from a Service Provider when it refers a user to his home
-Identity Provider, PrivacyLens is currently referring to a configuration
-file to provide these details. Adjust @$SHIB_INSTALL$/conf/spsetup.json@
-to fit your environment. The file is in JSON(Javascript Object Notation)
-format.
+As there is currently no reliable transmission of requested and required attributes from a Service Provider when it refers a user to his home Identity Provider, PrivacyLens is currently referring to a configuration file to provide these details. Adjust @$SHIB_INSTALL$/conf/spsetup.json@ to fit your environment. The file is in JSON(Javascript Object Notation) format.
 
-The @id@ field for a Service Provider definition is interpreted as a
-regular expression. By ordering the definitions from specific to general,
-specific information can be shown for some Service Providers, yet
-general information still provided for others. To specify a definition that
-should be matched successfully for all Service Providers, the @id@ field
-can be set to @DEFAULT@.
+The @id@ field for a Service Provider definition is interpreted as a regular expression. By ordering the definitions from specific to general, specific information can be shown for some Service Providers, yet general information still provided for others. To specify a definition that should be matched successfully for all Service Providers, the @id@ field can be set to @DEFAULT@.
 
 bc.. {
   "attrs":[
@@ -390,13 +372,7 @@ ar.attributes.entitlement.description = "urn:mace:dir:entitlement:common-lib-ter
 
 h2. 4.8 Black/Whitelisting
 
-PrivacyLens can be configured to show or not show the interface, depending on
-what Service Provider is involved. In the PrivacyLens.properties file,
-regular expressions that the Service Provider will be matched again are
-provided to "services". If "services.blacklist" is true, the user will
-not see the interface for any Service Provider that matches the regular
-expressions. If "services.blacklist" is false, the user will only see the
-interface for Service Providers that match the regular expressions.
+PrivacyLens can be configured to show or not show the interface, depending on what Service Provider is involved. In the PrivacyLens.properties file, regular expressions that the Service Provider will be matched again are provided to "services". If "services.blacklist" is true, the user will not see the interface for any Service Provider that matches the regular expressions. If "services.blacklist" is false, the user will only see the interface for Service Providers that match the regular expressions.
 
 h3. Enable Attribute Release Audit Log
 
