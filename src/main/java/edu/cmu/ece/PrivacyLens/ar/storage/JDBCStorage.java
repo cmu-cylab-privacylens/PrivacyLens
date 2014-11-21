@@ -42,11 +42,10 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 
-import ch.SWITCH.aai.uApprove.AbstractJDBCStorage;
-
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import edu.cmu.ece.PrivacyLens.AbstractJDBCStorage;
 import edu.cmu.ece.PrivacyLens.ar.Attribute;
 import edu.cmu.ece.PrivacyLens.ar.AttributeReleaseChoice;
 import edu.cmu.ece.PrivacyLens.ar.LoginEvent;
