@@ -170,6 +170,16 @@ Do expand the variable $SHIB_INSTALL$ here (so that the location value looks lik
 
 Customize @$SHIB_INSTALL$/conf/PrivacyLens.properties@ according your database environment and required features. See inline documentation of PrivacyLens.properties for configuration options.
 
+In case of database connectivity problems, you may want to set the "graceful" property to "true" in @$SHIB_INSTALL$/conf/PrivacyLens.xml@:
+
+bc. 
+<property name="storage">
+  <bean class="ch.SWITCH.aai.uApprove.tou.storage.JDBCStorage" init-method="initialize"
+  p:dataSource-ref="PrivacyLens.dataSource" p:sqlStatements="classpath:/storage/sql-statements.properties" p:graceful="true" />
+</property>
+
+You may then want to provide an appropriate timeout setting to the database configuration in @$SHIB_INSTALL$/conf/PrivacyLens.properties@.
+
 In case you enable the 'Terms of Use' module (disabled by default), you need to provide an appropriate text
 suitable for your organization.
 
