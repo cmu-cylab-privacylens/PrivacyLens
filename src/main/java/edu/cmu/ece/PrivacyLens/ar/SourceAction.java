@@ -214,11 +214,15 @@ public class SourceAction implements Action {
             // but we have to look through the actual attribute values.
 
             for (final Attribute attr : attrList) {
-                try {
-                    final String attrValue = Util.listToString(attr.getValues());
-                    subValues.add(attrValue);
-                } catch (final IndexOutOfBoundsException x) {
-                    subValues.add("[blank]");
+                if (!attr.isMachineReadable()) {
+                    try {
+                        final String attrValue = Util.listToString(attr.getValues());
+                        subValues.add(attrValue);
+                    } catch (final IndexOutOfBoundsException x) {
+                        subValues.add("[blank]");
+                    }
+                } else {
+                    //subValues.add("[machine readable]");
                 }
             }
 
