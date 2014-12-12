@@ -68,8 +68,8 @@ public class SourceAction implements Action {
     private Oracle oracle;
 
     private List<ToggleBean>
-        generateToggleFromAttributes(final List<Attribute> attributes,
-        final Map<String, Boolean> settingsMap) {
+    generateToggleFromAttributes(final List<Attribute> attributes,
+            final Map<String, Boolean> settingsMap) {
         final List<ToggleBean> out = new ArrayList<ToggleBean>();
 
         final Map<String, Map> attrMap =
@@ -138,7 +138,7 @@ public class SourceAction implements Action {
                 + attribute.getDescription() + " will ");
             stringBuilder.append(value ? "" : "not");
             stringBuilder
-                .append(" be sent to it. Use the toggle switch to change this setting.");
+            .append(" be sent to it. Use the toggle switch to change this setting.");
             stringBuilder.append("</p>");
             stringBuilder.append(emailAdminBoilerText);
 
@@ -258,20 +258,20 @@ public class SourceAction implements Action {
                     //subValues.add("[machine readable]");
                 }
 
-                if (subValues.size() == 0) {
-                    logger.warn("Attribute {} has empty value", attributeId);
-                }
             }
 
             String subValuesText = "(not initialized)";
             // if the attribute value is the empty set, don't print anything
-            // XXXstroucki this shouldn't happen though (warning above).
+            // XXXstroucki this shouldn't happen though (warning below).
             if (subValues.size() != 0) {
                 subValuesText = Util.listToString(subValues);
                 stringBuilder.append("Your " + description
                     + " includes the items (");
                 stringBuilder.append(subValuesText);
                 stringBuilder.append("). ");
+            } else {
+                logger.warn("Attribute group description {} has empty value",
+                    description);
             }
 
             // set up consequence text
@@ -279,7 +279,7 @@ public class SourceAction implements Action {
                 + oracle.getServiceName() + ", your " + description + " will ");
             stringBuilder.append(value ? "" : "not");
             stringBuilder
-                .append(" be sent to it. Use the toggle switch to change this setting.");
+            .append(" be sent to it. Use the toggle switch to change this setting.");
             stringBuilder.append("</p>");
             stringBuilder.append(emailAdminBoilerText);
 
@@ -322,7 +322,7 @@ public class SourceAction implements Action {
         final ServletContext servletContext = Util.servletContext;
         final WebApplicationContext appContext =
             WebApplicationContextUtils
-                .getRequiredWebApplicationContext(servletContext);
+            .getRequiredWebApplicationContext(servletContext);
         final SAMLHelper samlHelper =
             (SAMLHelper) appContext.getBean("PrivacyLens.samlHelper",
                 SAMLHelper.class);
