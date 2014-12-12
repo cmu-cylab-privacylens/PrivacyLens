@@ -2,7 +2,7 @@
  * COPYRIGHT_BOILERPLATE
  * Copyright (c) 2013 Carnegie Mellon University
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -13,7 +13,7 @@
  *     * Neither the name of SWITCH nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -58,7 +58,8 @@ public class SourceAction implements Action {
     /** Class logger. */
     private final Logger logger = LoggerFactory.getLogger(SourceAction.class);
 
-    private final String emailAdminBoilerText = HTMLUtils.getEmailAdminBoilerText(General.getInstance().getAdminMail());
+    private final String emailAdminBoilerText = HTMLUtils
+        .getEmailAdminBoilerText(General.getInstance().getAdminMail());
 
     private String requestContextPath;
 
@@ -66,16 +67,21 @@ public class SourceAction implements Action {
 
     private Oracle oracle;
 
-    private List<ToggleBean> generateToggleFromAttributes(final List<Attribute> attributes,
-            final Map<String, Boolean> settingsMap) {
+    private List<ToggleBean>
+        generateToggleFromAttributes(final List<Attribute> attributes,
+        final Map<String, Boolean> settingsMap) {
         final List<ToggleBean> out = new ArrayList<ToggleBean>();
 
-        final Map<String, Map> attrMap = oracle.getAttributeRequested(relyingPartyId);
-        final Map<String, Map> attrGroups = oracle.getAttributeGroupRequested(relyingPartyId);
+        final Map<String, Map> attrMap =
+            oracle.getAttributeRequested(relyingPartyId);
+        final Map<String, Map> attrGroups =
+            oracle.getAttributeGroupRequested(relyingPartyId);
 
-        final Map<String, List<Attribute>> beanToGroup = new HashMap<String, List<Attribute>>();
+        final Map<String, List<Attribute>> beanToGroup =
+            new HashMap<String, List<Attribute>>();
 
-        final Map<Attribute, ToggleBean> attributeBeans = new HashMap<Attribute, ToggleBean>();
+        final Map<Attribute, ToggleBean> attributeBeans =
+            new HashMap<Attribute, ToggleBean>();
 
         for (final Attribute attribute : attributes) {
             final String attributeId = attribute.getId();
@@ -85,50 +91,61 @@ public class SourceAction implements Action {
                 continue;
             }
 
-            final String attrReason = (String) attrMap.get(attributeId).get("reason");
-            final String attrPrivacy = (String) attrMap.get(attributeId).get("privpolicy");
+            final String attrReason =
+                (String) attrMap.get(attributeId).get("reason");
+            final String attrPrivacy =
+                (String) attrMap.get(attributeId).get("privpolicy");
             final String group = (String) attrMap.get(attributeId).get("group");
 
             final ToggleBean bean = new ToggleBean();
 
             // if the attribute is required, set the proper icon and force
             // the value to true
-            final boolean required = attrMap.get(attributeId).get("required") != null;
+            final boolean required =
+                attrMap.get(attributeId).get("required") != null;
             final boolean value = settingsMap.get(attributeId);
 
             if (required) {
                 bean.setValue(true);
                 bean.setImmutable(true);
-                bean.setImageTrue(requestContextPath + "/PrivacyLens/force_sending.png");
+                bean.setImageTrue(requestContextPath
+                    + "/PrivacyLens/force_sending.png");
             } else {
                 bean.setValue(value);
                 bean.setImmutable(false);
-                bean.setImageFalse(requestContextPath + "/PrivacyLens/not_sending.png");
-                bean.setImageTrue(requestContextPath + "/PrivacyLens/sending.png");
+                bean.setImageFalse(requestContextPath
+                    + "/PrivacyLens/not_sending.png");
+                bean.setImageTrue(requestContextPath
+                    + "/PrivacyLens/sending.png");
             }
 
             // set up privacy and request reason text
             final StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("<p>" + attrReason + "</p><p>" + attrPrivacy + "</p>");
+            stringBuilder.append("<p>" + attrReason + "</p><p>" + attrPrivacy
+                + "</p>");
             stringBuilder.append("<p>");
 
             // don't present values of machine readable attributes
             if (!attribute.isMachineReadable()) {
-                stringBuilder.append("Your " + attribute.getDescription() + " is " + '"'
-                        + Util.listToString(attribute.getValues()) + "\". ");
+                stringBuilder.append("Your " + attribute.getDescription()
+                    + " is " + '"' + Util.listToString(attribute.getValues())
+                    + "\". ");
             }
 
             // set up consequence text
-            stringBuilder.append("If you continue to " + oracle.getServiceName() + ", your "
-                    + attribute.getDescription() + " will ");
+            stringBuilder.append("If you continue to "
+                + oracle.getServiceName() + ", your "
+                + attribute.getDescription() + " will ");
             stringBuilder.append(value ? "" : "not");
-            stringBuilder.append(" be sent to it. Use the toggle switch to change this setting.");
+            stringBuilder
+                .append(" be sent to it. Use the toggle switch to change this setting.");
             stringBuilder.append("</p>");
             stringBuilder.append(emailAdminBoilerText);
 
             final String explanation = stringBuilder.toString();
             bean.setExplanation(explanation);
-            bean.setExplanationIcon(requestContextPath + "/PrivacyLens/info.png");
+            bean.setExplanationIcon(requestContextPath
+                + "/PrivacyLens/info.png");
             bean.setTextDiv("attributeReleaseAttribute");
             bean.setImageDiv("attributeReleaseControl");
             bean.setParameter(attributeId);
@@ -169,13 +186,17 @@ public class SourceAction implements Action {
         final Map<String, ToggleBean> groupHandle;
         for (final String groupId : beanToGroup.keySet()) {
 
-            final String attrReason = (String) attrGroups.get(groupId).get("reason");
-            final String attrPrivacy = (String) attrGroups.get(groupId).get("privpolicy");
+            final String attrReason =
+                (String) attrGroups.get(groupId).get("reason");
+            final String attrPrivacy =
+                (String) attrGroups.get(groupId).get("privpolicy");
 
             final ToggleBean bean = new ToggleBean();
 
-            final boolean required = attrGroups.get(groupId).get("required") != null;
-            final String description = (String) attrGroups.get(groupId).get("description");
+            final boolean required =
+                attrGroups.get(groupId).get("required") != null;
+            final String description =
+                (String) attrGroups.get(groupId).get("description");
 
             // for each group, pick the member attributes out of the map
             // created before
@@ -195,17 +216,21 @@ public class SourceAction implements Action {
             if (required) {
                 bean.setValue(true);
                 bean.setImmutable(true);
-                bean.setImageTrue(requestContextPath + "/PrivacyLens/force_sending.png");
+                bean.setImageTrue(requestContextPath
+                    + "/PrivacyLens/force_sending.png");
             } else {
                 bean.setValue(value);
                 bean.setImmutable(false);
-                bean.setImageFalse(requestContextPath + "/PrivacyLens/not_sending.png");
-                bean.setImageTrue(requestContextPath + "/PrivacyLens/sending.png");
+                bean.setImageFalse(requestContextPath
+                    + "/PrivacyLens/not_sending.png");
+                bean.setImageTrue(requestContextPath
+                    + "/PrivacyLens/sending.png");
             }
 
             // set up privacy and request reason text
             final StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("<p>" + attrReason + "</p><p>" + attrPrivacy + "</p>");
+            stringBuilder.append("<p>" + attrReason + "</p><p>" + attrPrivacy
+                + "</p>");
             stringBuilder.append("<p>");
 
             final List<String> subValues = new ArrayList<String>();
@@ -213,10 +238,18 @@ public class SourceAction implements Action {
             // this is annoying. we have attribute definitions from the oracle
             // but we have to look through the actual attribute values.
 
-            for (final Attribute attr : attrList) {
-                if (!attr.isMachineReadable()) {
+            for (final Attribute attribute : attrList) {
+                final String attributeId = attribute.getId();
+
+                // skip attribute if not requested
+                if (!attrMap.containsKey(attributeId)) {
+                    continue;
+                }
+
+                if (!attribute.isMachineReadable()) {
                     try {
-                        final String attrValue = Util.listToString(attr.getValues());
+                        final String attrValue =
+                            Util.listToString(attribute.getValues());
                         subValues.add(attrValue);
                     } catch (final IndexOutOfBoundsException x) {
                         subValues.add("[blank]");
@@ -224,24 +257,37 @@ public class SourceAction implements Action {
                 } else {
                     //subValues.add("[machine readable]");
                 }
+
+                if (subValues.size() == 0) {
+                    logger.warn("Attribute {} has empty value", attributeId);
+                }
             }
 
-            final String subValuesText = Util.listToString(subValues);
-            stringBuilder.append("Your " + description + " includes the items (");
-            stringBuilder.append(subValuesText);
-            stringBuilder.append("). ");
+            String subValuesText = "(not initialized)";
+            // if the attribute value is the empty set, don't print anything
+            // XXXstroucki this shouldn't happen though (warning above).
+            if (subValues.size() != 0) {
+                subValuesText = Util.listToString(subValues);
+                stringBuilder.append("Your " + description
+                    + " includes the items (");
+                stringBuilder.append(subValuesText);
+                stringBuilder.append("). ");
+            }
 
             // set up consequence text
-            stringBuilder.append("If you continue to " + oracle.getServiceName() + ", your " + description + " will ");
+            stringBuilder.append("If you continue to "
+                + oracle.getServiceName() + ", your " + description + " will ");
             stringBuilder.append(value ? "" : "not");
-            stringBuilder.append(" be sent to it. Use the toggle switch to change this setting.");
+            stringBuilder
+                .append(" be sent to it. Use the toggle switch to change this setting.");
             stringBuilder.append("</p>");
             stringBuilder.append(emailAdminBoilerText);
 
             // set up first presentation
             final String explanation = stringBuilder.toString();
             bean.setExplanation(explanation);
-            bean.setExplanationIcon(requestContextPath + "/PrivacyLens/info.png");
+            bean.setExplanationIcon(requestContextPath
+                + "/PrivacyLens/info.png");
             bean.setTextDiv("attributeReleaseAttribute");
             bean.setImageDiv("attributeReleaseControl");
             bean.setParameter(groupId);
@@ -249,9 +295,11 @@ public class SourceAction implements Action {
             stringBuilder.setLength(0);
             stringBuilder.append(description);
 
-            stringBuilder.append(" (<b>");
-            stringBuilder.append(subValuesText);
-            stringBuilder.append("</b>)");
+            if (subValues.size() != 0) {
+                stringBuilder.append(" (<b>");
+                stringBuilder.append(subValuesText);
+                stringBuilder.append("</b>)");
+            }
 
             if (required) {
                 stringBuilder.append('*');
@@ -273,10 +321,15 @@ public class SourceAction implements Action {
         // XXXstroucki really complex.
         final ServletContext servletContext = Util.servletContext;
         final WebApplicationContext appContext =
-                WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
-        final SAMLHelper samlHelper = (SAMLHelper) appContext.getBean("PrivacyLens.samlHelper", SAMLHelper.class);
-        final AttributeProcessor attributeProcessor = samlHelper.getAttributeProcessor();
-        final List<Attribute> attributeKeys = new ArrayList<Attribute>(attributeBeans.keySet());
+            WebApplicationContextUtils
+                .getRequiredWebApplicationContext(servletContext);
+        final SAMLHelper samlHelper =
+            (SAMLHelper) appContext.getBean("PrivacyLens.samlHelper",
+                SAMLHelper.class);
+        final AttributeProcessor attributeProcessor =
+            samlHelper.getAttributeProcessor();
+        final List<Attribute> attributeKeys =
+            new ArrayList<Attribute>(attributeBeans.keySet());
         attributeProcessor.sortAttributes(attributeKeys);
         for (final Attribute attribute : attributeKeys) {
             out.add(attributeBeans.get(attribute));
@@ -287,16 +340,19 @@ public class SourceAction implements Action {
     }
 
     /** {@inheritDoc} */
-    public String execute(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
+    public String execute(final HttpServletRequest request,
+        final HttpServletResponse response) throws Exception {
         logger.debug("execute");
 
         final ServletContext servletContext = Util.servletContext;
         // this timestamp will describe this transaction
         final DateTime timestamp = new DateTime();
         oracle = Oracle.getInstance();
-        final AttributeReleaseModule attributeReleaseModule = IdPHelper.attributeReleaseModule;
+        final AttributeReleaseModule attributeReleaseModule =
+            IdPHelper.attributeReleaseModule;
 
-        final String principalName = IdPHelper.getPrincipalName(servletContext, request);
+        final String principalName =
+            IdPHelper.getPrincipalName(servletContext, request);
         oracle.setUserName(principalName);
 
         relyingPartyId = IdPHelper.getRelyingPartyId(servletContext, request);
@@ -304,7 +360,8 @@ public class SourceAction implements Action {
         requestContextPath = request.getContextPath();
 
         // assemble list of attributes
-        final List<Attribute> attributes = IdPHelper.getAttributes(servletContext, request);
+        final List<Attribute> attributes =
+            IdPHelper.getAttributes(servletContext, request);
         // XXX needed?
         request.getSession().setAttribute("attributes", attributes);
 
@@ -312,9 +369,11 @@ public class SourceAction implements Action {
 
         // XXX obtain these from user preferences!
         final Map<String, Boolean> consentByAttribute =
-                attributeReleaseModule.getAttributeConsent(principalName, relyingPartyId, attributes);
+            attributeReleaseModule.getAttributeConsent(principalName,
+                relyingPartyId, attributes);
 
-        final List<ToggleBean> attributeBeans = generateToggleFromAttributes(attributes, consentByAttribute);
+        final List<ToggleBean> attributeBeans =
+            generateToggleFromAttributes(attributes, consentByAttribute);
         request.getSession().setAttribute("attributeBeans", attributeBeans);
 
         request.getSession().setAttribute("timestamp", timestamp);
@@ -326,39 +385,48 @@ public class SourceAction implements Action {
 
         }
         try {
-            request.getSession().setAttribute("userName", Oracle.getInstance().getUserName());
-            request.getSession().setAttribute("idpName", General.getInstance().getIdpName());
+            request.getSession().setAttribute("userName",
+                Oracle.getInstance().getUserName());
+            request.getSession().setAttribute("idpName",
+                General.getInstance().getIdpName());
 
-            if (attributeReleaseModule.isForceShowInterface(principalName, relyingPartyId)) {
+            if (attributeReleaseModule.isForceShowInterface(principalName,
+                relyingPartyId)) {
                 logger.debug("Interface forced");
                 return "entry";
             }
             // does the user want to be bothered
             final ReminderInterval reminderInterval =
-                    attributeReleaseModule.getReminderInterval(principalName, relyingPartyId);
-            logger.debug("Entering reminder interval for {} is {}", principalName, reminderInterval);
+                attributeReleaseModule.getReminderInterval(principalName,
+                    relyingPartyId);
+            logger.debug("Entering reminder interval for {} is {}",
+                principalName, reminderInterval);
             final int currentCount = reminderInterval.getCurrentCount() + 1;
             final int remindAfter = reminderInterval.getRemindAfter();
             final int modulo = currentCount % remindAfter;
             reminderInterval.setCurrentCount(modulo);
             attributeReleaseModule.updateReminderInterval(reminderInterval);
             if (modulo == 0) {
-                final String attributeList = getReminderAttributes(attributes, consentByAttribute);
-                request.getSession().setAttribute("attributeList", attributeList);
+                final String attributeList =
+                    getReminderAttributes(attributes, consentByAttribute);
+                request.getSession().setAttribute("attributeList",
+                    attributeList);
                 logger.debug("Reminder due");
                 return "reminder";
             } else {
                 logger.debug("No reminder due");
                 // make entry in login database, with all consented attributes
-                final List<Attribute> consentedAttributes = new ArrayList<Attribute>();
+                final List<Attribute> consentedAttributes =
+                    new ArrayList<Attribute>();
                 for (final Attribute attribute : attributes) {
                     if (consentByAttribute.get(attribute.getId())) {
                         consentedAttributes.add(attribute);
                     }
                 }
                 final Oracle oracle = Oracle.getInstance();
-                attributeReleaseModule.addLogin(principalName, oracle.getServiceName(), relyingPartyId, timestamp,
-                        consentedAttributes);
+                attributeReleaseModule.addLogin(principalName,
+                    oracle.getServiceName(), relyingPartyId, timestamp,
+                    consentedAttributes);
                 return "sink";
             }
 
@@ -373,11 +441,13 @@ public class SourceAction implements Action {
     }
 
     /**
-     * Obtains a string list of attributes, and possibly their values for insertion into reminder view
-     * 
+     * Obtains a string list of attributes, and possibly their values for
+     * insertion into reminder view
+     *
      * @return html block to insert into view
      */
-    private String getReminderAttributes(final List<Attribute> attributes, final Map<String, Boolean> settingsMap) {
+    private String getReminderAttributes(final List<Attribute> attributes,
+        final Map<String, Boolean> settingsMap) {
         final List<String> list = new ArrayList<String>();
 
         for (final Attribute attr : attributes) {
