@@ -2,7 +2,7 @@
  * COPYRIGHT_BOILERPLATE
  * Copyright (c) 2013 Carnegie Mellon University
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -13,7 +13,7 @@
  *     * Neither the name of SWITCH nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -24,7 +24,7 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+ */
 
 package edu.cmu.ece.PrivacyLens;
 
@@ -46,7 +46,8 @@ import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 
 /**
- * This class holds a lot of unchanging data, perhaps some of it should be cached.
+ * This class holds a lot of unchanging data, perhaps some of it should be
+ * cached.
  */
 public class Oracle {
 
@@ -73,7 +74,8 @@ public class Oracle {
         private OracleData() {
         }
 
-        public OracleData(final ServiceProviderData[] SPs, final LocalizedAttributes[] attrs) {
+        public OracleData(final ServiceProviderData[] SPs,
+            final LocalizedAttributes[] attrs) {
             this.SPs = SPs;
             this.attrs = attrs;
         }
@@ -116,15 +118,16 @@ public class Oracle {
         private ServiceProviderData() {
         }
 
-        public ServiceProviderData(final String id, final String name, final AttributeData[] attrs) {
+        public ServiceProviderData(final String id, final String name,
+            final AttributeData[] attrs) {
             this.id = id;
             this.name = name;
             this.attrs = attrs;
             this.hasAttrGroups = false;
         }
 
-        public ServiceProviderData(final String id, final String name, final AttributeData[] attrs,
-                final AttributeGroupData[] attrGroups) {
+        public ServiceProviderData(final String id, final String name,
+            final AttributeData[] attrs, final AttributeGroupData[] attrGroups) {
             this.id = id;
             this.name = name;
             this.attrs = attrs;
@@ -177,7 +180,8 @@ public class Oracle {
         private AttributeData() {
         }
 
-        public AttributeData(final String id, final String reason, final String privpolicy, final String required) {
+        public AttributeData(final String id, final String reason,
+            final String privpolicy, final String required) {
             this.id = id;
             this.reason = reason;
             this.privpolicy = privpolicy;
@@ -185,8 +189,8 @@ public class Oracle {
             hasGroup = false;
         }
 
-        public AttributeData(final String id, final String reason, final String privpolicy, final String required,
-                final String group) {
+        public AttributeData(final String id, final String reason,
+            final String privpolicy, final String required, final String group) {
             this.id = id;
             this.reason = reason;
             this.privpolicy = privpolicy;
@@ -200,6 +204,7 @@ public class Oracle {
             out.put("reason", reason);
             out.put("group", group);
             out.put("privpolicy", privpolicy);
+            out.put("required", Boolean.toString(required));
             out.put("id", id);
             return out;
         }
@@ -214,11 +219,13 @@ public class Oracle {
 
         private String id;
 
+        private boolean required;
+
         private AttributeGroupData() {
         }
 
-        public AttributeGroupData(final String id, final String description, final String reason,
-                final String privpolicy) {
+        public AttributeGroupData(final String id, final String description,
+            final String reason, final String privpolicy) {
             this.id = id;
             this.description = description;
             this.reason = reason;
@@ -230,6 +237,7 @@ public class Oracle {
             out.put("reason", reason);
             out.put("description", description);
             out.put("privpolicy", privpolicy);
+            out.put("required", Boolean.toString(required));
             out.put("id", id);
             return out;
         }
@@ -260,7 +268,8 @@ public class Oracle {
 
         try {
             final InputStream in = configResource.getInputStream();
-            final JsonReader reader = new JsonReader(new InputStreamReader(in, "UTF-8"));
+            final JsonReader reader =
+                new JsonReader(new InputStreamReader(in, "UTF-8"));
             data = gson.fromJson(reader, OracleData.class);
             reader.close();
             //logger.debug("OracleData JSON: {}", gson.toJson(x));
@@ -292,7 +301,8 @@ public class Oracle {
     }
 
     /**
-     * @param regexpMatch Whether SP matching should be done with regular expressions.
+     * @param regexpMatch Whether SP matching should be done with regular
+     *            expressions.
      */
     public static void setRegexpMatch(final boolean regexpMatch) {
         Oracle.regexpMatch = regexpMatch;
@@ -334,7 +344,8 @@ public class Oracle {
      * @param groupId Attribute Group ID
      * @return list of attribute ids
      */
-    public List<String> getAttributeGroupMembers(final String spId, final String groupId) {
+    public List<String> getAttributeGroupMembers(final String spId,
+        final String groupId) {
         // isAttrGroup?
         final List<String> out = new ArrayList<String>();
         if (!isAttrGroup(spId, groupId)) {
@@ -369,7 +380,8 @@ public class Oracle {
 
     /**
      * @param spId Service Provider ID
-     * @return the ServiceProviderData object for a matching service provider (can be null)
+     * @return the ServiceProviderData object for a matching service provider
+     *         (can be null)
      */
     private ServiceProviderData getMatchingSP(final String spId) {
         ServiceProviderData matchedSP = null;
