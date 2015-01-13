@@ -1,8 +1,8 @@
 /*
  * Copyright (c) 2011, SWITCH
- * Copyright (c) 2013, Carnegie Mellon University
+ * Copyright (c) 2013-2015, Carnegie Mellon University
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -13,7 +13,7 @@
  *     * Neither the name of SWITCH nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -52,10 +52,11 @@ import ch.SWITCH.aai.uApprove.tou.ToUModule;
 import edu.cmu.ece.PrivacyLens.ar.Attribute;
 import edu.cmu.ece.PrivacyLens.ar.AttributeReleaseModule;
 import edu.cmu.ece.PrivacyLens.ar.SAMLHelper;
+import edu.cmu.ece.PrivacyLens.config.General;
 import edu.internet2.middleware.shibboleth.idp.authn.PassiveAuthenticationException;
 
 /**
- * uApprove request intercepter.
+ * PrivacyLens request intercepter.
  */
 public class Intercepter implements Filter {
 
@@ -77,7 +78,11 @@ public class Intercepter implements Filter {
     /** The view helper. */
     private ViewHelper viewHelper;
 
-    /** If set, uApprove will be only enabled if authnContextClassRef equals to the requested one. */
+    /**
+     * If set, PrivacyLens will be only enabled if authnContextClassRef equals
+     * to
+     * the requested one.
+     */
     private String authnContextClassRef;
 
     /** {@inheritDoc} */
@@ -85,63 +90,89 @@ public class Intercepter implements Filter {
         try {
             servletContext = filterConfig.getServletContext();
             final WebApplicationContext appContext =
-                    WebApplicationContextUtils.getRequiredWebApplicationContext(filterConfig.getServletContext());
-            touModule = (ToUModule) appContext.getBean("uApprove.touModule", ToUModule.class);
+                WebApplicationContextUtils
+                    .getRequiredWebApplicationContext(filterConfig
+                        .getServletContext());
+            touModule =
+                (ToUModule) appContext.getBean("uApprove.touModule",
+                    ToUModule.class);
             attributeReleaseModule =
-                    (AttributeReleaseModule) appContext.getBean("PrivacyLens.attributeReleaseModule",
-                            AttributeReleaseModule.class);
-            samlHelper = (SAMLHelper) appContext.getBean("PrivacyLens.samlHelper", SAMLHelper.class);
+                (AttributeReleaseModule) appContext.getBean(
+                    "PrivacyLens.attributeReleaseModule",
+                    AttributeReleaseModule.class);
+            samlHelper =
+                (SAMLHelper) appContext.getBean("PrivacyLens.samlHelper",
+                    SAMLHelper.class);
 
-            viewHelper = (ViewHelper) appContext.getBean("PrivacyLens.viewHelper", ViewHelper.class);
+            viewHelper =
+                (ViewHelper) appContext.getBean("PrivacyLens.viewHelper",
+                    ViewHelper.class);
 
-            Validate.notNull(touModule, "ToU module isn't properly configured.");
-            Validate.notNull(attributeReleaseModule, "Attribute Release module isn't properly configured.");
-            Validate.notNull(samlHelper, "SAML Helper isn't properly configured.");
-            Validate.notNull(viewHelper, "View Helper isn't properly configured.");
+            Validate
+                .notNull(touModule, "ToU module isn't properly configured.");
+            Validate.notNull(attributeReleaseModule,
+                "Attribute Release module isn't properly configured.");
+            Validate.notNull(samlHelper,
+                "SAML Helper isn't properly configured.");
+            Validate.notNull(viewHelper,
+                "View Helper isn't properly configured.");
 
-            authnContextClassRef = filterConfig.getInitParameter("authnContextClassRef");
-            logger.debug("PrivacyLens initialized.{}", authnContextClassRef != null
-                    ? " authnContextClassRef is set to " + authnContextClassRef : "");
+            authnContextClassRef =
+                filterConfig.getInitParameter("authnContextClassRef");
+            logger.debug("PrivacyLens initialized.{}",
+                authnContextClassRef != null
+                ? " authnContextClassRef is set to " + authnContextClassRef
+                    : "");
         } catch (final Throwable t) {
-            logger.error("Error while initializing PrivacyLens intercepter.", t);
+            logger
+                .error("Error while initializing PrivacyLens intercepter.", t);
             throw new ServletException(t);
         }
     }
 
     /** {@inheritDoc} */
-    public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
-            throws IOException, ServletException {
+    public void doFilter(final ServletRequest request,
+        final ServletResponse response, final FilterChain chain)
+        throws IOException, ServletException {
 
-        Validate.isTrue(request instanceof HttpServletRequest, "Not an HttpServletRequest.");
-        Validate.isTrue(response instanceof HttpServletResponse, "Not an HttpServletResponse.");
+        Validate.isTrue(request instanceof HttpServletRequest,
+            "Not an HttpServletRequest.");
+        Validate.isTrue(response instanceof HttpServletResponse,
+            "Not an HttpServletResponse.");
 
         try {
-            intercept((HttpServletRequest) request, (HttpServletResponse) response, chain);
+            intercept((HttpServletRequest) request,
+                (HttpServletResponse) response, chain);
         } catch (final Throwable t) {
             logger.error("Error while intercepting request.", t);
-            IdPHelper.handleException(servletContext, (HttpServletRequest) request, (HttpServletResponse) response, t);
+            IdPHelper
+                .handleException(servletContext, (HttpServletRequest) request,
+                    (HttpServletResponse) response, t);
         }
     }
 
     /**
      * Intercepts requests to the IdP.
-     * 
+     *
      * @param request The request.
      * @param response The response.
      * @param chain The filter chain.
      * @throws IOException Throws IOException.
      * @throws ServletException Throws ServletException.
      */
-    public void
-            intercept(final HttpServletRequest request, final HttpServletResponse response, final FilterChain chain)
-                    throws IOException, ServletException {
+    public void intercept(final HttpServletRequest request,
+        final HttpServletResponse response, final FilterChain chain)
+        throws IOException, ServletException {
 
         logger.trace("Entered intercept from URL {}", request.getPathInfo());
 
         if (authnContextClassRef != null
-                && !StringUtils.equals(authnContextClassRef, IdPHelper.getAuthContextClassRef(servletContext, request))) {
-            logger.trace("Intercept sending to filter after something with authnContextClassRef {}",
-                    authnContextClassRef);
+            && !StringUtils.equals(authnContextClassRef,
+                IdPHelper.getAuthContextClassRef(servletContext, request))) {
+            logger
+                .trace(
+                    "Intercept sending to filter after something with authnContextClassRef {}",
+                authnContextClassRef);
             chain.doFilter(request, response);
             return;
         }
@@ -150,7 +181,8 @@ public class Intercepter implements Filter {
         if (!IdPHelper.isAuthenticated(servletContext, request, response)) {
             logger.trace("Request is not authenticated.");
             IdPHelper.setConsentRevocationRequested(servletContext, request);
-            logger.trace("Intercept sending to filter at request not authenticated");
+            logger
+                .trace("Intercept sending to filter at request not authenticated");
             chain.doFilter(request, response);
             return;
         }
@@ -172,12 +204,13 @@ public class Intercepter implements Filter {
 
     /**
      * Handles Terms Of Use.
-     * 
+     *
      * @param request The request.
      * @param response The response.
      * @return Returns true if ToU were handled.
      */
-    private boolean handleTermsOfUse(final HttpServletRequest request, final HttpServletResponse response) {
+    private boolean handleTermsOfUse(final HttpServletRequest request,
+        final HttpServletResponse response) {
 
         if (!touModule.isEnabled()) {
             return false;
@@ -187,16 +220,20 @@ public class Intercepter implements Filter {
             return false;
         }
 
-        final String principalName = IdPHelper.getPrincipalName(servletContext, request);
-        final String relyingPartyId = IdPHelper.getRelyingPartyId(servletContext, request);
+        final String principalName =
+            IdPHelper.getPrincipalName(servletContext, request);
+        final String relyingPartyId =
+            IdPHelper.getRelyingPartyId(servletContext, request);
         if (touModule.requiresToUAcceptance(principalName, relyingPartyId)) {
 
             if (IdPHelper.isPassiveRequest(servletContext, request)) {
-                IdPHelper.setAuthenticationFailure(servletContext, request, new PassiveAuthenticationException());
+                IdPHelper.setAuthenticationFailure(servletContext, request,
+                    new PassiveAuthenticationException());
                 return false;
             }
 
-            IdPHelper.redirectToServlet(servletContext, request, response, "/PrivacyLens/TermsOfUse");
+            IdPHelper.redirectToServlet(servletContext, request, response,
+                "/PrivacyLens/TermsOfUse");
             return true;
         }
 
@@ -205,26 +242,54 @@ public class Intercepter implements Filter {
 
     /**
      * Handle Attribute Release.
-     * 
+     *
      * @param request The request.
      * @param response The response.
      * @return Returns true if the attribute release were handled.
      */
-    private boolean handleAttributeRelease(final HttpServletRequest request, final HttpServletResponse response) {
+    private boolean handleAttributeRelease(final HttpServletRequest request,
+        final HttpServletResponse response) {
 
         if (!attributeReleaseModule.isEnabled()) {
             return false;
         }
 
+        // has this part already been called in a previous interception?
         if (IdPHelper.isAttributeReleaseConsented(servletContext, request)) {
             return false;
         }
 
-        final String principalName = IdPHelper.getPrincipalName(servletContext, request);
-        final String relyingPartyId = IdPHelper.getRelyingPartyId(servletContext, request);
+        final String principalName =
+            IdPHelper.getPrincipalName(servletContext, request);
+        final String relyingPartyId =
+            IdPHelper.getRelyingPartyId(servletContext, request);
+
+        // does the user want to see the administrative interface?
+        final String adminUrl = General.getInstance().getAdminUrl();
+        if (adminUrl.equals(relyingPartyId)) {
+            // XXXstroucki providing attributes to the servlet the same way as for the main attribute release servlet. After review, they could be made common if both servlets really need them.
+            final List<Attribute> attributes =
+                samlHelper.resolveAttributes(principalName, relyingPartyId,
+                    viewHelper.selectLocale(request),
+                    IdPHelper.getSession(request));
+
+            // set up the context
+            // XXXstroucki i see we use different ways of setting attributes here.
+            IdPHelper.setAttributes(servletContext, request, attributes);
+
+            // don't carry in a view attribute
+            // XXXstroucki maybe we should set one?
+            request.getSession().removeAttribute("view");
+            IdPHelper.redirectToServlet(servletContext, request, response,
+                "/PrivacyLens/AdminServlet");
+            return true;
+        }
+
         final List<Attribute> attributes =
-                samlHelper.resolveAttributes(principalName, relyingPartyId, viewHelper.selectLocale(request),
-                        IdPHelper.getSession(request));
+            samlHelper
+                .resolveAttributes(principalName, relyingPartyId,
+                    viewHelper.selectLocale(request),
+                    IdPHelper.getSession(request));
 
         if (IdPHelper.isConsentRevocationRequested(servletContext, request)) {
             logger.debug("Consent revocation requested. Clear consent.");
@@ -234,13 +299,15 @@ public class Intercepter implements Filter {
         // XXXstroucki https://wiki.shibboleth.net/confluence/display/SHIB2/isPassive
         // but I guess we'll just error anyway
         if (IdPHelper.isPassiveRequest(servletContext, request)) {
-            IdPHelper.setAuthenticationFailure(servletContext, request, new PassiveAuthenticationException());
+            IdPHelper.setAuthenticationFailure(servletContext, request,
+                new PassiveAuthenticationException());
             return false;
         }
 
         // XXXstroucki handling reminder / no reminder in ar/SourceAction, but
         // SP whitelisting still happens here
-        if (attributeReleaseModule.checkSPWhitelisted(principalName, relyingPartyId)) {
+        if (attributeReleaseModule.checkSPWhitelisted(principalName,
+            relyingPartyId)) {
             return false;
         }
 
@@ -251,7 +318,8 @@ public class Intercepter implements Filter {
         // don't carry in a view attribute
         // XXXstroucki maybe we should set one?
         request.getSession().removeAttribute("view");
-        IdPHelper.redirectToServlet(servletContext, request, response, "/PrivacyLens/AttributeRelease");
+        IdPHelper.redirectToServlet(servletContext, request, response,
+            "/PrivacyLens/AttributeRelease");
         return true;
 
     }

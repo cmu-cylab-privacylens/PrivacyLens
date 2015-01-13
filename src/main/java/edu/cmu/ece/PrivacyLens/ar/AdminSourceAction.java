@@ -1,8 +1,8 @@
 /*
  * COPYRIGHT_BOILERPLATE
- * Copyright (c) 2013 Carnegie Mellon University
+ * Copyright (c) 2013-2015 Carnegie Mellon University
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -13,7 +13,7 @@
  *     * Neither the name of SWITCH nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -28,6 +28,8 @@
 
 package edu.cmu.ece.PrivacyLens.ar;
 
+import java.util.List;
+
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -38,6 +40,8 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import edu.cmu.ece.PrivacyLens.Action;
+import edu.cmu.ece.PrivacyLens.IdPHelper;
+import edu.cmu.ece.PrivacyLens.Oracle;
 import edu.cmu.ece.PrivacyLens.Util;
 
 /**
@@ -46,26 +50,50 @@ import edu.cmu.ece.PrivacyLens.Util;
 public class AdminSourceAction implements Action {
     private final ServletContext servletContext;
 
+    private Oracle oracle;
+
     private final AttributeReleaseModule attributeReleaseModule;
 
     /** Class logger. */
-    private final Logger logger = LoggerFactory.getLogger(AdminSourceAction.class);
+    private final Logger logger = LoggerFactory
+        .getLogger(AdminSourceAction.class);
 
     /** {@inheritDoc} */
     public AdminSourceAction() {
         logger.trace("AdminSourceAction init");
         servletContext = Util.servletContext;
         final WebApplicationContext appContext =
-                WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+            WebApplicationContextUtils
+            .getRequiredWebApplicationContext(servletContext);
 
         attributeReleaseModule =
-                (AttributeReleaseModule) appContext.getBean("PrivacyLens.attributeReleaseModule",
-                        AttributeReleaseModule.class);
-        logger.trace("AdminSourceAction init end arm: {}", attributeReleaseModule);
+            (AttributeReleaseModule) appContext.getBean(
+                "PrivacyLens.attributeReleaseModule",
+                AttributeReleaseModule.class);
+        logger.trace("AdminSourceAction init end arm: {}",
+            attributeReleaseModule);
     }
 
     /** {@inheritDoc} */
-    public String execute(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
+    public String execute(final HttpServletRequest request,
+        final HttpServletResponse response) throws Exception {
+        oracle = Oracle.getInstance();
+        final String principalName =
+            IdPHelper.getPrincipalName(servletContext, request);
+
+        // personalize the application. Use displayName if available, otherwise leave
+        // it with the login principal name.
+        oracle.setUserName(principalName);
+
+        // assemble list of attributes
+        final List<Attribute> attributes =
+            IdPHelper.getAttributes(servletContext, request);
+        for (final Attribute attribute : attributes) {
+            if (attribute.getId().equals("displayName")) {
+                Oracle.getInstance().setUserName(attribute.getValues().get(0));
+            }
+        }
+
         return "entry";
     }
 }

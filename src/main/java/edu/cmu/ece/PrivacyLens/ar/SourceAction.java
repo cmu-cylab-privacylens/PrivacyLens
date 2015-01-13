@@ -68,8 +68,8 @@ public class SourceAction implements Action {
     private Oracle oracle;
 
     private List<ToggleBean>
-        generateToggleFromAttributes(final List<Attribute> attributes,
-        final Map<String, Boolean> settingsMap) {
+    generateToggleFromAttributes(final List<Attribute> attributes,
+            final Map<String, Boolean> settingsMap) {
         final List<ToggleBean> out = new ArrayList<ToggleBean>();
 
         final Map<String, Map> attrMap =
@@ -139,7 +139,7 @@ public class SourceAction implements Action {
                 + attribute.getDescription() + " will ");
             stringBuilder.append(value ? "" : "not");
             stringBuilder
-                .append(" be sent to it. Use the toggle switch to change this setting.");
+            .append(" be sent to it. Use the toggle switch to change this setting.");
             stringBuilder.append("</p>");
             stringBuilder.append(emailAdminBoilerText);
 
@@ -283,7 +283,7 @@ public class SourceAction implements Action {
                 + oracle.getServiceName() + ", your " + description + " will ");
             stringBuilder.append(value ? "" : "not");
             stringBuilder
-                .append(" be sent to it. Use the toggle switch to change this setting.");
+            .append(" be sent to it. Use the toggle switch to change this setting.");
             stringBuilder.append("</p>");
             stringBuilder.append(emailAdminBoilerText);
 
@@ -326,7 +326,7 @@ public class SourceAction implements Action {
         final ServletContext servletContext = Util.servletContext;
         final WebApplicationContext appContext =
             WebApplicationContextUtils
-                .getRequiredWebApplicationContext(servletContext);
+            .getRequiredWebApplicationContext(servletContext);
         final SAMLHelper samlHelper =
             (SAMLHelper) appContext.getBean("PrivacyLens.samlHelper",
                 SAMLHelper.class);
@@ -355,17 +355,25 @@ public class SourceAction implements Action {
         final AttributeReleaseModule attributeReleaseModule =
             IdPHelper.attributeReleaseModule;
 
+        // assemble list of attributes
+        final List<Attribute> attributes =
+            IdPHelper.getAttributes(servletContext, request);
+
+        // personalize the application. Use displayName if available, otherwise leave
+        // it with the login principal name.
         final String principalName =
             IdPHelper.getPrincipalName(servletContext, request);
         oracle.setUserName(principalName);
+        for (final Attribute attribute : attributes) {
+            if (attribute.getId().equals("displayName")) {
+                Oracle.getInstance().setUserName(attribute.getValues().get(0));
+            }
+        }
 
         relyingPartyId = IdPHelper.getRelyingPartyId(servletContext, request);
         oracle.setRelyingPartyId(relyingPartyId);
         requestContextPath = request.getContextPath();
 
-        // assemble list of attributes
-        final List<Attribute> attributes =
-            IdPHelper.getAttributes(servletContext, request);
         // XXX needed?
         request.getSession().setAttribute("attributes", attributes);
 
@@ -382,12 +390,6 @@ public class SourceAction implements Action {
 
         request.getSession().setAttribute("timestamp", timestamp);
 
-        for (final Attribute attribute : attributes) {
-            if (attribute.getId().equals("cn")) {
-                Oracle.getInstance().setUserName(attribute.getValues().get(0));
-            }
-
-        }
         try {
             request.getSession().setAttribute("userName",
                 Oracle.getInstance().getUserName());

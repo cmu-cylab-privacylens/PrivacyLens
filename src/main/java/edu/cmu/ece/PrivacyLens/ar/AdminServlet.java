@@ -1,8 +1,8 @@
 /*
  * COPYRIGHT_BOILERPLATE
- * Copyright (c) 2013 Carnegie Mellon University
+ * Copyright (c) 2013-2015 Carnegie Mellon University
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -13,7 +13,7 @@
  *     * Neither the name of SWITCH nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -46,6 +46,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import edu.cmu.ece.PrivacyLens.Action;
 import edu.cmu.ece.PrivacyLens.IdPHelper;
+import edu.cmu.ece.PrivacyLens.Util;
 import edu.cmu.ece.PrivacyLens.ViewHelper;
 import edu.cmu.ece.PrivacyLens.config.General;
 
@@ -77,28 +78,39 @@ public class AdminServlet extends HttpServlet {
         try {
             super.init();
             servletContext = getServletContext();
+            Util.servletContext = servletContext;
+
             final WebApplicationContext appContext =
-                    WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+                WebApplicationContextUtils
+                .getRequiredWebApplicationContext(servletContext);
 
             attributeReleaseModule =
-                    (AttributeReleaseModule) appContext.getBean("PrivacyLens.attributeReleaseModule",
-                            AttributeReleaseModule.class);
-            samlHelper = (SAMLHelper) appContext.getBean("PrivacyLens.samlHelper", SAMLHelper.class);
+                (AttributeReleaseModule) appContext.getBean(
+                    "PrivacyLens.attributeReleaseModule",
+                    AttributeReleaseModule.class);
+            samlHelper =
+                (SAMLHelper) appContext.getBean("PrivacyLens.samlHelper",
+                    SAMLHelper.class);
 
-            viewHelper = (ViewHelper) appContext.getBean("PrivacyLens.viewHelper", ViewHelper.class);
+            viewHelper =
+                (ViewHelper) appContext.getBean("PrivacyLens.viewHelper",
+                    ViewHelper.class);
         } catch (final Throwable t) {
-            logger.error("Error while initializing Attribute Release Servlet.", t);
+            logger.error("Error while initializing Attribute Release Servlet.",
+                t);
             throw new ServletException(t);
         }
     }
 
-    protected void doShowMenu(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException,
-            IOException {
+    protected void doShowMenu(final HttpServletRequest req,
+        final HttpServletResponse resp) throws ServletException, IOException {
         // ShowAttributes, ShowAttributeDetail, ShowDenyRequired, ShowAttributeConfirm
         logger.trace("entered doShowMenu");
         final java.io.PrintWriter out = resp.getWriter();
         out.println("<html><head><title>View test page</title><body>");
-        out.println(edu.cmu.ece.PrivacyLens.Util.request2string(req).replace('<', '[').replace('>', ']') + "<br/>");
+        out.println(edu.cmu.ece.PrivacyLens.Util.request2string(req)
+            .replace('<', '[').replace('>', ']')
+            + "<br/>");
 
         out.println("<form action=\"DebugView\" method=\"POST\">");
         out.println("<input type=\"radio\" name=\"state\" value=\"ShowAttributes\"> Show attributes</input><br/>");
@@ -115,8 +127,9 @@ public class AdminServlet extends HttpServlet {
         out.println("</body></html>");
     }
 
-    protected void doShowMain(final HttpServletRequest request, final HttpServletResponse response)
-            throws ServletException, IOException {
+    protected void doShowMain(final HttpServletRequest request,
+        final HttpServletResponse response) throws ServletException,
+        IOException {
         try {
             logger.trace("entered doShowMain");
             final Action action = AdminActionFactory.getAction(request);
@@ -130,7 +143,8 @@ public class AdminServlet extends HttpServlet {
             }
 
             final Map<String, Object> context = new HashMap<String, Object>();
-            context.put("idpOrganization", General.getInstance().getOrganizationName());
+            context.put("idpOrganization", General.getInstance()
+                .getOrganizationName());
 
             //final RelyingParty rpSample = new RelyingParty("RPId", "RPName", "RPDescription");
             //context.put("relyingParty", rpSample);
@@ -142,18 +156,20 @@ public class AdminServlet extends HttpServlet {
             out.println("<p>text</p>");
 
             out.println("</body></html>");
-            */
+             */
             // XXX debugging
             if (view.equals("XXX")) {
                 IdPHelper.setAttributeReleaseConsented(servletContext, request);
                 IdPHelper.returnToIdP(servletContext, request, response);
             } else if (view.equals("loginEvent")) {
                 //AdminViewHelper.setupView(view);
-                viewHelper.showView(servletContext, request, response, "attribute-loginevent", context);
+                viewHelper.showView(servletContext, request, response,
+                    "attribute-loginevent", context);
                 logger.trace("loginEvent view finished");
             } else if (view.equals("serviceLogin")) {
                 //AdminViewHelper.setupView(view);
-                viewHelper.showView(servletContext, request, response, "attribute-service", context);
+                viewHelper.showView(servletContext, request, response,
+                    "attribute-service", context);
                 logger.trace("serviceLogin view finished");
             } else {
                 if (!view.equals("entry")) {
@@ -161,8 +177,10 @@ public class AdminServlet extends HttpServlet {
                 }
                 // default and entry point
                 //context.put("allowGeneralConsent", attributeReleaseModule.isAllowGeneralConsent());
-                AdminViewHelper.setupView("entry", servletContext, request, attributeReleaseModule);
-                viewHelper.showView(servletContext, request, response, "attribute-admin", context);
+                AdminViewHelper.setupView("entry", servletContext, request,
+                    attributeReleaseModule);
+                viewHelper.showView(servletContext, request, response,
+                    "attribute-admin", context);
                 logger.trace("entry view finished");
                 return;
             }
@@ -174,15 +192,15 @@ public class AdminServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException,
-            IOException {
+    protected void doGet(final HttpServletRequest req,
+        final HttpServletResponse resp) throws ServletException, IOException {
         doPost(req, resp);
     }
 
     /** {@inheritDoc} */
     @Override
-    protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException,
-            IOException {
+    protected void doPost(final HttpServletRequest req,
+        final HttpServletResponse resp) throws ServletException, IOException {
         try {
             final String state = req.getParameter("state");
             if (state == null) {
