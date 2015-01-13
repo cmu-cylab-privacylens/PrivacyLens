@@ -199,6 +199,10 @@ You should at the least copy your organization's logo to the file @$SHIB_DIST$/s
 You may also want to put your federation's logo to the file @$SHIB_DIST$/src/main/webapp/PrivacyLens/federation-logo.png@ (which is an empty placeholder logo by default).
 _(For the SWITCHaai federation, the logo is available at "http://www.switch.ch/aai/design/images/switchaai-logo.png":http://www.switch.ch/aai/design/images/switchaai-logo.png.)_
 
+h2. 2.4 Configure administrative interface
+
+In @$SHIB_INSTALL$/conf/PrivacyLens.properties@, the property @general.adminUrl@ determines the Service Provider identifier that should cause the PrivacyLens administrative interface to be presented. Define a new Service Provider with this identifier and make it known to the Identity Provider via the @$SHIB_INSTALL$/conf/relying-party.xml@ file. Provide the full set of attributes to users of this Service Provider, and require authentication.
+
 h2. 2.4 Configure Shibboleth to honor PrivacyLens choices
 
 Configure the Identity Provider to query PrivacyLens for attribute release choices. Edit the file @$SHIB_INSTALL$/conf/attribute-filter.xml@ and make each AttributeFilterPolicy contain a PermitValueRule that will query PrivacyLens. The language used for the script is Javascript:
