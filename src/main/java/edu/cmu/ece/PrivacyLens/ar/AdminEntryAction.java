@@ -44,7 +44,6 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import edu.cmu.ece.PrivacyLens.Action;
-import edu.cmu.ece.PrivacyLens.HTMLUtils;
 import edu.cmu.ece.PrivacyLens.IdPHelper;
 import edu.cmu.ece.PrivacyLens.Oracle;
 import edu.cmu.ece.PrivacyLens.ToggleBean;
@@ -62,9 +61,6 @@ public class AdminEntryAction implements Action {
     /** Class logger. */
     private final Logger logger = LoggerFactory
         .getLogger(AdminEntryAction.class);
-
-    private final String emailAdminBoilerText = HTMLUtils
-        .getEmailAdminBoilerText(General.getInstance().getAdminMail());
 
     private String relyingPartyId;
 
@@ -109,95 +105,6 @@ public class AdminEntryAction implements Action {
             out.add(map);
         }
         return out;
-    }
-
-    public List<ToggleBean>
-        generateToggleFromAttributes(final List<Attribute> attributes,
-        final Map<String, Boolean> settingsMap) {
-        final Map<String, Boolean> attrMap =
-            Oracle.getInstance().getAttributeRequired(relyingPartyId);
-        final Map<String, String> attrReason =
-            Oracle.getInstance().getAttributeReason(relyingPartyId);
-        final Map<String, String> attrPrivacy =
-            Oracle.getInstance().getAttributePrivacy(relyingPartyId);
-
-        final List<ToggleBean> attributeBeans = new ArrayList<ToggleBean>();
-        for (final Attribute attribute : attributes) {
-            final String attributeId = attribute.getId();
-            if (!attrMap.containsKey(attributeId)) {
-                continue;
-            }
-
-            final ToggleBean bean = new ToggleBean();
-
-            final boolean required = attrMap.get(attributeId);
-
-            if (required) {
-                bean.setImmutable(true);
-                bean.setImageTrue(requestContextPath
-                    + "/PrivacyLens/force_sending.png");
-            } else {
-                bean.setImmutable(false);
-                bean.setImageFalse(requestContextPath
-                    + "/PrivacyLens/not_sending.png");
-                bean.setImageTrue(requestContextPath
-                    + "/PrivacyLens/sending.png");
-            }
-
-            final boolean value = required || settingsMap.get(attributeId);
-
-            bean.setValue(value);
-
-            final StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("<p>" + attrReason.get(attributeId)
-                + "</p><p>" + attrPrivacy.get(attributeId) + "</p>");
-            stringBuilder.append("<p>");
-
-            // don't present values of machine readable attributes
-            if (!attribute.isMachineReadable()) {
-                stringBuilder.append("Your " + attribute.getDescription()
-                    + " is " + '"' + Util.listToString(attribute.getValues())
-                    + "\". ");
-            }
-            stringBuilder.append("If you continue to "
-                + oracle.getServiceName() + ", your "
-                + attribute.getDescription() + " will ");
-            stringBuilder.append(value ? "" : "not");
-            stringBuilder
-                .append(" be sent to it. Use the toggle switch to change this setting.");
-            stringBuilder.append("</p>");
-            stringBuilder.append(emailAdminBoilerText);
-
-            final String explanation = stringBuilder.toString();
-            bean.setExplanation(explanation);
-            bean.setExplanationIcon(requestContextPath
-                + "/PrivacyLens/info.png");
-            bean.setTextDiv("attributeReleaseAttribute");
-            bean.setImageDiv("attributeReleaseControl");
-            bean.setParameter(attributeId);
-
-            stringBuilder.setLength(0);
-            stringBuilder.append(attribute.getDescription());
-            // don't present values of machine readable attributes
-            if (!attribute.isMachineReadable()) {
-                stringBuilder.append(" (<b>");
-                stringBuilder.append(Util.listToString(attribute.getValues()));
-                stringBuilder.append("</b>)");
-            }
-            if (required) {
-                stringBuilder.append('*');
-            }
-
-            final String text = stringBuilder.toString();
-            bean.setText(text);
-            if (!bean.validate()) {
-                logger.error("AdminServiceLoginAction {} did not validate",
-                    attribute);
-            }
-            attributeBeans.add(bean);
-
-        }
-        return attributeBeans;
     }
 
     /** {@inheritDoc} */
@@ -271,7 +178,9 @@ public class AdminEntryAction implements Action {
                     relyingPartyId, attributes);
 
             final List<ToggleBean> beanList =
-                generateToggleFromAttributes(attributes, consentByAttribute);
+                AdminUtil.generateToggleFromAttributes(attributes,
+                    consentByAttribute, oracle, relyingPartyId,
+                    requestContextPath);
             request.getSession().setAttribute("attributeBeans", beanList);
             request.getSession().setAttribute("relyingParty", relyingPartyId);
             final boolean forceShow =
