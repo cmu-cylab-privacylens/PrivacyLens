@@ -104,21 +104,20 @@ public class SourceAction implements Action {
             final boolean required =
                 Boolean.valueOf((String) attrMap.get(attributeId).get(
                     "required"));
-            final boolean value = settingsMap.get(attributeId);
+            final boolean value = required || settingsMap.get(attributeId);
 
             if (required) {
-                bean.setValue(true);
                 bean.setImmutable(true);
                 bean.setImageTrue(requestContextPath
                     + "/PrivacyLens/force_sending.png");
             } else {
-                bean.setValue(value);
                 bean.setImmutable(false);
                 bean.setImageFalse(requestContextPath
                     + "/PrivacyLens/not_sending.png");
                 bean.setImageTrue(requestContextPath
                     + "/PrivacyLens/sending.png");
             }
+            bean.setValue(value);
 
             // set up privacy and request reason text
             final StringBuilder stringBuilder = new StringBuilder();

@@ -2,7 +2,7 @@
  * COPYRIGHT_BOILERPLATE
  * Copyright (c) 2013 Carnegie Mellon University
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -13,7 +13,7 @@
  *     * Neither the name of SWITCH nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -60,9 +60,11 @@ public class AdminEntryAction implements Action {
     private final AttributeReleaseModule attributeReleaseModule;
 
     /** Class logger. */
-    private final Logger logger = LoggerFactory.getLogger(AdminEntryAction.class);
+    private final Logger logger = LoggerFactory
+        .getLogger(AdminEntryAction.class);
 
-    private final String emailAdminBoilerText = HTMLUtils.getEmailAdminBoilerText(General.getInstance().getAdminMail());
+    private final String emailAdminBoilerText = HTMLUtils
+        .getEmailAdminBoilerText(General.getInstance().getAdminMail());
 
     private String relyingPartyId;
 
@@ -76,21 +78,26 @@ public class AdminEntryAction implements Action {
         servletContext = Util.servletContext;
 
         final WebApplicationContext appContext =
-                WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+            WebApplicationContextUtils
+                .getRequiredWebApplicationContext(servletContext);
         attributeReleaseModule =
-                (AttributeReleaseModule) appContext.getBean("PrivacyLens.attributeReleaseModule",
-                        AttributeReleaseModule.class);
-        logger.trace("AdminEntryAction init end arm: {}", attributeReleaseModule);
+            (AttributeReleaseModule) appContext.getBean(
+                "PrivacyLens.attributeReleaseModule",
+                AttributeReleaseModule.class);
+        logger.trace("AdminEntryAction init end arm: {}",
+            attributeReleaseModule);
 
     }
 
-    private List<Map> processLoginEvents(final List<LoginEvent> loginEventsList) {
+    private List<Map>
+        processLoginEvents(final List<LoginEvent> loginEventsList) {
         final List<Map> foobar = new ArrayList<Map>();
         for (final LoginEvent loginEvent : loginEventsList) {
             loginEvent.getEventDetailHash();
             final DateTime loginEventDate = loginEvent.getDate();
             final DateTime now = new DateTime();
-            final long relativeTime = now.getMillis() - loginEventDate.getMillis();
+            final long relativeTime =
+                now.getMillis() - loginEventDate.getMillis();
             final String dateTimeString = Util.millisToDuration(relativeTime);
             final String serviceString = loginEvent.getServiceName();
             final String loginEventId = loginEvent.getEventDetailHash();
@@ -104,11 +111,15 @@ public class AdminEntryAction implements Action {
         return foobar;
     }
 
-    public List<ToggleBean> generateToggleFromAttributes(final List<Attribute> attributes,
-            final Map<String, Boolean> settingsMap) {
-        final Map<String, Boolean> attrMap = Oracle.getInstance().getAttributeRequired(relyingPartyId);
-        final Map<String, String> attrReason = Oracle.getInstance().getAttributeReason(relyingPartyId);
-        final Map<String, String> attrPrivacy = Oracle.getInstance().getAttributePrivacy(relyingPartyId);
+    public List<ToggleBean>
+        generateToggleFromAttributes(final List<Attribute> attributes,
+        final Map<String, Boolean> settingsMap) {
+        final Map<String, Boolean> attrMap =
+            Oracle.getInstance().getAttributeRequired(relyingPartyId);
+        final Map<String, String> attrReason =
+            Oracle.getInstance().getAttributeReason(relyingPartyId);
+        final Map<String, String> attrPrivacy =
+            Oracle.getInstance().getAttributePrivacy(relyingPartyId);
 
         final List<ToggleBean> attributeBeans = new ArrayList<ToggleBean>();
         for (final Attribute attribute : attributes) {
@@ -123,40 +134,44 @@ public class AdminEntryAction implements Action {
 
             if (required) {
                 bean.setImmutable(true);
-                bean.setImageTrue(requestContextPath + "/PrivacyLens/force_sending.png");
+                bean.setImageTrue(requestContextPath
+                    + "/PrivacyLens/force_sending.png");
             } else {
                 bean.setImmutable(false);
-                bean.setImageFalse(requestContextPath + "/PrivacyLens/not_sending.png");
-                bean.setImageTrue(requestContextPath + "/PrivacyLens/sending.png");
+                bean.setImageFalse(requestContextPath
+                    + "/PrivacyLens/not_sending.png");
+                bean.setImageTrue(requestContextPath
+                    + "/PrivacyLens/sending.png");
             }
 
-            final boolean value = settingsMap.get(attributeId);
-            if (required) {
-                bean.setValue(true);
-            } else {
-                bean.setValue(value);
-            }
+            final boolean value = required || settingsMap.get(attributeId);
+
+            bean.setValue(value);
 
             final StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("<p>" + attrReason.get(attributeId) + "</p><p>" + attrPrivacy.get(attributeId)
-                    + "</p>");
+            stringBuilder.append("<p>" + attrReason.get(attributeId)
+                + "</p><p>" + attrPrivacy.get(attributeId) + "</p>");
             stringBuilder.append("<p>");
 
             // don't present values of machine readable attributes
             if (!attribute.isMachineReadable()) {
-                stringBuilder.append("Your " + attribute.getDescription() + " is " + '"'
-                        + Util.listToString(attribute.getValues()) + "\". ");
+                stringBuilder.append("Your " + attribute.getDescription()
+                    + " is " + '"' + Util.listToString(attribute.getValues())
+                    + "\". ");
             }
-            stringBuilder.append("If you continue to " + oracle.getServiceName() + ", your "
-                    + attribute.getDescription() + " will ");
+            stringBuilder.append("If you continue to "
+                + oracle.getServiceName() + ", your "
+                + attribute.getDescription() + " will ");
             stringBuilder.append(value ? "" : "not");
-            stringBuilder.append(" be sent to it. Use the toggle switch to change this setting.");
+            stringBuilder
+                .append(" be sent to it. Use the toggle switch to change this setting.");
             stringBuilder.append("</p>");
             stringBuilder.append(emailAdminBoilerText);
 
             final String explanation = stringBuilder.toString();
             bean.setExplanation(explanation);
-            bean.setExplanationIcon(requestContextPath + "/PrivacyLens/info.png");
+            bean.setExplanationIcon(requestContextPath
+                + "/PrivacyLens/info.png");
             bean.setTextDiv("attributeReleaseAttribute");
             bean.setImageDiv("attributeReleaseControl");
             bean.setParameter(attributeId);
@@ -176,7 +191,8 @@ public class AdminEntryAction implements Action {
             final String text = stringBuilder.toString();
             bean.setText(text);
             if (!bean.validate()) {
-                logger.error("AdminServiceLoginAction {} did not validate", attribute);
+                logger.error("AdminServiceLoginAction {} did not validate",
+                    attribute);
             }
             attributeBeans.add(bean);
 
@@ -185,7 +201,8 @@ public class AdminEntryAction implements Action {
     }
 
     /** {@inheritDoc} */
-    public String execute(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
+    public String execute(final HttpServletRequest request,
+        final HttpServletResponse response) throws Exception {
         //final ServletContext servletContext = Util.servletContext;
         logger.trace("AdminEntryAction execute sc: {}", servletContext);
 
@@ -195,12 +212,14 @@ public class AdminEntryAction implements Action {
 
         oracle = Oracle.getInstance();
 
-        final String principalName = IdPHelper.getPrincipalName(servletContext, request);
+        final String principalName =
+            IdPHelper.getPrincipalName(servletContext, request);
 
         final int limitLoginEvents = 6;
 
         final String sectionParameter = request.getParameter("section");
-        final boolean loginEventSection = (sectionParameter.equals("loginEvent"));
+        final boolean loginEventSection =
+            (sectionParameter.equals("loginEvent"));
         final boolean serviceSection = (sectionParameter.equals("service"));
 
         final boolean helpButton = (request.getParameter("help") != null);
@@ -213,25 +232,29 @@ public class AdminEntryAction implements Action {
         if (loginEventSection) {
             final String choice = request.getParameter("choice");
             // do stuff with choice
-            final LoginEvent loginEvent = attributeReleaseModule.readLoginEvent(choice);
+            final LoginEvent loginEvent =
+                attributeReleaseModule.readLoginEvent(choice);
 
             if (loginEvent == null) {
                 // error
                 return "entry";
             }
 
-            final LoginEventDetail loginEventDetail = attributeReleaseModule.readLoginEventDetail(loginEvent);
+            final LoginEventDetail loginEventDetail =
+                attributeReleaseModule.readLoginEventDetail(loginEvent);
             // the whole event is given to the jsp since additional text uses
             // some of the fields
             request.getSession().setAttribute("loginEvent", loginEvent);
-            request.getSession().setAttribute("loginEventDetail", loginEventDetail);
+            request.getSession().setAttribute("loginEventDetail",
+                loginEventDetail);
 
             final StringBuffer sentInfoBuffer = new StringBuffer();
             for (final Attribute attribute : loginEventDetail.getAttributes()) {
                 sentInfoBuffer.append(attribute.getDescription());
                 // don't present values of machine readable attributes
                 if (!attribute.isMachineReadable()) {
-                    sentInfoBuffer.append(": \"" + Util.listToString(attribute.getValues()) + "\"");
+                    sentInfoBuffer.append(": \""
+                        + Util.listToString(attribute.getValues()) + "\"");
                 }
 
                 sentInfoBuffer.append("<br/>");
@@ -241,17 +264,24 @@ public class AdminEntryAction implements Action {
 
             relyingPartyId = loginEvent.getServiceUrl();
 
-            final List<Attribute> attributes = IdPHelper.getAttributes(servletContext, request);
+            final List<Attribute> attributes =
+                IdPHelper.getAttributes(servletContext, request);
             final Map<String, Boolean> consentByAttribute =
-                    attributeReleaseModule.getAttributeConsent(principalName, relyingPartyId, attributes);
+                attributeReleaseModule.getAttributeConsent(principalName,
+                    relyingPartyId, attributes);
 
-            final List<ToggleBean> beanList = generateToggleFromAttributes(attributes, consentByAttribute);
+            final List<ToggleBean> beanList =
+                generateToggleFromAttributes(attributes, consentByAttribute);
             request.getSession().setAttribute("attributeBeans", beanList);
             request.getSession().setAttribute("relyingParty", relyingPartyId);
-            final boolean forceShow = attributeReleaseModule.isForceShowInterface(principalName, relyingPartyId);
+            final boolean forceShow =
+                attributeReleaseModule.isForceShowInterface(principalName,
+                    relyingPartyId);
             final ReminderInterval reminderInterval =
-                    attributeReleaseModule.getReminderInterval(principalName, relyingPartyId);
-            request.getSession().setAttribute("reminderInterval", reminderInterval.getRemindAfter());
+                attributeReleaseModule.getReminderInterval(principalName,
+                    relyingPartyId);
+            request.getSession().setAttribute("reminderInterval",
+                reminderInterval.getRemindAfter());
             request.getSession().setAttribute("forceShow", forceShow);
             return "loginEvent";
 
@@ -268,17 +298,22 @@ public class AdminEntryAction implements Action {
             final String service = choice;
 
             final List<LoginEvent> serviceLoginEvents =
-                    attributeReleaseModule.listLoginEvents(principalName, service, limitLoginEvents);
+                attributeReleaseModule.listLoginEvents(principalName, service,
+                    limitLoginEvents);
 
-            final List<Map> serviceLoginList = processLoginEvents(serviceLoginEvents);
-            request.getSession().setAttribute("lastLoginEvents", serviceLoginList);
+            final List<Map> serviceLoginList =
+                processLoginEvents(serviceLoginEvents);
+            request.getSession().setAttribute("lastLoginEvents",
+                serviceLoginList);
             if (serviceLoginList.size() == limitLoginEvents) {
                 request.getSession().setAttribute("loginEventListFull", true);
             }
 
-            request.getSession().setAttribute("userName", Oracle.getInstance().getUserName());
+            request.getSession().setAttribute("userName",
+                Oracle.getInstance().getUserName());
             request.getSession().setAttribute("relyingParty", service);
-            request.getSession().setAttribute("idpName", General.getInstance().getIdpName());
+            request.getSession().setAttribute("idpName",
+                General.getInstance().getIdpName());
 
             //final List<Attribute> attributes = IdPHelper.getAttributes(servletContext, request);
             //request.getSession().setAttribute("attributes", attributes);
