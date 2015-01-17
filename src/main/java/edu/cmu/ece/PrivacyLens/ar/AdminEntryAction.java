@@ -1,6 +1,6 @@
 /*
  * COPYRIGHT_BOILERPLATE
- * Copyright (c) 2013 Carnegie Mellon University
+ * Copyright (c) 2013-2015 Carnegie Mellon University
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -91,7 +91,7 @@ public class AdminEntryAction implements Action {
 
     private List<Map>
         processLoginEvents(final List<LoginEvent> loginEventsList) {
-        final List<Map> foobar = new ArrayList<Map>();
+        final List<Map> out = new ArrayList<Map>();
         for (final LoginEvent loginEvent : loginEventsList) {
             loginEvent.getEventDetailHash();
             final DateTime loginEventDate = loginEvent.getDate();
@@ -106,9 +106,9 @@ public class AdminEntryAction implements Action {
             map.put("service", serviceString);
             map.put("loginEvent", loginEvent);
             map.put("loginEventId", loginEventId);
-            foobar.add(map);
+            out.add(map);
         }
-        return foobar;
+        return out;
     }
 
     public List<ToggleBean>
