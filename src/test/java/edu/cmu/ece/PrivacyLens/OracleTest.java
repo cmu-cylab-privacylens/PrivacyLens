@@ -1,8 +1,8 @@
 /*
  * COPYRIGHT_BOILERPLATE
- * Copyright (c) 2014 Carnegie Mellon University
+ * Copyright (c) 2014-2015 Carnegie Mellon University
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -13,7 +13,7 @@
  *     * Neither the name of SWITCH nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -24,7 +24,7 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+ */
 
 package edu.cmu.ece.PrivacyLens;
 
@@ -81,6 +81,22 @@ public class OracleTest {
         oracle.setRelyingPartyId(rpid2);
         final String serviceName2 = oracle.getServiceName();
         Assert.assertEquals(serviceName2, "CMU's Calendar");
+    }
+
+    /** Test whether retrieving logo by service provider works */
+    @Test
+    public void testGetLogo() {
+        final String rpid = "https://scalepriv.ece.cmu.edu/shibboleth";
+        Oracle.setRegexpMatch(false);
+
+        String logo = oracle.getLogo(rpid);
+        Assert.assertEquals(logo, "logo.png");
+
+        Oracle.setRegexpMatch(true);
+
+        final String rpid2 = "https://scalepriv.ece.cmu.edu/foobar";
+        logo = oracle.getLogo(rpid2);
+        Assert.assertNull(logo);
     }
 
     /** Test whether matching url to service provider works */

@@ -1,6 +1,6 @@
 /*
  * COPYRIGHT_BOILERPLATE
- * Copyright (c) 2013 Carnegie Mellon University
+ * Copyright (c) 2013-2015 Carnegie Mellon University
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -110,6 +110,8 @@ public class Oracle {
         private String name;
 
         private String id;
+
+        private String logo;
 
         private transient boolean hasAttrGroups;
 
@@ -393,6 +395,22 @@ public class Oracle {
         }
 
         return matchedSP;
+    }
+
+    /**
+     * Get the logo file for a service provider
+     *
+     * @param spId Service Provider ID
+     * @return String (could be null) logo file name
+     */
+    public String getLogo(final String spId) {
+        String out = null;
+        final ServiceProviderData matchedSP = getMatchingSP(spId);
+
+        if (matchedSP != null) {
+            out = matchedSP.logo;
+        }
+        return out;
     }
 
     /**
