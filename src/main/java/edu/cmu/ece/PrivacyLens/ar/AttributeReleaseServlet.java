@@ -134,28 +134,18 @@ public class AttributeReleaseServlet extends HttpServlet {
 
             // Set up logos
             final String requestContextPath = request.getContextPath();
-            context.put("orgLogo", requestContextPath
+            context.put("fedLogo", requestContextPath
                 + "/PrivacyLens/federation-logo.png");
             context
-            .put("fedLogo", requestContextPath + "/PrivacyLens/logo.png");
+                .put("orgLogo", requestContextPath + "/PrivacyLens/logo.png");
             final String spLogo = oracle.getLogo(relyingPartyId);
             if (spLogo != null) {
                 context.put("spLogo", requestContextPath + "/PrivacyLens/"
                     + spLogo);
             }
 
-            final Map<String, String> attributeReason =
-                oracle.getAttributeReason(relyingPartyId);
-            final Map<String, String> attributePrivacy =
-                oracle.getAttributePrivacy(relyingPartyId);
-            final Map<String, Boolean> attributeRequired =
-                oracle.getAttributeRequired(relyingPartyId);
             final String serviceName = oracle.getServiceName();
             context.put("service", serviceName);
-
-            //context.put("remoteAttributeReason", attributeReason);
-            //context.put("remoteAttributePrivacy", attributePrivacy);
-            //context.put("remoteAttributeRequired", attributeRequired);
 
             context
                 .put(

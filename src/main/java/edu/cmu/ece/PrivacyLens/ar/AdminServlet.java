@@ -142,10 +142,10 @@ public class AdminServlet extends HttpServlet {
 
             // Set up logos
             final String requestContextPath = request.getContextPath();
-            context.put("orgLogo", requestContextPath
+            context.put("fedLogo", requestContextPath
                 + "/PrivacyLens/federation-logo.png");
             context
-                .put("fedLogo", requestContextPath + "/PrivacyLens/logo.png");
+                .put("orgLogo", requestContextPath + "/PrivacyLens/logo.png");
 
             // XXX debugging
             if (view.equals("XXX")) {
