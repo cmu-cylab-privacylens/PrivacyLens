@@ -67,9 +67,6 @@ public class AdminServlet extends HttpServlet {
     /** The Attribute Release module. */
     private AttributeReleaseModule attributeReleaseModule;
 
-    /** The SAML helper. */
-    private SAMLHelper samlHelper;
-
     /** The view helper. */
     private ViewHelper viewHelper;
 
@@ -82,15 +79,12 @@ public class AdminServlet extends HttpServlet {
 
             final WebApplicationContext appContext =
                 WebApplicationContextUtils
-                .getRequiredWebApplicationContext(servletContext);
+                    .getRequiredWebApplicationContext(servletContext);
 
             attributeReleaseModule =
                 (AttributeReleaseModule) appContext.getBean(
                     "PrivacyLens.attributeReleaseModule",
                     AttributeReleaseModule.class);
-            samlHelper =
-                (SAMLHelper) appContext.getBean("PrivacyLens.samlHelper",
-                    SAMLHelper.class);
 
             viewHelper =
                 (ViewHelper) appContext.getBean("PrivacyLens.viewHelper",
@@ -146,17 +140,13 @@ public class AdminServlet extends HttpServlet {
             context.put("idpOrganization", General.getInstance()
                 .getOrganizationName());
 
-            //final RelyingParty rpSample = new RelyingParty("RPId", "RPName", "RPDescription");
-            //context.put("relyingParty", rpSample);
-            /*
-            final java.io.PrintWriter out = resp.getWriter();
-            out.println("<html><head><title>Admin test page</title><body>");
-            out.println(edu.cmu.ece.ua.StrouckiUtils.request2string(req).replace('<', '[').replace('>', ']') + "<br/>");
+            // Set up logos
+            final String requestContextPath = request.getContextPath();
+            context.put("orgLogo", requestContextPath
+                + "/PrivacyLens/federation-logo.png");
+            context
+                .put("fedLogo", requestContextPath + "/PrivacyLens/logo.png");
 
-            out.println("<p>text</p>");
-
-            out.println("</body></html>");
-             */
             // XXX debugging
             if (view.equals("XXX")) {
                 IdPHelper.setAttributeReleaseConsented(servletContext, request);

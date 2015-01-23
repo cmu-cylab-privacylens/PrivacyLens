@@ -1,8 +1,8 @@
 /*
  * Copyright (c) 2011, SWITCH
- * Copyright (c) 2013, Carnegie Mellon University
+ * Copyright (c) 2013-2015, Carnegie Mellon University
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -13,7 +13,7 @@
  *     * Neither the name of SWITCH nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -60,7 +60,8 @@ public class AttributeReleaseServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     /** Class logger. */
-    private final Logger logger = LoggerFactory.getLogger(AttributeReleaseServlet.class);
+    private final Logger logger = LoggerFactory
+        .getLogger(AttributeReleaseServlet.class);
 
     /** The servlet context. */
     private ServletContext servletContext;
@@ -82,21 +83,29 @@ public class AttributeReleaseServlet extends HttpServlet {
             Util.servletContext = servletContext;
 
             final WebApplicationContext appContext =
-                    WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+                WebApplicationContextUtils
+                    .getRequiredWebApplicationContext(servletContext);
             attributeReleaseModule =
-                    (AttributeReleaseModule) appContext.getBean("PrivacyLens.attributeReleaseModule",
-                            AttributeReleaseModule.class);
-            samlHelper = (SAMLHelper) appContext.getBean("PrivacyLens.samlHelper", SAMLHelper.class);
-            viewHelper = (ViewHelper) appContext.getBean("PrivacyLens.viewHelper", ViewHelper.class);
+                (AttributeReleaseModule) appContext.getBean(
+                    "PrivacyLens.attributeReleaseModule",
+                    AttributeReleaseModule.class);
+            samlHelper =
+                (SAMLHelper) appContext.getBean("PrivacyLens.samlHelper",
+                    SAMLHelper.class);
+            viewHelper =
+                (ViewHelper) appContext.getBean("PrivacyLens.viewHelper",
+                    ViewHelper.class);
         } catch (final Throwable t) {
-            logger.error("Error while initializing Attribute Release Servlet.", t);
+            logger.error("Error while initializing Attribute Release Servlet.",
+                t);
             throw new ServletException(t);
         }
     }
 
     /** {@inheritDoc} */
-    protected void service(final HttpServletRequest request, final HttpServletResponse response)
-            throws ServletException, IOException {
+    protected void service(final HttpServletRequest request,
+        final HttpServletResponse response) throws ServletException,
+        IOException {
         try {
             logger.trace("Incoming signal");
             final Action action = ActionFactory.getAction(request);
@@ -109,20 +118,38 @@ public class AttributeReleaseServlet extends HttpServlet {
                 session.setAttribute("view", view);
             }
 
-            final String relyingPartyId = IdPHelper.getRelyingPartyId(servletContext, request);
+            final String relyingPartyId =
+                IdPHelper.getRelyingPartyId(servletContext, request);
             final Map<String, Object> context = new HashMap<String, Object>();
             final Oracle oracle = Oracle.getInstance();
             // may be done in SourceAction already
-            oracle.setUserName(IdPHelper.getPrincipalName(servletContext, request));
+            oracle.setUserName(IdPHelper.getPrincipalName(servletContext,
+                request));
             oracle.setRelyingPartyId(relyingPartyId);
             context.put("adminUrl", General.getInstance().getAdminUrl());
             context.put("adminMail", General.getInstance().getAdminMail());
 
-            context.put("idpOrganization", General.getInstance().getOrganizationName());
+            context.put("idpOrganization", General.getInstance()
+                .getOrganizationName());
 
-            final Map<String, String> attributeReason = oracle.getAttributeReason(relyingPartyId);
-            final Map<String, String> attributePrivacy = oracle.getAttributePrivacy(relyingPartyId);
-            final Map<String, Boolean> attributeRequired = oracle.getAttributeRequired(relyingPartyId);
+            // Set up logos
+            final String requestContextPath = request.getContextPath();
+            context.put("orgLogo", requestContextPath
+                + "/PrivacyLens/federation-logo.png");
+            context
+            .put("fedLogo", requestContextPath + "/PrivacyLens/logo.png");
+            final String spLogo = oracle.getLogo(relyingPartyId);
+            if (spLogo != null) {
+                context.put("spLogo", requestContextPath + "/PrivacyLens/"
+                    + spLogo);
+            }
+
+            final Map<String, String> attributeReason =
+                oracle.getAttributeReason(relyingPartyId);
+            final Map<String, String> attributePrivacy =
+                oracle.getAttributePrivacy(relyingPartyId);
+            final Map<String, Boolean> attributeRequired =
+                oracle.getAttributeRequired(relyingPartyId);
             final String serviceName = oracle.getServiceName();
             context.put("service", serviceName);
 
@@ -130,19 +157,28 @@ public class AttributeReleaseServlet extends HttpServlet {
             //context.put("remoteAttributePrivacy", attributePrivacy);
             //context.put("remoteAttributeRequired", attributeRequired);
 
-            context.put("requirementStatement", "Use the toggle switches to select the items that will be sent to "
-                    + serviceName + ". Items marked with * are required to access and personalize " + serviceName
-                    + " and cannot be unselected.");
-            context.put("relyingParty", samlHelper.readRelyingParty(relyingPartyId, viewHelper.selectLocale(request)));
+            context
+                .put(
+                    "requirementStatement",
+                    "Use the toggle switches to select the items that will be sent to "
+                        + serviceName
+                        + ". Items marked with * are required to access and personalize "
+                        + serviceName + " and cannot be unselected.");
+            context.put(
+                "relyingParty",
+                samlHelper.readRelyingParty(relyingPartyId,
+                    viewHelper.selectLocale(request)));
             context.put("allowDenyRequired", false);
 
             if (view.equals("reminder")) {
-                viewHelper.showView(servletContext, request, response, "attribute-reminder", context);
+                viewHelper.showView(servletContext, request, response,
+                    "attribute-reminder", context);
                 return;
             } else if (view.equals("admin")) {
                 // don't carry in a view attribute as we send the user to a new app
                 request.getSession().removeAttribute("view");
-                IdPHelper.redirectToUrl(servletContext, request, response, (String) context.get("adminUrl"));
+                IdPHelper.redirectToUrl(servletContext, request, response,
+                    (String) context.get("adminUrl"));
                 return;
             } else if (view.equals("sink")) {
                 IdPHelper.setAttributeReleaseConsented(servletContext, request);
@@ -152,8 +188,10 @@ public class AttributeReleaseServlet extends HttpServlet {
                     logger.error("Fell through when setting up view {}", view);
                 }
                 // default and entry point
-                context.put("allowGeneralConsent", attributeReleaseModule.isAllowGeneralConsent());
-                viewHelper.showView(servletContext, request, response, "attribute-detail", context);
+                context.put("allowGeneralConsent",
+                    attributeReleaseModule.isAllowGeneralConsent());
+                viewHelper.showView(servletContext, request, response,
+                    "attribute-detail", context);
                 return;
             }
 
