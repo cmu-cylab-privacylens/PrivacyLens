@@ -203,6 +203,37 @@ h2. 2.4 Configure administrative interface
 
 In @$SHIB_INSTALL$/conf/PrivacyLens.properties@, the property @general.adminUrl@ determines the Service Provider identifier that should cause the PrivacyLens administrative interface to be presented. Define a new Service Provider with this identifier and make it known to the Identity Provider via the @$SHIB_INSTALL$/conf/relying-party.xml@ file. Provide the full set of attributes to users of this Service Provider, and require authentication.
 
+On the client side, the web server and the Shibboleth module have to be configured.
+* For Apache, add these lines to the configuration to have Shibboleth handle these URLs:
+bc.. 
+
+<Location /admin/Shibboleth.sso>
+  SetHandler shib
+</Location>
+
+<Location /admin>
+  AuthType shibboleth
+  ShibRequestSetting requireSession 1
+  Require shib-session
+</Location>
+p. 
+* Configure @/etc/shibboleth/shibboleth2.xml@ to assign a new application to the administrative URL:
+bc.. 
+<ApplicationOverride id="admin" entityID="https://<SP host>/admin">
+  <Sessions lifetime="28800" timeout="3600" checkAddress="false" handlerURL="/admin/Shibboleth.sso" />
+</ApplicationOverride>
+p. 
+Server side configuration
+* Define the metadata cache for the new virtual Service Provider (this file will be created by the Identity Provider). Modify @$SHIB_INSTALL$/conf/relying-party.xml@ and add the following:
+bc.. 
+<metadata:MetadataProvider id="SPAdmin" xsi:type="metadata:FileBackedHTTPMetadataProvider"
+  metadataURL="https://<SP host>/admin/Shibboleth.sso/Metadata"
+  backingFile="$SHIB_INSTALL$/metadata/scaleprivSPAdmin.xml">
+</metadata:MetadataProvider>
+p. 
+* Ensure the virtual Service Provider is defined in @$SHIB_INSTALL$/conf/PrivacyLens.properties@:
+bc. general.adminUrl = https://<SP host>/admin
+
 h2. 2.5 Configure Shibboleth to honor PrivacyLens choices
 
 Configure the Identity Provider to query PrivacyLens for attribute release choices. Edit the file @$SHIB_INSTALL$/conf/attribute-filter.xml@ and make each AttributeFilterPolicy contain a PermitValueRule that will query PrivacyLens. The language used for the script is Javascript:
