@@ -409,6 +409,52 @@
 			<code>general.adminUrl</code> determines the Service Provider identifier that should cause the PrivacyLens administrative interface to be presented. Define a new Service Provider with this identifier and make it known to the Identity Provider via the 
 			<code>$SHIB_INSTALL$/conf/relying-party.xml</code> file. Provide the full set of attributes to users of this Service Provider, and require authentication.
 		</p>
+		<p>On the client side, the web server and the Shibboleth module have to be configured.</p>
+		<ul>
+			<li>For Apache, add these lines to the configuration to have Shibboleth handle these URLs:</li>
+		</ul>
+		<pre><pre>
+&lt;Location /admin/Shibboleth.sso>
+  SetHandler shib
+&lt;/Location>
+
+&lt;Location /admin>
+  AuthType shibboleth
+  ShibRequestSetting requireSession 1
+  Require shib-session
+&lt;/Location>
+</pre></pre>
+		<p></p>
+		<ul>
+			<li>Configure 
+				<code>/etc/shibboleth/shibboleth2.xml</code> to assign a new application to the administrative URL:
+			</li>
+		</ul>
+		<pre><pre>&lt;ApplicationOverride id="admin" entityID="https://&lt;SP host>/admin">
+  &lt;Sessions lifetime="28800" timeout="3600" checkAddress="false" handlerURL="/admin/Shibboleth.sso" />
+&lt;/ApplicationOverride>
+</pre></pre>
+		<p>
+			<br/>Server side configuration
+		</p>
+		<ul>
+			<li>Define the metadata cache for the new virtual Service Provider (this file will be created by the Identity Provider). Modify 
+				<code>$SHIB_INSTALL$/conf/relying-party.xml</code> and add the following:
+			</li>
+		</ul>
+		<pre><pre>&lt;metadata:MetadataProvider id="SPAdmin" xsi:type="metadata:FileBackedHTTPMetadataProvider"
+  metadataURL="https://&lt;SP host>/admin/Shibboleth.sso/Metadata"
+  backingFile="$SHIB_INSTALL$/metadata/scaleprivSPAdmin.xml">
+&lt;/metadata:MetadataProvider>
+</pre></pre>
+		<p></p>
+		<ul>
+			<li>Ensure the virtual Service Provider is defined in 
+				<code>$SHIB_INSTALL$/conf/PrivacyLens.properties</code>:
+			</li>
+		</ul>
+		<pre><pre>general.adminUrl = https://&lt;SP host>/admin
+</pre></pre>
 		<h2 id="a2.5ConfigureShibbolethtohonorPrivacyLenschoices">2.5 Configure Shibboleth to honor PrivacyLens choices</h2>
 		<p>Configure the Identity Provider to query PrivacyLens for attribute release choices. Edit the file 
 			<code>$SHIB_INSTALL$/conf/attribute-filter.xml</code> and make each AttributeFilterPolicy contain a PermitValueRule that will query PrivacyLens. The language used for the script is Javascript:
