@@ -267,7 +267,6 @@ bc.. {
     {
       "name":Human readable name of the Service Provider,
       "id":Regular expression to match Service Provider identifier within Shibboleth against,
-      "logo":Optional logo image file for the service provider,
       "attrGroups":[
         {
           "id":Attribute group identifier,
