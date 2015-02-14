@@ -415,6 +415,23 @@ public class Oracle {
 
     /**
      * @param spId Service Provider ID
+     * @return map of attribute id -> group
+     */
+    public Map<String, String> getAttributeGroup(final String spId) {
+        final Map<String, String> out = new HashMap();
+        final ServiceProviderData matchedSP = getMatchingSP(spId);
+
+        if (matchedSP != null) {
+            for (final AttributeData attrmap : matchedSP.attrs) {
+                out.put(attrmap.id, attrmap.group);
+            }
+
+        }
+        return out;
+    }
+
+    /**
+     * @param spId Service Provider ID
      * @return map of group id -> (map of k -> v))
      */
     public Map<String, Map> getAttributeGroupRequested(final String spId) {

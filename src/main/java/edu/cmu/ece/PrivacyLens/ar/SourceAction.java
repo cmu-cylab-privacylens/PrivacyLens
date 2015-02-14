@@ -1,6 +1,6 @@
 /*
  * COPYRIGHT_BOILERPLATE
- * Copyright (c) 2013 Carnegie Mellon University
+ * Copyright (c) 2013-2015 Carnegie Mellon University
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,8 +40,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import edu.cmu.ece.PrivacyLens.Action;
 import edu.cmu.ece.PrivacyLens.HTMLUtils;
@@ -58,7 +56,7 @@ public class SourceAction implements Action {
     /** Class logger. */
     private final Logger logger = LoggerFactory.getLogger(SourceAction.class);
 
-    private final String emailAdminBoilerText = HTMLUtils
+    private final String explanationCoda = HTMLUtils
         .getEmailAdminBoilerText(General.getInstance().getAdminMail());
 
     private String requestContextPath;
@@ -67,185 +65,86 @@ public class SourceAction implements Action {
 
     private Oracle oracle;
 
-    private List<ToggleBean>
-    generateToggleFromAttributes(final List<Attribute> attributes,
-            final Map<String, Boolean> settingsMap) {
-        final List<ToggleBean> out = new ArrayList<ToggleBean>();
+    private List<ToggleBean> generateToggleFromAttributes(
+        final List<Attribute> attributes,
+        final Map<String, Boolean> settingsMap, final Oracle oracle,
+        final String relyingPartyId, final String requestContextPath) {
+        final Map<String, Boolean> attrIsRequiredMap =
+            oracle.getAttributeRequired(relyingPartyId);
 
-        final Map<String, Map> attrMap =
-            oracle.getAttributeRequested(relyingPartyId);
+        final Map<Attribute, ToggleBean> attributeBeans =
+            InterfaceUtil.generateToggleFromAttributes(attributes, settingsMap,
+                oracle, relyingPartyId, requestContextPath);
+
+        // attribute group handling
+
         final Map<String, Map> attrGroups =
             oracle.getAttributeGroupRequested(relyingPartyId);
 
         final Map<String, List<Attribute>> beanToGroup =
             new HashMap<String, List<Attribute>>();
 
-        final Map<Attribute, ToggleBean> attributeBeans =
-            new HashMap<Attribute, ToggleBean>();
+        final Map<String, String> attrGroupMap =
+            oracle.getAttributeGroup(relyingPartyId);
 
-        for (final Attribute attribute : attributes) {
+        // if this attribute is part of a group, add it
+        for (final Attribute attribute : attributeBeans.keySet()) {
             final String attributeId = attribute.getId();
-
-            // skip attribute if not requested
-            if (!attrMap.containsKey(attributeId)) {
-                continue;
-            }
-
-            final String attrReason =
-                (String) attrMap.get(attributeId).get("reason");
-            final String attrPrivacy =
-                (String) attrMap.get(attributeId).get("privpolicy");
-            final String group = (String) attrMap.get(attributeId).get("group");
-
-            final ToggleBean bean = new ToggleBean();
-
-            // if the attribute is required, set the proper icon and force
-            // the value to true
-            final boolean required =
-                Boolean.valueOf((String) attrMap.get(attributeId).get(
-                    "required"));
-            final boolean value = required || settingsMap.get(attributeId);
-
-            if (required) {
-                bean.setImmutable(true);
-                bean.setImageTrue(requestContextPath
-                    + "/PrivacyLens/force_sending.png");
-            } else {
-                bean.setImmutable(false);
-                bean.setImageFalse(requestContextPath
-                    + "/PrivacyLens/not_sending.png");
-                bean.setImageTrue(requestContextPath
-                    + "/PrivacyLens/sending.png");
-            }
-            bean.setValue(value);
-
-            // set up privacy and request reason text
-            final StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("<p>" + attrReason + "</p><p>" + attrPrivacy
-                + "</p>");
-            stringBuilder.append("<p>");
-
-            // don't present values of machine readable attributes
-            if (!attribute.isMachineReadable()) {
-                stringBuilder.append("Your " + attribute.getDescription()
-                    + " is " + '"' + Util.listToString(attribute.getValues())
-                    + "\". ");
-            }
-
-            // set up consequence text
-            stringBuilder.append("If you continue to "
-                + oracle.getServiceName() + ", your "
-                + attribute.getDescription() + " will ");
-            stringBuilder.append(value ? "" : "not");
-            stringBuilder
-            .append(" be sent to it. Use the toggle switch to change this setting.");
-            stringBuilder.append("</p>");
-            stringBuilder.append(emailAdminBoilerText);
-
-            final String explanation = stringBuilder.toString();
-            bean.setExplanation(explanation);
-            bean.setExplanationIcon(requestContextPath
-                + "/PrivacyLens/info.png");
-            bean.setTextDiv("attributeReleaseAttribute");
-            bean.setImageDiv("attributeReleaseControl");
-            bean.setParameter(attributeId);
-
-            // set up first presentation
-            stringBuilder.setLength(0);
-            stringBuilder.append(attribute.getDescription());
-            // don't present values of machine readable attributes
-            if (!attribute.isMachineReadable()) {
-                stringBuilder.append(" (<b>");
-                stringBuilder.append(Util.listToString(attribute.getValues()));
-                stringBuilder.append("</b>)");
-            }
-            if (required) {
-                stringBuilder.append('*');
-            }
-
-            final String text = stringBuilder.toString();
-            bean.setText(text);
-
-            if (!bean.validate()) {
-                logger.error("{} did not validate", attribute);
-            }
-
-            // if this attribute is part of a group, add it
+            final String group = attrGroupMap.get(attributeId);
             if (group != null) {
                 if (!beanToGroup.containsKey(group)) {
                     beanToGroup.put(group, new ArrayList<Attribute>());
                 }
                 beanToGroup.get(group).add(attribute);
             }
-
-            attributeBeans.put(attribute, bean);
-
         }
 
-        // handle attribute groups
-        final Map<String, ToggleBean> groupHandle;
         for (final String groupId : beanToGroup.keySet()) {
 
             final String attrReason =
                 (String) attrGroups.get(groupId).get("reason");
             final String attrPrivacy =
                 (String) attrGroups.get(groupId).get("privpolicy");
-
-            final ToggleBean bean = new ToggleBean();
+            final String description =
+                (String) attrGroups.get(groupId).get("description");
 
             final boolean required =
                 Boolean.valueOf((String) attrGroups.get(groupId)
                     .get("required"));
-
-            final String description =
-                (String) attrGroups.get(groupId).get("description");
+            final String parameter = groupId;
+            final String serviceName = oracle.getServiceName();
 
             // for each group, pick the member attributes out of the map
             // created before
-            final List<Attribute> attrList = beanToGroup.get(groupId);
-            // assign value true, unless the members have different settings
-            boolean value = true;
-            for (final Attribute attr : attrList) {
-                final ToggleBean memberBean = attributeBeans.get(attr);
-                attributeBeans.remove(attr);
-                // XXX mixed values?
-                value &= memberBean.isValue();
-                bean.addMember(memberBean);
-            }
+            final List<Attribute> groupAttrList = beanToGroup.get(groupId);
 
-            // if the attribute is required, set the proper icon and force
-            // the value to true
+            final ToggleBean bean = new ToggleBean();
+            boolean value =
+                InterfaceUtil.groupBeanToValue(bean, groupAttrList,
+                    attributeBeans);
 
-            if (required) {
-                bean.setValue(true);
-                bean.setImmutable(true);
-                bean.setImageTrue(requestContextPath
-                    + "/PrivacyLens/force_sending.png");
-            } else {
-                bean.setValue(value);
-                bean.setImmutable(false);
-                bean.setImageFalse(requestContextPath
-                    + "/PrivacyLens/not_sending.png");
-                bean.setImageTrue(requestContextPath
-                    + "/PrivacyLens/sending.png");
-            }
+            value = required || value;
+
+            // similarity start
+            InterfaceUtil.setValueAndImages(bean, requestContextPath, value,
+                required);
 
             // set up privacy and request reason text
-            final StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("<p>" + attrReason + "</p><p>" + attrPrivacy
-                + "</p>");
-            stringBuilder.append("<p>");
+            final StringBuilder explanationStringBuilder = new StringBuilder();
+            InterfaceUtil.addPrivacyAndReasonText(explanationStringBuilder, attrReason,
+                attrPrivacy);
+            // similarity end
 
             final List<String> subValues = new ArrayList<String>();
 
             // this is annoying. we have attribute definitions from the oracle
             // but we have to look through the actual attribute values.
 
-            for (final Attribute attribute : attrList) {
+            for (final Attribute attribute : groupAttrList) {
                 final String attributeId = attribute.getId();
 
                 // skip attribute if not requested
-                if (!attrMap.containsKey(attributeId)) {
+                if (!attrIsRequiredMap.containsKey(attributeId)) {
                     continue;
                 }
 
@@ -263,56 +162,32 @@ public class SourceAction implements Action {
 
             }
 
-            String subValuesText = "(not initialized)";
-            // if the attribute value is the empty set, don't print anything
-            // XXXstroucki this shouldn't happen though (warning below).
+            String valueText = null;
             if (subValues.size() != 0) {
-                subValuesText = Util.listToString(subValues);
-                stringBuilder.append("Your " + description
+                valueText = Util.listToString(subValues);
+            }
+
+            if (valueText != null) {
+                explanationStringBuilder.append("Your " + description
                     + " includes the items (");
-                stringBuilder.append(subValuesText);
-                stringBuilder.append("). ");
-            } else {
-                logger.warn("Attribute group description {} has empty value",
-                    description);
+                explanationStringBuilder.append(valueText);
+                explanationStringBuilder.append("). ");
             }
 
             // set up consequence text
-            stringBuilder.append("If you continue to "
-                + oracle.getServiceName() + ", your " + description + " will ");
-            stringBuilder.append(value ? "" : "not");
-            stringBuilder
-            .append(" be sent to it. Use the toggle switch to change this setting.");
-            stringBuilder.append("</p>");
-            stringBuilder.append(emailAdminBoilerText);
+            InterfaceUtil.addConsequenceText(explanationStringBuilder, serviceName, value,
+ description, explanationCoda);
+
+            final String explanation = explanationStringBuilder.toString();
+            bean.setExplanation(explanation);
+
+            bean.setParameter(parameter);
 
             // set up first presentation
-            final String explanation = stringBuilder.toString();
-            bean.setExplanation(explanation);
-            bean.setExplanationIcon(requestContextPath
-                + "/PrivacyLens/info.png");
-            bean.setTextDiv("attributeReleaseAttribute");
-            bean.setImageDiv("attributeReleaseControl");
-            bean.setParameter(groupId);
-
-            stringBuilder.setLength(0);
-            stringBuilder.append(description);
-
-            if (subValues.size() != 0) {
-                stringBuilder.append(" (<b>");
-                stringBuilder.append(subValuesText);
-                stringBuilder.append("</b>)");
-            }
-
-            if (required) {
-                stringBuilder.append('*');
-            }
-
-            final String text = stringBuilder.toString();
-            bean.setText(text);
+            InterfaceUtil.setBeanText(bean, description, valueText, required);
 
             if (!bean.validate()) {
-                logger.error("{} did not validate", groupId);
+                logger.error("{} did not validate", parameter);
             }
 
             // XXXstroucki should we do a super attribute which can be sorted?
@@ -321,22 +196,7 @@ public class SourceAction implements Action {
         }
 
         // now sort this based on preference in config
-        // XXXstroucki really complex.
-        final ServletContext servletContext = Util.servletContext;
-        final WebApplicationContext appContext =
-            WebApplicationContextUtils
-            .getRequiredWebApplicationContext(servletContext);
-        final SAMLHelper samlHelper =
-            (SAMLHelper) appContext.getBean("PrivacyLens.samlHelper",
-                SAMLHelper.class);
-        final AttributeProcessor attributeProcessor =
-            samlHelper.getAttributeProcessor();
-        final List<Attribute> attributeKeys =
-            new ArrayList<Attribute>(attributeBeans.keySet());
-        attributeProcessor.sortAttributes(attributeKeys);
-        for (final Attribute attribute : attributeKeys) {
-            out.add(attributeBeans.get(attribute));
-        }
+        final List<ToggleBean> out = InterfaceUtil.sortBeans(attributeBeans);
 
         return out;
 
@@ -384,7 +244,9 @@ public class SourceAction implements Action {
                 relyingPartyId, attributes);
 
         final List<ToggleBean> attributeBeans =
-            generateToggleFromAttributes(attributes, consentByAttribute);
+            generateToggleFromAttributes(attributes, consentByAttribute,
+                oracle, relyingPartyId, requestContextPath);
+
         request.getSession().setAttribute("attributeBeans", attributeBeans);
 
         request.getSession().setAttribute("timestamp", timestamp);

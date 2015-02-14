@@ -178,7 +178,7 @@ public class AdminEntryAction implements Action {
                     relyingPartyId, attributes);
 
             final List<ToggleBean> beanList =
-                AdminUtil.generateToggleFromAttributes(attributes,
+                InterfaceUtil.generateToggleListFromAttributes(attributes,
                     consentByAttribute, oracle, relyingPartyId,
                     requestContextPath);
             request.getSession().setAttribute("attributeBeans", beanList);
