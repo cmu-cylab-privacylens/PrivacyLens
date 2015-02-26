@@ -46,6 +46,7 @@ import org.slf4j.LoggerFactory;
 
 import edu.cmu.ece.PrivacyLens.ar.Attribute;
 import edu.cmu.ece.PrivacyLens.ar.AttributeReleaseModule;
+import edu.cmu.ece.PrivacyLens.ar.SAMLHelper;
 import edu.internet2.middleware.shibboleth.common.attribute.BaseAttribute;
 import edu.internet2.middleware.shibboleth.common.attribute.filtering.provider.ShibbolethFilteringContext;
 import edu.internet2.middleware.shibboleth.common.log.AuditLogEntry;
@@ -503,19 +504,40 @@ public final class IdPHelper {
         logger.info(auditLogEntry.toString());
     }
 
+    /**
+     * This function is called from a JavaScript script in attribute-filter.xml
+     * The intent is to ask PrivacyLens whether the user has consented to
+     * release a particular attribute to the SP (obtained from filterContext).
+     * A return value of true means the attribute can be released.
+     *
+     * However since the initial assembly of attributes also ends up passing
+     * through attribute-filter.xml, we make use of a special session object
+     * to see whether we are in that phase. In that case, just return true.
+     *
+     * @param filterContext a data bag
+     * @param attributeId the attribute id
+     * @param attributeValue the attribute value
+     * @return true if the attribute can be released
+     */
     public static boolean releaseFilter(
         final ShibbolethFilteringContext filterContext,
         final String attributeId, final String attributeValue) {
         // This is the part that does the actual filtering right now.
+        // returning true means consent is given
         LOGGER.trace("releaseFilter attributeId: {} attributeValue: {}",
             attributeId, attributeValue);
         // edu.internet2.middleware.shibboleth.common.attribute.BaseAttribute foo =
         // filterContext.getUnfilteredAttributes().get(attributeId);
         final Session session =
             filterContext.getAttributeRequestContext().getUserSession();
-        final java.util.Map<String, BaseAttribute> bla =
+        if (session instanceof SAMLHelper.AttributeAuthoritySession) {
+            LOGGER.trace("Not checking consent at this time");
+            return true;
+        }
+
+        final java.util.Map<String, BaseAttribute> unfilteredAttributes =
             filterContext.getUnfilteredAttributes();
-        for (final java.util.Map.Entry<String, BaseAttribute> item : bla
+        for (final java.util.Map.Entry<String, BaseAttribute> item : unfilteredAttributes
             .entrySet()) {
             LOGGER.trace("attribute " + item.getKey() + " value "
                 + item.getValue().getValues());

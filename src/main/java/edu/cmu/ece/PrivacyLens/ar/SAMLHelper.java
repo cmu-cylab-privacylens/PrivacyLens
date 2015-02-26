@@ -1,8 +1,8 @@
 /*
  * Copyright (c) 2011, SWITCH
- * Copyright (c) 2013, Carnegie Mellon University
+ * Copyright (c) 2013-2015, Carnegie Mellon University
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -13,7 +13,7 @@
  *     * Neither the name of SWITCH nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -35,8 +35,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.security.auth.Subject;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
+import org.joda.time.DateTime;
 import org.opensaml.common.xml.SAMLConstants;
 import org.opensaml.saml2.core.NameID;
 import org.opensaml.saml2.metadata.AttributeConsumingService;
@@ -85,7 +88,7 @@ public class SAMLHelper {
 
     /**
      * Sets the attribute authority.
-     * 
+     *
      * @param attributeAuthority The attributeAuthority to set.
      */
     public void setAttributeAuthority(final SAML2AttributeAuthority attributeAuthority) {
@@ -94,7 +97,7 @@ public class SAMLHelper {
 
     /**
      * Sets the relying party configuration manager.
-     * 
+     *
      * @param relyingPartyConfigurationManager The relyingPartyConfigurationManager to set.
      */
     public void setRelyingPartyConfigurationManager(
@@ -104,7 +107,7 @@ public class SAMLHelper {
 
     /**
      * Sets the attribute processor.
-     * 
+     *
      * @param attributeProcessor The attributeProcessor to set.
      */
     public void setAttributeProcessor(final AttributeProcessor attributeProcessor) {
@@ -120,7 +123,7 @@ public class SAMLHelper {
 
     /**
      * Sets the attribute resolver.
-     * 
+     *
      * @param attributeResolver The attributeResolver to set.
      */
     public void setAttributeResolver(final AttributeResolver attributeResolver) {
@@ -140,8 +143,61 @@ public class SAMLHelper {
     }
 
     /**
+     * This class wraps Session to be included in the request context used when
+     * looking up attributes. We can then check for this and not consult user
+     * decisions during that phase.
+     *
+     */
+    public class AttributeAuthoritySession implements Session {
+        /**
+         *
+         */
+        private static final long serialVersionUID = -3957897161053933121L;
+        private final Session session;
+
+        AttributeAuthoritySession(final Session session) {
+            this.session = session;
+        }
+
+        /** {@inheritDoc} */
+        public String getSessionID() {
+            return session.getSessionID();
+        }
+
+        /** {@inheritDoc} */
+        public Subject getSubject() {
+            return session.getSubject();
+        }
+
+        /** {@inheritDoc} */
+        public void setSubject(final Subject newSubject) {
+            session.setSubject(newSubject);
+        }
+
+        /** {@inheritDoc} */
+        public String getPrincipalName() {
+            return session.getPrincipalName();
+        }
+
+        /** {@inheritDoc} */
+        public long getInactivityTimeout() {
+            return session.getInactivityTimeout();
+        }
+
+        /** {@inheritDoc} */
+        public DateTime getLastActivityInstant() {
+            return session.getLastActivityInstant();
+        }
+
+        /** {@inheritDoc} */
+        public void setLastActivityInstant(final DateTime lastActivity) {
+            session.setLastActivityInstant(lastActivity);
+        }
+    }
+
+    /**
      * Resolves the attributes.
-     * 
+     *
      * @param principalName The principal name.
      * @param relyingPartyId The relying party id.
      * @param locale The locale.
@@ -152,7 +208,8 @@ public class SAMLHelper {
             final Locale locale, final Session session) {
         logger.trace("[SAMLHelper] resolveAttributes");
         @SuppressWarnings("rawtypes") final BaseSAMLProfileRequestContext requestCtx =
-                buildRequestContext(principalName, relyingPartyId, session);
+            buildRequestContext(principalName, relyingPartyId, new AttributeAuthoritySession(
+                session));
 
         Collection<?> requestedAttributes = requestCtx.getRequestedAttributesIds();
         if (requestedAttributes == null || requestedAttributes.isEmpty()) {
@@ -165,9 +222,10 @@ public class SAMLHelper {
 
         @SuppressWarnings("rawtypes") Map<String, BaseAttribute> baseAttributes = null;
         try {
-            baseAttributes = attributeResolver.resolveAttributes(requestCtx);
             // getting attributes from the attribute authority means pulling them through the filter
-            // baseAttributes = attributeAuthority.getAttributes(requestCtx);
+            // to get attributes unfiltered:
+            // baseAttributes = attributeResolver.resolveAttributes(requestCtx);
+            baseAttributes = attributeAuthority.getAttributes(requestCtx);
         } catch (final AttributeRequestException e) {
             logger.error("Error while retrieving attributes for {}.", principalName, e);
             throw new IllegalStateException(e);
@@ -254,7 +312,7 @@ public class SAMLHelper {
 
     /**
      * Builds a profile request context.
-     * 
+     *
      * @param principalName The principal name.
      * @param relyingPartyId The relying party id.
      * @param session The session.
@@ -318,8 +376,8 @@ public class SAMLHelper {
     /**
      * Reads the relying party. Apparently the (optional?) AttributeConsumingService can specify descriptions and
      * required attribute information
-     * 
-     * 
+     *
+     *
      * @param relyingPartyId The relying party id.
      * @param locale The locale.
      * @return Returns a relying party.
@@ -367,7 +425,7 @@ public class SAMLHelper {
 
     /**
      * Gets the attribute consuming service.
-     * 
+     *
      * @param entityDescriptor The entity descriptor.
      * @return Returns the attribute consuming service
      */
