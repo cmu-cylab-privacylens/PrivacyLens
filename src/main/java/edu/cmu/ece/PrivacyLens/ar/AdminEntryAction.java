@@ -48,6 +48,7 @@ import edu.cmu.ece.PrivacyLens.IdPHelper;
 import edu.cmu.ece.PrivacyLens.Oracle;
 import edu.cmu.ece.PrivacyLens.ToggleBean;
 import edu.cmu.ece.PrivacyLens.Util;
+import edu.cmu.ece.PrivacyLens.ViewHelper;
 import edu.cmu.ece.PrivacyLens.config.General;
 
 /**
@@ -171,8 +172,22 @@ public class AdminEntryAction implements Action {
 
             relyingPartyId = loginEvent.getServiceUrl();
 
+            final WebApplicationContext appContext =
+                WebApplicationContextUtils
+                    .getRequiredWebApplicationContext(servletContext);
+            final SAMLHelper samlHelper =
+                (SAMLHelper) appContext.getBean("PrivacyLens.samlHelper",
+                    SAMLHelper.class);
+
+            final ViewHelper viewHelper =
+                (ViewHelper) appContext.getBean("PrivacyLens.viewHelper",
+                    ViewHelper.class);
+
             final List<Attribute> attributes =
-                IdPHelper.getAttributes(servletContext, request);
+                samlHelper.resolveAttributes(principalName, relyingPartyId,
+                    viewHelper.selectLocale(request),
+                    IdPHelper.getSession(request));
+            //IdPHelper.getAttributes(servletContext, request);
             final Map<String, Boolean> consentByAttribute =
                 attributeReleaseModule.getAttributeConsent(principalName,
                     relyingPartyId, attributes);
