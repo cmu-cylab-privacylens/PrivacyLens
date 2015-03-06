@@ -1,8 +1,8 @@
 /*
  * Copyright (c) 2011, SWITCH
- * Copyright (c) 2013, Carnegie Mellon University
+ * Copyright (c) 2013-2015, Carnegie Mellon University
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -13,7 +13,7 @@
  *     * Neither the name of SWITCH nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -51,6 +51,28 @@ import edu.cmu.ece.PrivacyLens.Util;
  * Attribute Processor.
  */
 public class AttributeProcessor {
+
+    /** Class logger. */
+    @SuppressWarnings("unused")
+    private final Logger logger = LoggerFactory
+        .getLogger(AttributeProcessor.class);
+
+    /** The attribute blacklist. Doesn't look used as of 20150306 */
+    private List<String> blacklist;
+
+    /** The ordering of the attributes. */
+    private List<String> order;
+
+    /**
+     * List of attributes that are machine readable
+     */
+    private List<String> machinereadable;
+
+    /**
+     * Structure allowing mapping from technical entitlement strings to more
+     * user friendly strings
+     */
+    private EntitlementDescriptions entitlementDescriptions;
 
     private class EntitlementDescriptions {
         private final Logger logger = LoggerFactory.getLogger(EntitlementDescriptions.class);
@@ -109,26 +131,6 @@ public class AttributeProcessor {
 
     }
 
-    /** Class logger. */
-    @SuppressWarnings("unused")
-    private final Logger logger = LoggerFactory.getLogger(AttributeProcessor.class);
-
-    /** The attribute blacklist. */
-    private List<String> blacklist;
-
-    /** The ordering of the attributes. */
-    private List<String> order;
-
-    /**
-     * List of attributes that are machine readable
-     */
-    private List<String> machinereadable;
-
-    /**
-     * Structure allowing mapping from technical entitlement strings to more user friendly strings
-     */
-    private EntitlementDescriptions entitlementDescriptions;
-
     /** Default constructor. */
     public AttributeProcessor() {
         blacklist = Collections.emptyList();
@@ -137,7 +139,7 @@ public class AttributeProcessor {
 
     /**
      * Sets the blacklist.
-     * 
+     *
      * @param blacklist The blacklist to set.
      */
     public void setBlacklist(final String blacklist) {
@@ -146,7 +148,7 @@ public class AttributeProcessor {
 
     /**
      * Sets the ordering.
-     * 
+     *
      * @param order The order to set.
      */
     public void setOrder(final String order) {
@@ -154,6 +156,8 @@ public class AttributeProcessor {
     }
 
     /**
+     * Set which attributes have machine readable values
+     *
      * @param machinereadable The list of machine readable attributes to set.
      */
     public void setMachinereadable(final String machinereadable) {
@@ -161,7 +165,10 @@ public class AttributeProcessor {
     }
 
     /**
-     * @param entitlementdescription The list of comma separated quoted string pairs to decode entitlements.
+     * Sets translation from machine readable entitlement strings
+     *
+     * @param entitlementdescription The list of comma separated quoted string
+     *            pairs to decode entitlements.
      */
     public void setEntitlementdescription(final String entitlementdescription) {
         this.entitlementDescriptions = new EntitlementDescriptions(entitlementdescription);
@@ -169,7 +176,7 @@ public class AttributeProcessor {
 
     /**
      * Removes the blacklisted attributes from the list.
-     * 
+     *
      * @param attributes The attributes.
      */
     public void removeBlacklistedAttributes(final List<Attribute> attributes) {
@@ -181,6 +188,11 @@ public class AttributeProcessor {
         }
     }
 
+    /**
+     * Mark whether attributes are machine readable
+     *
+     * @param attributes machine readable attributes
+     */
     public void markMachineReadableAttributes(final List<Attribute> attributes) {
         final Iterator<Attribute> iterator = attributes.iterator();
         while (iterator.hasNext()) {
@@ -192,8 +204,13 @@ public class AttributeProcessor {
 
     }
 
+    /**
+     * Translate the entitlements
+     *
+     * @param attribute the attribute
+     */
     public void processEntitlementDescriptions(final Attribute attribute) {
-        // XXXstroucki check that the attribute is entitlements
+        // XXX check that the attribute is entitlements
         if (entitlementDescriptions == null) {
             logger.error("entitlementDescriptions is null, can't process");
             return;
@@ -211,7 +228,7 @@ public class AttributeProcessor {
 
     /**
      * Sorts the attributes.
-     * 
+     *
      * @param attributes The attributes.
      */
     public void sortAttributes(final List<Attribute> attributes) {
@@ -241,7 +258,7 @@ public class AttributeProcessor {
 
     /**
      * Removes null/empty/blank values.
-     * 
+     *
      * @param attribute The attribute.
      */
     public void removeEmptyValues(final Attribute attribute) {
@@ -256,7 +273,7 @@ public class AttributeProcessor {
 
     /**
      * Removes duplicate values.
-     * 
+     *
      * @param attribute The attribute.
      */
     public void removeDuplicateValues(final Attribute attribute) {
@@ -266,8 +283,8 @@ public class AttributeProcessor {
     }
 
     /**
-     * Removes attributes which does not contain any values.
-     * 
+     * Removes attributes which do not contain any values.
+     *
      * @param attributes List of attributes.
      */
     public void removeEmptyAttributes(final List<Attribute> attributes) {
