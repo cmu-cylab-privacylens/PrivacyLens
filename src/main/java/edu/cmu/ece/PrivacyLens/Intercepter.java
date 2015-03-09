@@ -91,8 +91,7 @@ public class Intercepter implements Filter {
             servletContext = filterConfig.getServletContext();
             final WebApplicationContext appContext =
                 WebApplicationContextUtils
-                    .getRequiredWebApplicationContext(filterConfig
-                        .getServletContext());
+                    .getRequiredWebApplicationContext(servletContext);
             touModule =
                 (ToUModule) appContext.getBean("uApprove.touModule",
                     ToUModule.class);

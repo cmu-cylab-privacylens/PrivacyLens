@@ -44,7 +44,8 @@ import edu.cmu.ece.PrivacyLens.Action;
  *
  */
 public class ActionFactory {
-    private static Map<String, Action> actions;
+    private static final Map<String, Action> actions;
+    private static final String defaultAction;
 
     /** Class logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(ActionFactory.class);
@@ -55,6 +56,7 @@ public class ActionFactory {
         actions.put("source", new SourceAction());
         actions.put("entry", new EntryAction());
         actions.put("reminder", new ReminderAction());
+        defaultAction = "source";
         // sink action will return to IdP, we shouldn't get any requests for actions from there
     }
 
@@ -79,8 +81,8 @@ public class ActionFactory {
         LOGGER.trace("ActionFactory handling request from view {}", sourceView);
         final Action returnAction = actions.get(sourceView);
         if (returnAction == null) {
-            // no action found, send back to source
-            return actions.get("source");
+            // no action found, send to default action
+            return actions.get(defaultAction);
         }
 
         // finally return the corresponding action

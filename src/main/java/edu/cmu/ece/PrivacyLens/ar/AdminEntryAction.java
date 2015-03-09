@@ -69,6 +69,8 @@ public class AdminEntryAction implements Action {
 
     private String requestContextPath;
 
+    private final int limitLoginEvents = 6;
+
     /** {@inheritDoc} */
     public AdminEntryAction() {
         logger.trace("AdminEntryAction init");
@@ -122,8 +124,6 @@ public class AdminEntryAction implements Action {
 
         final String principalName =
             IdPHelper.getPrincipalName(servletContext, request);
-
-        final int limitLoginEvents = 6;
 
         final String sectionParameter = request.getParameter("section");
         final boolean loginEventSection =
