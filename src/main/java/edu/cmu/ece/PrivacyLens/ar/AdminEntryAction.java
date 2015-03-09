@@ -197,6 +197,7 @@ public class AdminEntryAction implements Action {
                     consentByAttribute, oracle, relyingPartyId,
                     requestContextPath);
             request.getSession().setAttribute("attributeBeans", beanList);
+            request.getSession().setAttribute("attributes", attributes);
             request.getSession().setAttribute("relyingParty", relyingPartyId);
             final boolean forceShow =
                 attributeReleaseModule.isForceShowInterface(principalName,
