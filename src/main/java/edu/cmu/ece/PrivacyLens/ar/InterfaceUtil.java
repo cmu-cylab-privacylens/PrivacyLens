@@ -292,7 +292,7 @@ public class InterfaceUtil {
      * @param bean
      * @param description "color"
      * @param valueText "blue"
-     * @param isStar whether to put a star at then end
+     * @param isStar whether to put a star at the end
      */
     public static void setBeanText(final ToggleBean bean,
         final String description, final String valueText, final boolean isStar) {
@@ -305,7 +305,6 @@ public class InterfaceUtil {
             textStringBuilder.append("</b>)");
         }
 
-        // similarity start
         if (isStar) {
             textStringBuilder.append('*');
         }
