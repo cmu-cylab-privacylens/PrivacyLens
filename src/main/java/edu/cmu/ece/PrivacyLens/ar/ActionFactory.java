@@ -73,7 +73,7 @@ public class ActionFactory {
         if (sourceViewO == null || !(sourceViewO instanceof String)) {
             // corrupt or null, send back to source
             LOGGER.debug("ActionFactory found corrupt flow information");
-            return actions.get("source");
+            return actions.get(defaultAction);
         }
 
         final String sourceView = (String) sourceViewO;
