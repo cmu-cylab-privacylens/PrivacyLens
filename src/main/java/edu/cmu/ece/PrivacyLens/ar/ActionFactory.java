@@ -1,6 +1,6 @@
 /*
  * COPYRIGHT_BOILERPLATE
- * Copyright (c) 2013 Carnegie Mellon University
+ * Copyright (c) 2013-2015 Carnegie Mellon University
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -71,7 +71,7 @@ public class ActionFactory {
         // attribute view is set in the controller
         final Object sourceViewO = session.getAttribute("view");
         if (sourceViewO == null || !(sourceViewO instanceof String)) {
-            // corrupt or null, send back to source
+            // corrupt or null, send back to default
             LOGGER.debug("ActionFactory found corrupt flow information");
             return actions.get(defaultAction);
         }

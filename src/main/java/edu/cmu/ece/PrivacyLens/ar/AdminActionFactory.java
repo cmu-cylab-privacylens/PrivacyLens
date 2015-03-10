@@ -1,8 +1,8 @@
 /*
  * COPYRIGHT_BOILERPLATE
- * Copyright (c) 2013 Carnegie Mellon University
+ * Copyright (c) 2013-2015 Carnegie Mellon University
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -13,7 +13,7 @@
  *     * Neither the name of SWITCH nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -40,10 +40,13 @@ import org.slf4j.LoggerFactory;
 import edu.cmu.ece.PrivacyLens.Action;
 
 /**
+ * Factory to manage the creation of Action objects, given a HttpServletRequest
  *
  */
 public class AdminActionFactory {
-    private static Map<String, Action> actions;
+    private static final Map<String, Action> actions;
+
+    private static final String defaultAction;
 
     /** Class logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(AdminActionFactory.class);
@@ -57,6 +60,7 @@ public class AdminActionFactory {
         actions.put("loginEvent", new AdminLoginEventAction());
 
         // sink action will return to IdP, we shouldn't get any requests for actions from there
+        defaultAction = "source";
     }
 
     public static Action getAction(final HttpServletRequest request) {
@@ -70,9 +74,9 @@ public class AdminActionFactory {
         // attribute view is set in the controller
         final Object sourceViewO = session.getAttribute("view");
         if (sourceViewO == null || !(sourceViewO instanceof String)) {
-            // corrupt or null, send back to source
+            // corrupt or null, send back to default
             LOGGER.debug("ActionFactory found corrupt flow information");
-            return actions.get("source");
+            return actions.get(defaultAction);
         }
 
         final String sourceView = (String) sourceViewO;
@@ -80,8 +84,8 @@ public class AdminActionFactory {
         LOGGER.trace("ActionFactory handling request from view {}", sourceView);
         final Action returnAction = actions.get(sourceView);
         if (returnAction == null) {
-            // no action found, send back to source
-            return actions.get("source");
+            // no action found, send back to default
+            return actions.get(defaultAction);
         }
 
         // finally return the corresponding action
