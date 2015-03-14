@@ -74,6 +74,12 @@ public class AdminSourceAction implements Action {
             attributeReleaseModule);
     }
 
+    private void prepareEntry(final HttpServletRequest request) {
+        final AdminEntryPrepare.Databag databag =
+            new AdminEntryPrepare.Databag(attributeReleaseModule, request);
+        AdminEntryPrepare.prepare(databag);
+    }
+
     /** {@inheritDoc} */
     public String execute(final HttpServletRequest request,
         final HttpServletResponse response) throws Exception {
@@ -94,6 +100,7 @@ public class AdminSourceAction implements Action {
             }
         }
 
+        prepareEntry(request);
         return "entry";
     }
 }

@@ -28,16 +28,10 @@
 
 package edu.cmu.ece.PrivacyLens.ar;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.context.WebApplicationContext;
@@ -45,11 +39,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import edu.cmu.ece.PrivacyLens.Action;
 import edu.cmu.ece.PrivacyLens.IdPHelper;
-import edu.cmu.ece.PrivacyLens.Oracle;
-import edu.cmu.ece.PrivacyLens.ToggleBean;
 import edu.cmu.ece.PrivacyLens.Util;
-import edu.cmu.ece.PrivacyLens.ViewHelper;
-import edu.cmu.ece.PrivacyLens.config.General;
 
 /**
  * Causes the controller to go to entry state
@@ -62,14 +52,6 @@ public class AdminEntryAction implements Action {
     /** Class logger. */
     private final Logger logger = LoggerFactory
         .getLogger(AdminEntryAction.class);
-
-    private String relyingPartyId;
-
-    private Oracle oracle;
-
-    private String requestContextPath;
-
-    private final int limitLoginEvents = 6;
 
     /** {@inheritDoc} */
     public AdminEntryAction() {
@@ -88,26 +70,10 @@ public class AdminEntryAction implements Action {
 
     }
 
-    private List<Map>
-        processLoginEvents(final List<LoginEvent> loginEventsList) {
-        final List<Map> out = new ArrayList<Map>();
-        for (final LoginEvent loginEvent : loginEventsList) {
-            loginEvent.getEventDetailHash();
-            final DateTime loginEventDate = loginEvent.getDate();
-            final DateTime now = new DateTime();
-            final long relativeTime =
-                now.getMillis() - loginEventDate.getMillis();
-            final String dateTimeString = Util.millisToDuration(relativeTime);
-            final String serviceString = loginEvent.getServiceName();
-            final String loginEventId = loginEvent.getEventDetailHash();
-            final Map<String, Object> map = new HashMap<String, Object>();
-            map.put("dateTimeString", dateTimeString);
-            map.put("service", serviceString);
-            map.put("loginEvent", loginEvent);
-            map.put("loginEventId", loginEventId);
-            out.add(map);
-        }
-        return out;
+    private void prepareEntry(final HttpServletRequest request) {
+        final AdminEntryPrepare.Databag databag =
+            new AdminEntryPrepare.Databag(attributeReleaseModule, request);
+        AdminEntryPrepare.prepare(databag);
     }
 
     /** {@inheritDoc} */
@@ -115,12 +81,6 @@ public class AdminEntryAction implements Action {
         final HttpServletResponse response) throws Exception {
         //final ServletContext servletContext = Util.servletContext;
         logger.trace("AdminEntryAction execute sc: {}", servletContext);
-
-        if (requestContextPath == null) {
-            requestContextPath = request.getContextPath();
-        }
-
-        oracle = Oracle.getInstance();
 
         final String principalName =
             IdPHelper.getPrincipalName(servletContext, request);
@@ -134,6 +94,7 @@ public class AdminEntryAction implements Action {
 
         if (loginEventSection && serviceSection) { // only one section should be defined
             // error
+            prepareEntry(request);
             return "entry";
         }
 
@@ -145,69 +106,15 @@ public class AdminEntryAction implements Action {
 
             if (loginEvent == null) {
                 // error
+                prepareEntry(request);
                 return "entry";
             }
 
-            final LoginEventDetail loginEventDetail =
-                attributeReleaseModule.readLoginEventDetail(loginEvent);
-            // the whole event is given to the jsp since additional text uses
-            // some of the fields
-            request.getSession().setAttribute("loginEvent", loginEvent);
-            request.getSession().setAttribute("loginEventDetail",
-                loginEventDetail);
+            final AdminLoginEventPrepare.Databag databag =
+                new AdminLoginEventPrepare.Databag(attributeReleaseModule,
+                    request, principalName, loginEvent);
+            AdminLoginEventPrepare.prepare(databag);
 
-            final StringBuffer sentInfoBuffer = new StringBuffer();
-            for (final Attribute attribute : loginEventDetail.getAttributes()) {
-                sentInfoBuffer.append(attribute.getDescription());
-                // don't present values of machine readable attributes
-                if (!attribute.isMachineReadable()) {
-                    sentInfoBuffer.append(": \""
-                        + Util.listToString(attribute.getValues()) + "\"");
-                }
-
-                sentInfoBuffer.append("<br/>");
-            }
-            final String sentInfo = sentInfoBuffer.toString();
-            request.getSession().setAttribute("sentInfo", sentInfo);
-
-            relyingPartyId = loginEvent.getServiceUrl();
-
-            final WebApplicationContext appContext =
-                WebApplicationContextUtils
-                    .getRequiredWebApplicationContext(servletContext);
-            final SAMLHelper samlHelper =
-                (SAMLHelper) appContext.getBean("PrivacyLens.samlHelper",
-                    SAMLHelper.class);
-
-            final ViewHelper viewHelper =
-                (ViewHelper) appContext.getBean("PrivacyLens.viewHelper",
-                    ViewHelper.class);
-
-            final List<Attribute> attributes =
-                samlHelper.resolveAttributes(principalName, relyingPartyId,
-                    viewHelper.selectLocale(request),
-                    IdPHelper.getSession(request));
-            //IdPHelper.getAttributes(servletContext, request);
-            final Map<String, Boolean> consentByAttribute =
-                attributeReleaseModule.getAttributeConsent(principalName,
-                    relyingPartyId, attributes);
-
-            final List<ToggleBean> beanList =
-                InterfaceUtil.generateToggleListFromAttributes(attributes,
-                    consentByAttribute, oracle, relyingPartyId,
-                    requestContextPath);
-            request.getSession().setAttribute("attributeBeans", beanList);
-            request.getSession().setAttribute("attributes", attributes);
-            request.getSession().setAttribute("relyingParty", relyingPartyId);
-            final boolean forceShow =
-                attributeReleaseModule.isForceShowInterface(principalName,
-                    relyingPartyId);
-            final ReminderInterval reminderInterval =
-                attributeReleaseModule.getReminderInterval(principalName,
-                    relyingPartyId);
-            request.getSession().setAttribute("reminderInterval",
-                reminderInterval.getRemindAfter());
-            request.getSession().setAttribute("forceShow", forceShow);
             return "loginEvent";
 
         }
@@ -222,35 +129,22 @@ public class AdminEntryAction implements Action {
 
             final String service = choice;
 
-            final List<LoginEvent> serviceLoginEvents =
-                attributeReleaseModule.listLoginEvents(principalName, service,
-                    limitLoginEvents);
-
-            final List<Map> serviceLoginList =
-                processLoginEvents(serviceLoginEvents);
-            request.getSession().setAttribute("lastLoginEvents",
-                serviceLoginList);
-            if (serviceLoginList.size() == limitLoginEvents) {
-                request.getSession().setAttribute("loginEventListFull", true);
-            }
-
-            request.getSession().setAttribute("userName",
-                Oracle.getInstance().getUserName());
-            request.getSession().setAttribute("relyingParty", service);
-            request.getSession().setAttribute("idpName",
-                General.getInstance().getIdpName());
-
-            //final List<Attribute> attributes = IdPHelper.getAttributes(servletContext, request);
-            //request.getSession().setAttribute("attributes", attributes);
+            final AdminServiceLoginPrepare.Databag databag =
+                new AdminServiceLoginPrepare.Databag(attributeReleaseModule,
+                    request.getSession(), principalName, service);
+            AdminServiceLoginPrepare.prepare(databag);
 
             return "serviceLogin";
 
         }
 
         if (helpButton) {
+            prepareEntry(request);
             return "entry";
         }
 
+        logger.warn("AdminEntryAction fallthrough");
+        prepareEntry(request);
         return "entry";
     }
 

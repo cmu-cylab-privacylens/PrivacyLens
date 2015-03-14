@@ -1,8 +1,8 @@
 /*
  * COPYRIGHT_BOILERPLATE
- * Copyright (c) 2013 Carnegie Mellon University
+ * Copyright (c) 2013-2015 Carnegie Mellon University
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -13,7 +13,7 @@
  *     * Neither the name of SWITCH nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -54,6 +54,12 @@ public class ReminderAction implements Action {
     /** Class logger. */
     private final Logger logger = LoggerFactory.getLogger(ReminderAction.class);
 
+    private void prepareEntry(final HttpServletRequest request) {
+        final EntryPrepare.Databag databag =
+            new EntryPrepare.Databag(IdPHelper.attributeReleaseModule, request);
+        EntryPrepare.prepare(databag);
+    }
+
     /** {@inheritDoc} */
     public String execute(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
         final boolean yesButton = (request.getParameter("yes") != null);
@@ -73,6 +79,7 @@ public class ReminderAction implements Action {
         final List<Attribute> attributes = IdPHelper.getAttributes(servletContext, request);
 
         if (noButton) {
+            prepareEntry(request);
             return "entry";
         }
 

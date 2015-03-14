@@ -202,6 +202,12 @@ public class SourceAction implements Action {
 
     }
 
+    private void prepareEntry(final HttpServletRequest request) {
+        final EntryPrepare.Databag databag =
+            new EntryPrepare.Databag(IdPHelper.attributeReleaseModule, request);
+        EntryPrepare.prepare(databag);
+    }
+
     /** {@inheritDoc} */
     public String execute(final HttpServletRequest request,
         final HttpServletResponse response) throws Exception {
@@ -274,11 +280,21 @@ public class SourceAction implements Action {
             reminderInterval.setCurrentCount(modulo);
             attributeReleaseModule.updateReminderInterval(reminderInterval);
             if (modulo == 0) {
-                final String attributeList =
-                    getReminderAttributes(attributes, consentByAttribute);
-                request.getSession().setAttribute("attributeList",
-                    attributeList);
                 logger.debug("Reminder due");
+                final List<Attribute> reminderAttributes =
+                    new ArrayList<Attribute>();
+                for (final Attribute attr : attributes) {
+                    final boolean include =
+                        consentByAttribute.get(attr.getId());
+                    if (!include) {
+                        continue;
+                    }
+                    reminderAttributes.add(attr);
+                }
+                final ReminderPrepare.Databag databag =
+                    new ReminderPrepare.Databag(reminderAttributes,
+                        request.getSession());
+                ReminderPrepare.prepare(databag);
                 return "reminder";
             } else {
                 logger.debug("No reminder due");
@@ -304,35 +320,8 @@ public class SourceAction implements Action {
         }
 
         logger.debug("Fell through");
+        prepareEntry(request);
         return "entry";
     }
 
-    /**
-     * Obtains a string list of attributes, and possibly their values for
-     * insertion into reminder view
-     *
-     * @return html block to insert into view
-     */
-    private String getReminderAttributes(final List<Attribute> attributes,
-        final Map<String, Boolean> settingsMap) {
-        final List<String> list = new ArrayList<String>();
-
-        for (final Attribute attr : attributes) {
-            final StringBuilder sb = new StringBuilder();
-            final boolean include = settingsMap.get(attr.getId());
-            if (!include) {
-                continue;
-            }
-            sb.append(attr.getDescription());
-            // don't present values of machine readable attributes
-            if (!attr.isMachineReadable()) {
-                sb.append(" (<strong>");
-                sb.append(Util.listToString(attr.getValues()));
-                sb.append("</strong>)");
-            }
-            list.add(sb.toString());
-        }
-        final String out = Util.listToString(list);
-        return out;
-    }
 }

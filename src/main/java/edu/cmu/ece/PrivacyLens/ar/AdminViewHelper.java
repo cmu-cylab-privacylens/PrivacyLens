@@ -1,8 +1,8 @@
 /*
  * COPYRIGHT_BOILERPLATE
- * Copyright (c) 2014 Carnegie Mellon University
+ * Copyright (c) 2014-2015 Carnegie Mellon University
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -13,7 +13,7 @@
  *     * Neither the name of SWITCH nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -33,27 +33,27 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import edu.cmu.ece.PrivacyLens.IdPHelper;
-import edu.cmu.ece.PrivacyLens.Oracle;
 import edu.cmu.ece.PrivacyLens.Util;
-import edu.cmu.ece.PrivacyLens.config.General;
 
 /**
  * This should eventually be put elsewhere
- * 
+ *
  */
 public class AdminViewHelper {
     /** Class logger. */
     private static final Logger logger = LoggerFactory.getLogger(AdminViewHelper.class);
 
-    private static List<Map> processLoginEvents(final List<LoginEvent> loginEventsList) {
+    // limit the number of entries shown
+    protected static final int limitLoginEvents = 6;
+
+    protected static final int limitRelyingPartyList = 6;
+
+    protected static List<Map> processLoginEvents(
+        final List<LoginEvent> loginEventsList) {
         final List<Map> out = new ArrayList<Map>();
         for (final LoginEvent loginEvent : loginEventsList) {
             loginEvent.getEventDetailHash();
@@ -71,43 +71,5 @@ public class AdminViewHelper {
             out.add(map);
         }
         return out;
-    }
-
-    public static void setupView(final String view, final ServletContext servletContext,
-            final HttpServletRequest request, final AttributeReleaseModule attributeReleaseModule) {
-        logger.trace("setupView called for view {}", view);
-        if (view.equals("entry")) {
-            final String principalName = IdPHelper.getPrincipalName(servletContext, request);
-
-            // set up target view
-            final int limitLoginEvents = 6;
-            final int limitRelyingPartyList = 6;
-
-            final List<LoginEvent> lastLoginEvents =
-                    attributeReleaseModule.listLoginEvents(principalName, "", limitLoginEvents);
-            final List<Map> loginEventList = processLoginEvents(lastLoginEvents);
-            request.getSession().setAttribute("lastLoginEvents", loginEventList);
-            if (loginEventList.size() == limitLoginEvents) {
-                request.getSession().setAttribute("loginEventFull", true);
-            }
-
-            final List<String> servicesList =
-                    attributeReleaseModule.listRelyingParties(principalName, limitRelyingPartyList);
-            final Map<String, List> serviceLoginEventMap = new HashMap<String, List>();
-            for (final String service : servicesList) {
-                final List<LoginEvent> serviceLoginEvents =
-                        attributeReleaseModule.listLoginEvents(principalName, service, limitLoginEvents);
-                final List<Map> serviceLoginEventList = processLoginEvents(serviceLoginEvents);
-                serviceLoginEventMap.put(service, serviceLoginEventList);
-            }
-            request.getSession().setAttribute("relyingPartiesList", servicesList);
-            request.getSession().setAttribute("serviceLoginEvents", serviceLoginEventMap);
-            if (servicesList.size() == limitRelyingPartyList) {
-                request.getSession().setAttribute("relyingPartyListFull", true);
-            }
-
-            request.getSession().setAttribute("userName", Oracle.getInstance().getUserName());
-            request.getSession().setAttribute("idpName", General.getInstance().getIdpName());
-        }
     }
 }

@@ -96,7 +96,7 @@ public class AdminServlet extends HttpServlet {
         }
     }
 
-    protected void doShowMenu(final HttpServletRequest req,
+    private void doShowMenu(final HttpServletRequest req,
         final HttpServletResponse resp) throws ServletException, IOException {
         // ShowAttributes, ShowAttributeDetail, ShowDenyRequired, ShowAttributeConfirm
         logger.trace("entered doShowMenu");
@@ -131,10 +131,8 @@ public class AdminServlet extends HttpServlet {
             logger.trace("Business logic completed, next view: {}", view);
 
             // save our destination view in the session so that ActionFactory can tell where we came from
-            final HttpSession session = request.getSession(false);
-            if (session != null) {
-                session.setAttribute("view", view);
-            }
+            final HttpSession session = request.getSession();
+            session.setAttribute("view", view);
 
             final Map<String, Object> context = new HashMap<String, Object>();
             context.put("idpOrganization", General.getInstance()
@@ -167,8 +165,7 @@ public class AdminServlet extends HttpServlet {
                 }
                 // default and entry point
                 //context.put("allowGeneralConsent", attributeReleaseModule.isAllowGeneralConsent());
-                AdminViewHelper.setupView("entry", servletContext, request,
-                    attributeReleaseModule);
+                //AdminViewHelper.setupView("entry", servletContext, request,attributeReleaseModule);
                 viewHelper.showView(servletContext, request, response,
                     "attribute-admin", context);
                 logger.trace("entry view finished");
@@ -192,16 +189,7 @@ public class AdminServlet extends HttpServlet {
     protected void doPost(final HttpServletRequest req,
         final HttpServletResponse resp) throws ServletException, IOException {
         try {
-            final String state = req.getParameter("state");
-            if (state == null) {
-                // show menu of views
-                doShowMain(req, resp);
-            } else {
-
-                doShowMain(req, resp);
-
-            }
-
+            doShowMain(req, resp);
         } catch (final Throwable t) {
             logger.error("Error while POST Attribute Release Servlet.", t);
         }

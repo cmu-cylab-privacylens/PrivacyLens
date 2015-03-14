@@ -1,8 +1,8 @@
 /*
  * COPYRIGHT_BOILERPLATE
- * Copyright (c) 2013 Carnegie Mellon University
+ * Copyright (c) 2013-2015 Carnegie Mellon University
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -13,7 +13,7 @@
  *     * Neither the name of SWITCH nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -72,17 +72,25 @@ public class AdminLoginEventAction implements Action {
         logger.trace("AdminLoginEventAction init end arm: {}", attributeReleaseModule);
     }
 
+    private void prepareEntry(final HttpServletRequest request) {
+        final AdminEntryPrepare.Databag databag =
+            new AdminEntryPrepare.Databag(attributeReleaseModule, request);
+        AdminEntryPrepare.prepare(databag);
+    }
+
     /** {@inheritDoc} */
     public String execute(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
         //final ServletContext servletContext = Util.servletContext;
         logger.trace("AdminLoginEventAction execute sc: {} arm: {}", servletContext, attributeReleaseModule);
-        final String userId = IdPHelper.getPrincipalName(servletContext, request);
+        final String principalName =
+            IdPHelper.getPrincipalName(servletContext, request);
         final String relyingPartyId = (String) request.getSession().getAttribute("relyingParty");
 
         final boolean backButton = (request.getParameter("back") != null);
         final boolean saveButton = (request.getParameter("save") != null);
 
         if (backButton) {
+            prepareEntry(request);
             return "entry";
         }
 
@@ -90,7 +98,8 @@ public class AdminLoginEventAction implements Action {
             final String forceShowInterface = (request.getParameter("forceShowInterface"));
             final boolean forceShow = (forceShowInterface.equals("yes"));
 
-            attributeReleaseModule.setForceShowInterface(userId, relyingPartyId, forceShow);
+            attributeReleaseModule.setForceShowInterface(principalName,
+                relyingPartyId, forceShow);
 
             final List<Attribute> attributes = (List<Attribute>) request.getSession().getAttribute("attributes");
 
@@ -111,7 +120,8 @@ public class AdminLoginEventAction implements Action {
                     consentByAttribute.put(attributeName, request.getParameter(param).equals("1") ? true : false);
                 }
             }
-            logger.debug("Create consent for user {} to {}.", userId, relyingPartyId);
+            logger.debug("Create consent for user {} to {}.", principalName,
+                relyingPartyId);
 
             final List<Attribute> deniedAttributes = new ArrayList<Attribute>();
             final List<Attribute> consentedAttributes = new ArrayList<Attribute>();
@@ -126,8 +136,11 @@ public class AdminLoginEventAction implements Action {
                     consentedAttributes.add(attribute);
                 }
             }
-            attributeReleaseModule.denyAttributeRelease(userId, relyingPartyId, deniedAttributes);
-            attributeReleaseModule.consentAttributeRelease(userId, relyingPartyId, consentedAttributes);
+            // XXX check correctness
+            attributeReleaseModule.denyAttributeRelease(principalName,
+                relyingPartyId, deniedAttributes);
+            attributeReleaseModule.consentAttributeRelease(principalName,
+                relyingPartyId, consentedAttributes);
 
             int remindAfter = 1;
             final String reminderIntervalString = (request.getParameter("reminderInterval"));
@@ -136,13 +149,18 @@ public class AdminLoginEventAction implements Action {
                 remindAfter = Integer.parseInt(reminderIntervalString);
             } catch (final NumberFormatException x) {
             }
-            final ReminderInterval reminderInterval = new ReminderInterval(userId, relyingPartyId, remindAfter, 0);
+            final ReminderInterval reminderInterval =
+                new ReminderInterval(principalName, relyingPartyId,
+                    remindAfter, 0);
             attributeReleaseModule.updateReminderInterval(reminderInterval);
 
+            prepareEntry(request);
             return "entry";
         }
 
         logger.warn("AdminLoginEventAction fallthrough");
+
+        prepareEntry(request);
         return "entry";
     }
 }

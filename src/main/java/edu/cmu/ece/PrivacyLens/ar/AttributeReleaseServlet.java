@@ -75,6 +75,12 @@ public class AttributeReleaseServlet extends HttpServlet {
     /** The view helper. */
     private ViewHelper viewHelper;
 
+    private final String adminUrl = General.getInstance().getAdminUrl();
+
+    private final String adminMail = General.getInstance().getAdminMail();
+
+    private final String orgName = General.getInstance().getOrganizationName();
+
     /** {@inheritDoc} */
     public void init() throws ServletException {
         try {
@@ -103,7 +109,14 @@ public class AttributeReleaseServlet extends HttpServlet {
     }
 
     /** {@inheritDoc} */
-    protected void service(final HttpServletRequest request,
+    protected void doGet(final HttpServletRequest request,
+        final HttpServletResponse response) throws ServletException,
+        IOException {
+        doPost(request, response);
+    }
+
+    /** {@inheritDoc} */
+    protected void doPost(final HttpServletRequest request,
         final HttpServletResponse response) throws ServletException,
         IOException {
         try {
@@ -126,11 +139,10 @@ public class AttributeReleaseServlet extends HttpServlet {
             oracle.setUserName(IdPHelper.getPrincipalName(servletContext,
                 request));
             oracle.setRelyingPartyId(relyingPartyId);
-            context.put("adminUrl", General.getInstance().getAdminUrl());
-            context.put("adminMail", General.getInstance().getAdminMail());
+            context.put("adminUrl", adminUrl);
+            context.put("adminMail", adminMail);
 
-            context.put("idpOrganization", General.getInstance()
-                .getOrganizationName());
+            context.put("idpOrganization", orgName);
 
             // Set up logos
             final String requestContextPath = request.getContextPath();
@@ -147,17 +159,6 @@ public class AttributeReleaseServlet extends HttpServlet {
             final String serviceName = oracle.getServiceName();
             context.put("service", serviceName);
 
-            context
-                .put(
-                    "requirementStatement",
-                    "Use the toggle switches to select the items that will be sent to "
-                        + serviceName
-                        + ". Items marked with * are required to access and personalize "
-                        + serviceName + " and cannot be unselected.");
-            context.put(
-                "relyingParty",
-                samlHelper.readRelyingParty(relyingPartyId,
-                    viewHelper.selectLocale(request)));
             context.put("allowDenyRequired", false);
 
             if (view.equals("reminder")) {
@@ -190,7 +191,7 @@ public class AttributeReleaseServlet extends HttpServlet {
              * ".jsp").forward(request, response); } else { response.sendRedirect(view); // We'd like to fire redirect
              * in case of a view change as result of the action (PRG pattern). }
              */
-        } catch (final Exception e) {
+        } catch (final Throwable e) {
             throw new ServletException("Executing action failed.", e);
         }
     }
