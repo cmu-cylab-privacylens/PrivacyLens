@@ -1,8 +1,8 @@
 /*
  * COPYRIGHT_BOILERPLATE
- * Copyright (c) 2013 Carnegie Mellon University
+ * Copyright (c) 2013-2015 Carnegie Mellon University
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -13,7 +13,7 @@
  *     * Neither the name of SWITCH nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -44,7 +44,7 @@ public class LoginEvent {
     /** service name */
     private final String serviceName;
 
-    /** service url */
+    /** service url (service provider id) */
     private final String serviceUrl;
 
     /** event detail hash */
@@ -57,7 +57,7 @@ public class LoginEvent {
 
     /**
      * Constructs a @see LoginEvent.
-     * 
+     *
      * @param userId The user id.
      * @param serviceName The service name.
      * @param serviceUrl The service url.
@@ -71,7 +71,7 @@ public class LoginEvent {
 
     /**
      * Constructs a @see LoginEvent.
-     * 
+     *
      * @param userId The user id.
      * @param serviceName The service name.
      * @param serviceUrl The relying party id.
@@ -93,7 +93,7 @@ public class LoginEvent {
 
     /**
      * Generate fake LoginEvent
-     * 
+     *
      * @return Returns a fake login event (without linkage to other objects)
      */
     public LoginEvent genFakeLoginEvent() {
@@ -102,7 +102,7 @@ public class LoginEvent {
 
     /**
      * Gets the user id.
-     * 
+     *
      * @return Returns the user id.
      */
     public String getUserId() {
@@ -111,7 +111,7 @@ public class LoginEvent {
 
     /**
      * Gets the service name.
-     * 
+     *
      * @return Returns the service name.
      */
     public String getServiceName() {
@@ -120,7 +120,7 @@ public class LoginEvent {
 
     /**
      * Gets the service url.
-     * 
+     *
      * @return Returns the service url.
      */
     public String getServiceUrl() {
@@ -129,7 +129,7 @@ public class LoginEvent {
 
     /**
      * Gets the timestamp when the login event happened.
-     * 
+     *
      * @return Returns the date.
      */
     public DateTime getDate() {
@@ -138,7 +138,7 @@ public class LoginEvent {
 
     /**
      * Gets the login event detail hash.
-     * 
+     *
      * @return Returns the event detail hash.
      */
     public String getEventDetailHash() {

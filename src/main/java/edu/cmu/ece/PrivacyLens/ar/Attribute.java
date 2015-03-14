@@ -1,8 +1,8 @@
 /*
  * Copyright (c) 2011, SWITCH
- * Copyright (c) 2013, Carnegie Mellon University
+ * Copyright (c) 2013-2015, Carnegie Mellon University
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -13,7 +13,7 @@
  *     * Neither the name of SWITCH nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -65,7 +65,7 @@ public class Attribute {
 
     /**
      * Constructor.
-     * 
+     *
      * @param id The id.
      * @param values The values.
      */
@@ -74,8 +74,9 @@ public class Attribute {
     }
 
     /**
-     * Constructor.
-     * 
+     * Long form constructor.
+     * We appear to no longer use required. Only SAMLHelper currently passes it.
+     *
      * @param id The id.
      * @param name The name.
      * @param description The description.
@@ -163,7 +164,7 @@ public class Attribute {
 
     /**
      * Gets the id.
-     * 
+     *
      * @return Returns the id.
      */
     public String getId() {
@@ -172,7 +173,7 @@ public class Attribute {
 
     /**
      * Gets the name.
-     * 
+     *
      * @return Returns the name.
      */
     public String getName() {
@@ -181,7 +182,7 @@ public class Attribute {
 
     /**
      * Gets the description.
-     * 
+     *
      * @return Returns the description.
      */
     public String getDescription() {
@@ -190,7 +191,7 @@ public class Attribute {
 
     /**
      * Gets the values.
-     * 
+     *
      * @return Returns the values.
      */
     public List<String> getValues() {
