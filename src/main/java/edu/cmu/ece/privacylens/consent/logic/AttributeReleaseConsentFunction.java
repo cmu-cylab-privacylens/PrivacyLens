@@ -133,30 +133,25 @@ public class AttributeReleaseConsentFunction implements Function<ProfileRequestC
 
     /** {@inheritDoc} */
     @Override @Nullable public Map<String, Consent> apply(@Nullable final ProfileRequestContext input) {
-        log.debug("XXXstroucki apply called");
         if (input == null) {
             return null;
         }
 
-        log.debug("XXXstroucki here1");
         final ConsentFlowDescriptor consentFlowDescriptor = consentFlowDescriptorLookupStrategy.apply(input);
         if (consentFlowDescriptor == null) {
             return null;
         }
 
-        log.debug("XXXstroucki here2");
         final ConsentContext consentContext = consentContextLookupStrategy.apply(input);
         if (consentContext == null) {
             return null;
         }
 
-        log.debug("XXXstroucki here3");
         final AttributeReleaseContext attributeReleaseContext = attributeReleaseContextLookupStrategy.apply(input);
         if (attributeReleaseContext == null) {
             return null;
         }
 
-        log.debug("XXXstroucki here4");
         final Map<String, Consent> currentConsents = new LinkedHashMap<>();
 
         final Map<String, IdPAttribute> consentableAttributes = attributeReleaseContext.getConsentableAttributes();
