@@ -1,10 +1,10 @@
 PrivacyLens
   Terms Of Use & Attribute Release Consent
-  for the Shibboleth Identity Provider 2.
+  for the Shibboleth Identity Provider 3.
   Allows users of the Identity Provider to control the
   release of attributes that would normally be sent
   directly to a Service Provider.
-  PrivacyLens derives from uApprove, available at
+  PrivacyLens originally derived from uApprove, available at
   http://www.switch.ch/aai/uApprove
 
 License

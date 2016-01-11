@@ -1,45 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>edu.cmu.ece</groupId>
-    <artifactId>PrivacyLens</artifactId>
-    <version>2.5.0</version>
-    <packaging>jar</packaging>
+<!--
+    <parent>
+        <groupId>net.shibboleth.idp</groupId>
+        <artifactId>idp-parent</artifactId>
+        <version>3.2.0-SNAPSHOT</version>
+        <relativePath>/Users/stroucki/svn/shib/java-identity-provider/trunk/idp-parent</relativePath>
+    </parent>
+-->
 
-    <name>PrivacyLens</name>
-    <description>
-        Terms of Use and Attribute Release Consent Module
-        for the Shibboleth Identity Provider.
-        Allows users of the Identity Provider to control the
-        release of attributes that would normally be sent
-        directly to a Service Provider.
-        PrivacyLens derives from uApprove, available at
-        http://www.switch.ch/aai/uApprove
-    </description>
+<repositories>
+  <repository>
+  <id>shib-release</id>
+  <url>https://build.shibboleth.net/nexus/content/groups/public</url>
+  <snapshots>
+    <enabled>false</enabled>
+  </snapshots>
+  </repository>
+</repositories>
 
     <properties>
+        <java-support.version>7.2.0-SNAPSHOT</java-support.version>
+        <jetty9-dta-ssl.version>1.0.0</jetty9-dta-ssl.version>
+        <shib.groupId>net.shibboleth.idp</shib.groupId>
+        <shib.version>3.2.0</shib.version>
+        <opensaml.groupId>org.opensaml</opensaml.groupId>
+        <opensaml.version>3.2.0</opensaml.version>
+        <spring.version>4.2.3.RELEASE</spring.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <idp.version>2.3.6</idp.version>
-        <spring.version>2.5.6.SEC03</spring.version>
-        <hsql.version>2.2.9</hsql.version>
-        <mysql.version>5.1.25</mysql.version>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>shib-release</id>
-            <url>https://shibboleth.net/nexus/content/groups/public</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
+    <name>PrivacyLens</name>
+    <groupId>edu.cmu.ece</groupId>
+    <artifactId>PrivacyLens</artifactId>
+    <version>3</version>
+    <packaging>jar</packaging>
 
     <dependencies>
-        <!-- Compile dependencies -->
+        <!-- Compile Dependencies -->
     <!--  Gson: Java to Json conversion -->
     <dependency>
       <groupId>com.google.code.gson</groupId>
@@ -47,53 +50,136 @@
       <version>2.2.4</version>
       <scope>compile</scope>
     </dependency>
+    <!-- Apache commons lang -->
+    <dependency>
+        	<groupId>commons-lang</groupId>
+        	<artifactId>commons-lang</artifactId>
+        	<version>2.4</version>
+          <scope>compile</scope>
+        </dependency>
+<!-- spring -->
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-jdbc</artifactId>
-            <version>${spring.version}</version>
-            <scope>compile</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-beans</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-context</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
+        	<groupId>org.springframework</groupId>
+        	<artifactId>spring-jdbc</artifactId>
+        	<version>${spring.version}</version>
+          <scope>compile</scope>
         </dependency>
 
-        <!-- Provided dependencies -->
         <dependency>
-            <groupId>edu.internet2.middleware</groupId>
-            <artifactId>shibboleth-identityprovider</artifactId>
-            <version>${idp.version}</version>
-            <scope>provided</scope>
+        	<groupId>org.springframework</groupId>
+        	<artifactId>spring-expression</artifactId>
+        	<version>${spring.version}</version>
+          <scope>compile</scope>
         </dependency>
- 
+
+<!-- db -->
+        <dependency>
+        	<groupId>c3p0</groupId>
+        	<artifactId>c3p0</artifactId>
+        	<version>0.9.1.2</version>
+          <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>${shib.groupId}</groupId>
+            <artifactId>idp-attribute-api</artifactId>
+            <version>${shib.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${shib.groupId}</groupId>
+            <artifactId>idp-authn-api</artifactId>
+            <version>${shib.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${shib.groupId}</groupId>
+            <artifactId>idp-profile-api</artifactId>
+            <version>${shib.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${shib.groupId}</groupId>
+            <artifactId>idp-profile-impl</artifactId>
+            <version>${shib.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${shib.groupId}</groupId>
+            <artifactId>idp-consent-api</artifactId>
+            <version>${shib.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${shib.groupId}</groupId>
+            <artifactId>idp-consent-impl</artifactId>
+            <version>${shib.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${shib.groupId}</groupId>
+            <artifactId>idp-session-api</artifactId>
+            <version>${shib.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${shib.groupId}</groupId>
+            <artifactId>idp-ui</artifactId>
+            <version>${shib.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${opensaml.groupId}</groupId>
+            <artifactId>opensaml-saml-api</artifactId>
+            <version>${opensaml.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${opensaml.groupId}</groupId>
+            <artifactId>opensaml-storage-api</artifactId>
+            <version>${opensaml.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${opensaml.groupId}</groupId>
+            <artifactId>opensaml-storage-impl</artifactId>
+            <version>${opensaml.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.json</groupId>
+            <artifactId>javax.json-api</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <!-- Provided Dependencies -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
             <version>2.5</version>
             <scope>provided</scope>
         </dependency>
-        
-        <!-- Runtime dependencies -->
-  <!-- joda templates -->
-<dependency>
-	<groupId>joda-time</groupId>
-	<artifactId>joda-time-jsptags</artifactId>
-	<version>1.1.1</version>
-</dependency>
+
+        <dependency>
+            <groupId>javax.servlet.jsp</groupId>
+            <artifactId>jsp-api</artifactId>
+            <version>2.2</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Runtime Dependencies -->
+<!-- hsql -->
+        <dependency>
+        	<groupId>org.hsqldb</groupId>
+        	<artifactId>hsqldb</artifactId>
+        	<version>2.3.3</version>
+          <scope>runtime</scope>
+        </dependency>
+
+<!-- mysql -->
+        <dependency>
+        	<groupId>mysql</groupId>
+        	<artifactId>mysql-connector-java</artifactId>
+        	<version>5.1.36</version>
+          <scope>runtime</scope>
+        </dependency>
+
+<!-- joda jsp tags -->
+        <dependency>
+        	<groupId>joda-time</groupId>
+        	<artifactId>joda-time-jsptags</artifactId>
+        	<version>1.1.1</version>
+          <scope>runtime</scope>
+        </dependency>
 
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -101,36 +187,19 @@
             <version>1.2</version>
             <scope>runtime</scope>
         </dependency>
-        
-        <!-- Optional JDBC Connectors -->
+
         <dependency>
-            <groupId>org.hsqldb</groupId>
-            <artifactId>hsqldb</artifactId>
-            <version>${hsql.version}</version>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.json</artifactId>
             <scope>runtime</scope>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>${mysql.version}</version>
-            <scope>runtime</scope>
-            <optional>true</optional>
-        </dependency>
-        
-        <!-- Migration -->
-        <dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-all</artifactId>
-            <version>1.8.6</version>
-            <scope>runtime</scope>
+            <version>1.0.4</version>
         </dependency>
 
-        <!-- Test dependencies -->
+        <!-- Test Dependencies -->
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>6.4</version>
+            <version>6.9.6</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -155,8 +224,39 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
+        <dependency>
+            <groupId>${shib.groupId}</groupId>
+            <artifactId>idp-profile-api</artifactId>
+            <version>${shib.version}</version>
+            <scope>test</scope>
+            <type>test-jar</type>
+        </dependency>
+        <dependency>
+            <groupId>${shib.groupId}</groupId>
+            <artifactId>idp-saml-impl</artifactId>
+            <version>${shib.version}</version>
+            <scope>test</scope>
+        </dependency>
+<!--
+        <dependency>
+            <groupId>${shib.groupId}</groupId>
+            <artifactId>idp-profile-impl</artifactId>
+            <version>${shib.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${opensaml.groupId}</groupId>
+            <artifactId>opensaml-storage-impl</artifactId>
+            <version>${opensaml.version}</version>
+            <scope>test</scope>
+        </dependency>
+-->
+
+        <!-- Managed Dependencies -->
     </dependencies>
 
+    
     <build>
         <plugins>
             <plugin>
@@ -164,8 +264,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.3.2</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                     <debug>true</debug>
                 </configuration>
             </plugin>
@@ -180,6 +280,7 @@
                                 <wikitext-to-html markupLanguage="Textile"
                                     file="${basedir}/manual/manual.textile" htmlFilenameFormat="$1.html"
                                     formatOutput="true" emitDoctype="false" title="${project.name}-${project.version}">
+<markupLanguageConfiguration locale="en"/>
                                     <stylesheet url="style.css" />
                                 </wikitext-to-html>
                             </tasks>

@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.springframework.org/schema/webflow
+        http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd"
+        parent="intercept.abstract" start-state="AttributeConsentSetup">
+
+    <input name="calledAsSubflow" type="boolean" required="true" />
+    <!-- Rudimentary impediment to direct execution of subflow. -->
+
+    <!-- Attribute consent setup. -->
+    
+    <on-start>
+        <evaluate expression="AttributeConsentFlowDescriptorLookupStrategy.apply(opensamlProfileRequestContext)"
+            result="flowScope.attributeReleaseFlowDescriptor" />
+    </on-start>
+
+<!-- timestamp this interaction -->
+    <action-state id="AttributeConsentSetup">
+        <!-- add general info -->
+        <evaluate expression="DecorateGeneral" />
+        <evaluate expression="DecorateOther" />
+        <evaluate expression="DecorateUserName" />
+        <evaluate expression="InitializeConsentContext" />
+        <evaluate expression="InitializeAttributeConsentContext" />
+        <!-- PopulateAttributeConsentContext populates the ARC -->
+        <evaluate expression="PopulateAttributeConsentContext" />
+        <evaluate expression="'proceed'" />
+        <transition to="CheckAdminInterface" />
+    </action-state>
+   
+    <action-state id="CheckAdminInterface">
+        <evaluate expression="CheckAdminInterface" />
+        <transition on="yes" to="ShowAdminInterface" />
+        <transition on="no" to="PrepareAttributeRelease" />
+    </action-state>
+    
+    <action-state id="PrepareAttributeRelease">
+        <!-- add descriptive texts to attributes -->
+        <evaluate expression="DecorateAttributes" />
+        <!-- <evaluate expression="PopulatePreConsentAuditContext" /> -->
+        <evaluate expression="SetRPUIInformation" />
+        <evaluate expression="ReadConsentFromStorage" />
+        <evaluate expression="PopulateConsentContext"/>
+        <evaluate expression="'proceed'" />
+        <transition to="PrepareTestConsentRequired" />
+    </action-state>
+    
+    <action-state id="PrepareTestConsentRequired">
+    <!-- force show interface option -->
+        <evaluate expression="IsConsentRequiredPredicate.apply(opensamlProfileRequestContext)" result="flowScope.consentRequired"/>
+        <transition to="TestConsentRequired"/>
+    </action-state>
+    
+    <decision-state id="TestConsentRequired">
+            <!-- where to handle changed attributes? -->
+        <if test="flowScope.consentRequired" then="ShowConsentInterface" else="PrepareTestReminderRequired"/>
+    </decision-state>
+    
+    <action-state id="PrepareTestReminderRequired">
+        <!-- <evaluate expression="ReadReminder"/> -->
+        <evaluate expression="IsReminderRequiredPredicate.apply(opensamlProfileRequestContext)" result="flowScope.reminderRequired"/>
+        <transition to="TestReminderRequired"/>
+    </action-state>
+    
+    <decision-state id="TestReminderRequired">
+        <if test="flowScope.reminderRequired" then="ShowReminderInterface" else="ReleaseAttributes"/>
+    </decision-state>
+    
+    <end-state id="proceed"/>
+    
+    
+    <!-- flowRequestContext.activeFlow.id would probably have held intercept/privacy-lens? -->
+    <view-state id="ShowReminderInterface" view="PrivacyLens/attribute-reminder">
+        <on-render>
+            <evaluate expression="environment" result="viewScope.environment" />
+            <evaluate expression="T(edu.cmu.ece.privacylens.LogoService).getFederationLogo(flowRequestContext)" result="viewScope.fedLogo" />
+            <evaluate expression="T(edu.cmu.ece.privacylens.LogoService).getOrganizationLogo(flowRequestContext)" result="viewScope.orgLogo" />
+            <evaluate expression="ReminderAttributeService" />
+            <evaluate expression="'messages.attribute-reminder'" result="viewScope.bundle" />
+            <evaluate expression="T(net.shibboleth.utilities.java.support.codec.HTMLEncoder)" result="viewScope.encoder" />
+            <evaluate expression="flowRequestContext.getExternalContext().getNativeRequest()" result="viewScope.request" />
+            <evaluate expression="flowRequestContext.getExternalContext().getNativeResponse()" result="viewScope.response" />
+            <evaluate expression="opensamlProfileRequestContext" result="viewScope.profileRequestContext" />
+            <evaluate expression="new net.shibboleth.idp.consent.logic.impl.AttributeDisplayNameFunction(flowRequestContext.getExternalContext().getNativeRequest(), FallbackLanguages)" 
+                                                                                               result="viewScope.attributeDisplayNameFunction" />
+            <evaluate expression="new net.shibboleth.idp.consent.logic.impl.AttributeDisplayDescriptionFunction(flowRequestContext.getExternalContext().getNativeRequest(), FallbackLanguages)" 
+                                                                                               result="viewScope.attributeDisplayDescriptionFunction" />
+            <evaluate expression="opensamlProfileRequestContext.getSubcontext(T(edu.cmu.ece.privacylens.context.ConsentContext))" result="viewScope.consentContext" />
+            <evaluate expression="opensamlProfileRequestContext.getSubcontext(T(edu.cmu.ece.privacylens.context.AttributeReleaseContext))" result="viewScope.attributeReleaseContext" />
+            <evaluate expression="SetRPUIInformation.getRPUIContextCreateStrategy().apply(opensamlProfileRequestContext)" result="viewScope.rpUIContext" />
+        </on-render>
+        <transition on="proceed" to="ProcessReminderView" />
+    </view-state>
+    
+    <!-- flowRequestContext.activeFlow.id would probably have held intercept/privacy-lens? -->
+    <view-state id="ShowConsentInterface" view="PrivacyLens/attribute-detail">
+        <on-render>
+            <!-- reset visits -->
+            <evaluate expression="environment" result="viewScope.environment" />            
+            <evaluate expression="T(edu.cmu.ece.privacylens.LogoService).getFederationLogo(flowRequestContext)" result="viewScope.fedLogo" />
+            <evaluate expression="T(edu.cmu.ece.privacylens.LogoService).getOrganizationLogo(flowRequestContext)" result="viewScope.orgLogo" />
+            <evaluate expression="ToggleBeanService" />
+            <evaluate expression="'messages.attribute-detail'" result="viewScope.bundle" />
+            <evaluate expression="T(net.shibboleth.utilities.java.support.codec.HTMLEncoder)" result="viewScope.encoder" />
+            <evaluate expression="flowRequestContext.getExternalContext().getNativeRequest()" result="viewScope.request" />
+            <evaluate expression="flowRequestContext.getExternalContext().getNativeResponse()" result="viewScope.response" />
+            <evaluate expression="opensamlProfileRequestContext" result="viewScope.profileRequestContext" />
+            <evaluate expression="new net.shibboleth.idp.consent.logic.impl.AttributeDisplayNameFunction(flowRequestContext.getExternalContext().getNativeRequest(), FallbackLanguages)" 
+                                                                                               result="viewScope.attributeDisplayNameFunction" />
+            <evaluate expression="new net.shibboleth.idp.consent.logic.impl.AttributeDisplayDescriptionFunction(flowRequestContext.getExternalContext().getNativeRequest(), FallbackLanguages)" 
+                                                                                               result="viewScope.attributeDisplayDescriptionFunction" />
+            <evaluate expression="opensamlProfileRequestContext.getSubcontext(T(edu.cmu.ece.privacylens.context.ConsentContext))" result="viewScope.consentContext" />
+            <evaluate expression="opensamlProfileRequestContext.getSubcontext(T(edu.cmu.ece.privacylens.context.AttributeReleaseContext))" result="viewScope.attributeReleaseContext" />
+            <evaluate expression="SetRPUIInformation.getRPUIContextCreateStrategy().apply(opensamlProfileRequestContext)" result="viewScope.rpUIContext" />
+        </on-render>
+        <transition on="proceed" to="ProcessConsentView" />
+    </view-state>
+
+    <action-state id="ProcessReminderView">
+        <evaluate expression="ProcessReminderView" />
+        <transition on="yes" to="ReleaseAttributes" />
+        <transition on="no" to="ShowConsentInterface" />
+    </action-state>
+    
+    <action-state id="ProcessConsentView">
+        <evaluate expression="ProcessConsentView" />
+        <transition on="yes" to="ReleaseAttributes" />
+        <transition on="no" to="ShowAdminInterface" />
+    </action-state>
+    
+    <!-- Release attributes consented to as well as non-consentable attributes from attribute context. -->
+    
+    <action-state id="ReleaseAttributes">
+        <evaluate expression="StoreConsent" />
+        <evaluate expression="ReleaseAttributes" />
+        <evaluate expression="'proceed'" />
+        <transition on="proceed" to="proceed" />
+    </action-state>
+
+    <view-state id="ShowAdminInterface" view="PrivacyLens/attribute-admin">
+        <on-render>
+        <!-- userName, idpName, lastLoginEvents, relyingPartiesList -->
+            <evaluate expression="environment" result="viewScope.environment" />            
+            <evaluate expression="T(edu.cmu.ece.privacylens.LogoService).getFederationLogo(flowRequestContext)" result="viewScope.fedLogo" />
+            <evaluate expression="T(edu.cmu.ece.privacylens.LogoService).getOrganizationLogo(flowRequestContext)" result="viewScope.orgLogo" />
+            <evaluate expression="DecorateAttributes" />
+            <evaluate expression="DecorateEvents" />
+            <evaluate expression="'messages.attribute-admin'" result="viewScope.bundle" />
+            <evaluate expression="T(net.shibboleth.utilities.java.support.codec.HTMLEncoder)" result="viewScope.encoder" />
+            <evaluate expression="flowRequestContext.getExternalContext().getNativeRequest()" result="viewScope.request" />
+            <evaluate expression="flowRequestContext.getExternalContext().getNativeResponse()" result="viewScope.response" />
+            <evaluate expression="opensamlProfileRequestContext" result="viewScope.profileRequestContext" />
+            <evaluate expression="new net.shibboleth.idp.consent.logic.impl.AttributeDisplayNameFunction(flowRequestContext.getExternalContext().getNativeRequest(), FallbackLanguages)" 
+                                                                                               result="viewScope.attributeDisplayNameFunction" />
+            <evaluate expression="new net.shibboleth.idp.consent.logic.impl.AttributeDisplayDescriptionFunction(flowRequestContext.getExternalContext().getNativeRequest(), FallbackLanguages)" 
+                                                                                               result="viewScope.attributeDisplayDescriptionFunction" />
+            <evaluate expression="opensamlProfileRequestContext.getSubcontext(T(edu.cmu.ece.privacylens.context.ConsentContext))" result="viewScope.consentContext" />
+            <evaluate expression="opensamlProfileRequestContext.getSubcontext(T(edu.cmu.ece.privacylens.context.AttributeReleaseContext))" result="viewScope.attributeReleaseContext" />
+            <evaluate expression="SetRPUIInformation.getRPUIContextCreateStrategy().apply(opensamlProfileRequestContext)" result="viewScope.rpUIContext" />
+        </on-render>
+        <transition on="proceed" to="ProcessAdminView" />
+    </view-state>
+    
+    <action-state id="ProcessAdminView">
+        <evaluate expression="ProcessAdminView" />
+        <transition on="loginEvent" to="ShowLoginEvent" />
+        <transition on="serviceLogin" to="ShowServiceLogins" />
+        <transition on="error" to="ShowAdminInterface" />
+    </action-state>
+    
+    <view-state id="ShowLoginEvent" view="PrivacyLens/attribute-loginevent">
+        <on-render>
+        <!-- userName, idpName, lastLoginEvents, relyingPartiesList -->
+            <evaluate expression="environment" result="viewScope.environment" />            
+            <evaluate expression="T(edu.cmu.ece.privacylens.LogoService).getFederationLogo(flowRequestContext)" result="viewScope.fedLogo" />
+            <evaluate expression="T(edu.cmu.ece.privacylens.LogoService).getOrganizationLogo(flowRequestContext)" result="viewScope.orgLogo" />
+            <evaluate expression="DecorateEvents" />
+            <evaluate expression="'messages.attribute-loginevent'" result="viewScope.bundle" />
+            <evaluate expression="T(net.shibboleth.utilities.java.support.codec.HTMLEncoder)" result="viewScope.encoder" />
+            <evaluate expression="flowRequestContext.getExternalContext().getNativeRequest()" result="viewScope.request" />
+            <evaluate expression="flowRequestContext.getExternalContext().getNativeResponse()" result="viewScope.response" />
+            <evaluate expression="opensamlProfileRequestContext" result="viewScope.profileRequestContext" />
+            <evaluate expression="new net.shibboleth.idp.consent.logic.impl.AttributeDisplayNameFunction(flowRequestContext.getExternalContext().getNativeRequest(), FallbackLanguages)" 
+                                                                                               result="viewScope.attributeDisplayNameFunction" />
+            <evaluate expression="new net.shibboleth.idp.consent.logic.impl.AttributeDisplayDescriptionFunction(flowRequestContext.getExternalContext().getNativeRequest(), FallbackLanguages)" 
+                                                                                               result="viewScope.attributeDisplayDescriptionFunction" />
+            <evaluate expression="opensamlProfileRequestContext.getSubcontext(T(edu.cmu.ece.privacylens.context.ConsentContext))" result="viewScope.consentContext" />
+            <evaluate expression="opensamlProfileRequestContext.getSubcontext(T(edu.cmu.ece.privacylens.context.AttributeReleaseContext))" result="viewScope.attributeReleaseContext" />
+            <evaluate expression="SetRPUIInformation.getRPUIContextCreateStrategy().apply(opensamlProfileRequestContext)" result="viewScope.rpUIContext" />
+        </on-render>
+        <transition on="proceed" to="ProcessLoginEventView" />
+    </view-state>
+    
+    <action-state id="ProcessLoginEventView">
+        <evaluate expression="ProcessLoginEventView" />
+        <transition on="proceed" to="ShowAdminInterface" />
+    </action-state>
+    
+    <view-state id="ShowServiceLogins" view="PrivacyLens/attribute-service">
+        <on-render>
+        <!-- userName, idpName, lastLoginEvents, relyingPartiesList -->
+            <evaluate expression="environment" result="viewScope.environment" />            
+            <evaluate expression="T(edu.cmu.ece.privacylens.LogoService).getFederationLogo(flowRequestContext)" result="viewScope.fedLogo" />
+            <evaluate expression="T(edu.cmu.ece.privacylens.LogoService).getOrganizationLogo(flowRequestContext)" result="viewScope.orgLogo" />
+            <evaluate expression="DecorateEvents" />
+            <evaluate expression="'messages.attribute-service'" result="viewScope.bundle" />
+            <evaluate expression="T(net.shibboleth.utilities.java.support.codec.HTMLEncoder)" result="viewScope.encoder" />
+            <evaluate expression="flowRequestContext.getExternalContext().getNativeRequest()" result="viewScope.request" />
+            <evaluate expression="flowRequestContext.getExternalContext().getNativeResponse()" result="viewScope.response" />
+            <evaluate expression="opensamlProfileRequestContext" result="viewScope.profileRequestContext" />
+            <evaluate expression="new net.shibboleth.idp.consent.logic.impl.AttributeDisplayNameFunction(flowRequestContext.getExternalContext().getNativeRequest(), FallbackLanguages)" 
+                                                                                               result="viewScope.attributeDisplayNameFunction" />
+            <evaluate expression="new net.shibboleth.idp.consent.logic.impl.AttributeDisplayDescriptionFunction(flowRequestContext.getExternalContext().getNativeRequest(), FallbackLanguages)" 
+                                                                                               result="viewScope.attributeDisplayDescriptionFunction" />
+            <evaluate expression="opensamlProfileRequestContext.getSubcontext(T(edu.cmu.ece.privacylens.context.ConsentContext))" result="viewScope.consentContext" />
+            <evaluate expression="opensamlProfileRequestContext.getSubcontext(T(edu.cmu.ece.privacylens.context.AttributeReleaseContext))" result="viewScope.attributeReleaseContext" />
+            <evaluate expression="SetRPUIInformation.getRPUIContextCreateStrategy().apply(opensamlProfileRequestContext)" result="viewScope.rpUIContext" />
+        </on-render>
+        <transition on="proceed" to="ProcessServiceView" />
+    </view-state>
+    
+    <action-state id="ProcessServiceView">
+        <evaluate expression="ProcessServiceView" />
+        <transition on="proceed" to="ShowLoginEvent" />
+        <transition on="error" to="ShowAdminInterface" />
+    </action-state>
+
+<!-- resource path is relative to here! -->
+        <bean-import resource="privacy-lens-beans.xml" />
+    
+
+</flow>

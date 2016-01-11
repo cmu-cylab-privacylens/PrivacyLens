@@ -31,12 +31,6 @@
                 <include>org.hsqldb:hsqldb</include>
             </includes>
         </dependencySet>
-        <dependencySet>
-            <outputDirectory>/scripts/lib</outputDirectory>
-            <includes>
-                <include>org.codehaus.groovy:groovy-all</include>
-            </includes>
-        </dependencySet>
     </dependencySets>
     
     
@@ -80,8 +74,8 @@
         </fileSet>
         
         <fileSet>
-            <outputDirectory>/scripts</outputDirectory>
-            <directory>src/main/groovy</directory>
+            <outputDirectory>/flows/intercept/privacy-lens</outputDirectory>
+            <directory>src/main/resources/flows</directory>
         </fileSet>
         
         <fileSet>

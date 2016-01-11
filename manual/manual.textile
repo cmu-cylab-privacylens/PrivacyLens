@@ -1,6 +1,6 @@
 This document contains the PrivacyLens deployment guide and the general manual.
 
-PrivacyLens is an extension for the Shibboleth Identity Provider 2.x. It provides an interface to allow users to review the personal information that will be sent to a requesting web site, and to opt in or out of disclosing it. PrivacyLens grew out of "uApprove":http://www.switch.ch/aai/uApprove, and its module to present a Terms of Use page has been kept. PrivacyLens' web page is at "www.privacylens.org":http://www.privacylens.org/
+PrivacyLens is an extension for the Shibboleth Identity Provider 3.x. It provides an interface to allow users to review the personal information that will be sent to a requesting web site, and to opt in or out of disclosing it. PrivacyLens grew out of "uApprove":http://www.switch.ch/aai/uApprove. PrivacyLens' web page is at "www.privacylens.org":http://www.privacylens.org/
 
 Notes about this guide:
 * This guide assumes that PrivacyLens will be installed on a Linux system. It's also possible to install it on a different operating system. In this case, you may need to adapt some paths and commands accordingly.
@@ -12,7 +12,7 @@ h1. 1 Installation
 
 h2. 1.1 Prerequisites
 
-* "Shibboleth Identity Provider":http://shibboleth.net/, version 2.3 or greater.
+* "Shibboleth Identity Provider":http://shibboleth.net/, version 3.2.0 or greater.
 * "PrivacyLens":http://www.privacylens.org/, either source or binary package.
 * Database which supports JDBC(Java Database Connectivity).
 
@@ -29,13 +29,30 @@ Ensure your installation of Shibboleth is working correctly.
 
 * Unpack the binary package ZIP file in @$PLENS_DIST$@ (e.g., @/usr/local/src/PrivacyLens-#version#@).
 * Copy the jar files to Shibboleth's library directory:
-** @cp $PLENS_DIST$/lib/*.jar $SHIB_DIST$/lib@
-** @cp $PLENS_DIST$/lib/jdbc/*.jar $SHIB_DIST$/lib@
-* Copy the JDBC connector for your database to Shibboleth's classpath. PrivacyLens itself already provides "MySQL":http://mysql.com or "HSQL":http://hsqldb.org JDBC connectors: <br /> @cp $PLENS_DIST$/lib/jdbc/optional/#jdbc-connector#.jar $SHIB_DIST$/lib@
+** @cp $PLENS_DIST$/lib/*.jar $SHIB_DIST$/webapp/WEB-INF/lib@
+** @cp $PLENS_DIST$/lib/jdbc/*.jar $SHIB_DIST$/webapp/WEB-INF/lib@
+* Copy the JDBC connector for your database to Shibboleth's classpath. PrivacyLens itself already provides "MySQL":http://mysql.com or "HSQL":http://hsqldb.org JDBC connectors: <br /> @cp $PLENS_DIST$/lib/jdbc/optional/#jdbc-connector#.jar $SHIB_DIST$/webapp/WEB-INF/lib@
 
-Ensure that only one version of each jar file is present in @$SHIB_DIST$/lib@.
+Ensure that only one version of each jar file is present in @$SHIB_DIST$/webapp/WEB-INF/lib@.
 
-h2. 1.4 Configuration Template
+h2. 1.4 PrivacyLens WebFlow files
+
+Copy the PrivacyLens flow and component configuration files to the Shibboleth flow directory:
+
+* @mkdir -p $SHIB_INSTALL$/flows/intercept/privacy-lens@
+* @cp $PLENS_DIST$/flows/intercept/privacy-lens/*.xml $SHIB_INSTALL$/flows/intercept/privacy-lens/@
+
+h2. 1.5 PrivacyLens view templates
+
+Copy the PrivacyLens view templates (JSP(Java Server Pages)s, CSS(Cascading Style Sheet) files, images and JavaScript libraries) to directories under Shibboleth's webapp directory:
+
+* @mkdir -p $SHIB_DIST$/webapp/WEB-INF/jsp/PrivacyLens@
+* @cp -r $PLENS_DIST$/webapp/PrivacyLens/*.jsp $SHIB_DIST$/webapp/WEB-INF/jsp/PrivacyLens@
+* @cp -r $PLENS_DIST$/webapp/PrivacyLens/jquery $SHIB_DIST$/webapp/PrivacyLens/jquery@
+* @cp -r $PLENS_DIST$/webapp/PrivacyLens/img $SHIB_DIST$/webapp/PrivacyLens/img@
+* @cp -r $PLENS_DIST$/webapp/PrivacyLens/css $SHIB_DIST$/webapp/PrivacyLens/css@
+
+h2. 1.6 Configuration Template
 
 Copy the configuration template to Shibboleth's configuration directory:
 
@@ -43,14 +60,7 @@ Copy the configuration template to Shibboleth's configuration directory:
 * @cp $PLENS_DIST$/manual/configuration/PrivacyLens.xml $SHIB_INSTALL$/conf@
 * @cp $PLENS_DIST$/manual/configuration/spsetup.json $SHIB_INSTALL$/conf@
 
-h2. 1.5 PrivacyLens view templates
-
-Copy the PrivacyLens view templates (JSP(Java Server Pages)s, CSS(Cascading Style Sheet) files and images) to a directory under Shibboleth's webapp directory:
-
-* @mkdir $SHIB_DIST$/src/main/webapp/PrivacyLens@
-* @cp -r $PLENS_DIST$/webapp/* $SHIB_DIST$/src/main/webapp/PrivacyLens@
-
-h2. 1.6 Database Preparation
+h2. 1.7 Database Preparation
 
 bq(note). The following database parameters are examples. Adapt the values as necessary. Choose a secure password.
 
@@ -59,149 +69,89 @@ bq(note). The following database parameters are examples. Adapt the values as ne
 * Grant @INSERT, SELECT, UPDATE, DELETE@ rights to user "PrivacyLens".
 * Create the initial table structures using the schemas:
 ** @$PLENS_DIST$/manual/storage/attribute-release-schema.sql@
-** @$PLENS_DIST$/manual/storage/terms-of-use-schema.sql@
 
 h1. 2 Basic Deployment
 
-h2. 2.1 Web Application Deployment Descriptor
+h2. 2.1 PrivacyLens Flow insertion
 
-Extend Shibboleth's web application deployment descriptor (@$SHIB_DIST$/src/main/webapp/WEB-INF/web.xml@). Adapt your existing file as shown below.
-* Add @$SHIB_INSTALL$/conf/PrivacyLens.xml@ to the @contextConfigLocation@ context parameter. Do not expand the @$IDP_HOME$@ variables here. They are handled by Shibboleth's install script.
-* Add the required filters and servlets as shown.
+Edit @$SHIB_INSTALL$/conf/intercept/profile-intercept.xml@ and add PrivacyLens to the list of available intercept flows.
+
+bc. 
+            <list merge="true">
+...
+                <bean id="intercept/privacy-lens" parent="privacylens.consent.AttributeReleaseFlow" />
+            </list>
+
+Add PrivacyLens configuration information to the same file as shown.
 
 bc.. 
+<bean id="privacylens.config.General"
+    class="edu.cmu.ece.privacylens.config.General"
+    init-method="initialize"
+    factory-method="getInstance"
+    p:idpName="%{general.IdPName}"
+    p:adminUrl="%{general.adminUrl}"
+    p:adminMail="%{general.adminMail}"
+    p:credits="%{general.credits}" />
 
-<web-app ...>
+<bean id="privacylens.Oracle"
+    class="edu.cmu.ece.privacylens.Oracle"
+    init-method="initialize"
+    factory-method="getInstance"
+    p:config="/opt/shibboleth-idp/conf/spsetup.json" />
 
-    <context-param>
-        <param-name>contextConfigLocation</param-name>
-        <param-value>$IDP_HOME$/conf/internal.xml; $IDP_HOME$/conf/service.xml; $IDP_HOME$/conf/PrivacyLens.xml</param-value>
-    </context-param>
+    <!-- Parent bean for attribute release consent flows. -->
+<bean id="privacylens.consent.AttributeReleaseFlow" abstract="true"
+        class="edu.cmu.ece.privacylens.consent.flow.ar.AttributeReleaseFlowDescriptor"
+        p:storageService-ref="#{'%{idp.consent.StorageService:shibboleth.ClientPersistentStorageService}'.trim()}"
+        p:doNotRememberConsentAllowed="%{idp.consent.allowDoNotRemember:true}"
+        p:globalConsentAllowed="%{idp.consent.allowGlobal:true}"
+        p:perAttributeConsentEnabled="%{idp.consent.allowPerAttribute:false}"
+        p:compareValues="%{idp.consent.compareValues:false}"
+        p:lifetime="%{idp.consent.storageRecordLifetime:P1Y}"
+        p:maximumNumberOfStoredRecords="%{idp.consent.maxStoredRecords:10}"
+        p:nonBrowserSupported="false">
+    <property name="activationCondition">
+        <bean parent="shibboleth.Conditions.OR">
+            <constructor-arg>
+                <bean parent="shibboleth.Conditions.NOT">
+                    <constructor-arg value="%{idp.consent.allowPerAttribute:false}" />
+                </bean>
+            </constructor-arg>
+            <constructor-arg>
+                <bean class="net.shibboleth.idp.saml.profile.config.logic.IncludeAttributeStatementPredicate" />
+            </constructor-arg>
+        </bean>
+    </property>
+</bean>
 
-    <!-- IdP Listeners, Filters and Servlets -->
-    <!-- ...                                 -->
-    
-    
-    <!-- PrivacyLens Filter and Servlets -->
-    
-    <filter>
-        <filter-name>PrivacyLens</filter-name>
-        <filter-class>edu.cmu.ece.PrivacyLens.Intercepter</filter-class>
-    </filter>
+p. Add the PrivacyLens properties file to the available properties of the IdP:
 
-    <filter-mapping>
-        <filter-name>PrivacyLens</filter-name>
-        <url-pattern>/profile/Shibboleth/SSO</url-pattern>
-        <url-pattern>/profile/SAML1/SOAP/AttributeQuery</url-pattern>
-        <url-pattern>/profile/SAML1/SOAP/ArtifactResolution</url-pattern>
-        <url-pattern>/profile/SAML2/POST/SSO</url-pattern>
-        <url-pattern>/profile/SAML2/POST-SimpleSign/SSO</url-pattern>
-        <url-pattern>/profile/SAML2/Redirect/SSO</url-pattern>
-        <url-pattern>/profile/SAML2/Unsolicited/SSO</url-pattern>
-        <url-pattern>/Authn/UserPassword</url-pattern>
-    </filter-mapping>
+bc. 
+idp.additionalProperties= /conf/ldap.properties, /conf/saml-nameid.properties, /conf/services.properties, /conf/PrivacyLens.properties
 
-    <servlet>
-        <servlet-name>PrivacyLens - Terms Of Use</servlet-name>
-        <servlet-class>ch.SWITCH.aai.uApprove.tou.ToUServlet</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>PrivacyLens - Terms Of Use</servlet-name>
-        <url-pattern>/PrivacyLens/TermsOfUse</url-pattern>
-    </servlet-mapping>
-
-    <servlet>
-        <servlet-name>PrivacyLens - Attribute Release</servlet-name>
-        <servlet-class>edu.cmu.ece.PrivacyLens.ar.AttributeReleaseServlet</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>PrivacyLens - Attribute Release</servlet-name>
-        <url-pattern>/PrivacyLens/AttributeRelease</url-pattern>
-    </servlet-mapping>
-
-<servlet>
-<servlet-name>PrivacyLens - AR Admin</servlet-name>
-<servlet-class>edu.cmu.ece.PrivacyLens.ar.AdminServlet</servlet-class>
-</servlet>
-
-<servlet-mapping>
-<servlet-name>PrivacyLens - AR Admin</servlet-name>
-<url-pattern>/PrivacyLens/AdminServlet</url-pattern>
-</servlet-mapping>
-
-<servlet>
-<servlet-name>PrivacyLens - AR AJAX</servlet-name>
-<servlet-class>edu.cmu.ece.PrivacyLens.ar.AttributeReleaseAjaxServlet</servlet-class>
-</servlet>
-
-<servlet-mapping>
-<servlet-name>PrivacyLens - AR AJAX</servlet-name>
-<url-pattern>/PrivacyLens/AttributeReleaseAjaxServlet</url-pattern>
-</servlet-mapping>
-
-<servlet>
-<servlet-name>PrivacyLens - Debug</servlet-name>
-<servlet-class>edu.cmu.ece.PrivacyLens.DebugViewServlet</servlet-class>
-</servlet>
-
-<servlet-mapping>
-<servlet-name>PrivacyLens - Debug</servlet-name>
-<url-pattern>/PrivacyLens/DebugView</url-pattern>
-</servlet-mapping>
-
-</web-app>
 h2. 2.2 Custom Configuration
-
-In @$SHIB_INSTALL$/conf/PrivacyLens.xml@ change:
-
-bc. 
-<context:property-placeholder location="classpath:/configuration/PrivacyLens.properties" />
-
-to:
-
-bc. 
-<context:property-placeholder location="file:$SHIB_INSTALL$/conf/PrivacyLens.properties" />
-
-Do expand the variable $SHIB_INSTALL$ here (so that the location value looks like e.g. @file:/opt/shibboleth-idp/conf/PrivacyLens.properties@).
 
 Customize @$SHIB_INSTALL$/conf/PrivacyLens.properties@ according your database environment and required features. See inline documentation of PrivacyLens.properties for configuration options.
 
-In case of database connectivity problems, you may want to set the "graceful" property to "true" in @$SHIB_INSTALL$/conf/PrivacyLens.xml@:
+In case of database connectivity problems, you may want to set the "graceful" property to "true" in @$SHIB_INSTALL$/flows/intercept/privacy-lens/privacy-lens-beans.xml@:
 
 bc. 
 <property name="storage">
-  <bean class="ch.SWITCH.aai.uApprove.tou.storage.JDBCStorage" init-method="initialize"
-  p:dataSource-ref="PrivacyLens.dataSource" p:sqlStatements="classpath:/storage/sql-statements.properties" p:graceful="true" />
+  <bean class="edu.cmu.ece.privacylens.ar.storage.JDBCStorage" init-method="initialize"
+  p:dataSource-ref="DataSource" p:sqlStatements="classpath:/storage/sql-statements.properties" p:graceful="false" />
 </property>
 
 You may then want to provide an appropriate timeout setting to the database configuration in @$SHIB_INSTALL$/conf/PrivacyLens.properties@.
-
-In case you enable the 'Terms of Use' module (disabled by default), you need to provide an appropriate text suitable for your organization.
-
-An example 'Terms Of Use' HTML file can be found in @$PLENS_DIST$/manual/examples/terms-of-use.html@.
-
-* Copy @$PLENS_DIST$/manual/examples/terms-of-use.html@ to @$SHIB_INSTALL$/conf/terms-of-use.html@.
-
-bc. cp $PLENS_DIST$/manual/examples/terms-of-use.html $SHIB_INSTALL$/conf/terms-of-use.html
-
-* Adapt @$SHIB_INSTALL$/conf/terms-of-use.html@ as required.
-* Adapt the value of @tou.resource@ in @$SHIB_INSTALL$/conf/PrivacyLens.properties@ accordingly.
-
-bc. tou.resource = file:$SHIB_INSTALL$/conf/terms-of-use.html
 
 h2. 2.3 Custom Templates
 
 In case you want to customize the templates, follow section "Custom View Templates":#CustomViewTemplates.
 
-You should at the least copy your organization's logo to the file @$SHIB_DIST$/src/main/webapp/PrivacyLens/logo.png@, since a placeholder logo is installed by default.
-You may also want to put your federation's logo to the file @$SHIB_DIST$/src/main/webapp/PrivacyLens/federation-logo.png@ (which is an empty placeholder logo by default).
-_(For the SWITCHaai federation, the logo is available at "http://www.switch.ch/aai/design/images/switchaai-logo.png":http://www.switch.ch/aai/design/images/switchaai-logo.png.)_
+You should at the least copy your organization's logo to the file @$SHIB_DIST$/src/main/webapp/PrivacyLens/img/logo.png@, since a placeholder logo is installed by default.
+You may also want to put your federation's logo to the file @$SHIB_DIST$/src/main/webapp/PrivacyLens/img/federation-logo.png@ (which is an empty placeholder logo by default).
 
 h2. 2.4 Configure administrative interface
-
-In @$SHIB_INSTALL$/conf/PrivacyLens.properties@, the property @general.adminUrl@ determines the Service Provider identifier that should cause the PrivacyLens administrative interface to be presented. Define a new Service Provider with this identifier and make it known to the Identity Provider via the @$SHIB_INSTALL$/conf/relying-party.xml@ file. Provide the full set of attributes to users of this Service Provider, and require authentication.
 
 On the client side, the web server and the Shibboleth module have to be configured.
 * For Apache, add these lines to the configuration to have Shibboleth handle these URLs:
@@ -224,30 +174,19 @@ bc..
 </ApplicationOverride>
 p. 
 Server side configuration
-* Define the metadata cache for the new virtual Service Provider (this file will be created by the Identity Provider). Modify @$SHIB_INSTALL$/conf/relying-party.xml@ and add the following:
-bc.. 
-<metadata:MetadataProvider id="SPAdmin" xsi:type="metadata:FileBackedHTTPMetadataProvider"
-  metadataURL="https://<SP host>/admin/Shibboleth.sso/Metadata"
-  backingFile="$SHIB_INSTALL$/metadata/scaleprivSPAdmin.xml">
-</metadata:MetadataProvider>
-p. 
+In @$SHIB_INSTALL$/conf/PrivacyLens.properties@, the property @general.adminUrl@ determines the Service Provider identifier that should cause the PrivacyLens administrative interface to be presented.
+* Define the metadata cache for the new virtual Service Provider (this file will be created by the Identity Provider). Modify @$SHIB_INSTALL$/conf/metadata-providers.xml@ and add the following:
+
+bc. 
+<MetadataProvider id="AdminSP" xsi:type="FileBackedHTTPMetadataProvider"
+                  metadataURL="https://$SP_HOST$/admin/Shibboleth.sso/Metadata"
+                  backingFile="$SHIB_INSTALL$/metadata/AdminSP.xml">
+</MetadataProvider>
+
+Provide the full set of attributes to users of this Service Provider, and require authentication.
+
 * Ensure the virtual Service Provider is defined in @$SHIB_INSTALL$/conf/PrivacyLens.properties@:
-bc. general.adminUrl = https://<SP host>/admin
-
-h2. 2.5 Configure Shibboleth to honor PrivacyLens choices
-
-Configure the Identity Provider to query PrivacyLens for attribute release choices. Edit the file @$SHIB_INSTALL$/conf/attribute-filter.xml@ and make each AttributeFilterPolicy contain a PermitValueRule that will query PrivacyLens. The language used for the script is Javascript:
-
-bc.. <afp:PermitValueRule xsi:type="basic:Script" >
-    <basic:Script>
-        <![CDATA[
-            importPackage(Packages.edu.cmu.ece.PrivacyLens);
-            IdPHelper.releaseFilter(filterContext, attributeId, attributeValue);
-        ]]>
-    </basic:Script>
-</afp:PermitValueRule>
-
-The return value of the last function called will determine the outcome of this rule. If the return value is true, the attribute will be released by the Identity Provider.
+bc. general.adminUrl = https://$SP_HOST$/admin
 
 h2. 2.6 Configuring the Oracle
 
@@ -266,7 +205,7 @@ bc.. {
   "SPs":[
     {
       "name":Human readable name of the Service Provider,
-      "id":Regular expression to match Service Provider identifier within Shibboleth against,
+      "id":Regular expression to match against Service Provider identifier within Shibboleth,
       "attrGroups":[
         {
           "id":Attribute group identifier,
@@ -295,7 +234,7 @@ h2. 2.7 Deployment
 To activate PrivacyLens, Shibboleth must be re-deployed:
 
 bc. cd $SHIB_DIST$
-./install.sh
+./bin/install.sh
 
 You may also need to restart your Java web application server (e.g. Tomcat or Jetty).
 
@@ -303,19 +242,8 @@ h1. 3 Upgrade
 
 h2. 3.1 General procedure
 
-Unless noted below, the general procedure for upgrading PrivacyLens is:-
-
-* Unpack the distribution package to @$PLENS_DIST$.
-* Replace the old version of the PrivacyLens jar file (@rm $SHIB_DIST$/lib/PrivacyLens-#old-version#.jar; cp $PLENS_DIST$/lib/PrivacyLens-#new-version#.jar $SHIB_DIST$/lib@).
-* Update the JDBC dependencies (@cp $PLENS_DIST$/lib/jdbc/*.jar $SHIB_DIST$/lib@).
-* Optionally update the JDBC connector for your database. PrivacyLens provides connectors for HSQL and MySQL. (e.g. if you are using HSQL as a database, @cp $PLENS_DIST$/lib/jdbc/optional/hsqldb-#version#.jar $SHIB_DIST$/lib@).
-* Verify that only one version of each jar file is installed in @$SHIB_DIST$/lib@.
-* Update the PrivacyLens view templates in @$SHIB_DIST$/src/main/webapp/PrivacyLens@. If you have previously customized these files, back up the old files first, and then re-apply the customizations.
-
-You should at the least copy your organization's logo to the file @$SHIB_DIST$/src/main/webapp/PrivacyLens/logo.png@, since a placeholder logo is installed by default.
-You may also want to put your federation's logo to the file @$SHIB_DIST$/src/main/webapp/PrivacyLens/federation-logo.png@ (which is an empty placeholder logo by default).
-_(For the SWITCHaai federation, the logo is available at "http://www.switch.ch/aai/design/images/switchaai-logo.png":http://www.switch.ch/aai/design/images/switchaai-logo.png.)_
-
+* Redo the installation steps Library Installation, PrivacyLens WebFlow files, PrivacyLens view templates. These do not hold configuration settings.
+* Adapt any customizations you may have done to the view templates.
 * Deploy Shibboleth as in section "Deployment":#a2.5Deployment above.
 
 h1. 4 Advanced Deployment
@@ -326,23 +254,13 @@ h2. 4.1 Custom SQL Statements
 
 * Copy @$PLENS_DIST$/manual/storage/sql-statements.properties@ to @$SHIB_INSTALL$/conf/PrivacyLens.sql-statements.properties@.
 * Adjust @$SHIB_INSTALL$/conf/PrivacyLens.sql-statements.properties@ according your needs.
-* Enable your custom @sql-statements.properties@ in @$SHIB_INSTALL$/conf/PrivacyLens.xml@:
+* Enable your custom @sql-statements.properties@ in @$SHIB_INSTALL$/flows/intercept/privacy-lens/privacy-lens-beans.xml@:
 
 bc.. 
-    <bean id="uApprove.touModule" class="ch.SWITCH.aai.uApprove.tou.ToUModule" ...>
+    <bean id="AttributeReleaseModule" class="edu.cmu.ece.privacylens.ar.AttributeReleaseModule" init-method="initialize"
         <!-- ... -->
         <property name="storage">
-            <bean class="ch.SWITCH.aai.uApprove.tou.storage.JDBCStorage" ...
-                p:sqlStatements="file:/$SHIB_INSTALL$/conf/PrivacyLens.sql-statements.properties" ... />
-        </property>
-    </bean>
-    
-    <!-- ... -->
-    
-    <bean id="PrivacyLens.attributeReleaseModule" class="edu.cmu.ece.PrivacyLens.ar.AttributeReleaseModule" ...>
-        <!-- ... -->
-        <property name="storage">
-            <bean class="edu.cmu.ece.PrivacyLens.ar.storage.JDBCStorage" ...
+            <bean class="edu.cmu.ece.privacylens.ar.storage.JDBCStorage" init-method="initialize"
                p:sqlStatements="file:/$SHIB_INSTALL$/conf/PrivacyLens.sql-statements.properties" ... />
         </property>
     </bean>
@@ -351,42 +269,7 @@ h2. 4.2 Templates
 
 h3. Custom View Templates
 
-Feel free to customize the PrivacyLens view templates in @$SHIB_DIST$/src/main/webapp/PrivacyLens/@.
-
-h2. 4.3 Localization
-
-h3. Custom Messages
-
-You may provided custom messages by copying the directory @$PLENS_DIST$/manual/examples/messages@ to Shibboleth's classpath (e.g., @$SHIB_DIST$/src/main/webapp/WEB-INF/classes/PrivacyLens/messages@), and editing the files within.
-
-Point PrivacyLens to use your custom messages by editing @$SHIB_INSTALL$/conf/PrivacyLens.xml@:
-
-bc. 
-    <bean id="PrivacyLens.viewHelper" class="ch.SWITCH.aai.uApprove.ViewHelper" ...
-        p:messagesBase="PrivacyLens.messages" />
-
-h2. 4.4 Strict Comparison
-
-h3. Terms Of Use Content Comparison
-
-If the Terms of Use module is enabled, by default only the version is compared to decide whether a user has accepted the terms. You can enable full-text comparison by making the following change in @$SHIB_INSTALL$/conf/PrivacyLens.xml@: 
-
-bc. <bean id="uApprove.touModule" ... p:compareContent="true" ...
-
-
-h2. 4.5 Audit Logging
-
-PrivacyLens can write into Shibboleth's audit log at @$SHIB_INSTALL$/logs/idp-audit.log@.
-
-h3. Enable Terms Of Use Audit Log
-
-You can enable the Terms of Use audit log in in @$SHIB_INSTALL$/conf/PrivacyLens.xml@: 
-
-bc. <bean id="uApprove.touModule" ... p:auditLogEnabled="true" ...
-
-Example output:
-
-bc. 20120101T010000Z|ch.SWITCH.aai.uApprove.PrivacyLens|||tou.acceptance|null|null|null|student1||1.0,5b2ee897c08c79a09cd57e8602d605bf8c52db17de9793677c36b5c78644b2b3,|
+Feel free to customize the PrivacyLens view templates in @$SHIB_DIST$/webapp/WEB-INF/jsp/PrivacyLens/@.
 
 h2. 4.6 Machine readable attributes
 
@@ -409,19 +292,6 @@ h2. 4.8 Black/Whitelisting
 
 PrivacyLens can be configured to show or not show the interface, depending on what Service Provider is involved. In the PrivacyLens.properties file, regular expressions that the Service Provider will be matched again are provided to "services". If "services.blacklist" is true, the user will not see the interface for any Service Provider that matches the regular expressions. If "services.blacklist" is false, the user will only see the interface for Service Providers that match the regular expressions.
 
-h3. Enable Attribute Release Audit Log
-
-You can enable the attribute release module audit log in in @$SHIB_INSTALL$/conf/PrivacyLens.xml@:
-
-bc. <bean id="PrivacyLens.attributeReleaseModule" ... p:auditLogEnabled="true" ...
-
-Example output:
-
-bc. 
-20120101T010000Z|edu.cmu.ece.PrivacyLens||https://sp.example.org/shibboleth|ar.consent|null|null|null|student1||uid,surname,givenName,|
-20120101T010000Z|edu.cmu.ece.PrivacyLens||https://sp.example.org/shibboleth|ar.clearConsent|null|null|null|student1|||
-20120101T010000Z|edu.cmu.ece.PrivacyLens|||ar.generalConsent|null|null|null|student1|||
-
 h1. 5 Troubleshooting
 
 * Check @$SHIB_INSTALL$/logs/idp-process.log@ for @ERROR@ or @WARN@ messages.
@@ -429,14 +299,14 @@ h1. 5 Troubleshooting
 
 h2. Debugging
 
-Enabling @DEBUG@ or @TRACE@ log level for PrivacyLens in @$SHIB_INSTALL$/conf/logging.xml@:
+Enabling @DEBUG@ or @TRACE@ log level for PrivacyLens in @$SHIB_INSTALL$/conf/logback.xml@:
 
-bc. <logger name="ch.SWITCH.aai.uApprove" level="DEBUG"/>
+bc. 
 <logger name="edu.cmu.ece.PrivacyLens" level="DEBUG"/>
 
 h1. 6 Feedback
 
-Send general questions and comments to "privacylens@ece.cmu.edu":mailto:privacylens@ece.cmu.edu. For bug reports, please use our "issue tracking":https://github.com/cmu-cylab-privacylens/PrivacyLens/issues.
+Send general questions and comments to "privacylens@ece.cmu.edu":mailto:privacylens@ece.cmu.edu. For bug reports, please use our "issue tracking":https://github.com/cmu-cylab-privacylens/PrivacyLens/issues facility.
 
 h1. 7 Abbreviations
 
