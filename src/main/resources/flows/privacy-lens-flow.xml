@@ -127,6 +127,7 @@
         <evaluate expression="ProcessConsentView" />
         <transition on="yes" to="ReleaseAttributes" />
         <transition on="no" to="ShowAdminInterface" />
+        <transition on="admin" to="ShowAdminInterface" />
     </action-state>
     
     <!-- Release attributes consented to as well as non-consentable attributes from attribute context. -->
