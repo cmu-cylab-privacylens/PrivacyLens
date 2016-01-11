@@ -1,6 +1,6 @@
 PrivacyLens
   Terms Of Use & Attribute Release Consent
-  for the Shibboleth Identity Provider 2.
+  for the Shibboleth Identity Provider.
   Allows users of the Identity Provider to control the
   release of attributes that would normally be sent
   directly to a Service Provider.
@@ -12,8 +12,8 @@ License
   which is provided in the LICENSE file.
 
 Download
-  No binary distribution site yet.
-  Get it via GitHub, then build with Maven to obtain installation files.
+  Precompiled versions are available at
+  http://www.privacylens.org/downloads.html
   
 Manual and Installation
   https://github.com/cmu-cylab-privacylens/PrivacyLens/blob/master/manual/index.textile
