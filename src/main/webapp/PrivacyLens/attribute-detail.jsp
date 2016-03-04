@@ -49,7 +49,7 @@ ${attributeBean.html}
 </c:forEach><br/> 
 
 
-                ${requirementStatement }<br/>
+<fmt:message key="arRequirementStatement"><fmt:param>${service}</fmt:param></fmt:message><br/>
                 <br/>
 <b><fmt:message key="arAllowQuestion"><fmt:param>${service}</fmt:param></fmt:message></b><br/>
                 
