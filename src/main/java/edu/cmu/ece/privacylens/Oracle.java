@@ -70,15 +70,15 @@ public class Oracle implements ResourceLoaderAware {
     private OracleData data;
 
     private static final class OracleData {
-        private ServiceProviderData[] SPs;
+        private List<ServiceProviderData> SPs;
 
-        private LocalizedAttributes[] attrs;
+        private List<LocalizedAttributes> attrs;
 
         private OracleData() {
         }
 
-        public OracleData(final ServiceProviderData[] SPs,
-            final LocalizedAttributes[] attrs) {
+        public OracleData(final List<ServiceProviderData> SPs,
+                final List<LocalizedAttributes> attrs) {
             this.SPs = SPs;
             this.attrs = attrs;
         }
@@ -106,9 +106,9 @@ public class Oracle implements ResourceLoaderAware {
     }
 
     private static final class ServiceProviderData {
-        private AttributeData[] attrs;
+        private List<AttributeData> attrs;
 
-        private AttributeGroupData[] attrGroups;
+        private List<AttributeGroupData> attrGroups;
 
         private String name;
 
@@ -124,7 +124,7 @@ public class Oracle implements ResourceLoaderAware {
         }
 
         public ServiceProviderData(final String id, final String name,
-            final AttributeData[] attrs) {
+                final List<AttributeData> attrs) {
             this.id = id;
             this.name = name;
             this.attrs = attrs;
@@ -132,7 +132,8 @@ public class Oracle implements ResourceLoaderAware {
         }
 
         public ServiceProviderData(final String id, final String name,
-            final AttributeData[] attrs, final AttributeGroupData[] attrGroups) {
+                final List<AttributeData> attrs,
+                final List<AttributeGroupData> attrGroups) {
             this.id = id;
             this.name = name;
             this.attrs = attrs;
