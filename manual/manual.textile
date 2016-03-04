@@ -244,7 +244,7 @@ h2. 3.1 General procedure
 
 * Redo the installation steps Library Installation, PrivacyLens WebFlow files, PrivacyLens view templates. These do not hold configuration settings.
 * Adapt any customizations you may have done to the view templates.
-* Deploy Shibboleth as in section "Deployment":#a2.5Deployment above.
+* Deploy Shibboleth as in section "Deployment":#a2.7Deployment above.
 
 h1. 4 Advanced Deployment
 
