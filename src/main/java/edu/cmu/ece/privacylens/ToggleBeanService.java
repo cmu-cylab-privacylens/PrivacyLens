@@ -1,6 +1,6 @@
 /*
  * COPYRIGHT_BOILERPLATE
- * Copyright (c) 2015, Carnegie Mellon University
+ * Copyright (c) 2015-2016, Carnegie Mellon University
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.annotation.Nonnull;
 import javax.servlet.http.HttpServletRequest;
@@ -138,8 +139,9 @@ public final class ToggleBeanService extends AbstractAttributeReleaseAction {
             }
         }
 
-        for (final String groupId : beanToGroup.keySet()) {
-
+        for (final Entry<String, List<Attribute>> entry : beanToGroup
+                .entrySet()) {
+            final String groupId = entry.getKey();
             final String attrReason =
                     (String) attrGroups.get(groupId).get("reason");
             final String attrPrivacy =
@@ -155,7 +157,7 @@ public final class ToggleBeanService extends AbstractAttributeReleaseAction {
 
             // for each group, pick the member attributes out of the map
             // created before
-            final List<Attribute> groupAttrList = beanToGroup.get(groupId);
+            final List<Attribute> groupAttrList = entry.getValue();
 
             final ToggleBean bean = new ToggleBean();
             boolean value =
@@ -241,7 +243,9 @@ public final class ToggleBeanService extends AbstractAttributeReleaseAction {
 
     }
 
-    public List<ToggleBean> getToggleBeans(final RequestContext rc) {
+    // XXXstroucki probably remove
+    /*
+    private List<ToggleBean> getToggleBeans(final RequestContext rc) {
         final HttpServletRequest request =
                 (HttpServletRequest) rc.getExternalContext().getNativeRequest();
         final String requestContextPath = request.getContextPath();
@@ -265,4 +269,5 @@ public final class ToggleBeanService extends AbstractAttributeReleaseAction {
         return out;
 
     }
+    */
 }

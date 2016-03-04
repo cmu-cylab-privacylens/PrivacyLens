@@ -1,6 +1,6 @@
 /*
  * COPYRIGHT_BOILERPLATE
- * Copyright (c) 2015, Carnegie Mellon University
+ * Copyright (c) 2015-2016, Carnegie Mellon University
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -164,7 +164,7 @@ public final class ProcessConsentView extends AbstractAttributeReleaseAction {
 
             // do this elsewhere? change how it is done?
             final AttributeReleaseModule attributeReleaseModule =
-                    IdPHelper.attributeReleaseModule;
+                    IdPHelper.getAttributeReleaseModule();
             final List<Attribute> deniedAttributes = new ArrayList<Attribute>();
             final List<Attribute> consentedAttributes =
                     new ArrayList<Attribute>();

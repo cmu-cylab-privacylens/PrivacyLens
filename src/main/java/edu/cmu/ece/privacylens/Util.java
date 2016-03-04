@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011, SWITCH
- * Copyright (c) 2013, Carnegie Mellon University
+ * Copyright (c) 2013-2016, Carnegie Mellon University
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,6 +30,7 @@ package edu.cmu.ece.privacylens;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -87,9 +88,11 @@ public final class Util {
     }
 
     /**
-     * @return Returns the springContext.
+     * Returns the springContext
+     *
+     * @return the springContext.
      */
-    public static WebApplicationContext getSpringContext() {
+    public static synchronized WebApplicationContext getSpringContext() {
         if (springContext == null) {
             springContext =
                     WebApplicationContextUtils
@@ -98,6 +101,12 @@ public final class Util {
         return springContext;
     }
 
+    /**
+     * Returns the principal name
+     *
+     * @param prc ProfileRequestContext
+     * @return the principal name
+     */
     public static String getPrincipalName(final ProfileRequestContext prc) {
         final SubjectContextPrincipalLookupFunction subject =
                 springContext.getBean("shibboleth.PrincipalNameLookup.Subject",
@@ -105,14 +114,13 @@ public final class Util {
         final ChildContextLookup<ProfileRequestContext, SubjectContext> cc =
                 new ChildContextLookup<ProfileRequestContext, SubjectContext>(
                         SubjectContext.class);
-        final SubjectContext subjectContext =
-                springContext.getBean("shibboleth.ChildLookup.SubjectContext",
-                        SubjectContext.class);
+
         final Function<ProfileRequestContext, String> getter =
                 Functions.compose(subject, cc);
         final String result = getter.apply(prc);
         return result;
     }
+
     /**
      * Reads a resource into a String.
      *
@@ -120,15 +128,24 @@ public final class Util {
      * @return Returns the content of the resource.
      * @throws IOException in case of failure.
      */
-    public static String readResource(final Resource resource) throws IOException {
+    public static String readResource(final Resource resource)
+            throws IOException {
         final StringBuilder stringBuilder = new StringBuilder();
-        final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(resource.getInputStream()));
+        final InputStream inputStream = resource.getInputStream();
+
+        final BufferedReader bufferedReader =
+                new BufferedReader(new InputStreamReader(inputStream));
         String line = null;
-        while ((line = bufferedReader.readLine()) != null) {
-            stringBuilder.append(line);
-            stringBuilder.append("\n");
+        try {
+            while ((line = bufferedReader.readLine()) != null) {
+                stringBuilder.append(line);
+                stringBuilder.append("\n");
+            }
+        } finally {
+            if (bufferedReader != null) {
+                bufferedReader.close();
+            }
         }
-        bufferedReader.close();
         return stringBuilder.toString();
     }
 
@@ -166,7 +183,7 @@ public final class Util {
      */
     public static void auditLog(final String event, final String principalName, final String relyingPartyId,
             final List<String> data) {
-        final String requestBinding = "edu.cmu.ece.PrivacyLens";
+        final String requestBinding = "edu.cmu.ece.privacylens";
 
         final StringBuilder entryString = new StringBuilder();
         entryString.append(new DateTime().toString(ISODateTimeFormat.basicDateTimeNoMillis().withZone(DateTimeZone.UTC)));

@@ -1,6 +1,6 @@
 /*
  * COPYRIGHT_BOILERPLATE
- * Copyright (c) 2014-2015 Carnegie Mellon University
+ * Copyright (c) 2014-2016 Carnegie Mellon University
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -56,7 +56,6 @@ public class AdminViewHelper {
         final List<LoginEvent> loginEventsList) {
         final List<Map> out = new ArrayList<Map>();
         for (final LoginEvent loginEvent : loginEventsList) {
-            loginEvent.getEventDetailHash();
             final DateTime loginEventDate = loginEvent.getDate();
             final DateTime now = new DateTime();
             final long relativeTime = now.getMillis() - loginEventDate.getMillis();

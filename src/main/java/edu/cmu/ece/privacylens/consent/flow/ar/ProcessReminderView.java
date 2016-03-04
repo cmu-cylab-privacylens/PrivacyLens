@@ -1,6 +1,6 @@
 /*
  * COPYRIGHT_BOILERPLATE
- * Copyright (c) 2015, Carnegie Mellon University
+ * Copyright (c) 2015-2016, Carnegie Mellon University
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -127,7 +127,7 @@ public final class ProcessReminderView extends AbstractAttributeReleaseAction {
 
             // change this way?
             final AttributeReleaseModule attributeReleaseModule =
-                    IdPHelper.attributeReleaseModule;
+                    IdPHelper.getAttributeReleaseModule();
             final Map<String, Consent> consentByAttribute =
                     attributeReleaseModule.getAttributeConsent(principalName,
                             relyingPartyId, attributes);

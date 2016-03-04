@@ -71,7 +71,8 @@ public class ReadConsentFromStorage extends AbstractConsentStorageAction {
 
         try {
 
-            final AttributeReleaseModule arm = IdPHelper.attributeReleaseModule;
+            final AttributeReleaseModule arm =
+                    IdPHelper.getAttributeReleaseModule();
             final String relyingPartyId =
                     IdPHelper.getRelyingPartyId(profileRequestContext);
             final String principalName =

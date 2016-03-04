@@ -1,6 +1,6 @@
 /*
  * COPYRIGHT_BOILERPLATE
- * Copyright (c) 2015 Carnegie Mellon University
+ * Copyright (c) 2015-2016 Carnegie Mellon University
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,8 +30,8 @@ package edu.cmu.ece.privacylens.ar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.webflow.core.collection.MutableAttributeMap;
@@ -60,7 +60,7 @@ public class AdminLoginEventPrepare {
         public Databag(final AttributeReleaseModule attributeReleaseModule,
                 final RequestContext requestContext,
                 final String principalName,
- final LoginEvent loginEvent) {
+                final LoginEvent loginEvent) {
             this.attributeReleaseModule = attributeReleaseModule;
             this.principalName = principalName;
             this.loginEvent = loginEvent;
@@ -74,7 +74,7 @@ public class AdminLoginEventPrepare {
         final LoginEvent loginEvent = databag.loginEvent;
         final RequestContext requestContext = databag.requestContext;
         final String principalName = databag.principalName;
-        final ServletContext servletContext = Util.getServletContext();
+        //final ServletContext servletContext = Util.getServletContext();
 
         final Oracle oracle = Oracle.getInstance();
 
@@ -132,8 +132,10 @@ public class AdminLoginEventPrepare {
                 relyingPartyId, attributes);
 
         final Map<String, Boolean> settingsMap = new HashMap<String, Boolean>();
-        for (final String attribute : consentByAttribute.keySet()) {
-            final Consent consent = consentByAttribute.get(attribute);
+        for (final Entry<String, Consent> entry : consentByAttribute
+                .entrySet()) {
+            final String attribute = entry.getKey();
+            final Consent consent = entry.getValue();
             settingsMap.put(attribute, consent.isApproved());
         }
 

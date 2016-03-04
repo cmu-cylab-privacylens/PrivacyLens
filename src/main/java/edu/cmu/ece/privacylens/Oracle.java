@@ -1,6 +1,6 @@
 /*
  * COPYRIGHT_BOILERPLATE
- * Copyright (c) 2013-2015 Carnegie Mellon University
+ * Copyright (c) 2013-2016 Carnegie Mellon University
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -54,7 +54,7 @@ import com.google.gson.stream.JsonReader;
  */
 public class Oracle implements ResourceLoaderAware {
 
-    private static Oracle theInstance;
+    private static final Oracle theInstance = new Oracle();
 
     //private String relyingPartyId = "unset";
 
@@ -69,7 +69,7 @@ public class Oracle implements ResourceLoaderAware {
 
     private OracleData data;
 
-    private class OracleData {
+    private static final class OracleData {
         private ServiceProviderData[] SPs;
 
         private LocalizedAttributes[] attrs;
@@ -84,7 +84,7 @@ public class Oracle implements ResourceLoaderAware {
         }
     }
 
-    private class LocalizedAttributes {
+    private static final class LocalizedAttributes {
         private String desc;
 
         private String id;
@@ -105,7 +105,7 @@ public class Oracle implements ResourceLoaderAware {
         }
     }
 
-    private class ServiceProviderData {
+    private static final class ServiceProviderData {
         private AttributeData[] attrs;
 
         private AttributeGroupData[] attrGroups;
@@ -169,7 +169,7 @@ public class Oracle implements ResourceLoaderAware {
 
     }
 
-    private class AttributeData {
+    private static final class AttributeData {
         private String reason;
 
         private String privpolicy;
@@ -215,7 +215,7 @@ public class Oracle implements ResourceLoaderAware {
         }
     }
 
-    private class AttributeGroupData {
+    private static final class AttributeGroupData {
         private String reason;
 
         private String description;
@@ -230,11 +230,13 @@ public class Oracle implements ResourceLoaderAware {
         }
 
         public AttributeGroupData(final String id, final String description,
-            final String reason, final String privpolicy) {
+                final String reason, final String privpolicy,
+                final boolean required) {
             this.id = id;
             this.description = description;
             this.reason = reason;
             this.privpolicy = privpolicy;
+            this.required = required;
         }
 
         public Map<String, String> toMap() {
@@ -258,11 +260,10 @@ public class Oracle implements ResourceLoaderAware {
 
     /**
      * return handle to Oracle
+     *
+     * @return the instance
      */
     public static Oracle getInstance() {
-        if (theInstance == null) {
-            theInstance = new Oracle();
-        }
         return theInstance;
     }
 

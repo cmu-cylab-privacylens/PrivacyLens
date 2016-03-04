@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013 SWITCH
- * Copyright (c) 2013 Carnegie Mellon University
+ * Copyright (c) 2013-2016 Carnegie Mellon University
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,6 +34,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.annotation.Nonnull;
 
@@ -180,7 +181,7 @@ public class AttributeReleaseModule {
             logger.debug(
                     "Attribute Release Module initialized with {} general consent. Attribute values are{}compared.",
                     isAllowGeneralConsent() ? "enabled" : "disabled", compareAttributeValues ? " " : " not ");
-            IdPHelper.attributeReleaseModule = this;
+            IdPHelper.setAttributeReleaseModule(this);
         } else {
             logger.debug("Attribute Release Module is not enabled.");
         }
@@ -464,8 +465,9 @@ public class AttributeReleaseModule {
         // we should eventually be able to store negative consent
         clearChoice(principalName, relyingPartyId);
 
-        for (final String id : consents.keySet()) {
-            final Consent consent = consents.get(id);
+        for (final Entry<String, Consent> entry : consents.entrySet()) {
+            final String id = entry.getKey();
+            final Consent consent = entry.getValue();
             final AttributeReleaseChoice attributeReleaseConsent =
                     new AttributeReleaseChoice(id, consent.getValue(),
                             choiceDate, consent.isApproved());

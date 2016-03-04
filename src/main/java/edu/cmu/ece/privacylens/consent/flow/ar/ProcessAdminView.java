@@ -1,6 +1,6 @@
 /*
  * COPYRIGHT_BOILERPLATE
- * Copyright (c) 2015, Carnegie Mellon University
+ * Copyright (c) 2015-2016, Carnegie Mellon University
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,12 +35,10 @@ import org.opensaml.profile.context.EventContext;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.webflow.core.collection.MutableAttributeMap;
 import org.springframework.webflow.execution.RequestContext;
 import org.springframework.webflow.execution.RequestContextHolder;
 
 import edu.cmu.ece.privacylens.IdPHelper;
-import edu.cmu.ece.privacylens.Oracle;
 import edu.cmu.ece.privacylens.ar.AdminLoginEventPrepare;
 import edu.cmu.ece.privacylens.ar.AdminServiceLoginPrepare;
 import edu.cmu.ece.privacylens.ar.AttributeReleaseModule;
@@ -75,14 +73,9 @@ public final class ProcessAdminView extends AbstractAttributeReleaseAction {
         final RequestContext requestContext =
                 RequestContextHolder.getRequestContext();
 
-        final MutableAttributeMap<Object> flowScope =
-                requestContext.getFlowScope();
-
         final HttpServletRequest request =
                 (HttpServletRequest) requestContext.getExternalContext()
                         .getNativeRequest();
-
-        final Oracle oracle = Oracle.getInstance();
 
         final String principalName =
                 IdPHelper.getPrincipalName(profileRequestContext);
@@ -95,7 +88,7 @@ public final class ProcessAdminView extends AbstractAttributeReleaseAction {
         final boolean helpButton = (request.getParameter("help") != null);
 
         final AttributeReleaseModule attributeReleaseModule =
-                IdPHelper.attributeReleaseModule;
+                IdPHelper.getAttributeReleaseModule();
 
         if (loginEventSection && serviceSection) { // only one section should be defined
             // error

@@ -1,6 +1,6 @@
 /*
  * COPYRIGHT_BOILERPLATE
- * Copyright (c) 2015, Carnegie Mellon University
+ * Copyright (c) 2015-2016, Carnegie Mellon University
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -45,7 +45,9 @@ public final class IdPHelper {
     private static final Logger log = LoggerFactory.getLogger(IdPHelper.class);
 
     /** using this for storage. should it be in IdPHelper? */
-    public static AttributeReleaseModule attributeReleaseModule;
+    private static AttributeReleaseModule attributeReleaseModule;
+
+    private static final Object lock = new Object();
 
     /** Default constructor for utility classes is private. */
     private IdPHelper() {
@@ -72,6 +74,33 @@ public final class IdPHelper {
 
         log.trace("Relying party id is {}.", relyingPartyId);
         return relyingPartyId;
+    }
+
+    /**
+     * Return the AttributeReleaseModule
+     *
+     * @return the AttributeReleaseModule.
+     */
+    public static final AttributeReleaseModule getAttributeReleaseModule() {
+        if (attributeReleaseModule == null) {
+            throw new InternalError("ARM not yet set");
+        }
+        return attributeReleaseModule;
+    }
+
+    /**
+     * Set the AttributeReleaseModule
+     *
+     * @param attributeReleaseModule The attributeReleaseModule to set.
+     */
+    public static final void setAttributeReleaseModule(
+            final AttributeReleaseModule attributeReleaseModule) {
+        synchronized (lock) {
+            if (IdPHelper.attributeReleaseModule != null) {
+                throw new InternalError("ARM is already set");
+            }
+            IdPHelper.attributeReleaseModule = attributeReleaseModule;
+        }
     }
 
 }

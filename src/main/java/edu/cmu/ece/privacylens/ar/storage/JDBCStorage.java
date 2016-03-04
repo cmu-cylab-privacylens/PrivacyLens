@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011, SWITCH
- * Copyright (c) 2013, Carnegie Mellon University
+ * Copyright (c) 2013-2016, Carnegie Mellon University
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -84,6 +84,9 @@ public class JDBCStorage extends AbstractJDBCStorage implements Storage {
     /** {@see LoginEventDetail} row mapper. */
     private static final class LoginEventDetailMapper implements
             RowMapper<LoginEventDetail> {
+        private static final Type listAttributeType =
+                new TypeToken<List<Attribute>>() {}.getType();
+
         /** {@inheritDoc} */
         @Override
         public LoginEventDetail mapRow(final ResultSet rs, final int rowNum) throws SQLException {
@@ -91,7 +94,6 @@ public class JDBCStorage extends AbstractJDBCStorage implements Storage {
             final Blob attributesBlob = rs.getBlob("eventDetailData");
             final byte[] attributesBytes = attributesBlob.getBytes(1, (int) attributesBlob.length());
             final String json = new String(attributesBytes);
-            final Type listAttributeType = new TypeToken<List<Attribute>>() {}.getType();
             final List<Attribute> attributeList = new Gson().fromJson(json, listAttributeType);
             return new LoginEventDetail(eventDetailHash, attributeList);
         }

@@ -1,6 +1,6 @@
 /*
  * COPYRIGHT_BOILERPLATE
- * Copyright (c) 2013 Carnegie Mellon University
+ * Copyright (c) 2013-2016 Carnegie Mellon University
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
  */
 public class General {
 
-    private static General theInstance;
+    private static final General theInstance = new General();
 
     private final Logger logger = LoggerFactory.getLogger(General.class);
 
@@ -120,12 +120,11 @@ public class General {
     }
 
     /**
-     * return handle to Oracle
+     * return handle to General
+     *
+     * @return the instance
      */
     public static General getInstance() {
-        if (theInstance == null) {
-            theInstance = new General();
-        }
         return theInstance;
     }
 

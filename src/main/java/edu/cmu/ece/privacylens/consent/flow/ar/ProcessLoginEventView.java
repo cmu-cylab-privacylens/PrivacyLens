@@ -1,6 +1,6 @@
 /*
  * COPYRIGHT_BOILERPLATE
- * Copyright (c) 2015, Carnegie Mellon University
+ * Copyright (c) 2015-2016, Carnegie Mellon University
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -47,7 +47,6 @@ import org.springframework.webflow.execution.RequestContext;
 import org.springframework.webflow.execution.RequestContextHolder;
 
 import edu.cmu.ece.privacylens.IdPHelper;
-import edu.cmu.ece.privacylens.Oracle;
 import edu.cmu.ece.privacylens.ar.Attribute;
 import edu.cmu.ece.privacylens.ar.AttributeReleaseModule;
 import edu.cmu.ece.privacylens.ar.ReminderInterval;
@@ -88,8 +87,6 @@ public final class ProcessLoginEventView extends AbstractAttributeReleaseAction 
                 (HttpServletRequest) requestContext.getExternalContext()
                         .getNativeRequest();
 
-        final Oracle oracle = Oracle.getInstance();
-
         final String principalName =
                 IdPHelper.getPrincipalName(profileRequestContext);
 
@@ -101,7 +98,7 @@ public final class ProcessLoginEventView extends AbstractAttributeReleaseAction 
         final boolean helpButton = (request.getParameter("help") != null);
 
         final AttributeReleaseModule attributeReleaseModule =
-                IdPHelper.attributeReleaseModule;
+                IdPHelper.getAttributeReleaseModule();
 
         @Nonnull final String relyingPartyId =
                 (String) flowScope.get("relyingParty");

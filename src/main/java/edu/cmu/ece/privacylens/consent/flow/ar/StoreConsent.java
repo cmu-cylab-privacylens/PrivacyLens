@@ -73,7 +73,8 @@ public class StoreConsent extends AbstractConsentAction {
     @Override protected void doExecute(@Nonnull final ProfileRequestContext profileRequestContext,
             @Nonnull final ProfileInterceptorContext interceptorContext) {
 
-        final AttributeReleaseModule arm = IdPHelper.attributeReleaseModule;
+        final AttributeReleaseModule arm =
+                IdPHelper.getAttributeReleaseModule();
         final String relyingPartyId =
                 IdPHelper.getRelyingPartyId(profileRequestContext);
         final String principalName =

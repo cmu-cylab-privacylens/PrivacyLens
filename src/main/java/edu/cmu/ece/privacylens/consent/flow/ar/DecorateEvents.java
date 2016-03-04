@@ -84,7 +84,7 @@ public class DecorateEvents extends AbstractProfileInterceptorAction {
         flowScope.put("idpOrganization", General.getInstance().getOrganizationName());
 
         final AttributeReleaseModule attributeReleaseModule =
-                IdPHelper.attributeReleaseModule;
+                IdPHelper.getAttributeReleaseModule();
         final String principalName =
                 IdPHelper.getPrincipalName(profileRequestContext);
         final int limitLoginEvents = AdminViewHelper.limitLoginEvents;

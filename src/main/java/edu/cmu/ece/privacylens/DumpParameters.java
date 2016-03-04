@@ -1,6 +1,6 @@
 /*
  * COPYRIGHT_BOILERPLATE
- * Copyright (c) 2015, Carnegie Mellon University
+ * Copyright (c) 2015-2016, Carnegie Mellon University
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,7 +34,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.webflow.core.collection.MutableAttributeMap;
 import org.springframework.webflow.execution.RequestContext;
 import org.springframework.webflow.execution.RequestContextHolder;
 
@@ -68,9 +67,6 @@ public final class DumpParameters extends AbstractAttributeReleaseAction {
 
         final RequestContext requestContext =
                 RequestContextHolder.getRequestContext();
-
-        final MutableAttributeMap<Object> flowScope =
-                requestContext.getFlowScope();
 
         final HttpServletRequest request =
                 (HttpServletRequest) requestContext.getExternalContext()
