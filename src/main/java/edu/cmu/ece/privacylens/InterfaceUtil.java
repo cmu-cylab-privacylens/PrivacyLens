@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import edu.cmu.ece.privacylens.ar.Attribute;
+import edu.cmu.ece.privacylens.ar.AttributeProcessor;
 import edu.cmu.ece.privacylens.config.General;
 
 /**
@@ -241,18 +242,20 @@ public class InterfaceUtil {
      * @return a sorted list of toggle beans
      */
     public static List<ToggleBean> sortBeans(
+            final AttributeProcessor attributeProcessor,
         final Map<Attribute, ToggleBean> attributeBeans) {
         // sort the map based on preference in config
         final List<ToggleBean> out = new ArrayList<ToggleBean>();
-        // XXXstroucki really complex.
 
-        //final AttributeProcessor attributeProcessor = null;
         //samlHelper.getAttributeProcessor();
 
         final List<Attribute> attributeKeys =
             new ArrayList<Attribute>(attributeBeans.keySet());
-        // CHANGEME fix sorting
-        //attributeProcessor.sortAttributes(attributeKeys);
+        if (attributeProcessor != null) {
+            attributeProcessor.sortAttributes(attributeKeys);
+        } else {
+            logger.warn("AttributeProcessor is null");
+        }
         for (final Attribute attribute : attributeKeys) {
             out.add(attributeBeans.get(attribute));
         }

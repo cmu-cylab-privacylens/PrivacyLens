@@ -45,6 +45,7 @@ import org.springframework.webflow.execution.RequestContextHolder;
 
 import edu.cmu.ece.privacylens.AttributeUtils;
 import edu.cmu.ece.privacylens.ar.Attribute;
+import edu.cmu.ece.privacylens.ar.AttributeProcessor;
 import edu.cmu.ece.privacylens.context.AttributeContext;
 import net.shibboleth.idp.attribute.IdPAttribute;
 import net.shibboleth.idp.attribute.IdPAttributeValue;
@@ -67,9 +68,23 @@ public class DecorateAttributes extends AbstractAttributeReleaseAction {
     @Nonnull
     private final Locale locale = Locale.getDefault();
 
+    private AttributeProcessor attributeProcessor;
+
+    /**
+     * @param attributeProcessor The attributeProcessor to set.
+     */
+    public final void
+            setAttributeProcessor(final AttributeProcessor attributeProcessor) {
+        this.attributeProcessor = attributeProcessor;
+    }
+
     /** {@inheritDoc} */
     @Override protected void doInitialize() throws ComponentInitializationException {
         super.doInitialize();
+        if (attributeProcessor == null) {
+            throw new ComponentInitializationException(
+                    "Attribute Processor is null");
+        }
     }
 
     /** {@inheritDoc} */
@@ -97,10 +112,18 @@ public class DecorateAttributes extends AbstractAttributeReleaseAction {
             final Attribute outAttribute =
                     new Attribute(attributeId, attributeName,
                             attributeDescription, attributeValues);
+
+            if (attributeId.equals("eduPersonEntitlement")) {
+                attributeProcessor.processEntitlementDescriptions(outAttribute);
+            }
+
             outAttributes.add(outAttribute);
             // CHANGEME get proper settings
             attributeSettings.put(attributeId, false);
         }
+
+        attributeProcessor.markMachineReadableAttributes(outAttributes);
+        attributeProcessor.sortAttributes(outAttributes);
 
         final RequestContext requestContext =
                 RequestContextHolder.getRequestContext();
@@ -110,6 +133,7 @@ public class DecorateAttributes extends AbstractAttributeReleaseAction {
 
         // make available through flow and context
         flowScope.put("attributes", outAttributes);
+        flowScope.put("attributeProcessor", attributeProcessor);
         final AttributeContext attributeContext =
                 new AttributeContext(outAttributes);
         // overwrite it, because we may have come from the consent interface

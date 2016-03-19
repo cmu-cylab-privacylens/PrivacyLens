@@ -128,7 +128,14 @@ annotations against the current Spring Environment and its set of PropertySource
         class="edu.cmu.ece.privacylens.consent.flow.ar.DecorateUserName" scope="prototype" />
         
     <bean id="DecorateAttributes"
-        class="edu.cmu.ece.privacylens.consent.flow.ar.DecorateAttributes" scope="prototype" />
+        class="edu.cmu.ece.privacylens.consent.flow.ar.DecorateAttributes" scope="prototype" >
+        <property name="attributeProcessor">
+            <bean class="edu.cmu.ece.privacylens.ar.AttributeProcessor"
+                p:entitlementdescription="%{ar.attributes.entitlement.description}"
+                p:machinereadable="%{ar.attributes.machinereadable}"
+                p:order="%{ar.attributes.order}" />
+        </property>
+    </bean>
         
     <bean id="DecorateEvents"
         class="edu.cmu.ece.privacylens.consent.flow.ar.DecorateEvents" scope="prototype" />

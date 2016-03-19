@@ -45,6 +45,7 @@ import org.springframework.webflow.execution.RequestContext;
 import org.springframework.webflow.execution.RequestContextHolder;
 
 import edu.cmu.ece.privacylens.ar.Attribute;
+import edu.cmu.ece.privacylens.ar.AttributeProcessor;
 import edu.cmu.ece.privacylens.config.General;
 import edu.cmu.ece.privacylens.consent.flow.ar.AbstractAttributeReleaseAction;
 import net.shibboleth.idp.profile.context.ProfileInterceptorContext;
@@ -236,8 +237,16 @@ public final class ToggleBeanService extends AbstractAttributeReleaseAction {
             attributeBeans.put(fakeAttribute, bean);
         }
 
+        final RequestContext requestContext =
+                RequestContextHolder.getRequestContext();
+
+        final MutableAttributeMap<Object> flowScope =
+                requestContext.getFlowScope();
+        final AttributeProcessor attributeProcessor =
+                (AttributeProcessor) flowScope.get("attributeProcessor");
         // now sort this based on preference in config
-        final List<ToggleBean> out = InterfaceUtil.sortBeans(attributeBeans);
+        final List<ToggleBean> out =
+                InterfaceUtil.sortBeans(attributeProcessor, attributeBeans);
 
         return out;
 
