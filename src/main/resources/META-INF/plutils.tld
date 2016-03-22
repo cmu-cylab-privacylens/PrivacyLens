@@ -10,7 +10,7 @@ jsptaglibrary_2_0.xsd"
   <function>
     <name>escapeJS</name>
     <function-signature>java.lang.String escapeJS(java.lang.String)</function-signature>
-    <function-class>edu.cmu.ece.PrivacyLens.HTMLUtils</function-class>
+    <function-class>edu.cmu.ece.privacylens.HTMLUtils</function-class>
   </function>
 
 </taglib>

@@ -1,29 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<suite name="uApprove" verbose="2">
+<suite name="PrivacyLens" verbose="2">
     
-    <test name="uApprove" enabled="true">  
+    <test name="privacylens" enabled="true">
         <packages>
-            <package name="ch.SWITCH.aai.uApprove" />
+            <package name="edu.cmu.ece.privacylens" />
         </packages>
     </test>
 
-    <test name="PrivacyLens" enabled="true">
+    <test name="privacylens.ar" enabled="true">  
         <packages>
-            <package name="edu.cmu.ece.PrivacyLens" />
-        </packages>
-    </test>
-
-    <test name="uApprove.tou" enabled="true">  
-        <packages>       
-            <package name="ch.SWITCH.aai.uApprove.tou"></package>
-            <package name="ch.SWITCH.aai.uApprove.tou.storage"></package>
-        </packages>
-    </test>
-    
-    <test name="PrivacyLens.ar" enabled="true">  
-        <packages>       
-            <package name="edu.cmu.ece.PrivacyLens.ar"></package>
-            <package name="edu.cmu.ece.PrivacyLens.ar.storage"></package>
+            <package name="edu.cmu.ece.privacylens.ar"></package>
+            <package name="edu.cmu.ece.privacylens.ar.storage"></package>
         </packages>
     </test>
 </suite>

@@ -4,7 +4,7 @@ PrivacyLens
   Allows users of the Identity Provider to control the
   release of attributes that would normally be sent
   directly to a Service Provider.
-  PrivacyLens derives from uApprove, available at
+  PrivacyLens originally derived from uApprove, available at
   http://www.switch.ch/aai/uApprove
 
 License

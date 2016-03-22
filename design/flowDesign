@@ -1,0 +1,39 @@
+(entry)
+if consent is required:
+  set current visits to 0
+  show consent interface
+else if reminder is required:
+  increment current visits
+  if target visits reached:
+    show reminder interface
+  else:
+    proceed
+else:
+  proceed
+
+(show consent interface)
+set up consent view
+process consent view
+
+(show reminder interface)
+set up reminder view
+process reminder view
+
+(process consent view)
+if continue:
+  release attributes
+if edit:
+  show settings view
+
+(process reminder view)
+if continue:
+  release attributes
+if edit:
+  show consent interface
+
+(release attributes)
+save state
+release attributes
+
+(show settings view)
+...
